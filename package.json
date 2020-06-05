@@ -1,0 +1,12 @@
+{
+  "name": "fast-sandbox",
+  "version": "0",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-ws": "^4.0.0",
+    "heroku-ssl-redirect": "^0.0.4",
+    "node-pty": "^0.9.0"
+  }
+}
