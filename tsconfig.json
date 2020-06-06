@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "outDir": "./backend/out",
+    "resolveJsonModule": true,
+    "rootDir": "./backend/src",
+    "sourceMap": true
+  },
+  "include": ["backend/src"]
+}

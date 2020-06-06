@@ -1,1 +1,4 @@
+*.log
+.log
 node_modules
+out
