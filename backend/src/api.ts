@@ -1,5 +1,6 @@
 import * as pty from "node-pty";
 import { IPty } from "node-pty";
+import * as WebSocket from "ws";
 
 import { LangConfig, langs } from "./langs";
 
@@ -8,7 +9,7 @@ export class Session {
   term: IPty;
   ws: WebSocket;
 
-  constructor(ws, lang) {
+  constructor(ws: WebSocket, lang: string) {
     this.ws = ws;
     this.config = langs[lang];
     this.term = null;
