@@ -4,6 +4,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "app-root-path": "^3.0.0",
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
     "heroku-ssl-redirect": "^0.0.4",
