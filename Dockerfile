@@ -11,3 +11,4 @@ EXPOSE 6119
 
 ENTRYPOINT ["/usr/local/bin/pid1.bash"]
 COPY scripts/pid1.bash /usr/local/bin/
+CMD bash
