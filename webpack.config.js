@@ -9,6 +9,14 @@ module.exports = {
         test: /\.css$/i,
         use: ["style-loader", "css-loader"],
       },
+      {
+        test: /\.tsx?$/i,
+        loader: "ts-loader",
+        options: {
+          configFile: "tsconfig-webpack.json",
+        },
+        exclude: /node_modules/,
+      },
     ],
   },
   output: {

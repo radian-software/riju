@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "outDir": "./frontend/out",
+    "rootDir": "./frontend/src"
+  },
+  "extends": "./tsconfig.json",
+  "include": ["frontend/src"]
+}

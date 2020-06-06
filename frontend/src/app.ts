@@ -19,13 +19,33 @@ const socket = new WebSocket(
     `/api/v1/ws?lang=${lang}`
 );
 
-socket.onopen = () => console.log("Successfully connected to server");
-socket.onmessage = (event) => console.log(JSON.parse(event.data));
-socket.onclose = (event) => {
+socket.addEventListener("open", () =>
+  console.log("Successfully connected to server")
+);
+socket.addEventListener("message", (event) => {
+  let message: any;
+  try {
+    message = JSON.parse(event.data);
+  } catch (err) {
+    console.error("Malformed message from server:", event.data);
+    return;
+  }
+  switch (message?.event) {
+    case "terminalOutput":
+      console.log(message.output);
+      break;
+    default:
+      console.error("Unexpected message from server:", message);
+      break;
+  }
+});
+socket.addEventListener("close", (event) => {
   if (event.wasClean) {
     console.log("Connection closed cleanly");
   } else {
     console.error("Connection died");
   }
-};
-socket.onerror = (event) => console.error("Connection error:", event);
+});
+socket.addEventListener("onerror", (event) =>
+  console.error("Connection error:", event)
+);
