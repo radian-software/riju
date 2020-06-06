@@ -1,8 +1,13 @@
 const path = require("path");
+const webpack = require("webpack");
 
-module.exports = {
+function isProduction(argv) {
+  return !argv.development;
+}
+
+module.exports = (_, argv) => ({
   entry: "./frontend/src/app.ts",
-  mode: process.env.NODE_ENV || "production",
+  mode: isProduction(argv) ? "production" : "development",
   module: {
     rules: [
       {
@@ -26,4 +31,4 @@ module.exports = {
   performance: {
     hints: false,
   },
-};
+});
