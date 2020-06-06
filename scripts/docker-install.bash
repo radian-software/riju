@@ -23,24 +23,56 @@ EOF
 
 packages="
 
+# Needed for project infrastructure
+bash
+git
+make
+nodejs
+yarn
+
 # Handy utilities
 bsdmainutils
 curl
 emacs-nox
 git
 make
+man-db
 nano
 sudo
 tmux
 vim
 wget
 
+# Bash
+bash
+
 # C/C++
 clang
+
+# Clojure
+clojure
+
+# Emacs Lisp
+emacs-nox
+
+# Fish
+fish
+
+# Go
+golang
 
 # Haskell
 cabal-install
 ghc
+
+# Java
+default-jdk
+
+# Julia
+julia
+
+# Lua
+lua5.3
 
 # Node.js
 nodejs
@@ -50,6 +82,18 @@ yarn
 python3
 python3-pip
 python3-venv
+
+# Ruby
+ruby
+
+# Rust
+rustc
+
+# Vimscript
+vim
+
+# Zsh
+zsh
 
 "
 
@@ -69,5 +113,8 @@ if (( "$uid" != 0 )); then
 else
     ln -s /root /home/docker
 fi
+
+touch /home/docker/.zshrc
+chown docker:docker /home/docker/.zshrc
 
 rm "$0"
