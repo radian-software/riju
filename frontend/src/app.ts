@@ -32,11 +32,15 @@ socket.addEventListener("message", (event) => {
   }
   switch (message?.event) {
     case "terminalOutput":
-      console.log(message.output);
-      break;
+      if (typeof message.output !== "string") {
+        console.error("Unexpected message from server:", message);
+        return;
+      }
+      term.write(message.output);
+      return;
     default:
       console.error("Unexpected message from server:", message);
-      break;
+      return;
   }
 });
 socket.addEventListener("close", (event) => {
