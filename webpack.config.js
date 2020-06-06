@@ -22,6 +22,10 @@ module.exports = (_, argv) => ({
         },
         exclude: /node_modules/,
       },
+      {
+        test: /\.ttf$/,
+        use: ["file-loader"],
+      },
     ],
   },
   output: {

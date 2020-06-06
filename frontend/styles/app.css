@@ -1,7 +1,10 @@
 body {
   margin: 0;
+  height: 100vh;
 }
 
-#terminal {
-  height: 100vh;
+.column {
+  width: 50%;
+  height: 100%;
+  float: left;
 }

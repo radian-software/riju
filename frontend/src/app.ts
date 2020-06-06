@@ -1,3 +1,4 @@
+import * as monaco from "monaco-editor";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 
@@ -57,3 +58,5 @@ socket.addEventListener("onerror", (event) =>
 term.onData((data) =>
   socket.send(JSON.stringify({ event: "terminalInput", input: data }))
 );
+
+monaco.editor.create(document.getElementById("editor"));
