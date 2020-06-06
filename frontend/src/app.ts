@@ -32,6 +32,9 @@ socket.addEventListener("message", (event) => {
     return;
   }
   switch (message?.event) {
+    case "terminalClear":
+      term.reset();
+      return;
     case "terminalOutput":
       if (typeof message.output !== "string") {
         console.error("Unexpected message from server:", message);

@@ -1,92 +1,91 @@
 export interface LangConfig {
-  cmdline: string[];
+  repl?: string[];
+  file?: string;
+  run?: string[];
   monacoLang: string;
   name: string;
 }
 
 export const langs = {
   bash: {
-    cmdline: ["bash"],
+    repl: ["bash"],
     name: "Bash",
     monacoLang: "shell",
   },
   c: {
-    cmdline: ["echo", "not implemented"],
     name: "C",
     monacoLang: "c",
   },
   "c++": {
-    cmdline: ["echo", "not implemented"],
     name: "C++",
     monacoLang: "cpp",
   },
   clojure: {
-    cmdline: ["clojure"],
+    repl: ["clojure"],
     name: "Clojure",
     monacoLang: "clojure",
   },
   emacs: {
-    cmdline: ["emacs"],
+    repl: ["emacs"],
     name: "Emacs Lisp",
     monacoLang: "plaintext",
   },
   fish: {
-    cmdline: ["env", "SHELL=/usr/bin/fish", "fish"],
+    repl: ["env", "SHELL=/usr/bin/fish", "fish"],
     name: "Fish",
     monacoLang: "plaintext",
   },
   go: {
-    cmdline: ["echo", "not implemented"],
     name: "Go",
     monacoLang: "go",
   },
   haskell: {
-    cmdline: ["ghci"],
+    repl: ["ghci"],
     name: "Haskell",
     monacoLang: "plaintext",
   },
   java: {
-    cmdline: ["echo", "not implemented"],
     name: "Java",
     monacoLang: "java",
   },
   julia: {
-    cmdline: ["julia"],
+    repl: ["julia"],
     name: "Julia",
     monacoLang: "plaintext",
   },
   lua: {
-    cmdline: ["lua"],
+    repl: ["lua"],
     name: "Lua",
     monacoLang: "lua",
   },
   nodejs: {
-    cmdline: ["node"],
+    repl: ["node"],
     name: "Node.js",
     monacoLang: "javascript",
   },
   python: {
-    cmdline: ["python3"],
+    repl: ["python3", "-u"],
+    file: "main.py",
+    run: ["python3", "-u", "-i", "main.py"],
     name: "Python",
     monacoLang: "python",
   },
   ruby: {
-    cmdline: ["irb"],
+    repl: ["irb"],
     name: "Ruby",
     monacoLang: "ruby",
   },
   rust: {
-    cmdline: ["echo", "not implemented"],
     name: "Rust",
     monacoLang: "rust",
   },
   vim: {
-    cmdline: ["vim"],
+    repl: ["vim"],
     name: "Vimscript",
     monacoLang: "plaintext",
   },
   zsh: {
-    cmdline: ["env", "SHELL=/usr/bin/zsh", "zsh"],
+    repl: ["env", "SHELL=/usr/bin/zsh", "zsh"],
     name: "Zsh",
     monacoLang: "shell",
   },
