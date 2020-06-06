@@ -53,3 +53,7 @@ socket.addEventListener("close", (event) => {
 socket.addEventListener("onerror", (event) =>
   console.error("Connection error:", event)
 );
+
+term.onData((data) =>
+  socket.send(JSON.stringify({ event: "terminalInput", input: data }))
+);

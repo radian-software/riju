@@ -16,9 +16,10 @@ export class Session {
     this.run();
     ws.on("message", this.handleClientMessage);
   }
-  handleClientMessage(msg) {
+  handleClientMessage = (event: string) => {
+    let msg: any;
     try {
-      msg = JSON.parse(msg);
+      msg = JSON.parse(event);
     } catch (err) {
       console.error(`failed to parse client message: ${msg}`);
       return;
@@ -37,8 +38,8 @@ export class Session {
         console.error(`unknown client message type: ${msg.event}`);
         break;
     }
-  }
-  run() {
+  };
+  run = () => {
     const cmdline = this.config.cmdline;
     if (this.term) {
       this.term.kill();
@@ -51,5 +52,5 @@ export class Session {
     this.term.on("data", (data) =>
       this.ws.send(JSON.stringify({ event: "terminalOutput", output: data }))
     );
-  }
+  };
 }
