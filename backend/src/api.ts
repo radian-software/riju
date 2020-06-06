@@ -13,6 +13,12 @@ export class Session {
     this.ws = ws;
     this.config = langs[lang];
     this.term = null;
+    this.ws.send(
+      JSON.stringify({
+        event: "setMonacoLanguage",
+        monacoLanguage: this.config.monacoLang,
+      })
+    );
     this.run();
     ws.on("message", this.handleClientMessage);
   }

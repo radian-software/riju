@@ -30,6 +30,7 @@ module.exports = (_, argv) => ({
   },
   output: {
     path: path.resolve(__dirname, "frontend/out"),
+    publicPath: "/js/",
     filename: "app.js",
   },
   performance: {

@@ -39,6 +39,13 @@ socket.addEventListener("message", (event) => {
       }
       term.write(message.output);
       return;
+    case "setMonacoLanguage":
+      if (typeof message.monacoLanguage !== "string") {
+        console.error("Unexpected message from server:", message);
+        return;
+      }
+      monaco.editor.setModelLanguage(editor.getModel(), message.monacoLanguage);
+      return;
     default:
       console.error("Unexpected message from server:", message);
       return;
@@ -59,4 +66,9 @@ term.onData((data) =>
   socket.send(JSON.stringify({ event: "terminalInput", input: data }))
 );
 
-monaco.editor.create(document.getElementById("editor"));
+const editor = monaco.editor.create(document.getElementById("editor"));
+window.addEventListener("resize", () => editor.layout());
+
+document.getElementById("runButton").addEventListener("click", () => {
+  socket.send(JSON.stringify({ event: "runCode", code: editor.getValue() }));
+});
