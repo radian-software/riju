@@ -1,0 +1,17 @@
+{
+  "c": {
+    "name": "C"
+  },
+  "c++": {
+    "name": "C++"
+  },
+  "haskell": {
+    "name": "Haskell"
+  },
+  "nodejs": {
+    "name": "Node.js"
+  },
+  "python": {
+    "name": "Python"
+  }
+}
