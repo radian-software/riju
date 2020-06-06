@@ -21,6 +21,7 @@ app.get("/:lang", (req, res) => {
     res.send(`No such language: ${req.params.lang}`);
   }
 });
+app.use("/css", express.static(appRoot.path + "/frontend/styles"));
 app.use("/js", express.static(appRoot.path + "/frontend/out"));
 app.use("/api/v1/ws", (req, res, next) => {
   if (!req.query.lang) {
