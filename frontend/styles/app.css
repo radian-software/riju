@@ -3,6 +3,20 @@ body {
   height: 100vh;
 }
 
+#header {
+  height: 50px;
+  padding: 5px;
+}
+
+#runButton {
+  position: absolute;
+  left: 50%;
+}
+
+#app {
+  height: calc(100% - 50px);
+}
+
 .column {
   width: 50%;
   height: 100%;
