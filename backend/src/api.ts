@@ -58,6 +58,13 @@ export class Session {
         break;
     }
   };
+  parseCmdline = (cmdline: string[] | string) => {
+    if (typeof cmdline === "string") {
+      return ["bash", "-c", cmdline];
+    } else {
+      return cmdline;
+    }
+  };
   run = async () => {
     const { repl, file, run } = this.config;
     if (this.term) {
@@ -84,9 +91,9 @@ export class Session {
           }
         })
       );
-      cmdline = run;
+      cmdline = this.parseCmdline(run);
     } else {
-      cmdline = repl;
+      cmdline = this.parseCmdline(repl);
     }
     this.term = pty.spawn(cmdline[0], cmdline.slice(1), {
       name: "xterm-color",

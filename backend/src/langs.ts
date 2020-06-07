@@ -1,7 +1,7 @@
 export interface LangConfig {
   repl?: string[];
   file?: string;
-  run?: string[];
+  run?: string[] | string;
   monacoLang: string;
   name: string;
 }
@@ -9,6 +9,8 @@ export interface LangConfig {
 export const langs = {
   bash: {
     repl: ["bash"],
+    file: "main.bash",
+    run: ["bash", "--rcfile", "main.bash"],
     name: "Bash",
     monacoLang: "shell",
   },
@@ -41,6 +43,8 @@ export const langs = {
   },
   haskell: {
     repl: ["ghci"],
+    file: "Main.hs",
+    run: ["ghci", "Main.hs"],
     name: "Haskell",
     monacoLang: "plaintext",
   },
@@ -60,6 +64,8 @@ export const langs = {
   },
   nodejs: {
     repl: ["node"],
+    file: "main.js",
+    run: 'node -i -e "$(< main.js)"',
     name: "Node.js",
     monacoLang: "javascript",
   },
@@ -86,6 +92,8 @@ export const langs = {
   },
   zsh: {
     repl: ["env", "SHELL=/usr/bin/zsh", "zsh"],
+    file: ".zshrc",
+    run: ["env", "ZDOTDIR=.", "zsh"],
     name: "Zsh",
     monacoLang: "shell",
   },
