@@ -17,6 +17,8 @@ window.addEventListener("resize", () => fitAddon.fit());
 const initialRetryDelayMs = 200;
 let retryDelayMs = initialRetryDelayMs;
 
+let allowInsertingTemplate = true;
+
 function tryConnect() {
   console.log("Connecting to server...");
   socket = new WebSocket(
@@ -57,6 +59,15 @@ function tryConnect() {
           message.monacoLanguage
         );
         return;
+      case "insertTemplate":
+        if (typeof message.template !== "string") {
+          console.error("Unexpected message from server:", message);
+          return;
+        }
+        if (allowInsertingTemplate) {
+          editor.getModel().setValue(message.template);
+        }
+        return;
       default:
         console.error("Unexpected message from server:", message);
         return;
@@ -91,6 +102,9 @@ const editor = monaco.editor.create(document.getElementById("editor"), {
   scrollbar: { verticalScrollbarSize: 0 },
 });
 window.addEventListener("resize", () => editor.layout());
+editor.onDidChangeModelContent(() => {
+  allowInsertingTemplate = false;
+});
 
 document.getElementById("runButton").addEventListener("click", () => {
   socket.send(JSON.stringify({ event: "runCode", code: editor.getValue() }));

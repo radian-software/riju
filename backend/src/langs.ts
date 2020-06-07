@@ -1,103 +1,116 @@
 export interface LangConfig {
-  repl?: string[];
+  name: string;
+  monacoLang: string;
+  repl?: string;
   file?: string;
   prefix?: string;
   suffix?: string;
-  run?: string[] | string;
-  monacoLang: string;
-  name: string;
+  compile?: string;
+  run?: string;
+  template?: string;
 }
 
-export const langs = {
+export const langs: { [key: string]: LangConfig } = {
   bash: {
-    repl: ["bash"],
-    file: "main.bash",
-    run: ["bash", "--rcfile", "main.bash"],
     name: "Bash",
     monacoLang: "shell",
+    repl: "bash",
+    file: "main.bash",
+    run: "bash --rcfile main.bash",
+    template: 'echo "Hello, world!"',
   },
   c: {
     name: "C",
     monacoLang: "c",
+    file: "main.c",
+    compile: "clang -Wall -Wextra main.c -o main",
+    run: "./main",
+    template: `#include <stdio.h>
+
+int main() {
+  printf("Hello, world!\\n");
+  return 0;
+}
+`,
   },
   "c++": {
     name: "C++",
     monacoLang: "cpp",
   },
   clojure: {
-    repl: ["clojure"],
     name: "Clojure",
     monacoLang: "clojure",
+    repl: "clojure",
   },
   emacs: {
-    repl: ["emacs"],
     name: "Emacs Lisp",
     monacoLang: "plaintext",
+    repl: "emacs",
   },
   fish: {
-    repl: ["env", "SHELL=/usr/bin/fish", "fish"],
     name: "Fish",
     monacoLang: "plaintext",
+    repl: "SHELL=/usr/bin/fish fish",
   },
   go: {
     name: "Go",
     monacoLang: "go",
   },
   haskell: {
-    repl: ["ghci"],
-    file: "Main.hs",
-    run: ["ghci", "Main.hs"],
     name: "Haskell",
     monacoLang: "plaintext",
+    repl: "ghci",
+    file: "Main.hs",
+    run: "ghci Main.hs",
   },
   java: {
     name: "Java",
     monacoLang: "java",
   },
   julia: {
-    repl: ["julia"],
     name: "Julia",
     monacoLang: "plaintext",
+    repl: "julia",
   },
   lua: {
-    repl: ["lua"],
     name: "Lua",
     monacoLang: "lua",
+    repl: "lua",
   },
   nodejs: {
-    repl: ["node"],
+    name: "Node.js",
+    monacoLang: "javascript",
+    repl: "node",
     file: "main.js",
     suffix: '\n;require("repl").start();',
     run: "node main.js",
-    name: "Node.js",
-    monacoLang: "javascript",
   },
   python: {
-    repl: ["python3", "-u"],
-    file: "main.py",
-    run: ["python3", "-u", "-i", "main.py"],
     name: "Python",
     monacoLang: "python",
+    repl: "python3 -u",
+    file: "main.py",
+    run: "python3 -u -i main.py",
   },
   ruby: {
-    repl: ["irb"],
     name: "Ruby",
     monacoLang: "ruby",
+    repl: "irb",
   },
   rust: {
     name: "Rust",
     monacoLang: "rust",
   },
   vim: {
-    repl: ["vim"],
     name: "Vimscript",
     monacoLang: "plaintext",
+    repl: "vim",
   },
   zsh: {
-    repl: ["env", "SHELL=/usr/bin/zsh", "zsh"],
-    file: ".zshrc",
-    run: ["env", "ZDOTDIR=.", "zsh"],
     name: "Zsh",
     monacoLang: "shell",
+    repl: "SHELL=/usr/bin/zsh zsh",
+    file: ".zshrc",
+    run: "ZDOTDIR=. zsh",
   },
 };

@@ -24,6 +24,14 @@ export class Session {
         monacoLanguage: this.config.monacoLang,
       })
     );
+    if (this.config.template) {
+      this.ws.send(
+        JSON.stringify({
+          event: "insertTemplate",
+          template: this.config.template,
+        })
+      );
+    }
     this.run().catch(console.error);
     ws.on("message", this.handleClientMessage);
   }
@@ -58,15 +66,8 @@ export class Session {
         break;
     }
   };
-  parseCmdline = (cmdline: string[] | string) => {
-    if (typeof cmdline === "string") {
-      return ["bash", "-c", cmdline];
-    } else {
-      return cmdline;
-    }
-  };
   run = async () => {
-    const { repl, file, suffix, run } = this.config;
+    const { repl, file, suffix, compile, run } = this.config;
     if (this.term.pty) {
       this.term.pty.kill();
       this.term.live = false;
@@ -81,8 +82,10 @@ export class Session {
         }
       })
     );
-    let cmdline: string[];
-    if (this.code || !repl) {
+    let cmdline: string;
+    if (!run) {
+      cmdline = `echo 'Support for ${this.config.name} is not yet implemented.`;
+    } else if (this.code) {
       let code = this.code;
       if (suffix) {
         code += suffix;
@@ -96,12 +99,17 @@ export class Session {
           }
         })
       );
-      cmdline = this.parseCmdline(run);
+      cmdline = run;
+      if (compile) {
+        cmdline = compile + " && " + run;
+      }
+    } else if (repl) {
+      cmdline = repl;
     } else {
-      cmdline = this.parseCmdline(repl);
+      return;
     }
     const term = {
-      pty: pty.spawn(cmdline[0], cmdline.slice(1), {
+      pty: pty.spawn("bash", ["-c", cmdline], {
         name: "xterm-color",
         cwd: tmpdir,
         env: process.env,

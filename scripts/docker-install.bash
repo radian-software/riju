@@ -38,6 +38,7 @@ bsdmainutils
 curl
 emacs-nox
 git
+lsof
 make
 man-db
 nano
