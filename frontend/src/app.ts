@@ -69,7 +69,10 @@ term.onData((data) =>
   socket.send(JSON.stringify({ event: "terminalInput", input: data }))
 );
 
-const editor = monaco.editor.create(document.getElementById("editor"));
+const editor = monaco.editor.create(document.getElementById("editor"), {
+  minimap: { enabled: false },
+  scrollbar: { verticalScrollbarSize: 0 },
+});
 window.addEventListener("resize", () => editor.layout());
 
 document.getElementById("runButton").addEventListener("click", () => {

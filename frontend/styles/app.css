@@ -3,18 +3,14 @@ body {
   height: 100vh;
 }
 
-#header {
-  height: 50px;
-  padding: 5px;
-}
-
 #runButton {
   position: absolute;
-  left: 50%;
+  top: 25px;
+  right: calc(50% + 25px);
 }
 
 #app {
-  height: calc(100% - 50px);
+  height: 100%;
 }
 
 .column {
