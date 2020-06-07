@@ -10,13 +10,13 @@ import { LangConfig, langs } from "./langs";
 export class Session {
   code: string;
   config: LangConfig;
-  term: IPty;
+  term: { pty: IPty; live: boolean };
   ws: WebSocket;
 
   constructor(ws: WebSocket, lang: string) {
     this.ws = ws;
     this.config = langs[lang];
-    this.term = null;
+    this.term = { pty: null, live: false };
     this.code = "";
     this.ws.send(
       JSON.stringify({
@@ -42,7 +42,7 @@ export class Session {
         } else if (typeof msg.input !== "string") {
           console.error(`terminalInput: missing or malformed input field`);
         } else {
-          this.term.write(msg.input);
+          this.term.pty.write(msg.input);
         }
         break;
       case "runCode":
@@ -67,8 +67,9 @@ export class Session {
   };
   run = async () => {
     const { repl, file, suffix, run } = this.config;
-    if (this.term) {
-      this.term.kill();
+    if (this.term.pty) {
+      this.term.pty.kill();
+      this.term.live = false;
     }
     this.ws.send(JSON.stringify({ event: "terminalClear" }));
     const tmpdir: string = await new Promise((resolve, reject) =>
@@ -99,13 +100,21 @@ export class Session {
     } else {
       cmdline = this.parseCmdline(repl);
     }
-    this.term = pty.spawn(cmdline[0], cmdline.slice(1), {
-      name: "xterm-color",
-      cwd: tmpdir,
-      env: process.env,
+    const term = {
+      pty: pty.spawn(cmdline[0], cmdline.slice(1), {
+        name: "xterm-color",
+        cwd: tmpdir,
+        env: process.env,
+      }),
+      live: true,
+    };
+    this.term = term;
+    term.pty.on("data", (data) => {
+      // Capture term in closure so that we don't keep sending output
+      // from the old pty even after it's been killed (see ghci).
+      if (term.live) {
+        this.ws.send(JSON.stringify({ event: "terminalOutput", output: data }));
+      }
     });
-    this.term.on("data", (data) =>
-      this.ws.send(JSON.stringify({ event: "terminalOutput", output: data }))
-    );
   };
 }
