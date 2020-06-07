@@ -1,6 +1,8 @@
 export interface LangConfig {
   repl?: string[];
   file?: string;
+  prefix?: string;
+  suffix?: string;
   run?: string[] | string;
   monacoLang: string;
   name: string;
@@ -65,7 +67,8 @@ export const langs = {
   nodejs: {
     repl: ["node"],
     file: "main.js",
-    run: 'node -i -e "$(< main.js)"',
+    suffix: '\n;require("repl").start();',
+    run: "node main.js",
     name: "Node.js",
     monacoLang: "javascript",
   },

@@ -12,13 +12,16 @@ uid="$1"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y curl gnupg
+apt-get install -y curl gnupg lsb-release
 rm -rf /var/lib/apt/lists/*
 
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+curl -sS https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
 
-tee -a /etc/apt/sources.list.d/yarn.list >/dev/null <<"EOF"
+tee -a /etc/apt/sources.list.d/custom.list >/dev/null <<"EOF"
+deb https://deb.nodesource.com/node_14.x focal main
 deb https://dl.yarnpkg.com/debian/ stable main
+deb-src https://deb.nodesource.com/node_14.x
 EOF
 
 packages="

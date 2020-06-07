@@ -66,7 +66,7 @@ export class Session {
     }
   };
   run = async () => {
-    const { repl, file, run } = this.config;
+    const { repl, file, suffix, run } = this.config;
     if (this.term) {
       this.term.kill();
     }
@@ -82,8 +82,12 @@ export class Session {
     );
     let cmdline: string[];
     if (this.code || !repl) {
+      let code = this.code;
+      if (suffix) {
+        code += suffix;
+      }
       await new Promise((resolve, reject) =>
-        fs.writeFile(path.resolve(tmpdir, file), this.code, (err) => {
+        fs.writeFile(path.resolve(tmpdir, file), code, (err) => {
           if (err) {
             reject(err);
           } else {
