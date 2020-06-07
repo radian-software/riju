@@ -3,12 +3,6 @@ body {
   height: 100vh;
 }
 
-#runButton {
-  position: absolute;
-  top: 25px;
-  right: calc(50% + 25px);
-}
-
 #app {
   height: 100%;
 }
@@ -17,4 +11,18 @@ body {
   width: 50%;
   height: 100%;
   float: left;
+}
+
+#editor {
+  overflow: hidden;
+}
+
+#terminal {
+  background: black;
+}
+
+#runButton {
+  position: absolute;
+  top: 25px;
+  right: calc(50% + 25px);
 }
