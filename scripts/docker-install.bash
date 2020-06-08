@@ -12,10 +12,11 @@ uid="$1"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y apt-transport-https curl gnupg lsb-release
+apt-get install -y apt-transport-https curl gnupg lsb-release wget
 rm -rf /var/lib/apt/lists/*
 
 curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
+curl -sSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
 curl -sSL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 curl -sSL https://keybase.io/crystal/pgp_keys.asc | apt-key add -
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
@@ -26,11 +27,12 @@ dpkg -i packages-microsoft-prod.deb
 rm packages-microsoft-prod.deb
 
 tee -a /etc/apt/sources.list.d/custom.list >/dev/null <<"EOF"
+deb [arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main
 deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/
 deb https://deb.nodesource.com/node_14.x focal main
 deb https://dist.crystal-lang.org/apt crystal main
 deb https://dl.yarnpkg.com/debian/ stable main
-deb-src https://deb.nodesource.com/node_14.x
+deb-src https://deb.nodesource.com/node_14.x focal main
 EOF
 
 packages="
@@ -40,6 +42,7 @@ bash
 git
 make
 nodejs
+npm
 yarn
 
 # Handy utilities
@@ -47,6 +50,7 @@ bsdmainutils
 curl
 emacs-nox
 git
+jq
 lsof
 make
 man-db
@@ -71,11 +75,17 @@ clojure
 # Crystal
 crystal
 
+# Dart
+dart
+
 # Elixir
 elixir
 
 # Emacs Lisp
 emacs-nox
+
+# Erlang
+erlang
 
 # F#
 fsharp
@@ -99,9 +109,15 @@ julia
 # Lua
 lua5.3
 
+# Nim
+nim
+
 # Node.js
 nodejs
 yarn
+
+# PHP
+php
 
 # Python
 python3
@@ -120,6 +136,9 @@ rustc
 # Scheme
 mit-scheme
 
+# SQLite
+sqlite
+
 # Swift
 libpython2.7
 
@@ -136,11 +155,22 @@ apt-get update
 apt-get install -y $(grep -v "^#" <<< "$packages")
 rm -rf /var/lib/apt/lists/*
 
+# CoffeeScript
+npm install -g coffeescript
+
+# TypeScript
+npm install -g ts-node typescript
+
+# ReasonML
+npm install -g bs-platform
+
+# Needed for project infrastructure
 cd /tmp
 wget -nv https://github.com/watchexec/watchexec/releases/download/1.13.1/watchexec-1.13.1-x86_64-unknown-linux-gnu.deb
 dpkg -i watchexec-*.deb
 rm watchexec-*.deb
 
+# Kotlin
 cd /tmp
 wget -nv https://github.com/JetBrains/kotlin/releases/download/v1.3.72/kotlin-compiler-1.3.72.zip
 unzip kotlin-*.zip
@@ -148,6 +178,7 @@ cp kotlinc/bin/* /usr/bin/
 cp kotlinc/lib/* /usr/lib/
 rm -rf kotlin-*.zip kotlinc
 
+# Swift
 cd /tmp
 wget -nv https://swift.org/builds/swift-5.2.4-release/ubuntu2004/swift-5.2.4-RELEASE/swift-5.2.4-RELEASE-ubuntu20.04.tar.gz
 mkdir /opt/swift

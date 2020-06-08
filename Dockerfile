@@ -1,4 +1,4 @@
-FROM ubuntu:rolling
+FROM ubuntu:focal
 
 ARG UID
 

@@ -81,6 +81,29 @@ int main() {
     template: `(println "Hello, world!")
 `,
   },
+  coffeescript: {
+    name: "CoffeeScript",
+    monacoLang: "coffee",
+    repl: "coffee",
+    main: "main.coffee",
+    compile: "coffee -b -c main.coffee",
+    run: `node -e '
+eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
+require("/usr/lib/node_modules/coffeescript/repl").start()
+'`,
+    template: `console.log "Hello, world!"
+`,
+  },
+  dart: {
+    name: "Dart",
+    monacoLang: "dart",
+    main: "main.dart",
+    run: "dart main.dart",
+    template: `void main() {
+  print('Hello, world!');
+}
+`,
+  },
   elixir: {
     name: "Elixir",
     monacoLang: "plaintext",
@@ -97,6 +120,20 @@ int main() {
     main: "main.el",
     run: "emacs --load main.el --eval '(ielm)'",
     template: `(message "Hello, world!")
+`,
+  },
+  erlang: {
+    name: "Erlang",
+    monacoLang: "plaintext",
+    repl: "erl",
+    main: "main.erl",
+    compile: "erl -compile main",
+    run: "erl -s main main",
+    template: `-module(main).
+-export([main/0]).
+
+main() ->
+    io:fwrite("Hello, world!\n").
 `,
   },
   fish: {
@@ -185,16 +222,36 @@ main = putStrLn "Hello, world!"
     template: `print("Hello, world!")
 `,
   },
+  nim: {
+    name: "Nim",
+    monacoLang: "plaintext",
+    main: "main.nim",
+    compile: "nim compile main.nim",
+    run: "./main",
+    template: `echo "Hello, world!"
+`,
+  },
   nodejs: {
     name: "Node.js",
     monacoLang: "javascript",
     repl: "node",
     main: "main.js",
-    suffix: `
-require("repl").start();
-`,
-    run: "node main.js",
+    run: `node -e '
+eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
+require("repl").start()
+'`,
     template: `console.log("Hello, world!")
+`,
+  },
+  php: {
+    name: "PHP",
+    monacoLang: "php",
+    repl: "php -a",
+    main: "main.php",
+    run: "php -d auto_prepend_file=main.php -a",
+    template: `<?php
+
+echo "Hello, world!\\n";
 `,
   },
   python: {
@@ -213,6 +270,15 @@ require("repl").start();
     main: ".Rprofile",
     run: "R --no-save",
     template: `print("Hello, world!")
+`,
+  },
+  reasonml: {
+    name: "ReasonML",
+    monacoLang: "plaintext",
+    main: "main.re",
+    compile: "bsc main.re > main.js",
+    run: "NODE_PATH=/usr/lib/node_modules node main.js",
+    template: `print_string("Hello, world!\\n")
 `,
   },
   ruby: {
@@ -253,6 +319,15 @@ binding_irb.run(IRB.conf)
   (newline))
 `,
   },
+  sqlite: {
+    name: "SQLite",
+    monacoLang: "sql",
+    repl: "sqlite3",
+    main: "main.sql",
+    run: `sqlite3 -cmd "$(< main.sql)"`,
+    template: `SELECT "Hello, world!"
+`,
+  },
   swift: {
     name: "Swift",
     monacoLang: "swift",
@@ -260,6 +335,15 @@ binding_irb.run(IRB.conf)
     compile: "swiftc main.swift",
     run: "./main",
     template: `print("Hello, world!")
+`,
+  },
+  typescript: {
+    name: "TypeScript",
+    monacoLang: "typescript",
+    repl: "ts-node",
+    main: "main.ts",
+    run: `ts-node -i -e "$(< main.ts)"`,
+    template: `console.log("Hello, world!");
 `,
   },
   vim: {
