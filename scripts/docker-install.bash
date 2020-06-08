@@ -42,7 +42,6 @@ bash
 git
 make
 nodejs
-npm
 yarn
 
 # Handy utilities
@@ -60,8 +59,14 @@ tmux
 vim
 wget
 
+# BASIC
+bwbasic
+
 # Bash
 bash
+
+# BrainF
+beef
 
 # C/C++
 clang
@@ -93,6 +98,9 @@ fsharp
 # Fish
 fish
 
+# Forth
+gforth
+
 # Go
 golang
 
@@ -105,6 +113,9 @@ default-jdk
 
 # Julia
 julia
+
+# LOLCODE
+cmake
 
 # Lua
 lua5.3
@@ -141,6 +152,9 @@ sqlite
 
 # Swift
 libpython2.7
+
+# Unlambda
+unlambda
 
 # Vimscript
 vim
@@ -185,6 +199,71 @@ mkdir /opt/swift
 tar -xf swift-*.tar.gz -C /opt/swift --strip-components=2
 ln -s /opt/swift/bin/swiftc /usr/bin/swiftc
 rm swift-*.tar.gz
+
+# LOLCODE
+cd /tmp
+git clone https://github.com/justinmeza/lci.git
+pushd lci >/dev/null
+python3 install.py --prefix=/usr
+popd >/dev/null
+rm -rf lci
+
+# BrainF
+tee /usr/bin/brainf-repl >/dev/null <<"EOF"
+#!/usr/bin/env python3
+import argparse
+import readline
+import subprocess
+import tempfile
+
+parser = argparse.ArgumentParser()
+parser.add_argument("file", nargs="?")
+args = parser.parse_args()
+
+if args.file:
+    subprocess.run(["beef", args.file])
+while True:
+    try:
+        code = input("bf> ")
+    except KeyboardInterrupt:
+        print("^C")
+        continue
+    except EOFError:
+        print("^D")
+        break
+    with tempfile.NamedTemporaryFile(mode="w") as f:
+        f.write(code)
+        f.flush()
+        subprocess.run(["beef", f.name])
+EOF
+chmod +x /usr/bin/brainf-repl
+
+# Unlambda
+tee /usr/bin/unlambda-repl >/dev/null <<"EOF"
+#!/usr/bin/env python3
+import argparse
+import readline
+import subprocess
+
+parser = argparse.ArgumentParser()
+parser.add_argument("file", nargs="?")
+args = parser.parse_args()
+
+if args.file:
+    with open(args.file) as f:
+        subprocess.run(["unlambda"], input=f.read(), encoding="utf-8")
+while True:
+    try:
+        code = input("λ> ")
+    except KeyboardInterrupt:
+        print("^C")
+        continue
+    except EOFError:
+        print("^D")
+        break
+    subprocess.run(["unlambda"], input=code, encoding="utf-8")
+EOF
+chmod +x /usr/bin/unlambda-repl
 
 if (( "$uid" != 0 )); then
     useradd --uid="$uid" --create-home --groups sudo docker

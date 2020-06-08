@@ -23,6 +23,51 @@ export const langs: { [key: string]: LangConfig } = {
     template: `echo "Hello, world!"
 `,
   },
+  basic: {
+    name: "BASIC",
+    monacoLang: "plaintext",
+    repl: "bwbasic",
+    main: "main.bas",
+    run: "bwbasic main.bas",
+    template: `PRINT "Hello, world!"
+`,
+  },
+  brainf: {
+    name: "Brainf***",
+    monacoLang: "plaintext",
+    repl: "brainf-repl",
+    main: "main.bf",
+    run: "brainf-repl main.bf",
+    template: `++++++++
+[
+    >++++
+    [
+        >++
+        >+++
+        >+++
+        >+
+        <<<<-
+    ]
+    >+
+    >+
+    >-
+    >>+
+    [<]
+
+    <-
+]
+
+>>.
+>---.
++++++++..+++.
+>>.
+<-.
+<.
++++.------.--------.
+>>+.
+>++.
+`,
+  },
   c: {
     name: "C",
     monacoLang: "c",
@@ -145,6 +190,15 @@ main() ->
     template: `echo "Hello, world!"
 `,
   },
+  forth: {
+    name: "Forth",
+    monacoLang: "plaintext",
+    repl: "gforth",
+    main: "main.fs",
+    run: "gforth main.fs",
+    template: `." Hello, world!" CR
+`,
+  },
   fsharp: {
     name: "F#",
     monacoLang: "fsharp",
@@ -211,6 +265,16 @@ main = putStrLn "Hello, world!"
     main: "main.kts",
     run: "kotlinc -script main.kts; kotlinc",
     template: `println("Hello, world!")
+`,
+  },
+  lolcode: {
+    name: "LOLCODE",
+    monacoLang: "plaintext",
+    main: "main.lol",
+    run: "lci main.lol",
+    template: `HAI 1.2
+  VISIBLE "Hello, world!"
+KTHXBYE
 `,
   },
   lua: {
@@ -345,6 +409,14 @@ binding_irb.run(IRB.conf)
     run: `ts-node -i -e "$(< main.ts)"`,
     template: `console.log("Hello, world!");
 `,
+  },
+  unlambda: {
+    name: "Unlambda",
+    monacoLang: "plaintext",
+    repl: "unlambda-repl",
+    main: "main.unl",
+    run: "unlambda-repl main.unl",
+    template: "`.\n`.!`.d`.l`.r`.o`.w`. `.,`.o`.l`.l`.e`.Hi\n",
   },
   vim: {
     name: "Vimscript",
