@@ -25,9 +25,6 @@ app.use(sslRedirect());
 app.get("/", (_, res) => {
   res.sendFile(appRoot.path + "/frontend/pages/index.html");
 });
-app.get("/cpp", (_, res) => {
-  res.redirect("/c++");
-});
 app.get("/:lang", (req, res) => {
   if (langs[req.params.lang]) {
     res.sendFile(appRoot.path + "/frontend/pages/app.html");

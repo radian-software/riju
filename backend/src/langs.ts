@@ -37,7 +37,7 @@ int main() {
 }
 `,
   },
-  "c++": {
+  cpp: {
     name: "C++",
     monacoLang: "cpp",
     main: "main.cpp",
@@ -51,6 +51,27 @@ int main() {
 }
 `,
   },
+  crystal: {
+    name: "Crystal",
+    monacoLang: "plaintext",
+    main: "main.cr",
+    run: "crystal main.cr",
+    template: `puts "Hello, world!"
+`,
+  },
+  csharp: {
+    name: "C#",
+    monacoLang: "csharp",
+    main: "main.cs",
+    compile: "mcs main.cs",
+    run: "./main.exe",
+    template: `class main {
+    static void Main(string[] args) {
+        System.Console.WriteLine("Hello, world!");
+    }
+}
+`,
+  },
   clojure: {
     name: "Clojure",
     monacoLang: "clojure",
@@ -58,6 +79,15 @@ int main() {
     main: "main.clj",
     run: "clojure -i main.clj -r",
     template: `(println "Hello, world!")
+`,
+  },
+  elixir: {
+    name: "Elixir",
+    monacoLang: "plaintext",
+    repl: "iex",
+    main: "main.exs",
+    run: "iex main.exs",
+    template: `IO.puts("Hello, world!")
 `,
   },
   emacs: {
@@ -76,6 +106,15 @@ int main() {
     main: "main.fish",
     run: 'fish -C "$(< main.fish)"',
     template: `echo "Hello, world!"
+`,
+  },
+  fsharp: {
+    name: "F#",
+    monacoLang: "fsharp",
+    repl: "fsharpi",
+    main: "main.fsx",
+    run: "fsharpi --use:main.fsx",
+    template: `printfn "Hello, world!"
 `,
   },
   go: {
@@ -128,6 +167,15 @@ main = putStrLn "Hello, world!"
     template: `println("Hello, world!")
 `,
   },
+  kotlin: {
+    name: "Kotlin",
+    monacoLang: "kotlin",
+    repl: "kotlinc",
+    main: "main.kts",
+    run: "kotlinc -script main.kts; kotlinc",
+    template: `println("Hello, world!")
+`,
+  },
   lua: {
     name: "Lua",
     monacoLang: "lua",
@@ -158,6 +206,15 @@ require("repl").start();
     template: `print("Hello, world!")
 `,
   },
+  r: {
+    name: "R",
+    monacoLang: "r",
+    repl: "R",
+    main: ".Rprofile",
+    run: "R --no-save",
+    template: `print("Hello, world!")
+`,
+  },
   ruby: {
     name: "Ruby",
     monacoLang: "ruby",
@@ -183,6 +240,26 @@ binding_irb.run(IRB.conf)
     template: `fn main() {
     println!("Hello, world!");
 }
+`,
+  },
+  scheme: {
+    name: "Scheme",
+    monacoLang: "scheme",
+    repl: "mit-scheme",
+    main: "main.scm",
+    run: "mit-scheme --load main.scm",
+    template: `(begin
+  (display "Hello, world!")
+  (newline))
+`,
+  },
+  swift: {
+    name: "Swift",
+    monacoLang: "swift",
+    main: "main.swift",
+    compile: "swiftc main.swift",
+    run: "./main",
+    template: `print("Hello, world!")
 `,
   },
   vim: {
