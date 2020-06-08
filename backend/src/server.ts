@@ -1,3 +1,5 @@
+"use strict";
+
 import * as appRoot from "app-root-path";
 import * as express from "express";
 import { Request } from "express";
@@ -22,6 +24,9 @@ function getQueryParams(req: Request): URLSearchParams {
 app.use(sslRedirect());
 app.get("/", (_, res) => {
   res.sendFile(appRoot.path + "/frontend/pages/index.html");
+});
+app.get("/cpp", (_, res) => {
+  res.redirect("/c++");
 });
 app.get("/:lang", (req, res) => {
   if (langs[req.params.lang]) {

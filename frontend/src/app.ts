@@ -1,3 +1,5 @@
+"use strict";
+
 import * as monaco from "monaco-editor";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
@@ -24,10 +26,9 @@ function tryConnect() {
   socket = new WebSocket(
     (document.location.protocol === "http:" ? "ws://" : "wss://") +
       document.location.host +
-      `/api/v1/ws?lang=${lang}`
+      `/api/v1/ws?lang=${encodeURIComponent(lang)}`
   );
   socket.addEventListener("open", () => {
-    retryDelayMs = initialRetryDelayMs;
     console.log("Successfully connected to server");
   });
   socket.addEventListener("message", (event: MessageEvent) => {
@@ -37,6 +38,9 @@ function tryConnect() {
     } catch (err) {
       console.error("Malformed message from server:", event.data);
       return;
+    }
+    if (message?.event && message?.event !== "error") {
+      retryDelayMs = initialRetryDelayMs;
     }
     switch (message?.event) {
       case "terminalClear":

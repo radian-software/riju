@@ -1,3 +1,5 @@
+"use strict";
+
 import * as fs from "fs";
 import * as pty from "node-pty";
 import { IPty } from "node-pty";
@@ -18,19 +20,27 @@ export class Session {
     this.config = langs[lang];
     this.term = { pty: null, live: false };
     this.code = "";
-    this.ws.send(
-      JSON.stringify({
-        event: "setMonacoLanguage",
-        monacoLanguage: this.config.monacoLang,
-      })
-    );
-    if (this.config.template) {
+    try {
       this.ws.send(
         JSON.stringify({
-          event: "insertTemplate",
-          template: this.config.template,
+          event: "setMonacoLanguage",
+          monacoLanguage: this.config.monacoLang,
         })
       );
+    } catch (err) {
+      //
+    }
+    if (this.config.template) {
+      try {
+        this.ws.send(
+          JSON.stringify({
+            event: "insertTemplate",
+            template: this.config.template,
+          })
+        );
+      } catch (err) {
+        //
+      }
     }
     this.run().catch(console.error);
     ws.on("message", this.handleClientMessage);
@@ -67,12 +77,16 @@ export class Session {
     }
   };
   run = async () => {
-    const { repl, file, suffix, compile, run } = this.config;
+    const { repl, main, suffix, compile, run, hacks } = this.config;
     if (this.term.pty) {
       this.term.pty.kill();
       this.term.live = false;
     }
-    this.ws.send(JSON.stringify({ event: "terminalClear" }));
+    try {
+      this.ws.send(JSON.stringify({ event: "terminalClear" }));
+    } catch (err) {
+      //
+    }
     const tmpdir: string = await new Promise((resolve, reject) =>
       tmp.dir({ unsafeCleanup: true }, (err, path) => {
         if (err) {
@@ -84,14 +98,14 @@ export class Session {
     );
     let cmdline: string;
     if (!run) {
-      cmdline = `echo 'Support for ${this.config.name} is not yet implemented.`;
+      cmdline = `echo 'Support for ${this.config.name} is not yet implemented.'`;
     } else if (this.code) {
       let code = this.code;
       if (suffix) {
         code += suffix;
       }
       await new Promise((resolve, reject) =>
-        fs.writeFile(path.resolve(tmpdir, file), code, (err) => {
+        fs.writeFile(path.resolve(tmpdir, main), code, (err) => {
           if (err) {
             reject(err);
           } else {
@@ -108,6 +122,30 @@ export class Session {
     } else {
       return;
     }
+    if (hacks && hacks.includes("ghci-config") && run) {
+      if (this.code) {
+        const contents = ":load Main\nmain\n";
+        await new Promise((resolve, reject) => {
+          fs.writeFile(path.resolve(tmpdir, ".ghci"), contents, (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        });
+      } else {
+        await new Promise((resolve, reject) =>
+          fs.unlink(path.resolve(tmpdir, ".ghci"), (err) => {
+            if (err && err.code !== "ENOENT") {
+              reject(err);
+            } else {
+              resolve();
+            }
+          })
+        );
+      }
+    }
     const term = {
       pty: pty.spawn("bash", ["-c", cmdline], {
         name: "xterm-color",
@@ -121,7 +159,13 @@ export class Session {
       // Capture term in closure so that we don't keep sending output
       // from the old pty even after it's been killed (see ghci).
       if (term.live) {
-        this.ws.send(JSON.stringify({ event: "terminalOutput", output: data }));
+        try {
+          this.ws.send(
+            JSON.stringify({ event: "terminalOutput", output: data })
+          );
+        } catch (err) {
+          //
+        }
       }
     });
   };
