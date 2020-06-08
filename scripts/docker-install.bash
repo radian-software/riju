@@ -86,6 +86,9 @@ dart
 # Elixir
 elixir
 
+# Elvish
+elvish
+
 # Emacs Lisp
 emacs-nox
 
@@ -97,6 +100,9 @@ fsharp
 
 # Fish
 fish
+
+# FORTRAN
+flang-7
 
 # Forth
 gforth
@@ -114,6 +120,9 @@ default-jdk
 # Julia
 julia
 
+# Ksh
+ksh
+
 # LOLCODE
 cmake
 
@@ -126,6 +135,14 @@ nim
 # Node.js
 nodejs
 yarn
+
+# Objective-C
+gcc
+gnustep-devel
+
+# Perl
+perl
+perlconsole
 
 # PHP
 php
@@ -144,14 +161,26 @@ ruby
 # Rust
 rustc
 
+# Scala
+scala
+
 # Scheme
 mit-scheme
+
+# Sh
+posh
 
 # SQLite
 sqlite
 
 # Swift
 libpython2.7
+
+# Tcl
+tcl
+
+# Tcsh
+tcsh
 
 # Unlambda
 unlambda
@@ -178,6 +207,9 @@ npm install -g ts-node typescript
 # ReasonML
 npm install -g bs-platform
 
+# Perl
+cpan Devel::REPL
+
 # Needed for project infrastructure
 cd /tmp
 wget -nv https://github.com/watchexec/watchexec/releases/download/1.13.1/watchexec-1.13.1-x86_64-unknown-linux-gnu.deb
@@ -191,6 +223,13 @@ unzip kotlin-*.zip
 cp kotlinc/bin/* /usr/bin/
 cp kotlinc/lib/* /usr/lib/
 rm -rf kotlin-*.zip kotlinc
+
+# PowerShell
+cd /tmp
+wget -nv https://github.com/PowerShell/PowerShell/releases/download/v7.0.1/powershell-7.0.1-linux-x64.tar.gz
+mkdir /opt/powershell
+tar -xf powershell-*.tar.gz -C /opt/powershell
+ln -s /opt/powershell/pwsh /usr/bin/pwsh
 
 # Swift
 cd /tmp
@@ -231,6 +270,8 @@ while True:
     except EOFError:
         print("^D")
         break
+    if not code:
+        continue
     with tempfile.NamedTemporaryFile(mode="w") as f:
         f.write(code)
         f.flush()
@@ -261,6 +302,8 @@ while True:
     except EOFError:
         print("^D")
         break
+    if not code:
+        continue
     subprocess.run(["unlambda"], input=code, encoding="utf-8")
 EOF
 chmod +x /usr/bin/unlambda-repl

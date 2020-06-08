@@ -1,6 +1,7 @@
 "use strict";
 
 import * as fs from "fs";
+import * as mkdirp from "mkdirp";
 import * as pty from "node-pty";
 import { IPty } from "node-pty";
 import * as path from "path";
@@ -103,6 +104,9 @@ export class Session {
       let code = this.code;
       if (suffix) {
         code += suffix;
+      }
+      if (main.includes("/")) {
+        await mkdirp(path.dirname(path.resolve(tmpdir, main)));
       }
       await new Promise((resolve, reject) =>
         fs.writeFile(path.resolve(tmpdir, main), code, (err) => {

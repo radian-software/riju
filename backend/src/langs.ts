@@ -158,6 +158,15 @@ require("/usr/lib/node_modules/coffeescript/repl").start()
     template: `IO.puts("Hello, world!")
 `,
   },
+  elvish: {
+    name: "Elvish",
+    monacoLang: "plaintext",
+    repl: "SHELL=/usr/bin/elvish HOME=. elvish",
+    main: ".elvish/rc.elv",
+    run: "SHELL=/usr/bin/elvish HOME=. elvish",
+    template: `echo "Hello, world!"
+`,
+  },
   emacs: {
     name: "Emacs Lisp",
     monacoLang: "plaintext",
@@ -186,7 +195,7 @@ main() ->
     monacoLang: "plaintext",
     repl: "SHELL=/usr/bin/fish fish",
     main: "main.fish",
-    run: 'fish -C "$(< main.fish)"',
+    run: 'SHELL=/usr/bin/fish fish -C "$(< main.fish)"',
     template: `echo "Hello, world!"
 `,
   },
@@ -197,6 +206,17 @@ main() ->
     main: "main.fs",
     run: "gforth main.fs",
     template: `." Hello, world!" CR
+`,
+  },
+  fortran: {
+    name: "FORTRAN",
+    monacoLang: "plaintext",
+    main: "main.f",
+    compile: "flang main.f -o main",
+    run: "./main",
+    template: `       program hello
+          print *, "Hello, world!"
+       end program hello
 `,
   },
   fsharp: {
@@ -267,6 +287,15 @@ main = putStrLn "Hello, world!"
     template: `println("Hello, world!")
 `,
   },
+  ksh: {
+    name: "Ksh",
+    monacoLang: "shell",
+    repl: "SHELL=/usr/bin/ksh HOME=. ksh",
+    main: ".kshrc",
+    run: "SHELL=/usr/bin/ksh HOME=. ksh",
+    template: `echo "Hello, world!"
+`,
+  },
   lolcode: {
     name: "LOLCODE",
     monacoLang: "plaintext",
@@ -307,6 +336,32 @@ require("repl").start()
     template: `console.log("Hello, world!")
 `,
   },
+  objectivec: {
+    name: "Objective-C",
+    monacoLang: "objective-c",
+    main: "main.m",
+    compile:
+      "gcc $(gnustep-config --objc-flags) main.m $(gnustep-config --base-libs) -o main",
+    run: "./main",
+    template: `#import <Foundation/Foundation.h>
+
+int main() {
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSLog(@"Hello, world!");
+  [pool drain];
+  return 0;
+}
+`,
+  },
+  perl: {
+    name: "Perl",
+    monacoLang: "perl",
+    repl: "re.pl",
+    main: "main.pl",
+    run: "re.pl --rcfile ./main.pl",
+    template: `print("Hello, world!\\n")
+`,
+  },
   php: {
     name: "PHP",
     monacoLang: "php",
@@ -316,6 +371,15 @@ require("repl").start()
     template: `<?php
 
 echo "Hello, world!\\n";
+`,
+  },
+  powershell: {
+    name: "PowerShell",
+    monacoLang: "powershell",
+    repl: "SHELL=/usr/bin/pwsh pwsh",
+    main: "main.ps1",
+    run: "SHELL=/usr/bin/pwsh pwsh -NoExit main.ps1",
+    template: `Write-Host "Hello, world!"
 `,
   },
   python: {
@@ -372,6 +436,15 @@ binding_irb.run(IRB.conf)
 }
 `,
   },
+  scala: {
+    name: "Scala",
+    monacoLang: "plaintext",
+    repl: "scala",
+    main: "main.scala",
+    run: "scala -i main.scala",
+    template: `println("Hello, world!")
+`,
+  },
   scheme: {
     name: "Scheme",
     monacoLang: "scheme",
@@ -381,6 +454,15 @@ binding_irb.run(IRB.conf)
     template: `(begin
   (display "Hello, world!")
   (newline))
+`,
+  },
+  sh: {
+    name: "Sh",
+    monacoLang: "shell",
+    repl: "SHELL=/usr/bin/sh HOME=. posh -l",
+    main: ".profile",
+    run: "SHELL=/usr/bin/sh HOME=. posh -l",
+    template: `echo "Hello, world!"
 `,
   },
   sqlite: {
@@ -399,6 +481,24 @@ binding_irb.run(IRB.conf)
     compile: "swiftc main.swift",
     run: "./main",
     template: `print("Hello, world!")
+`,
+  },
+  tcl: {
+    name: "Tcl",
+    monacoLang: "tcl",
+    repl: "tclsh",
+    main: ".tclshrc",
+    run: "HOME=. tclsh",
+    template: `puts {Hello, world!}
+`,
+  },
+  tcsh: {
+    name: "Tcsh",
+    monacoLang: "shell",
+    repl: "SHELL=/usr/bin/tcsh HOME=. tcsh",
+    main: ".tcshrc",
+    run: "SHELL=/usr/bin/tcsh HOME=. tcsh",
+    template: `echo "Hello, world!"
 `,
   },
   typescript: {
@@ -432,7 +532,7 @@ binding_irb.run(IRB.conf)
     monacoLang: "shell",
     repl: "SHELL=/usr/bin/zsh zsh",
     main: ".zshrc",
-    run: "ZDOTDIR=. zsh",
+    run: "SHELL=/usr/bin/zsh ZDOTDIR=. zsh",
     template: `echo "Hello, world!"
 `,
   },
