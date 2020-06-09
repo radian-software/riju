@@ -1,58 +1,14 @@
-# Fast Sandbox
+# Riju
 
-This project is a work in progress and does not contain any serious
-documentation.
+Riju is an online playground for every programming language. In less
+than a second, you can start playing with a Python interpreter or
+compiling INTERCAL code.
 
-## API
+Check out the [live application](https://riju-sandbox.herokuapp.com/)!
 
-    POST /api/v1/ws?lang=python
+**You should not do any sensitive work on Riju, as NO GUARANTEES are
+made about its security or privacy. (No warranty etc etc.)**
 
-The API is based on message passing.
-
-### Server messages
-
-Received output from process.
-
-    {
-      "event": "terminalOutput",
-      "output": ">>> "
-    }
-
-Package name completions.
-
-    {
-      "event": "packageNameCompletions",
-      "packageNameCompletions": ["Flask", "Flask-Talisman"],
-      "messageSerial": 42
-    }
-
-### Client messages
-
-Received input from user.
-
-    {
-      "event": "terminalInput",
-      "input": "print('Hello, world!')\n"
-    }
-
-User wants to run code.
-
-    {
-      "event": "runCode",
-      "code": "import this"
-    }
-
-User wants to install a package.
-
-    {
-      "event": "installPackage",
-      "packageName": "Flask"
-    }
-
-Complete package names.
-
-    {
-      "event": "completePackageName",
-      "partialPackageName": "fla",
-      "messageSerial": 42
-    }
+This project is a work in progress, and I don't intend on thoroughly
+documenting it until it has reached feature-completeness. As such,
+you have reached the end of the README :)
