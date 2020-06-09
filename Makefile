@@ -8,11 +8,11 @@ help: ## Show this message
 		sed 's/:[^#]*[#]# /|/'		| \
 		column -t -s'|' >&2
 
-.PHONY: image
+.PHONY: image-dev
 image-dev: ## Build Docker image for development
 	scripts/docker.bash build . -f Dockerfile.dev -t riju --build-arg "UID=$(UID)"
 
-.PHONY: image
+.PHONY: image-prod
 image-prod: ## Build Docker image for production
 	scripts/docker.bash build . -f Dockerfile.prod -t riju:prod --build-arg "UID=$(UID)"
 

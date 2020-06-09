@@ -291,7 +291,7 @@ npm install -g lumo-cljs
 npm install -g coffeescript
 
 # Elm
-npm install -g run-elm
+npm install -g @kachkaev/run-elm
 
 # Perl
 cpan Devel::REPL
@@ -531,7 +531,8 @@ if (( "$uid" != 0 )); then
     useradd --uid="$uid" --create-home --groups sudo docker
     passwd -d docker
 else
-    ln -s /root /home/docker
+    useradd --create-home --groups sudo docker
+    passwd -d docker
 fi
 
 touch /home/docker/.zshrc
