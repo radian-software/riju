@@ -6,7 +6,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: apk add --no-cache --no-progress bash curl make
+      - run: apk add --no-cache --no-progress bash curl make nodejs
       - run: curl https://cli-assets.heroku.com/install.sh | sh
       - run: make deploy
 workflows:
