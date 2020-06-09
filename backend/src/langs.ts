@@ -370,6 +370,15 @@ func main() {
 }
 `,
   },
+  groovy: {
+    name: "Groovy",
+    monacoLang: "plaintext",
+    repl: "groovysh",
+    main: "main.groovy",
+    run: "groovysh main.groovy",
+    template: `print "Hello, world!";
+`,
+  },
   haskell: {
     name: "Haskell",
     monacoLang: "plaintext",
@@ -382,6 +391,20 @@ main :: IO ()
 main = putStrLn "Hello, world!"
 `,
     hacks: ["ghci-config"],
+  },
+  ink: {
+    name: "Ink",
+    monacoLang: "plaintext",
+    repl: "ink",
+    main: "main.ink",
+    run: "ink main.ink; ink",
+    template: `std := load('../../opt/ink/std')
+str := load('../../opt/ink/str')
+
+log := std.log
+
+log('Hello, world!')
+`,
   },
   intercal: {
     name: "INTERCAL",

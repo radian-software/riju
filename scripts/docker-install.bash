@@ -140,6 +140,9 @@ gforth
 # Go
 golang
 
+# Groovy
+groovy
+
 # Haskell
 cabal-install
 ghc
@@ -325,6 +328,16 @@ gunzip binary-for-linux-64-bit.gz
 chmod +x binary-for-linux-64-bit
 mv binary-for-linux-64-bit /usr/bin/elm
 rm binary-for-linux-64-bit.gz
+
+# Ink
+cd /tmp
+wget -nv https://github.com/thesephist/ink/releases/download/v0.1.7/ink-linux
+wget -nv https://github.com/thesephist/ink/releases/download/v0.1.7/std.ink
+wget -nv https://github.com/thesephist/ink/releases/download/v0.1.7/str.ink
+chmod +x ink-linux
+mv ink-linux /usr/bin/ink
+mkdir /opt/ink
+mv std.ink str.ink /opt/ink/
 
 # Kotlin
 cd /tmp
