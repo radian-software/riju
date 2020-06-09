@@ -78,7 +78,7 @@ export class Session {
     }
   };
   run = async () => {
-    const { repl, main, suffix, compile, run, hacks } = this.config;
+    const { name, repl, main, suffix, compile, run, hacks } = this.config;
     if (this.term.pty) {
       this.term.pty.kill();
       this.term.live = false;
@@ -119,12 +119,12 @@ export class Session {
       );
       cmdline = run;
       if (compile) {
-        cmdline = compile + " && " + run;
+        cmdline = `( ${compile} ) && ( ${run} )`;
       }
     } else if (repl) {
       cmdline = repl;
     } else {
-      return;
+      cmdline = `echo '${name} has no REPL, press Run to see it in action'`;
     }
     if (hacks && hacks.includes("ghci-config") && run) {
       if (this.code) {

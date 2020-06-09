@@ -26,3 +26,9 @@ body {
   top: 25px;
   right: calc(50% + 25px);
 }
+
+#backButton {
+  position: absolute;
+  left: 25px;
+  bottom: 25px;
+}

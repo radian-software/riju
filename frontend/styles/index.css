@@ -1,0 +1,33 @@
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: sans-serif;
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+div.language {
+  width: 120px;
+  height: 60px;
+  border: solid;
+  margin: 5px;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 18px;
+}
+
+a.language {
+  text-decoration: none;
+  color: black;
+}

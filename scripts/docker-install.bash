@@ -73,7 +73,7 @@ algol68g
 
 # ARM
 gcc-arm-linux-gnueabihf
-qemu-system-static
+qemu-user-static
 
 # ATS
 ats2-lang
@@ -170,7 +170,7 @@ lua5.3
 
 # MIPS
 gcc-mips64-linux-gnuabi64
-qemu-system-static
+qemu-user-static
 
 # MUMPS
 fis-gtm
@@ -215,7 +215,7 @@ racket
 
 # RISC-V
 gcc-riscv64-linux-gnu
-qemu-system-static
+qemu-user-static
 
 # Ruby
 ruby
@@ -309,7 +309,7 @@ npm install -g ts-node typescript
 pip3 install whitespace
 
 # Wolfram Language
-python3.7 -m pip install install mathics
+python3.7 -m pip install mathics
 
 # Needed for project infrastructure
 cd /tmp
@@ -320,6 +320,8 @@ rm watchexec-*.deb
 # D
 cd /tmp
 wget -nv http://downloads.dlang.org/releases/2.x/2.092.0/dmd_2.092.0-0_amd64.deb
+dpkg -i dmd_*.deb
+rm dmd_*.deb
 
 # Elm
 cd /tmp
@@ -327,7 +329,6 @@ wget -nv https://github.com/elm/compiler/releases/download/0.19.1/binary-for-lin
 gunzip binary-for-linux-64-bit.gz
 chmod +x binary-for-linux-64-bit
 mv binary-for-linux-64-bit /usr/bin/elm
-rm binary-for-linux-64-bit.gz
 
 # Ink
 cd /tmp
@@ -353,15 +354,16 @@ wget -nv https://github.com/PowerShell/PowerShell/releases/download/v7.0.1/power
 mkdir /opt/powershell
 tar -xf powershell-*.tar.gz -C /opt/powershell
 ln -s /opt/powershell/pwsh /usr/bin/pwsh
+rm powershell-*.tar.gz
 
 # SNOBOL
 wget -nv ftp://ftp.snobol4.org/snobol/snobol4-2.0.tar.gz
 tar -xf snobol4-*.tar.gz
 rm snobol4-*.tar.gz
-pushd snobol4-*
+pushd snobol4-* >/dev/null
 make || true
 mv snobol4 /usr/bin/snobol4
-popd
+popd >/dev/null
 rm -rf snobol4-*
 
 # Swift
@@ -380,7 +382,7 @@ stack build kalyn
 mv "$(stack exec which kalyn)" /usr/bin/kalyn
 mkdir /opt/kalyn
 cp -R src-kalyn/Stdlib src-kalyn/Stdlib.kalyn /opt/kalyn/
-popd
+popd >/dev/null
 rm -rf kalyn
 
 # LOLCODE

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Riju</title>
+    <link rel="stylesheet" href="/css/index.css" />
+  </head>
+  <body>
+    <h1>Riju: online access to any programming language</h1>
+    <i>Select a language to get started immediately:</i>
+    <div class="grid">
+      <% for (const [id, {name}] of Object.entries(langs)) { %>
+        <a href=<%= "/" + encodeURIComponent(id) %> class="language">
+          <div class="language">
+            <%= name %>
+          </div>
+        </a>
+      <% } %>
+    </div>
+    <p>
+      <i>
+        Created by
+        <a href="https://github.com/raxod502">Radon Rosborough</a>.
+        Check out the project
+        <a href="https://github.com/raxod502/riju">on GitHub</a>.
+      </i>
+    </p>
+  </body>
+</html>

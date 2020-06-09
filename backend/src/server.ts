@@ -14,6 +14,7 @@ const host = process.env.HOST || "localhost";
 const port = parseInt(process.env.PORT) || 6119;
 
 app.set("query parser", (qs: string) => new URLSearchParams(qs));
+app.set("view engine", "ejs");
 
 function getQueryParams(req: Request): URLSearchParams {
   // This is safe because we set the query parser for Express to
@@ -23,11 +24,13 @@ function getQueryParams(req: Request): URLSearchParams {
 
 app.use(sslRedirect());
 app.get("/", (_, res) => {
-  res.sendFile(appRoot.path + "/frontend/pages/index.html");
+  res.render(appRoot.path + "/frontend/pages/index", { langs });
 });
 app.get("/:lang", (req, res) => {
   if (langs[req.params.lang]) {
-    res.sendFile(appRoot.path + "/frontend/pages/app.html");
+    res.render(appRoot.path + "/frontend/pages/app", {
+      name: langs[req.params.lang].name,
+    });
   } else {
     res.send(`No such language: ${req.params.lang}`);
   }
