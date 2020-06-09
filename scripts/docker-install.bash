@@ -10,9 +10,11 @@ fi
 
 uid="$1"
 
+dpkg --add-architecture i386
+
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y apt-transport-https curl gnupg lsb-release wget
+apt-get install -y apt-transport-https curl gnupg lsb-release software-properties-common wget
 rm -rf /var/lib/apt/lists/*
 
 curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
@@ -35,6 +37,8 @@ deb https://dl.yarnpkg.com/debian/ stable main
 deb-src https://deb.nodesource.com/node_14.x focal main
 EOF
 
+add-apt-repository -y -n ppa:deadsnakes/ppa
+
 packages="
 
 # Needed for project infrastructure
@@ -42,6 +46,7 @@ bash
 git
 make
 nodejs
+python3-pip
 yarn
 
 # Handy utilities
@@ -49,6 +54,7 @@ bsdmainutils
 curl
 emacs-nox
 git
+htop
 jq
 lsof
 make
@@ -58,6 +64,19 @@ sudo
 tmux
 vim
 wget
+
+# Ada
+gnat
+
+# Algol
+algol68g
+
+# ARM
+gcc-arm-linux-gnueabihf
+qemu-system-static
+
+# ATS
+ats2-lang
 
 # BASIC
 bwbasic
@@ -76,6 +95,17 @@ mono-mcs
 
 # Clojure
 clojure
+
+# Cmd
+wine
+wine32
+
+# COBOL
+gnucobol
+
+# Common Lisp
+rlwrap
+sbcl
 
 # Crystal
 crystal
@@ -114,11 +144,17 @@ golang
 cabal-install
 ghc
 
+# INTERCAL
+intercal
+
 # Java
 default-jdk
 
 # Julia
 julia
+
+# Kalyn
+haskell-stack
 
 # Ksh
 ksh
@@ -128,6 +164,13 @@ cmake
 
 # Lua
 lua5.3
+
+# MIPS
+gcc-mips64-linux-gnuabi64
+qemu-system-static
+
+# MUMPS
+fis-gtm
 
 # Nim
 nim
@@ -140,12 +183,21 @@ yarn
 gcc
 gnustep-devel
 
+# Octave
+octave
+
+# Pascal
+fpc
+
 # Perl
 perl
 perlconsole
 
 # PHP
 php
+
+# Prolog
+swi-prolog
 
 # Python
 python3
@@ -154,6 +206,13 @@ python3-venv
 
 # R
 r-base
+
+# Racket
+racket
+
+# RISC-V
+gcc-riscv64-linux-gnu
+qemu-system-static
 
 # Ruby
 ruby
@@ -170,8 +229,18 @@ mit-scheme
 # Sh
 posh
 
+# Smalltalk
+gnu-smalltalk
+
+# SNOBOL
+m4
+
 # SQLite
 sqlite
+
+# Standard ML
+rlwrap
+smlnj
 
 # Swift
 libpython2.7
@@ -188,6 +257,15 @@ unlambda
 # Vimscript
 vim
 
+# Visual Basic
+mono-vbnc
+
+# Wolfram Language
+python3.7
+
+# x86
+clang
+
 # Zsh
 zsh
 
@@ -198,23 +276,55 @@ apt-get update
 apt-get install -y $(grep -v "^#" <<< "$packages")
 rm -rf /var/lib/apt/lists/*
 
+npm config set unsafe-perm true
+
+# Befunge
+npm install -g befunge93 prompt-sync
+
+# ClojureScript
+npm install -g lumo-cljs
+
 # CoffeeScript
 npm install -g coffeescript
 
-# TypeScript
-npm install -g ts-node typescript
+# Elm
+npm install -g run-elm
+
+# Perl
+cpan Devel::REPL
 
 # ReasonML
 npm install -g bs-platform
 
-# Perl
-cpan Devel::REPL
+# Shakespeare
+pip3 install shakespearelang
+
+# TypeScript
+npm install -g ts-node typescript
+
+# Whitespace
+pip3 install whitespace
+
+# Wolfram Language
+python3.7 -m pip install install mathics
 
 # Needed for project infrastructure
 cd /tmp
 wget -nv https://github.com/watchexec/watchexec/releases/download/1.13.1/watchexec-1.13.1-x86_64-unknown-linux-gnu.deb
 dpkg -i watchexec-*.deb
 rm watchexec-*.deb
+
+# D
+cd /tmp
+wget -nv http://downloads.dlang.org/releases/2.x/2.092.0/dmd_2.092.0-0_amd64.deb
+
+# Elm
+cd /tmp
+wget -nv https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz
+gunzip binary-for-linux-64-bit.gz
+chmod +x binary-for-linux-64-bit
+mv binary-for-linux-64-bit /usr/bin/elm
+rm binary-for-linux-64-bit.gz
 
 # Kotlin
 cd /tmp
@@ -231,6 +341,16 @@ mkdir /opt/powershell
 tar -xf powershell-*.tar.gz -C /opt/powershell
 ln -s /opt/powershell/pwsh /usr/bin/pwsh
 
+# SNOBOL
+wget -nv ftp://ftp.snobol4.org/snobol/snobol4-2.0.tar.gz
+tar -xf snobol4-*.tar.gz
+rm snobol4-*.tar.gz
+pushd snobol4-*
+make || true
+mv snobol4 /usr/bin/snobol4
+popd
+rm -rf snobol4-*
+
 # Swift
 cd /tmp
 wget -nv https://swift.org/builds/swift-5.2.4-release/ubuntu2004/swift-5.2.4-RELEASE/swift-5.2.4-RELEASE-ubuntu20.04.tar.gz
@@ -239,6 +359,17 @@ tar -xf swift-*.tar.gz -C /opt/swift --strip-components=2
 ln -s /opt/swift/bin/swiftc /usr/bin/swiftc
 rm swift-*.tar.gz
 
+# Kalyn
+cd /tmp
+git clone https://github.com/raxod502/kalyn
+pushd kalyn >/dev/null
+stack build kalyn
+mv "$(stack exec which kalyn)" /usr/bin/kalyn
+mkdir /opt/kalyn
+cp -R src-kalyn/Stdlib src-kalyn/Stdlib.kalyn /opt/kalyn/
+popd
+rm -rf kalyn
+
 # LOLCODE
 cd /tmp
 git clone https://github.com/justinmeza/lci.git
@@ -246,6 +377,50 @@ pushd lci >/dev/null
 python3 install.py --prefix=/usr
 popd >/dev/null
 rm -rf lci
+
+# Malbolge
+cd /tmp
+git clone https://github.com/bipinu/malbolge.git
+clang malbolge/malbolge.c -o /usr/bin/malbolge
+rm -rf malbolge
+
+# ActionScript
+tee /usr/bin/amxmlc >/dev/null <<"EOF"
+#!/bin/sh
+exec /opt/actionscript/bin/amxmlc "$@"
+EOF
+chmod +x /usr/bin/amxmlc
+
+# Befunge
+tee /usr/bin/befunge-repl >/dev/null <<"EOF"
+#!/usr/bin/env -S NODE_PATH=/usr/lib/node_modules node
+const fs = require("fs");
+
+const Befunge = require("befunge93");
+const prompt = require("prompt-sync")();
+
+const befunge = new Befunge();
+befunge.onInput = prompt;
+befunge.onOutput = (output) => {
+  if (typeof output === "string") {
+    process.stdout.write(output);
+  } else {
+    process.stdout.write(output + " ");
+  }
+};
+
+const args = process.argv.slice(2);
+if (args.length !== 1) {
+  console.error("usage: befunge-repl FILE");
+  process.exit(1);
+}
+
+befunge.run(fs.readFileSync(args[0], { encoding: "utf-8" })).catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
+EOF
+chmod +x /usr/bin/befunge-repl
 
 # BrainF
 tee /usr/bin/brainf-repl >/dev/null <<"EOF"
@@ -278,6 +453,35 @@ while True:
         subprocess.run(["beef", f.name])
 EOF
 chmod +x /usr/bin/brainf-repl
+
+# Elm
+mkdir /opt/elm
+tee /opt/elm/elm.json >/dev/null <<"EOF"
+{
+    "type": "application",
+    "source-directories": [
+        "."
+    ],
+    "elm-version": "0.19.1",
+    "dependencies": {
+        "direct": {
+            "elm/browser": "1.0.2",
+            "elm/core": "1.0.5",
+            "elm/html": "1.0.0"
+        },
+        "indirect": {
+            "elm/json": "1.1.3",
+            "elm/time": "1.0.0",
+            "elm/url": "1.0.0",
+            "elm/virtual-dom": "1.0.2"
+        }
+    },
+    "test-dependencies": {
+        "direct": {},
+        "indirect": {}
+    }
+}
+EOF
 
 # Unlambda
 tee /usr/bin/unlambda-repl >/dev/null <<"EOF"
