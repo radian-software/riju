@@ -6,8 +6,8 @@
     <link rel="stylesheet" href="/css/index.css" />
   </head>
   <body>
-    <h1>Riju: online access to any programming language</h1>
-    <i>Select a language to get started immediately:</i>
+    <h1>Riju: online playground for every programming language</h1>
+    <i>Pick your favorite language to get started:</i>
     <div class="grid">
       <% for (const [id, {name}] of Object.entries(langs)) { %>
         <a href=<%= "/" + encodeURIComponent(id) %> class="language">

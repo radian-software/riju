@@ -149,7 +149,7 @@ int main() {
     monacoLang: "bat",
     repl: "wine cmd",
     main: "main.bat",
-    run: `pkill wineserver64; while pgrep wineserver64 >/dev/null; do sleep 0.05; done; wine cmd /k main.bat`,
+    run: `wine cmd /k main.bat`,
     template: `echo "Hello, world!"
 `,
   },

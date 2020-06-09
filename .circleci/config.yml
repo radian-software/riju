@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  build_and_deploy:
+    docker:
+      - image: docker:18.09
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: apk add --no-cache --no-progress bash curl make
+      - run: curl https://cli-assets.heroku.com/install.sh | sh
+      - run: make deploy
+workflows:
+  version: 2
+  ci:
+    jobs:
+      - build_and_deploy:
+          filters:
+            branches:
+              only: master
+            tags:
+              ignore: /.*/

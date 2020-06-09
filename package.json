@@ -32,7 +32,7 @@
     "backend-dev": "tsc --watch",
     "frontend": "webpack --production",
     "frontend-dev": "webpack --development --watch",
-    "server": "node server.js",
+    "server": "node backend/out/server.js",
     "server-dev": "watchexec -w backend/out -r -n node backend/out/server.js"
   }
 }

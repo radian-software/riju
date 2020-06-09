@@ -9,8 +9,8 @@ export SHELL="$(which bash)"
 
 export HOST=0.0.0.0
 
-if [[ -d src ]]; then
-    cd src
+if [[ -d /home/docker/src ]]; then
+    cd /home/docker/src
 fi
 
 exec "$@"

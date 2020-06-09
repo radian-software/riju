@@ -1,0 +1,21 @@
+FROM ubuntu:focal
+
+ARG UID
+
+COPY scripts/docker-install.bash /tmp/
+RUN /tmp/docker-install.bash "$UID"
+
+USER $UID
+WORKDIR /home/docker
+EXPOSE 6119
+
+ENTRYPOINT ["/usr/local/bin/pid1.bash"]
+COPY scripts/pid1.bash /usr/local/bin/
+
+RUN sudo deluser docker sudo
+ADD --chown=docker:docker . /home/docker/src
+WORKDIR src
+RUN yarn install
+RUN yarn run backend
+RUN yarn run frontend
+CMD yarn run server
