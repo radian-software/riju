@@ -368,7 +368,7 @@ rm -rf snobol4-*
 
 # Swift
 cd /tmp
-wget -nv https://swift.org/builds/swift-5.2.4-release/ubuntu2004/swift-5.2.4-RELEASE/swift-5.2.4-RELEASE-ubuntu20.04.tar.gz
+wget https://swift.org/builds/swift-5.2.4-release/ubuntu2004/swift-5.2.4-RELEASE/swift-5.2.4-RELEASE-ubuntu20.04.tar.gz
 mkdir /opt/swift
 tar -xf swift-*.tar.gz -C /opt/swift --strip-components=2
 ln -s /opt/swift/bin/swiftc /usr/bin/swiftc
