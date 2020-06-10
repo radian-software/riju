@@ -1,11 +1,37 @@
 FROM ubuntu:focal
 
+# This is just here so we can reuse the Docker cache between dev and
+# prod, it's not actually read by anything.
 ARG UID
 
-COPY scripts/docker-install.bash /tmp/
-RUN /tmp/docker-install.bash "$UID"
+COPY scripts/docker-install-phase1.bash /tmp/
+RUN /tmp/docker-install-phase1.bash
 
-USER $UID
+COPY scripts/docker-install-phase2.bash /tmp/
+RUN /tmp/docker-install-phase2.bash
+
+COPY scripts/docker-install-phase3a.bash /tmp/
+RUN /tmp/docker-install-phase3a.bash
+
+COPY scripts/docker-install-phase3b.bash /tmp/
+RUN /tmp/docker-install-phase3b.bash
+
+COPY scripts/docker-install-phase3c.bash /tmp/
+RUN /tmp/docker-install-phase3c.bash
+
+COPY scripts/docker-install-phase3d.bash /tmp/
+RUN /tmp/docker-install-phase3d.bash
+
+COPY scripts/docker-install-phase4.bash /tmp/
+RUN /tmp/docker-install-phase4.bash
+
+COPY scripts/docker-install-phase5.bash /tmp/
+RUN /tmp/docker-install-phase5.bash
+
+COPY scripts/docker-install-phase6.bash /tmp/
+RUN /tmp/docker-install-phase6.bash
+
+USER docker
 WORKDIR /home/docker
 EXPOSE 6119
 
@@ -14,7 +40,7 @@ COPY scripts/pid1.bash /usr/local/bin/
 
 RUN sudo deluser docker sudo
 ADD --chown=docker:docker . /home/docker/src
-WORKDIR src
+WORKDIR /home/docker/src
 RUN yarn install
 RUN yarn run backend
 RUN yarn run frontend
