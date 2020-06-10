@@ -1,17 +1,21 @@
 "use strict";
 
+import * as fs from "fs";
+import * as https from "https";
+
 import * as appRoot from "app-root-path";
 import * as express from "express";
 import { Request } from "express";
 import * as ws from "express-ws";
-import * as sslRedirect from "heroku-ssl-redirect";
 
 import * as api from "./api";
 import { langs } from "./langs";
 
-const app = ws(express()).app;
 const host = process.env.HOST || "localhost";
 const port = parseInt(process.env.PORT) || 6119;
+const useTLS = process.env.TLS ? true : false;
+
+const app = ws(express()).app;
 
 app.set("query parser", (qs: string) => new URLSearchParams(qs));
 app.set("view engine", "ejs");
@@ -22,7 +26,13 @@ function getQueryParams(req: Request): URLSearchParams {
   return (req.query as unknown) as URLSearchParams;
 }
 
-app.use(sslRedirect());
+app.use((req, res, next) => {
+  if (useTLS && req.headers["x-forwarded-proto"] !== "https") {
+    res.redirect(301, "https://" + req.hostname + req.originalUrl);
+  } else {
+    next();
+  }
+});
 app.get("/", (_, res) => {
   res.render(appRoot.path + "/frontend/pages/index", { langs });
 });
@@ -57,6 +67,16 @@ app.ws("/api/v1/ws", (ws, req) => {
   }
 });
 
-app.listen(port, host, () =>
+const secureApp = useTLS
+  ? https.createServer(
+      {
+        key: fs.readFileSync("/etc/letsencrypt/live/riju.codes/privkey.pem"),
+        cert: fs.readFileSync("/etc/letsencrypt/live/riju.codes/fullchain.pem"),
+      },
+      app
+    )
+  : app;
+
+secureApp.listen(port, host, () =>
   console.log(`Listening on http://${host}:${port}`)
 );
