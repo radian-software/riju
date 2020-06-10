@@ -317,6 +317,10 @@ wget -nv https://github.com/watchexec/watchexec/releases/download/1.13.1/watchex
 dpkg -i watchexec-*.deb
 rm watchexec-*.deb
 
+cd /tmp
+git clone https://github.com/circulosmeos/gdown.pl.git
+mv gdown.pl/gdown.pl /usr/bin/gdown
+
 # D
 cd /tmp
 wget -nv http://downloads.dlang.org/releases/2.x/2.092.0/dmd_2.092.0-0_amd64.deb
@@ -368,11 +372,11 @@ rm -rf snobol4-*
 
 # Swift
 cd /tmp
-wget https://swift.org/builds/swift-5.2.4-release/ubuntu2004/swift-5.2.4-RELEASE/swift-5.2.4-RELEASE-ubuntu20.04.tar.gz
+gdown "https://drive.google.com/uc?export=download&id=1eE1-VuZz0gv-fITaGVT_r1UunCLjS-JT" swift.tar.gz
 mkdir /opt/swift
-tar -xf swift-*.tar.gz -C /opt/swift --strip-components=2
+tar -xf swift.tar.gz -C /opt/swift --strip-components=2
 ln -s /opt/swift/bin/swiftc /usr/bin/swiftc
-rm swift-*.tar.gz
+rm swift.tar.gz
 
 # Kalyn
 cd /tmp
