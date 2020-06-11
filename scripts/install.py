@@ -42,3 +42,5 @@ with tempfile.TemporaryDirectory() as tmpdir:
     subprocess.run(["scripts/install-scripts.bash"], check=True)
     subprocess.run(["docker", "system", "prune", "-f"], check=True)
     subprocess.run(["systemctl", "restart", "riju"], check=True)
+
+print("==> Successfully deployed Riju! <==", file=sys.stderr)
