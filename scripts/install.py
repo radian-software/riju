@@ -10,9 +10,7 @@ import sys
 import tempfile
 import time
 
-result = subprocess.run(
-    ["pgrep", "-x", "riju-install"], check=True, stdout=subprocess.PIPE
-)
+result = subprocess.run(["pgrep", "-x", "riju-install"], stdout=subprocess.PIPE)
 assert result.returncode in {0, 1}
 for pid in result.stdout.decode().splitlines():
     print(f"Found existing process {pid}, trying to kill ...", file=sys.stderr)
