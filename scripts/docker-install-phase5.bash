@@ -13,6 +13,12 @@ cd /tmp
 git clone https://github.com/circulosmeos/gdown.pl.git
 mv gdown.pl/gdown.pl /usr/bin/gdown
 
+cd /tmp
+wget https://get.haskellstack.org/stable/linux-x86_64-static.tar.gz
+tar -xf linux-x86_64-static.tar.gz
+mv stack-*-linux-x86_64-static/stack /usr/bin/stack
+rm -rf stack-*-linux-x86_64-static linux-x86_64-static.tar.gz
+
 # D
 cd /tmp
 wget -nv http://downloads.dlang.org/releases/2.x/2.092.0/dmd_2.092.0-0_amd64.deb

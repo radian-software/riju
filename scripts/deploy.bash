@@ -15,4 +15,5 @@ else
     exit 1
 fi
 
-ssh -o IdentitiesOnly=yes -i "${keyfile}" deploy@209.141.40.107 /usr/bin/riju-install
+ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no \
+    -i "${keyfile}" deploy@209.141.40.107 /usr/bin/riju-install

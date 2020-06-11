@@ -48,9 +48,6 @@ default-jdk
 # Julia
 julia
 
-# Kalyn
-haskell-stack
-
 # Ksh
 ksh
 
