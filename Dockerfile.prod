@@ -34,12 +34,13 @@ RUN /tmp/docker-install-phase6.bash
 USER docker
 WORKDIR /home/docker
 EXPOSE 6119
+EXPOSE 6120
 
 ENTRYPOINT ["/usr/local/bin/pid1.bash"]
 COPY scripts/pid1.bash /usr/local/bin/
 
 RUN sudo deluser docker sudo
-ADD --chown=docker:docker . /home/docker/src
+COPY --chown=docker:docker . /home/docker/src
 WORKDIR /home/docker/src
 RUN yarn install
 RUN yarn run backend

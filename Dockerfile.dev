@@ -32,6 +32,7 @@ RUN /tmp/docker-install-phase6.bash "$UID"
 USER docker
 WORKDIR /home/docker
 EXPOSE 6119
+EXPOSE 6120
 
 ENTRYPOINT ["/usr/local/bin/pid1.bash"]
 COPY scripts/pid1.bash /usr/local/bin/

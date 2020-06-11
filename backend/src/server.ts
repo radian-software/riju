@@ -1,6 +1,6 @@
 "use strict";
 
-import * as fs from "fs";
+import * as http from "http";
 import * as https from "https";
 
 import * as appRoot from "app-root-path";
@@ -13,6 +13,7 @@ import { langs } from "./langs";
 
 const host = process.env.HOST || "localhost";
 const port = parseInt(process.env.PORT) || 6119;
+const tlsPort = parseInt(process.env.TLS_PORT) || 6120;
 const useTLS = process.env.TLS ? true : false;
 
 const app = ws(express()).app;
@@ -26,13 +27,6 @@ function getQueryParams(req: Request): URLSearchParams {
   return (req.query as unknown) as URLSearchParams;
 }
 
-app.use((req, res, next) => {
-  if (useTLS && req.headers["x-forwarded-proto"] !== "https") {
-    res.redirect(301, "https://" + req.hostname + req.originalUrl);
-  } else {
-    next();
-  }
-});
 app.get("/", (_, res) => {
   res.render(appRoot.path + "/frontend/pages/index", { langs });
 });
@@ -67,8 +61,9 @@ app.ws("/api/v1/ws", (ws, req) => {
   }
 });
 
-const secureApp = useTLS
-  ? https.createServer(
+if (useTLS) {
+  https
+    .createServer(
       {
         key: Buffer.from(process.env.TLS_PRIVATE_KEY, "base64").toString(
           "ascii"
@@ -79,8 +74,21 @@ const secureApp = useTLS
       },
       app
     )
-  : app;
-
-secureApp.listen(port, host, () =>
-  console.log(`Listening on http://${host}:${port}`)
-);
+    .listen(tlsPort, host, () =>
+      console.log(`Listening on https://${host}:${tlsPort}`)
+    );
+  http
+    .createServer((req, res) => {
+      res.writeHead(301, {
+        Location: "https://" + req.headers["host"] + req.url,
+      });
+      res.end();
+    })
+    .listen(port, host, () =>
+      console.log(`Listening on http://${host}:${port}`)
+    );
+} else {
+  app.listen(port, host, () =>
+    console.log(`Listening on http://${host}:${port}`)
+  );
+}
