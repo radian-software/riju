@@ -16,7 +16,7 @@ const port = parseInt(process.env.PORT) || 6119;
 const tlsPort = parseInt(process.env.TLS_PORT) || 6120;
 const useTLS = process.env.TLS ? true : false;
 
-const app = ws(express()).app;
+const app = express();
 
 app.set("query parser", (qs: string) => new URLSearchParams(qs));
 app.set("view engine", "ejs");
@@ -41,29 +41,37 @@ app.get("/:lang", (req, res) => {
 });
 app.use("/css", express.static(appRoot.path + "/frontend/styles"));
 app.use("/js", express.static(appRoot.path + "/frontend/out"));
-app.ws("/api/v1/ws", (ws, req) => {
-  const lang = getQueryParams(req).get("lang");
-  if (!lang) {
-    ws.send(
-      JSON.stringify({ event: "error", errorMessage: "No language specified" })
-    );
-    ws.close();
-  } else if (!langs[lang]) {
-    ws.send(
-      JSON.stringify({
-        event: "error",
-        errorMessage: `No such language: ${lang}`,
-      })
-    );
-    ws.close();
-  } else {
-    new api.Session(ws, getQueryParams(req).get("lang"));
-  }
-});
+
+function addWebsocket(baseApp) {
+  const app = ws(baseApp).app;
+  app.ws("/api/v1/ws", (ws, req) => {
+    const lang = getQueryParams(req).get("lang");
+    if (!lang) {
+      ws.send(
+        JSON.stringify({
+          event: "error",
+          errorMessage: "No language specified",
+        })
+      );
+      ws.close();
+    } else if (!langs[lang]) {
+      ws.send(
+        JSON.stringify({
+          event: "error",
+          errorMessage: `No such language: ${lang}`,
+        })
+      );
+      ws.close();
+    } else {
+      new api.Session(ws, getQueryParams(req).get("lang"));
+    }
+  });
+  return app;
+}
 
 if (useTLS) {
-  https
-    .createServer(
+  addWebsocket(
+    https.createServer(
       {
         key: Buffer.from(process.env.TLS_PRIVATE_KEY, "base64").toString(
           "ascii"
@@ -74,9 +82,9 @@ if (useTLS) {
       },
       app
     )
-    .listen(tlsPort, host, () =>
-      console.log(`Listening on https://${host}:${tlsPort}`)
-    );
+  ).listen(tlsPort, host, () =>
+    console.log(`Listening on https://${host}:${tlsPort}`)
+  );
   http
     .createServer((req, res) => {
       res.writeHead(301, {
@@ -88,7 +96,7 @@ if (useTLS) {
       console.log(`Listening on http://${host}:${port}`)
     );
 } else {
-  app.listen(port, host, () =>
+  addWebsocket(app).listen(port, host, () =>
     console.log(`Listening on http://${host}:${port}`)
   );
 }
