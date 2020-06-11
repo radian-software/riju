@@ -20,4 +20,4 @@ ssh -o IdentitiesOnly=yes \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
     -o LogLevel=QUIET \
-    -i "${keyfile}" deploy@209.141.40.107 /usr/bin/riju-install
+    -i "${keyfile}" deploy@209.141.40.107
