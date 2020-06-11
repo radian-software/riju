@@ -2,7 +2,7 @@
 Description=Riju online coding sandbox
 
 [Service]
-ExecStart=docker run -p 0.0.0.0:6119 riju
+ExecStart=docker run --rm -p 0.0.0.0:80:6119 riju:prod
 
 [Install]
 WantedBy=multi-user.target
