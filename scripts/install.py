@@ -39,5 +39,6 @@ with tempfile.TemporaryDirectory() as tmpdir:
     )
     os.chdir("riju")
     subprocess.run(["make", "image-prod"], check=True)
+    subprocess.run(["scripts/install-scripts.bash"], check=True)
     subprocess.run(["docker", "system", "prune", "-f"], check=True)
     subprocess.run(["systemctl", "restart", "riju"], check=True)
