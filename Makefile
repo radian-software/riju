@@ -21,8 +21,5 @@ docker: image-dev ## Run shell with source code and deps inside Docker
 	scripts/docker.bash run -it --rm -v "$(PWD):/home/docker/src" -p 6119:6119 -p 6120:6120 riju bash
 
 .PHONY: deploy
-deploy: image-prod ## Deploy to Heroku
-	scripts/docker.bash tag riju:prod registry.heroku.com/riju-sandbox/web
-	heroku auth:token | scripts/docker.bash login --username=_ --password-stdin registry.heroku.com
-	scripts/docker.bash push registry.heroku.com/riju-sandbox/web
-	heroku container:release web -a riju-sandbox
+deploy: ## Deploy current master from GitHub to production
+	scripts/deploy.bash

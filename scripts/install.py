@@ -25,7 +25,7 @@ for pid in result.stdout.decode().splitlines():
                 break
 
 with tempfile.TemporaryDirectory() as tmpdir:
-    os.chdir(tmpdir.name)
+    os.chdir(tmpdir)
     subprocess.run(
         [
             "git",
