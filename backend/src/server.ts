@@ -70,8 +70,12 @@ app.ws("/api/v1/ws", (ws, req) => {
 const secureApp = useTLS
   ? https.createServer(
       {
-        key: fs.readFileSync("/etc/letsencrypt/live/riju.codes/privkey.pem"),
-        cert: fs.readFileSync("/etc/letsencrypt/live/riju.codes/fullchain.pem"),
+        key: Buffer.from(process.env.TLS_PRIVATE_KEY, "base64").toString(
+          "ascii"
+        ),
+        cert: Buffer.from(process.env.TLS_CERTIFICATE, "base64").toString(
+          "ascii"
+        ),
       },
       app
     )
