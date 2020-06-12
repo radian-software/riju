@@ -7,6 +7,7 @@ import * as appRoot from "app-root-path";
 import * as express from "express";
 import { Request } from "express";
 import * as ws from "express-ws";
+import * as _ from "lodash";
 
 import * as api from "./api";
 import { langs } from "./langs";
@@ -30,13 +31,26 @@ function getQueryParams(req: Request): URLSearchParams {
 app.get("/", (_, res) => {
   res.render(appRoot.path + "/frontend/pages/index", { langs });
 });
+for (const [lang, { aliases }] of Object.entries(langs)) {
+  if (aliases) {
+    for (const alias of aliases) {
+      app.get(`/${_.escapeRegExp(alias)}`, (_, res) => {
+        res.redirect(301, `/${lang}`);
+      });
+    }
+  }
+}
 app.get("/:lang", (req, res) => {
-  if (langs[req.params.lang]) {
+  const lang = req.params.lang;
+  const lowered = lang.toLowerCase();
+  if (lowered !== lang) {
+    res.redirect(301, `/${lowered}`);
+  } else if (langs[lang]) {
     res.render(appRoot.path + "/frontend/pages/app", {
-      config: { id: req.params.lang, ...langs[req.params.lang] },
+      config: { id: lang, ...langs[lang] },
     });
   } else {
-    res.send(`No such language: ${req.params.lang}`);
+    res.send(`No such language: ${lang}`);
   }
 });
 app.use("/css", express.static(appRoot.path + "/frontend/styles"));

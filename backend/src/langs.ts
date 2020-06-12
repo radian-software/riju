@@ -1,6 +1,7 @@
 "use strict";
 
 export interface LangConfig {
+  aliases?: string[];
   name: string;
   monacoLang: string;
   repl?: string;
@@ -15,6 +16,7 @@ export interface LangConfig {
 
 export const langs: { [key: string]: LangConfig } = {
   ada: {
+    aliases: ["adb"],
     name: "Ada",
     monacoLang: "plaintext",
     main: "main.adb",
@@ -29,6 +31,7 @@ end Main;
 `,
   },
   algol: {
+    aliases: ["alg"],
     name: "ALGOL 68",
     monacoLang: "plaintext",
     main: "main.alg",
@@ -59,6 +62,7 @@ message:
 `,
   },
   ats: {
+    aliases: ["dats"],
     name: "ATS",
     monacoLang: "postiats",
     main: "main.dats",
@@ -69,6 +73,7 @@ implement main0 () = ()
 `,
   },
   bash: {
+    aliases: ["bashrc", "bourneshell"],
     name: "Bash",
     monacoLang: "shell",
     repl: "bash --rcfile /dev/null",
@@ -78,6 +83,7 @@ implement main0 () = ()
 `,
   },
   basic: {
+    aliases: ["bas", "qbasic"],
     name: "BASIC",
     monacoLang: "plaintext",
     repl: "bwbasic",
@@ -87,6 +93,7 @@ implement main0 () = ()
 `,
   },
   befunge: {
+    aliases: ["be"],
     name: "Befunge",
     monacoLang: "plaintext",
     main: "main.be",
@@ -95,6 +102,7 @@ implement main0 () = ()
 `,
   },
   brainf: {
+    aliases: ["brainfuck", "bf"],
     name: "Brainf***",
     monacoLang: "plaintext",
     repl: "brainf-repl",
@@ -131,6 +139,7 @@ implement main0 () = ()
 `,
   },
   c: {
+    aliases: ["gcc", "llvm", "clang", "h", "cc", "c99", "c11", "c18"],
     name: "C",
     monacoLang: "c",
     main: "main.c",
@@ -145,6 +154,7 @@ int main() {
 `,
   },
   cmd: {
+    aliases: ["bat", "batch", "wine"],
     name: "Cmd",
     monacoLang: "bat",
     repl: "wine cmd",
@@ -154,6 +164,7 @@ int main() {
 `,
   },
   commonlisp: {
+    aliases: ["lisp", "sbcl"],
     name: "Common Lisp",
     monacoLang: "plaintext",
     repl: "rlwrap sbcl",
@@ -163,6 +174,26 @@ int main() {
 `,
   },
   cpp: {
+    aliases: [
+      "c++",
+      "g++",
+      "clang++",
+      "c++98",
+      "c++03",
+      "c++11",
+      "c++14",
+      "c++17",
+      "c++20",
+      "cpp98",
+      "cpp03",
+      "cpp11",
+      "cpp14",
+      "cpp17",
+      "cpp20",
+      "hpp",
+      "cxx",
+      "hxx",
+    ],
     name: "C++",
     monacoLang: "cpp",
     main: "main.cpp",
@@ -177,6 +208,7 @@ int main() {
 `,
   },
   crystal: {
+    aliases: ["cr"],
     name: "Crystal",
     monacoLang: "plaintext",
     main: "main.cr",
@@ -185,6 +217,7 @@ int main() {
 `,
   },
   csharp: {
+    aliases: ["cs", "mcs"],
     name: "C#",
     monacoLang: "csharp",
     main: "main.cs",
@@ -198,6 +231,7 @@ int main() {
 `,
   },
   clojure: {
+    aliases: ["clj"],
     name: "Clojure",
     monacoLang: "clojure",
     repl: "clojure",
@@ -207,6 +241,7 @@ int main() {
 `,
   },
   clojurescript: {
+    aliases: ["cljs", "lumo"],
     name: "ClojureScript",
     monacoLang: "clojure",
     repl: "lumo -r",
@@ -216,6 +251,7 @@ int main() {
 `,
   },
   cobol: {
+    aliases: ["cbl", "cobc"],
     name: "COBOL",
     monacoLang: "plaintext",
     main: "main.cbl",
@@ -229,6 +265,7 @@ PROCEDURE DIVISION.
 `,
   },
   coffeescript: {
+    aliases: ["coffee"],
     name: "CoffeeScript",
     monacoLang: "coffee",
     repl: "coffee",
@@ -242,6 +279,7 @@ require("/usr/lib/node_modules/coffeescript/repl").start()
 `,
   },
   d: {
+    aliases: ["dmd"],
     name: "D",
     monacoLang: "plaintext",
     main: "main.d",
@@ -265,6 +303,7 @@ void main() {
 `,
   },
   elixir: {
+    aliases: ["iex", "exs"],
     name: "Elixir",
     monacoLang: "plaintext",
     repl: "iex",
@@ -286,6 +325,7 @@ output = "Hello, world!"
 `,
   },
   elvish: {
+    aliases: ["elv"],
     name: "Elvish",
     monacoLang: "plaintext",
     repl: "SHELL=/usr/bin/elvish HOME=. elvish",
@@ -295,6 +335,7 @@ output = "Hello, world!"
 `,
   },
   emacs: {
+    aliases: ["emacslisp", "elisp", "gnuemacs", "xemacs", "ielm"],
     name: "Emacs Lisp",
     monacoLang: "plaintext",
     repl: "emacs --eval '(ielm)'",
@@ -304,6 +345,7 @@ output = "Hello, world!"
 `,
   },
   erlang: {
+    aliases: ["erl"],
     name: "Erlang",
     monacoLang: "plaintext",
     repl: "erl",
@@ -327,6 +369,7 @@ main() ->
 `,
   },
   forth: {
+    aliases: ["fs", "gforth"],
     name: "Forth",
     monacoLang: "plaintext",
     repl: "gforth",
@@ -336,6 +379,15 @@ main() ->
 `,
   },
   fortran: {
+    aliases: [
+      "f",
+      "flang",
+      "fortran77",
+      "fortran90",
+      "fortran95",
+      "fortran2003",
+      "fortran2008",
+    ],
     name: "FORTRAN",
     monacoLang: "plaintext",
     main: "main.f",
@@ -347,6 +399,7 @@ main() ->
 `,
   },
   fsharp: {
+    aliases: ["fsharpi", "fsx", "fs"],
     name: "F#",
     monacoLang: "fsharp",
     repl: "fsharpi",
@@ -356,6 +409,7 @@ main() ->
 `,
   },
   go: {
+    aliases: ["golang"],
     name: "Go",
     monacoLang: "go",
     main: "main.go",
@@ -380,6 +434,7 @@ func main() {
 `,
   },
   haskell: {
+    aliases: ["ghc", "ghci", "hs"],
     name: "Haskell",
     monacoLang: "plaintext",
     repl: "ghci",
@@ -407,6 +462,7 @@ log('Hello, world!')
 `,
   },
   intercal: {
+    aliases: ["i", "ick"],
     name: "INTERCAL",
     monacoLang: "plaintext",
     main: "main.i",
@@ -432,6 +488,7 @@ PLEASE GIVE UP
 `,
   },
   java: {
+    aliases: ["javac"],
     name: "Java",
     monacoLang: "java",
     main: "Main.java",
@@ -445,6 +502,7 @@ PLEASE GIVE UP
 `,
   },
   julia: {
+    aliases: ["jl"],
     name: "Julia",
     monacoLang: "plaintext",
     repl: "julia",
@@ -466,6 +524,7 @@ PLEASE GIVE UP
 `,
   },
   kotlin: {
+    aliases: ["kts", "kotlinc"],
     name: "Kotlin",
     monacoLang: "kotlin",
     repl: "kotlinc",
@@ -475,6 +534,7 @@ PLEASE GIVE UP
 `,
   },
   ksh: {
+    aliases: ["kshell"],
     name: "Ksh",
     monacoLang: "shell",
     repl: "SHELL=/usr/bin/ksh HOME=. ksh",
@@ -484,6 +544,7 @@ PLEASE GIVE UP
 `,
   },
   lolcode: {
+    aliases: ["lol", "lci"],
     name: "LOLCODE",
     monacoLang: "plaintext",
     main: "main.lol",
@@ -503,6 +564,7 @@ KTHXBYE
 `,
   },
   malbolge: {
+    aliases: ["mb"],
     name: "Malbolge",
     monacoLang: "plaintext",
     main: "main.mb",
@@ -511,6 +573,7 @@ KTHXBYE
       " (=<`#9]~6ZY32Vx/4Rs+0No-&Jk)\"Fh}|Bcy?`=*z]Kw%oG4UUS0/@-ejc(:'8dc\n",
   },
   mips: {
+    aliases: ["mips64"],
     name: "MIPS",
     monacoLang: "mips",
     main: "main.S",
@@ -533,6 +596,7 @@ message:
 `,
   },
   mumps: {
+    aliases: ["mlang", "gtm", "fisgtm"],
     name: "MUMPS",
     monacoLang: "plaintext",
     main: "main.m",
@@ -553,6 +617,7 @@ message:
 `,
   },
   nodejs: {
+    aliases: ["node", "js", "javascript", "web", "jsx", "v8", "closure"],
     name: "Node.js",
     monacoLang: "javascript",
     repl: "node",
@@ -565,6 +630,7 @@ require("repl").start()
 `,
   },
   objectivec: {
+    aliases: ["objc", "gnustep"],
     name: "Objective-C",
     monacoLang: "objective-c",
     main: "main.m",
@@ -582,6 +648,7 @@ int main() {
 `,
   },
   octave: {
+    aliases: ["matlab", "m", "mathworks"],
     name: "Octave",
     monacoLang: "plaintext",
     repl: "octave",
@@ -591,6 +658,7 @@ int main() {
 `,
   },
   pascal: {
+    aliases: ["pas", "fpc"],
     name: "Pascal",
     monacoLang: "pascal",
     main: "main.pas",
@@ -603,6 +671,7 @@ end.
 `,
   },
   perl: {
+    aliases: ["pl", "repl"],
     name: "Perl",
     monacoLang: "perl",
     repl: "re.pl",
@@ -612,6 +681,7 @@ end.
 `,
   },
   php: {
+    aliases: ["phpcli"],
     name: "PHP",
     monacoLang: "php",
     repl: "php -a",
@@ -623,6 +693,7 @@ echo "Hello, world!\\n";
 `,
   },
   powershell: {
+    aliases: ["pwsh", "ps1"],
     name: "PowerShell",
     monacoLang: "powershell",
     repl: "SHELL=/usr/bin/pwsh pwsh",
@@ -644,6 +715,7 @@ main :-
 `,
   },
   python: {
+    aliases: ["python3", "python2", "py"],
     name: "Python",
     monacoLang: "python",
     repl: "python3 -u",
@@ -653,6 +725,7 @@ main :-
 `,
   },
   r: {
+    aliases: ["rlang"],
     name: "R",
     monacoLang: "r",
     repl: "R",
@@ -662,6 +735,7 @@ main :-
 `,
   },
   racket: {
+    aliases: ["rkt"],
     name: "Racket",
     monacoLang: "plaintext",
     repl: "racket",
@@ -672,6 +746,7 @@ main :-
 `,
   },
   reasonml: {
+    aliases: ["re", "reason", "bsc", "buckle", "bucklescript"],
     name: "ReasonML",
     monacoLang: "plaintext",
     main: "main.re",
@@ -681,6 +756,7 @@ main :-
 `,
   },
   riscv: {
+    aliases: ["risc"],
     name: "RISC-V",
     monacoLang: "plaintext",
     main: "main.S",
@@ -703,6 +779,7 @@ message:
 `,
   },
   ruby: {
+    aliases: ["irb", "rb"],
     name: "Ruby",
     monacoLang: "ruby",
     repl: "irb",
@@ -719,6 +796,7 @@ binding_irb.run(IRB.conf)
 `,
   },
   rust: {
+    aliases: ["rs", "rustc"],
     name: "Rust",
     monacoLang: "rust",
     main: "main.rs",
@@ -739,6 +817,7 @@ binding_irb.run(IRB.conf)
 `,
   },
   scheme: {
+    aliases: ["scm", "mitscheme"],
     name: "Scheme",
     monacoLang: "scheme",
     repl: "mit-scheme",
@@ -750,6 +829,7 @@ binding_irb.run(IRB.conf)
 `,
   },
   sh: {
+    aliases: ["shell", "posix", "posixsh", "ash", "dash", "posh"],
     name: "Sh",
     monacoLang: "shell",
     repl: "SHELL=/usr/bin/sh HOME=. posh -l",
@@ -759,6 +839,7 @@ binding_irb.run(IRB.conf)
 `,
   },
   shakespeare: {
+    aliases: ["spl"],
     name: "Shakespeare",
     monacoLang: "plaintext",
     repl: "shakespeare console",
@@ -857,6 +938,7 @@ Ophelia:
 `,
   },
   smalltalk: {
+    aliases: ["gst", "st"],
     name: "Smalltalk",
     monacoLang: "plaintext",
     repl: "gst",
@@ -866,6 +948,7 @@ Ophelia:
 `,
   },
   snobol: {
+    aliases: ["snobol4", "spitbol", "sno"],
     name: "SNOBOL",
     monacoLang: "plaintext",
     repl: "snobol4",
@@ -876,6 +959,7 @@ END
 `,
   },
   sqlite: {
+    aliases: ["sql", "db", "sqlite3"],
     name: "SQLite",
     monacoLang: "sql",
     repl: "sqlite3",
@@ -885,6 +969,7 @@ END
 `,
   },
   standardml: {
+    aliases: ["sml", "ml"],
     name: "Standard ML",
     monacoLang: "plaintext",
     repl: "rlwrap sml",
@@ -894,6 +979,7 @@ END
 `,
   },
   swift: {
+    aliases: ["swiftc"],
     name: "Swift",
     monacoLang: "swift",
     main: "main.swift",
@@ -903,6 +989,7 @@ END
 `,
   },
   tcl: {
+    aliases: ["tclsh", "tclshrc"],
     name: "Tcl",
     monacoLang: "tcl",
     repl: "tclsh",
@@ -912,6 +999,7 @@ END
 `,
   },
   tcsh: {
+    aliases: ["tcshell", "tcshrc"],
     name: "Tcsh",
     monacoLang: "shell",
     repl: "SHELL=/usr/bin/tcsh HOME=. tcsh",
@@ -921,6 +1009,7 @@ END
 `,
   },
   typescript: {
+    aliases: ["ts", "tsnode", "tsc"],
     name: "TypeScript",
     monacoLang: "typescript",
     repl: "ts-node",
@@ -930,6 +1019,7 @@ END
 `,
   },
   unlambda: {
+    aliases: ["unl"],
     name: "Unlambda",
     monacoLang: "plaintext",
     repl: "unlambda-repl",
@@ -938,6 +1028,7 @@ END
     template: "`.\n`.!`.d`.l`.r`.o`.w`. `.,`.o`.l`.l`.e`.Hi\n",
   },
   vim: {
+    aliases: ["viml", "vimscript"],
     name: "Vimscript",
     monacoLang: "plaintext",
     repl: "vim",
@@ -947,6 +1038,7 @@ END
 `,
   },
   visualbasic: {
+    aliases: ["vbasic", "vb", "vbnc"],
     name: "Visual Basic",
     monacoLang: "vb",
     main: "main.vb",
@@ -960,6 +1052,7 @@ End Module
 `,
   },
   whitespace: {
+    aliases: ["ws"],
     name: "Whitespace",
     monacoLang: "plaintext",
     main: "main.ws",
@@ -967,6 +1060,15 @@ End Module
     template: `Hello, world!  \t  \t   \n\t\n     \t\t  \t \t\n\t\n     \t\t \t\t  \n\t\n     \t\t \t\t  \n\t\n     \t\t \t\t\t\t\n\t\n     \t \t\t  \n\t\n     \t     \n\t\n     \t\t\t \t\t\t\n\t\n     \t\t \t\t\t\t\n\t\n     \t\t\t  \t \n\t\n     \t\t \t\t  \n\t\n     \t\t  \t  \n\t\n  \n\n\n`,
   },
   wolframlanguage: {
+    aliases: [
+      "wolfram",
+      "mathematica",
+      "mathics",
+      "wolframmathematica",
+      "wls",
+      "expreduce",
+      "symja",
+    ],
     name: "Wolfram Language",
     monacoLang: "plaintext",
     repl: "mathics",
@@ -976,6 +1078,7 @@ End Module
 `,
   },
   x86: {
+    aliases: ["s", "asm", "assembly", "x86-64"],
     name: "x86",
     monacoLang: "plaintext",
     main: "main.S",
@@ -998,6 +1101,7 @@ message:
 `,
   },
   zsh: {
+    aliases: ["zshell", "zshrc"],
     name: "Zsh",
     monacoLang: "shell",
     repl: "SHELL=/usr/bin/zsh zsh",
