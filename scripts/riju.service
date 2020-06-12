@@ -1,8 +1,12 @@
 [Unit]
 Description=Riju online coding sandbox
+Requires=docker.service
+After=docker.service
 
 [Service]
+Type=exec
 ExecStart=riju-serve
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
