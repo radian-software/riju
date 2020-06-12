@@ -1,5 +1,3 @@
-"use strict";
-
 import * as fs from "fs";
 import * as mkdirp from "mkdirp";
 import * as pty from "node-pty";
@@ -13,7 +11,7 @@ import { LangConfig, langs } from "./langs";
 export class Session {
   code: string;
   config: LangConfig;
-  term: { pty: IPty; live: boolean };
+  term: { pty: IPty | null; live: boolean };
   ws: WebSocket;
 
   constructor(ws: WebSocket, lang: string) {
@@ -39,7 +37,7 @@ export class Session {
         } else if (typeof msg.input !== "string") {
           console.error(`terminalInput: missing or malformed input field`);
         } else {
-          this.term.pty.write(msg.input);
+          this.term.pty!.write(msg.input);
         }
         break;
       case "runCode":
@@ -132,7 +130,7 @@ export class Session {
       pty: pty.spawn("bash", ["-c", cmdline], {
         name: "xterm-color",
         cwd: tmpdir,
-        env: process.env,
+        env: process.env as { [key: string]: string },
       }),
       live: true,
     };

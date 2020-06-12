@@ -1,5 +1,3 @@
-"use strict";
-
 import * as http from "http";
 import * as https from "https";
 
@@ -13,8 +11,8 @@ import * as api from "./api";
 import { langs } from "./langs";
 
 const host = process.env.HOST || "localhost";
-const port = parseInt(process.env.PORT) || 6119;
-const tlsPort = parseInt(process.env.TLS_PORT) || 6120;
+const port = parseInt(process.env.PORT || "") || 6119;
+const tlsPort = parseInt(process.env.TLS_PORT || "") || 6120;
 const useTLS = process.env.TLS ? true : false;
 
 const app = express();
@@ -56,7 +54,10 @@ app.get("/:lang", (req, res) => {
 app.use("/css", express.static(appRoot.path + "/frontend/styles"));
 app.use("/js", express.static(appRoot.path + "/frontend/out"));
 
-function addWebsocket(baseApp: express.Express, httpsServer: https.Server) {
+function addWebsocket(
+  baseApp: express.Express,
+  httpsServer: https.Server | undefined
+) {
   const app = ws(baseApp, httpsServer).app;
   app.ws("/api/v1/ws", (ws, req) => {
     const lang = getQueryParams(req).get("lang");
@@ -77,7 +78,7 @@ function addWebsocket(baseApp: express.Express, httpsServer: https.Server) {
       );
       ws.close();
     } else {
-      new api.Session(ws, getQueryParams(req).get("lang"));
+      new api.Session(ws, lang);
     }
   });
   return app;
@@ -86,8 +87,10 @@ function addWebsocket(baseApp: express.Express, httpsServer: https.Server) {
 if (useTLS) {
   const httpsServer = https.createServer(
     {
-      key: Buffer.from(process.env.TLS_PRIVATE_KEY, "base64").toString("ascii"),
-      cert: Buffer.from(process.env.TLS_CERTIFICATE, "base64").toString(
+      key: Buffer.from(process.env.TLS_PRIVATE_KEY || "", "base64").toString(
+        "ascii"
+      ),
+      cert: Buffer.from(process.env.TLS_CERTIFICATE || "", "base64").toString(
         "ascii"
       ),
     },

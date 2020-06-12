@@ -3,7 +3,8 @@
     "outDir": "./backend/out",
     "resolveJsonModule": true,
     "rootDir": "./backend/src",
-    "sourceMap": true
+    "sourceMap": true,
+    "strict": true
   },
   "include": ["backend/src"]
 }

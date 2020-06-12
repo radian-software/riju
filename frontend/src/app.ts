@@ -1,5 +1,3 @@
-"use strict";
-
 import * as monaco from "monaco-editor";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
@@ -17,7 +15,7 @@ const config: RijuConfig = (window as any).rijuConfig;
 const term = new Terminal();
 const fitAddon = new FitAddon();
 term.loadAddon(fitAddon);
-term.open(document.getElementById("terminal"));
+term.open(document.getElementById("terminal")!);
 
 fitAddon.fit();
 window.addEventListener("resize", () => fitAddon.fit());
@@ -81,21 +79,23 @@ function scheduleConnect() {
   retryDelayMs *= 2;
 }
 
-let socket = null;
+let socket: WebSocket | null = null;
 tryConnect();
 
-term.onData((data) =>
-  socket.send(JSON.stringify({ event: "terminalInput", input: data }))
+term.onData(
+  (data) =>
+    socket &&
+    socket.send(JSON.stringify({ event: "terminalInput", input: data }))
 );
 
-const editor = monaco.editor.create(document.getElementById("editor"), {
+const editor = monaco.editor.create(document.getElementById("editor")!, {
   minimap: { enabled: false },
   scrollbar: { verticalScrollbarSize: 0 },
 });
 window.addEventListener("resize", () => editor.layout());
-editor.getModel().setValue(config.template);
-monaco.editor.setModelLanguage(editor.getModel(), config.monacoLang);
+editor.getModel()!.setValue(config.template);
+monaco.editor.setModelLanguage(editor.getModel()!, config.monacoLang);
 
-document.getElementById("runButton").addEventListener("click", () => {
-  socket.send(JSON.stringify({ event: "runCode", code: editor.getValue() }));
+document.getElementById("runButton")!.addEventListener("click", () => {
+  socket?.send(JSON.stringify({ event: "runCode", code: editor.getValue() }));
 });

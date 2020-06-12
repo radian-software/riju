@@ -1,5 +1,3 @@
-"use strict";
-
 export interface LangConfig {
   aliases?: string[];
   name: string;

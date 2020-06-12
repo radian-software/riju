@@ -8,6 +8,7 @@
     "@types/express": "^4.17.6",
     "@types/express-ws": "^3.0.0",
     "@types/lodash": "^4.14.155",
+    "@types/mkdirp": "^1.0.1",
     "@types/tmp": "^0.2.0",
     "app-root-path": "^3.0.0",
     "css-loader": "^3.5.3",
