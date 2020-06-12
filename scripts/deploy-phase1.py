@@ -10,7 +10,7 @@ import sys
 import tempfile
 import time
 
-result = subprocess.run(["pgrep", "-x", "riju-install"], stdout=subprocess.PIPE)
+result = subprocess.run(["pgrep", "-x", "riju-deploy"], stdout=subprocess.PIPE)
 assert result.returncode in {0, 1}
 for pid in result.stdout.decode().splitlines():
     print(f"Found existing process {pid}, trying to kill ...", file=sys.stderr)
@@ -38,14 +38,4 @@ with tempfile.TemporaryDirectory() as tmpdir:
         check=True,
     )
     os.chdir("riju")
-    subprocess.run(["make", "image-prod"], check=True)
-    subprocess.run(["scripts/install-scripts.bash"], check=True)
-    subprocess.run(["docker", "system", "prune", "-f"], check=True)
-    existing_containers = subprocess.run(
-        ["docker", "ps", "-q"], check=True, stdout=subprocess.PIPE
-    ).output.splitlines()
-    if existing_containers:
-        subprocess.run(["docker", "kill", *existing_containers], check=True)
-    subprocess.run(["systemctl", "restart", "riju"], check=True)
-
-print("==> Successfully deployed Riju! <==", file=sys.stderr)
+    subprocess.run(["scripts/deploy-phase2.py"])

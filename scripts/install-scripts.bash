@@ -6,6 +6,6 @@ set -o pipefail
 cp scripts/riju.service /etc/systemd/system/riju.service
 cp scripts/certbot-pre.bash /etc/letsencrypt/renewal-hooks/pre/riju
 cp scripts/certbot-post.bash /etc/letsencrypt/renewal-hooks/post/riju
-cp scripts/install.py /usr/bin/riju-install
+cp scripts/deploy-phase1.py /usr/bin/riju-deploy
 
 systemctl daemon-reload
