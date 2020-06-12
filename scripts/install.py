@@ -41,6 +41,11 @@ with tempfile.TemporaryDirectory() as tmpdir:
     subprocess.run(["make", "image-prod"], check=True)
     subprocess.run(["scripts/install-scripts.bash"], check=True)
     subprocess.run(["docker", "system", "prune", "-f"], check=True)
+    existing_containers = subprocess.run(
+        ["docker", "ps", "-q"], check=True, stdout=subprocess.PIPE
+    ).output.splitlines()
+    if existing_containers:
+        subprocess.run(["docker", "kill", *existing_containers], check=True)
     subprocess.run(["systemctl", "restart", "riju"], check=True)
 
 print("==> Successfully deployed Riju! <==", file=sys.stderr)

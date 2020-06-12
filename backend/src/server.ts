@@ -42,8 +42,8 @@ app.get("/:lang", (req, res) => {
 app.use("/css", express.static(appRoot.path + "/frontend/styles"));
 app.use("/js", express.static(appRoot.path + "/frontend/out"));
 
-function addWebsocket(baseApp) {
-  const app = ws(baseApp).app;
+function addWebsocket(baseApp: express.Express, httpsServer: https.Server) {
+  const app = ws(baseApp, httpsServer).app;
   app.ws("/api/v1/ws", (ws, req) => {
     const lang = getQueryParams(req).get("lang");
     if (!lang) {
@@ -70,19 +70,17 @@ function addWebsocket(baseApp) {
 }
 
 if (useTLS) {
-  addWebsocket(
-    https.createServer(
-      {
-        key: Buffer.from(process.env.TLS_PRIVATE_KEY, "base64").toString(
-          "ascii"
-        ),
-        cert: Buffer.from(process.env.TLS_CERTIFICATE, "base64").toString(
-          "ascii"
-        ),
-      },
-      app
-    )
-  ).listen(tlsPort, host, () =>
+  const httpsServer = https.createServer(
+    {
+      key: Buffer.from(process.env.TLS_PRIVATE_KEY, "base64").toString("ascii"),
+      cert: Buffer.from(process.env.TLS_CERTIFICATE, "base64").toString(
+        "ascii"
+      ),
+    },
+    app
+  );
+  addWebsocket(app, httpsServer);
+  httpsServer.listen(tlsPort, host, () =>
     console.log(`Listening on https://${host}:${tlsPort}`)
   );
   http
@@ -96,7 +94,8 @@ if (useTLS) {
       console.log(`Listening on http://${host}:${port}`)
     );
 } else {
-  addWebsocket(app).listen(port, host, () =>
+  addWebsocket(app, undefined);
+  app.listen(port, host, () =>
     console.log(`Listening on http://${host}:${port}`)
   );
 }
