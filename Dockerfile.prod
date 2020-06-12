@@ -53,4 +53,4 @@ COPY --chown=docker:docker . /home/docker/src
 RUN cp -R /tmp/riju/* /home/docker/src/ && rm -rf /tmp/riju
 
 WORKDIR /home/docker/src
-CMD yarn run server
+CMD ["yarn", "run", "server"]
