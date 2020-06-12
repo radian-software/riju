@@ -33,7 +33,7 @@ app.get("/", (_, res) => {
 app.get("/:lang", (req, res) => {
   if (langs[req.params.lang]) {
     res.render(appRoot.path + "/frontend/pages/app", {
-      name: langs[req.params.lang].name,
+      config: { id: req.params.lang, ...langs[req.params.lang] },
     });
   } else {
     res.send(`No such language: ${req.params.lang}`);

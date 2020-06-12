@@ -6,7 +6,13 @@ import { FitAddon } from "xterm-addon-fit";
 
 import "xterm/css/xterm.css";
 
-const lang = document.location.pathname.slice(1);
+interface RijuConfig {
+  id: string;
+  monacoLang: string;
+  template: string;
+}
+
+const config: RijuConfig = (window as any).rijuConfig;
 
 const term = new Terminal();
 const fitAddon = new FitAddon();
@@ -16,17 +22,17 @@ term.open(document.getElementById("terminal"));
 fitAddon.fit();
 window.addEventListener("resize", () => fitAddon.fit());
 
+term.write("Connecting to server...");
+
 const initialRetryDelayMs = 200;
 let retryDelayMs = initialRetryDelayMs;
-
-let allowInsertingTemplate = true;
 
 function tryConnect() {
   console.log("Connecting to server...");
   socket = new WebSocket(
     (document.location.protocol === "http:" ? "ws://" : "wss://") +
       document.location.host +
-      `/api/v1/ws?lang=${encodeURIComponent(lang)}`
+      `/api/v1/ws?lang=${encodeURIComponent(config.id)}`
   );
   socket.addEventListener("open", () => {
     console.log("Successfully connected to server");
@@ -52,25 +58,6 @@ function tryConnect() {
           return;
         }
         term.write(message.output);
-        return;
-      case "setMonacoLanguage":
-        if (typeof message.monacoLanguage !== "string") {
-          console.error("Unexpected message from server:", message);
-          return;
-        }
-        monaco.editor.setModelLanguage(
-          editor.getModel(),
-          message.monacoLanguage
-        );
-        return;
-      case "insertTemplate":
-        if (typeof message.template !== "string") {
-          console.error("Unexpected message from server:", message);
-          return;
-        }
-        if (allowInsertingTemplate) {
-          editor.getModel().setValue(message.template);
-        }
         return;
       default:
         console.error("Unexpected message from server:", message);
@@ -106,9 +93,8 @@ const editor = monaco.editor.create(document.getElementById("editor"), {
   scrollbar: { verticalScrollbarSize: 0 },
 });
 window.addEventListener("resize", () => editor.layout());
-editor.onDidChangeModelContent(() => {
-  allowInsertingTemplate = false;
-});
+editor.getModel().setValue(config.template);
+monaco.editor.setModelLanguage(editor.getModel(), config.monacoLang);
 
 document.getElementById("runButton").addEventListener("click", () => {
   socket.send(JSON.stringify({ event: "runCode", code: editor.getValue() }));

@@ -21,28 +21,6 @@ export class Session {
     this.config = langs[lang];
     this.term = { pty: null, live: false };
     this.code = "";
-    try {
-      this.ws.send(
-        JSON.stringify({
-          event: "setMonacoLanguage",
-          monacoLanguage: this.config.monacoLang,
-        })
-      );
-    } catch (err) {
-      //
-    }
-    if (this.config.template) {
-      try {
-        this.ws.send(
-          JSON.stringify({
-            event: "insertTemplate",
-            template: this.config.template,
-          })
-        );
-      } catch (err) {
-        //
-      }
-    }
     this.run().catch(console.error);
     ws.on("message", this.handleClientMessage);
   }

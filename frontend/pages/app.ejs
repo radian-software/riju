@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title><%= name %> - Riju</title>
+    <title><%= config.name %> - Riju</title>
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
@@ -10,7 +10,6 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="/css/app.css" />
-    <script src="/js/app.js" async defer></script>
   </head>
   <body>
     <div id="app">
@@ -19,5 +18,9 @@
       <button type="button" class="btn btn-success" id="runButton">Run</button>
       <a href="/" class="btn btn-secondary" id="backButton">Switch to a different language</a>
     </div>
+    <script>
+     window.rijuConfig = <%- JSON.stringify(config) %>;
+    </script>
+    <script src="/js/app.js"></script>
   </body>
 </html>
