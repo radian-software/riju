@@ -14,7 +14,7 @@ subprocess.run(["make", "image-prod"], check=True)
 subprocess.run(["docker", "system", "prune", "-f"], check=True)
 existing_containers = subprocess.run(
     ["docker", "ps", "-q"], check=True, stdout=subprocess.PIPE
-).output.splitlines()
+).stdout.splitlines()
 subprocess.run(["scripts/install-scripts.bash"], check=True)
 if existing_containers:
     subprocess.run(["docker", "kill", *existing_containers], check=True)
