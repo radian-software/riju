@@ -20,4 +20,4 @@ ssh -o IdentitiesOnly=yes \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
     -o LogLevel=QUIET \
-    -i "${keyfile}" deploy@138.68.247.206
+    -i "${keyfile}" deploy@riju.codes
