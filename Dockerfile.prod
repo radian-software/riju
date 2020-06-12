@@ -40,9 +40,17 @@ ENTRYPOINT ["/usr/local/bin/pid1.bash"]
 COPY scripts/pid1.bash /usr/local/bin/
 
 RUN sudo deluser docker sudo
+
+RUN mkdir /tmp/riju
+COPY --chown=docker:docker package.json yarn.lock /tmp/riju/
+RUN cd /tmp/riju && yarn install
+COPY --chown=docker:docker webpack.config.js tsconfig.json tsconfig-webpack.json /tmp/riju/
+COPY --chown=docker:docker frontend /tmp/riju/frontend
+RUN cd /tmp/riju && yarn run frontend
+COPY --chown=docker:docker backend /tmp/riju/backend
+RUN cd /tmp/riju && yarn run backend
 COPY --chown=docker:docker . /home/docker/src
+RUN cp -R /tmp/riju/* /home/docker/src/ && rm -rf /tmp/riju
+
 WORKDIR /home/docker/src
-RUN yarn install
-RUN yarn run backend
-RUN yarn run frontend
 CMD yarn run server
