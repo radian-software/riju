@@ -11,5 +11,11 @@ TLS_CERTIFICATE="$(base64 /etc/letsencrypt/live/riju.codes/fullchain.pem)"
 # the script.
 export TLS TLS_PRIVATE_KEY TLS_CERTIFICATE
 
-docker run -t -e TLS -e TLS_PRIVATE_KEY -e TLS_CERTIFICATE \
+if [[ -t 1 ]]; then
+    it=-it
+else
+    it=
+fi
+
+docker run ${it} -e TLS -e TLS_PRIVATE_KEY -e TLS_CERTIFICATE \
        --rm -p 0.0.0.0:80:6119 -p 0.0.0.0:443:6120 riju:prod
