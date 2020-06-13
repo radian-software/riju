@@ -5,6 +5,8 @@ set -o pipefail
 
 uid="$1"
 
+rm -rf /tmp/hsperfdata_root
+
 if [[ -n "$uid" ]] && (( "$uid" != 0 )); then
     useradd --uid="$uid" --create-home --groups sudo docker
     passwd -d docker

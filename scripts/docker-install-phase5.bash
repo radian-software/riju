@@ -12,6 +12,7 @@ rm watchexec-*.deb
 cd /tmp
 git clone https://github.com/circulosmeos/gdown.pl.git
 mv gdown.pl/gdown.pl /usr/bin/gdown
+rm -rf gdown.pl
 
 cd /tmp
 wget https://get.haskellstack.org/stable/linux-x86_64-static.tar.gz
