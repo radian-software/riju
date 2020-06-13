@@ -13,14 +13,19 @@ export class Session {
   config: LangConfig;
   term: { pty: IPty | null; live: boolean };
   ws: WebSocket;
+  tmpdir: string | null;
+  tmpdirCleanup: (() => void) | null;
 
   constructor(ws: WebSocket, lang: string) {
     this.ws = ws;
     this.config = langs[lang];
     this.term = { pty: null, live: false };
     this.code = "";
-    this.run().catch(console.error);
+    this.tmpdir = null;
+    this.tmpdirCleanup = null;
     ws.on("message", this.handleClientMessage);
+    ws.on("close", this.cleanup);
+    this.run().catch(console.error);
   }
   handleClientMessage = (event: string) => {
     let msg: any;
@@ -64,15 +69,18 @@ export class Session {
     } catch (err) {
       //
     }
-    const tmpdir: string = await new Promise((resolve, reject) =>
-      tmp.dir({ unsafeCleanup: true }, (err, path) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(path);
-        }
-      })
-    );
+    if (this.tmpdir == null) {
+      ({ path: this.tmpdir, cleanup: this.tmpdirCleanup } = await new Promise(
+        (resolve, reject) =>
+          tmp.dir({ unsafeCleanup: true }, (err, path, cleanup) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve({ path, cleanup });
+            }
+          })
+      ));
+    }
     let cmdline: string;
     if (!run) {
       cmdline = `echo 'Support for ${this.config.name} is not yet implemented.'`;
@@ -82,10 +90,10 @@ export class Session {
         code += suffix;
       }
       if (main.includes("/")) {
-        await mkdirp(path.dirname(path.resolve(tmpdir, main)));
+        await mkdirp(path.dirname(path.resolve(this.tmpdir!, main)));
       }
       await new Promise((resolve, reject) =>
-        fs.writeFile(path.resolve(tmpdir, main), code, (err) => {
+        fs.writeFile(path.resolve(this.tmpdir!, main), code, (err) => {
           if (err) {
             reject(err);
           } else {
@@ -106,7 +114,7 @@ export class Session {
       if (this.code) {
         const contents = ":load Main\nmain\n";
         await new Promise((resolve, reject) => {
-          fs.writeFile(path.resolve(tmpdir, ".ghci"), contents, (err) => {
+          fs.writeFile(path.resolve(this.tmpdir!, ".ghci"), contents, (err) => {
             if (err) {
               reject(err);
             } else {
@@ -116,7 +124,7 @@ export class Session {
         });
       } else {
         await new Promise((resolve, reject) =>
-          fs.unlink(path.resolve(tmpdir, ".ghci"), (err) => {
+          fs.unlink(path.resolve(this.tmpdir!, ".ghci"), (err) => {
             if (err && err.code !== "ENOENT") {
               reject(err);
             } else {
@@ -129,7 +137,7 @@ export class Session {
     const term = {
       pty: pty.spawn("bash", ["-c", cmdline], {
         name: "xterm-color",
-        cwd: tmpdir,
+        cwd: this.tmpdir!,
         env: process.env as { [key: string]: string },
       }),
       live: true,
@@ -148,5 +156,10 @@ export class Session {
         }
       }
     });
+  };
+  cleanup = () => {
+    if (this.tmpdirCleanup) {
+      this.tmpdirCleanup();
+    }
   };
 }
