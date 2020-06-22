@@ -20,6 +20,7 @@ usual to install dependencies. For production, it's:
 
     $ yarn backend
     $ yarn frontend
+    $ yarn system
     $ yarn server
 
 For development with file watching and automatic server rebooting and
@@ -27,15 +28,18 @@ all that, it's:
 
     $ yarn backend-dev
     $ yarn frontend-dev
+    $ yarn system-dev
     $ yarn server-dev
 
 The webserver listens on `localhost:6119`. Now, although the server
 itself will work, the only languages that will work are the ones that
 happen to be installed on your machine. (I'm sure you can find a few
-that are already.) If you want to test with *all* the languages (or
-you're working on adding a new language), then you need to use Docker.
-Running the app is exactly the same as before, you just have to jump
-into the container first:
+that are already.) Also, sandboxing using UNIX filesystem permissions
+will be disabled, because that requires root privileges. If you want
+to test with *all* the languages plus sandboxing (or you're working on
+adding a new language), then you need to use Docker. Running the app
+is exactly the same as before, you just have to jump into the
+container first:
 
     $ make docker
 

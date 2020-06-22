@@ -7,6 +7,11 @@
   resolved "https://registry.yarnpkg.com/@types/app-root-path/-/app-root-path-1.2.4.tgz#a78b703282b32ac54de768f5512ecc3569919dc7"
   integrity sha1-p4twMoKzKsVN52j1US7MNWmRncc=
 
+"@types/async-lock@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@types/async-lock/-/async-lock-1.1.2.tgz#cbc26a34b11b83b28f7783a843c393b443ef8bef"
+  integrity sha512-j9n4bb6RhgFIydBe0+kpjnBPYumDaDyU8zvbWykyVMkku+c2CSu31MZkLeaBfqIwU+XCxlDpYDfyMQRkM0AkeQ==
+
 "@types/body-parser@*":
   version "1.19.0"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.19.0.tgz#0685b3c47eb3006ffed117cdd55164b61f80538f"
@@ -77,6 +82,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.11.tgz#61d4886e2424da73b7b25547f59fdcb534c165a3"
   integrity sha512-lCvvI24L21ZVeIiyIUHZ5Oflv1hhHQ5E1S25IRlKIXaRkVgmXpJMI3wUJkmym2bTbCe+WoIibQnMVAU3FguaOg==
 
+"@types/parse-passwd@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/parse-passwd/-/parse-passwd-1.0.0.tgz#72fc50feb14d484547f40ba7da54dfcfc711dcf1"
+  integrity sha512-+kETlH3XJMQKUpJ4dYfU4MlfYqyjKwsOC9PLJcGiUhPcHrNEgvcEbllSJ5HlsvflDLswTtyDoKJEUcCQg2l9PA==
+
 "@types/qs@*":
   version "6.9.3"
   resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.9.3.tgz#b755a0934564a200d3efdf88546ec93c369abd03"
@@ -99,6 +109,11 @@
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@types/tmp/-/tmp-0.2.0.tgz#e3f52b4d7397eaa9193592ef3fdd44dc0af4298c"
   integrity sha512-flgpHJjntpBAdJD43ShRosQvNC0ME97DCfGvZEDlAThQmnerRXrLbX6YgzRBQCZTthET9eAWFAMaYP0m0Y4HzQ==
+
+"@types/uuid@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-8.0.0.tgz#165aae4819ad2174a17476dbe66feebd549556c0"
+  integrity sha512-xSQfNcvOiE5f9dyd4Kzxbof1aTrLobL278pGLKOZI6esGfZ7ts9Ka16CzIN6Y8hFHE1C7jIBZokULhK1bOgjRw==
 
 "@types/ws@*":
   version "7.2.5"
@@ -389,6 +404,11 @@ async-limiter@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/async-limiter/-/async-limiter-1.0.1.tgz#dd379e94f0db8310b08291f9d64c3209766617fd"
   integrity sha512-csOlWGAcRFJaI6m+F2WKdnMKr4HhdhFVBk0H/QbJFMCr+uO2kwohwXQPxw/9OCxp05r5ghVBFSyioixx3gfkNQ==
+
+async-lock@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/async-lock/-/async-lock-1.2.4.tgz#80d0d612383045dd0c30eb5aad08510c1397cb91"
+  integrity sha512-UBQJC2pbeyGutIfYmErGc9RaJYnpZ1FHaxuKwb0ahvGiiCkPUf3p67Io+YLPmmv3RHY+mF6JEtNW8FlHsraAaA==
 
 async@0.9.x:
   version "0.9.2"
@@ -2190,6 +2210,11 @@ nice-try@^1.0.4:
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
   integrity sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
 
+node-cleanup@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/node-cleanup/-/node-cleanup-2.1.2.tgz#7ac19abd297e09a7f72a71545d951b517e4dde2c"
+  integrity sha1-esGavSl+Caf3KnFUXZUbUX5N3iw=
+
 node-libs-browser@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/node-libs-browser/-/node-libs-browser-2.2.1.tgz#b64f513d18338625f90346d27b0d235e631f6425"
@@ -3298,6 +3323,11 @@ utils-merge@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
+
+uuid@^8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.1.0.tgz#6f1536eb43249f473abc6bd58ff983da1ca30d8d"
+  integrity sha512-CI18flHDznR0lq54xBycOVmphdCYnQLKn8abKn7PXUiKUGdEd+/l9LWNJmugXel4hXq7S+RMNl34ecyC9TntWg==
 
 v8-compile-cache@2.0.3:
   version "2.0.3"

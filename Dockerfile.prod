@@ -38,8 +38,7 @@ EXPOSE 6120
 
 ENTRYPOINT ["/usr/local/bin/pid1.bash"]
 COPY scripts/pid1.bash /usr/local/bin/
-
-RUN sudo deluser docker sudo
+CMD ["yarn", "run", "server"]
 
 RUN mkdir /tmp/riju
 COPY --chown=docker:docker package.json yarn.lock /tmp/riju/
@@ -49,8 +48,10 @@ COPY --chown=docker:docker frontend /tmp/riju/frontend
 RUN cd /tmp/riju && yarn run frontend
 COPY --chown=docker:docker backend /tmp/riju/backend
 RUN cd /tmp/riju && yarn run backend
+COPY --chown=docker:docker system /tmp/riju/system
+RUN cd /tmp/riju && RIJU_PRIVILEGED=1 yarn run system
 COPY --chown=docker:docker . /home/docker/src
 RUN cp -R /tmp/riju/* /home/docker/src/ && rm -rf /tmp/riju
 
 WORKDIR /home/docker/src
-CMD ["yarn", "run", "server"]
+RUN sudo deluser docker sudo
