@@ -6,6 +6,7 @@ export interface LangConfig {
   main: string;
   prefix?: string;
   suffix?: string;
+  alwaysCreate?: boolean;
   compile?: string;
   run: string;
   template: string;
@@ -220,7 +221,7 @@ int main() {
     monacoLang: "csharp",
     main: "main.cs",
     compile: "mcs main.cs",
-    run: "./main.exe",
+    run: "mono main.exe",
     template: `class main {
     static void Main(string[] args) {
         System.Console.WriteLine("Hello, world!");
@@ -326,9 +327,9 @@ output = "Hello, world!"
     aliases: ["elv"],
     name: "Elvish",
     monacoLang: "plaintext",
-    repl: "SHELL=/usr/bin/elvish HOME=. elvish",
+    repl: `SHELL=/usr/bin/elvish HOME="$PWD" elvish`,
     main: ".elvish/rc.elv",
-    run: "SHELL=/usr/bin/elvish HOME=. elvish",
+    run: `SHELL=/usr/bin/elvish HOME="$PWD" elvish`,
     template: `echo "Hello, world!"
 `,
   },
@@ -451,8 +452,8 @@ main = putStrLn "Hello, world!"
     repl: "ink",
     main: "main.ink",
     run: "ink main.ink; ink",
-    template: `std := load('../../opt/ink/std')
-str := load('../../opt/ink/str')
+    template: `std := load('../../../opt/ink/std')
+str := load('../../../opt/ink/str')
 
 log := std.log
 
@@ -535,9 +536,9 @@ PLEASE GIVE UP
     aliases: ["kshell"],
     name: "Ksh",
     monacoLang: "shell",
-    repl: "SHELL=/usr/bin/ksh HOME=. ksh",
+    repl: `SHELL=/usr/bin/ksh HOME="$PWD" ksh`,
     main: ".kshrc",
-    run: "SHELL=/usr/bin/ksh HOME=. ksh",
+    run: `SHELL=/usr/bin/ksh HOME="$PWD" ksh`,
     template: `echo "Hello, world!"
 `,
   },
@@ -830,9 +831,9 @@ binding_irb.run(IRB.conf)
     aliases: ["shell", "posix", "posixsh", "ash", "dash", "posh"],
     name: "Sh",
     monacoLang: "shell",
-    repl: "SHELL=/usr/bin/sh HOME=. posh -l",
+    repl: `SHELL=/usr/bin/sh HOME="$PWD" posh -l`,
     main: ".profile",
-    run: "SHELL=/usr/bin/sh HOME=. posh -l",
+    run: `SHELL=/usr/bin/sh HOME="$PWD" posh -l`,
     template: `echo "Hello, world!"
 `,
   },
@@ -992,7 +993,7 @@ END
     monacoLang: "tcl",
     repl: "tclsh",
     main: ".tclshrc",
-    run: "HOME=. tclsh",
+    run: `HOME="$PWD" tclsh`,
     template: `puts {Hello, world!}
 `,
   },
@@ -1000,9 +1001,9 @@ END
     aliases: ["tcshell", "tcshrc"],
     name: "Tcsh",
     monacoLang: "shell",
-    repl: "SHELL=/usr/bin/tcsh HOME=. tcsh",
+    repl: `SHELL=/usr/bin/tcsh HOME="$PWD" tcsh`,
     main: ".tcshrc",
-    run: "SHELL=/usr/bin/tcsh HOME=. tcsh",
+    run: `SHELL=/usr/bin/tcsh HOME="$PWD" tcsh`,
     template: `echo "Hello, world!"
 `,
   },
@@ -1104,7 +1105,8 @@ message:
     monacoLang: "shell",
     repl: "SHELL=/usr/bin/zsh zsh",
     main: ".zshrc",
-    run: "SHELL=/usr/bin/zsh ZDOTDIR=. zsh",
+    alwaysCreate: true,
+    run: `SHELL=/usr/bin/zsh ZDOTDIR="$PWD" zsh`,
     template: `echo "Hello, world!"
 `,
   },

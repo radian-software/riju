@@ -4,6 +4,9 @@ FROM ubuntu:focal
 # prod, it's not actually read by anything.
 ARG UID
 
+COPY scripts/docker-install-phase0.bash /tmp/
+RUN /tmp/docker-install-phase0.bash
+
 COPY scripts/docker-install-phase1.bash /tmp/
 RUN /tmp/docker-install-phase1.bash
 
@@ -33,6 +36,7 @@ RUN /tmp/docker-install-phase6.bash
 
 USER docker
 WORKDIR /home/docker
+RUN chmod go-rwx /home/docker
 EXPOSE 6119
 EXPOSE 6120
 
@@ -40,7 +44,7 @@ ENTRYPOINT ["/usr/local/bin/pid1.bash"]
 COPY scripts/pid1.bash /usr/local/bin/
 CMD ["yarn", "run", "server"]
 
-RUN mkdir /tmp/riju
+RUN mkdir /tmp/riju /tmp/riju/scripts
 COPY --chown=docker:docker package.json yarn.lock /tmp/riju/
 RUN cd /tmp/riju && yarn install
 COPY --chown=docker:docker webpack.config.js tsconfig.json tsconfig-webpack.json /tmp/riju/
@@ -48,10 +52,11 @@ COPY --chown=docker:docker frontend /tmp/riju/frontend
 RUN cd /tmp/riju && yarn run frontend
 COPY --chown=docker:docker backend /tmp/riju/backend
 RUN cd /tmp/riju && yarn run backend
+COPY --chown=docker:docker scripts/compile-system.bash /tmp/riju/scripts
 COPY --chown=docker:docker system /tmp/riju/system
 RUN cd /tmp/riju && RIJU_PRIVILEGED=1 yarn run system
 COPY --chown=docker:docker . /home/docker/src
-RUN cp -R /tmp/riju/* /home/docker/src/ && rm -rf /tmp/riju
+RUN sudo cp -a /tmp/riju/* /home/docker/src/ && rm -rf /tmp/riju
 
 WORKDIR /home/docker/src
 RUN sudo deluser docker sudo

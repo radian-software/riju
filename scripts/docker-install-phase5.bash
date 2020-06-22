@@ -2,6 +2,7 @@
 
 set -e
 set -o pipefail
+set -x
 
 # Needed for project infrastructure
 cd /tmp

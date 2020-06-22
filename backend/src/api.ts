@@ -1,49 +1,48 @@
-import * as fs from "fs";
 import * as path from "path";
 import * as WebSocket from "ws";
 
-import * as mkdirp from "mkdirp";
-import * as nodeCleanup from "node-cleanup";
 import * as pty from "node-pty";
 import { IPty } from "node-pty";
-import * as tmp from "tmp";
 import { v4 as getUUID } from "uuid";
 
+import { PRIVILEGED } from "./config";
 import { LangConfig, langs } from "./langs";
 import { borrowUser } from "./users";
+import { callPrivileged, getEnv, spawnPrivileged } from "./util";
 
 export class Session {
-  id: string;
+  uuid: string;
   code: string;
   config: LangConfig;
   term: { pty: IPty | null; live: boolean };
   ws: WebSocket;
-  tmpdir: string | null;
-  tmpdirCleanup: (() => void) | null;
+  homedir: string | null;
   uid: number | null;
   uidCleanup: (() => Promise<void>) | null;
 
-  log = (msg: string) => console.log(`[${this.id}] ${msg}`);
+  log = (msg: string) => console.log(`[${this.uuid}] ${msg}`);
 
   constructor(ws: WebSocket, lang: string) {
-    this.id = getUUID();
+    this.uuid = getUUID();
     this.log(`Creating session, language ${lang}`);
     this.ws = ws;
     this.config = langs[lang];
     this.term = { pty: null, live: false };
     this.code = "";
-    this.tmpdir = null;
-    this.tmpdirCleanup = null;
+    this.homedir = null;
     this.uid = null;
     this.uidCleanup = null;
     ws.on("message", this.handleClientMessage);
     ws.on("close", () =>
-      this.cleanup().catch((err) =>
-        this.log(`Error during session cleanup: ${err}`)
-      )
+      this.cleanup().catch((err) => {
+        this.log(`Error during session cleanup`);
+        console.log(err);
+      })
     );
-    nodeCleanup();
-    this.run().catch((err) => this.log(`Error while running: ${err}`));
+    this.run().catch((err) => {
+      this.log(`Error while setting up environment for pty`);
+      console.log(err);
+    });
   }
   handleClientMessage = (event: string) => {
     let msg: any;
@@ -81,9 +80,18 @@ export class Session {
       ({ uid: this.uid, cleanup: this.uidCleanup } = await borrowUser(
         this.log
       ));
+      this.log(`Borrowed uid ${this.uid}`);
     }
-    this.log(`Borrowed uid ${this.uid}`);
-    const { name, repl, main, suffix, compile, run, hacks } = this.config;
+    const {
+      name,
+      repl,
+      main,
+      suffix,
+      alwaysCreate,
+      compile,
+      run,
+      hacks,
+    } = this.config;
     if (this.term.pty) {
       this.term.pty.kill();
       this.term.live = false;
@@ -93,20 +101,9 @@ export class Session {
     } catch (err) {
       //
     }
-    if (this.tmpdir == null) {
-      ({ path: this.tmpdir, cleanup: this.tmpdirCleanup } = await new Promise(
-        (resolve, reject) =>
-          tmp.dir(
-            { unsafeCleanup: true, dir: "riju" },
-            (err, path, cleanup) => {
-              if (err) {
-                reject(err);
-              } else {
-                resolve({ path, cleanup });
-              }
-            }
-          )
-      ));
+    if (this.homedir == null) {
+      this.homedir = `/tmp/riju/${this.uuid}`;
+      await callPrivileged(["setup", `${this.uid}`, this.uuid], this.log);
     }
     let cmdline: string;
     if (!run) {
@@ -117,22 +114,33 @@ export class Session {
         code += suffix;
       }
       if (main.includes("/")) {
-        await mkdirp(path.dirname(path.resolve(this.tmpdir!, main)));
+        await spawnPrivileged(
+          this.uid,
+          this.uuid,
+          ["mkdir", "-p", path.dirname(path.resolve(this.homedir, main))],
+          this.log
+        );
       }
-      await new Promise((resolve, reject) =>
-        fs.writeFile(path.resolve(this.tmpdir!, main), code, (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        })
+      await spawnPrivileged(
+        this.uid,
+        this.uuid,
+        ["sh", "-c", `cat > ${path.resolve(this.homedir, main)}`],
+        this.log,
+        { input: code }
       );
       cmdline = run;
       if (compile) {
         cmdline = `( ${compile} ) && ( ${run} )`;
       }
     } else if (repl) {
+      if (alwaysCreate) {
+        await spawnPrivileged(
+          this.uid,
+          this.uuid,
+          ["touch", `${path.resolve(this.homedir, main)}`],
+          this.log
+        );
+      }
       cmdline = repl;
     } else {
       cmdline = `echo '${name} has no REPL, press Run to see it in action'`;
@@ -140,32 +148,38 @@ export class Session {
     if (hacks && hacks.includes("ghci-config") && run) {
       if (this.code) {
         const contents = ":load Main\nmain\n";
-        await new Promise((resolve, reject) => {
-          fs.writeFile(path.resolve(this.tmpdir!, ".ghci"), contents, (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        });
+        await spawnPrivileged(
+          this.uid,
+          this.uuid,
+          ["sh", "-c", `cat > ${path.resolve(this.homedir, ".ghci")}`],
+          this.log,
+          { input: contents }
+        );
       } else {
-        await new Promise((resolve, reject) =>
-          fs.unlink(path.resolve(this.tmpdir!, ".ghci"), (err) => {
-            if (err && err.code !== "ENOENT") {
-              reject(err);
-            } else {
-              resolve();
-            }
-          })
+        await spawnPrivileged(
+          this.uid,
+          this.uuid,
+          ["rm", "-f", path.resolve(this.homedir, ".ghci")],
+          this.log
         );
       }
     }
+    const args = PRIVILEGED
+      ? [
+          "/home/docker/src/system/out/riju-system-privileged",
+          "spawn",
+          `${this.uid}`,
+          `${this.uuid}`,
+          "bash",
+          "-c",
+          cmdline,
+        ]
+      : ["bash", "-c", cmdline];
+    const env = getEnv(this.uuid);
     const term = {
-      pty: pty.spawn("bash", ["-c", cmdline], {
+      pty: pty.spawn(args[0], args.slice(1), {
         name: "xterm-color",
-        cwd: this.tmpdir!,
-        env: process.env as { [key: string]: string },
+        env,
       }),
       live: true,
     };
@@ -186,8 +200,8 @@ export class Session {
   };
   cleanup = async () => {
     this.log(`Cleaning up session`);
-    if (this.tmpdirCleanup) {
-      this.tmpdirCleanup();
+    if (this.homedir) {
+      await callPrivileged(["teardown", this.uuid], this.log);
     }
     if (this.uidCleanup) {
       await this.uidCleanup();

@@ -18,18 +18,18 @@ documenting it until it has reached feature-completeness.
 To run the webserver, all you need is Yarn. Just run `yarn install` as
 usual to install dependencies. For production, it's:
 
-    $ yarn backend
-    $ yarn frontend
-    $ yarn system
+    $ yarn backend    |- or run all three with 'yarn build'
+    $ yarn frontend   |
+    $ yarn system     |
     $ yarn server
 
 For development with file watching and automatic server rebooting and
 all that, it's:
 
-    $ yarn backend-dev
-    $ yarn frontend-dev
-    $ yarn system-dev
-    $ yarn server-dev
+    $ yarn backend-dev    |- or run all four with 'yarn dev'
+    $ yarn frontend-dev   |
+    $ yarn system-dev     |
+    $ yarn server-dev     |
 
 The webserver listens on `localhost:6119`. Now, although the server
 itself will work, the only languages that will work are the ones that

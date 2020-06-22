@@ -2,18 +2,21 @@
 
 set -e
 set -o pipefail
+set -x
 
 uid="$1"
 
 rm -rf /tmp/hsperfdata_root
 
 if [[ -n "$uid" ]] && (( "$uid" != 0 )); then
-    useradd --uid="$uid" --create-home --groups sudo docker
-    passwd -d docker
+    useradd --uid="$uid" --password "!" --create-home --groups sudo docker
 else
-    useradd --create-home --groups sudo docker
-    passwd -d docker
+    useradd --password "!" --create-home --groups sudo docker
 fi
+
+tee /etc/sudoers.d/99-passwordless >/dev/null <<"EOF"
+%sudo   ALL=(ALL:ALL) NOPASSWD: ALL
+EOF
 
 touch /home/docker/.zshrc
 chown docker:docker /home/docker/.zshrc

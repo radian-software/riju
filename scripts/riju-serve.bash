@@ -18,4 +18,4 @@ else
 fi
 
 docker run ${it} -e TLS -e TLS_PRIVATE_KEY -e TLS_CERTIFICATE \
-       --rm -p 0.0.0.0:80:6119 -p 0.0.0.0:443:6120 riju:prod
+       --rm -p 0.0.0.0:80:6119 -p 0.0.0.0:443:6120 -h riju riju:prod

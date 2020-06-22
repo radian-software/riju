@@ -2,6 +2,7 @@
 
 set -e
 set -o pipefail
+set -x
 
 npm config set unsafe-perm true
 PERL_MM_USE_DEFAULT=1 cpan App::cpanminus

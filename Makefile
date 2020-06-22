@@ -18,7 +18,7 @@ image-prod: ## Build Docker image for production
 
 .PHONY: docker
 docker: image-dev ## Run shell with source code and deps inside Docker
-	scripts/docker.bash run -it --rm -v "$(PWD):/home/docker/src" -p 6119:6119 -p 6120:6120 riju bash
+	scripts/docker.bash run -it --rm -v "$(PWD):/home/docker/src" -p 6119:6119 -p 6120:6120 -h riju riju bash
 
 .PHONY: deploy
 deploy: ## Deploy current master from GitHub to production

@@ -4,4 +4,7 @@ set -e
 set -o pipefail
 
 mkdir -p /tmp/riju
-rm -rf /tmp/riju/*
+if [[ -x system/out/riju-system-privileged ]]; then
+    system/out/riju-system-privileged teardown "*"
+fi
+chmod a=x,u=rwx /tmp/riju

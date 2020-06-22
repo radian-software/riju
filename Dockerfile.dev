@@ -2,6 +2,9 @@ FROM ubuntu:focal
 
 ARG UID
 
+COPY scripts/docker-install-phase0.bash /tmp/
+RUN /tmp/docker-install-phase0.bash
+
 COPY scripts/docker-install-phase1.bash /tmp/
 RUN /tmp/docker-install-phase1.bash
 
@@ -31,6 +34,7 @@ RUN /tmp/docker-install-phase6.bash "$UID"
 
 USER docker
 WORKDIR /home/docker
+RUN chmod go-rwx /home/docker
 EXPOSE 6119
 EXPOSE 6120
 
