@@ -1,4 +1,17 @@
 import * as monaco from "monaco-editor";
+import {
+  createConnection,
+  MonacoLanguageClient,
+  MonacoServices,
+} from "monaco-languageclient";
+import { Disposable } from "vscode";
+import { createMessageConnection } from "vscode-jsonrpc";
+import {
+  AbstractMessageReader,
+  DataCallback,
+} from "vscode-jsonrpc/lib/messageReader";
+import { AbstractMessageWriter } from "vscode-jsonrpc/lib/messageWriter";
+import { Message } from "vscode-jsonrpc/lib/messages";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 
@@ -7,7 +20,65 @@ import "xterm/css/xterm.css";
 interface RijuConfig {
   id: string;
   monacoLang: string;
+  lspInit?: any;
+  lspConfig?: any;
   template: string;
+}
+
+class RijuMessageReader extends AbstractMessageReader {
+  state: "initial" | "listening" | "closed" = "initial";
+  callback: DataCallback | null = null;
+  messageQueue: any[] = [];
+  socket: WebSocket;
+
+  constructor(socket: WebSocket) {
+    super();
+    this.socket = socket;
+    this.socket.addEventListener("message", (event: MessageEvent) => {
+      this.readMessage(event.data);
+    });
+  }
+
+  listen(callback: DataCallback): void {
+    if (this.state === "initial") {
+      this.state = "listening";
+      this.callback = callback;
+      while (this.messageQueue.length > 0) {
+        this.readMessage(this.messageQueue.pop()!);
+      }
+    }
+  }
+
+  readMessage(rawMessage: string): void {
+    if (this.state === "initial") {
+      this.messageQueue.splice(0, 0, rawMessage);
+    } else if (this.state === "listening") {
+      let message: any;
+      try {
+        message = JSON.parse(rawMessage);
+      } catch (err) {
+        return;
+      }
+      switch (message?.event) {
+        case "lspOutput":
+          this.callback!(message?.output);
+          break;
+      }
+    }
+  }
+}
+
+class RijuMessageWriter extends AbstractMessageWriter {
+  socket: WebSocket;
+
+  constructor(socket: WebSocket) {
+    super();
+    this.socket = socket;
+  }
+
+  write(msg: Message): void {
+    this.socket.send(JSON.stringify({ event: "lspInput", input: msg }));
+  }
 }
 
 async function main() {
@@ -29,6 +100,7 @@ async function main() {
   let retryDelayMs = initialRetryDelayMs;
 
   function tryConnect() {
+    let clientDisposable: Disposable | null = null;
     console.log("Connecting to server...");
     socket = new WebSocket(
       (document.location.protocol === "http:" ? "ws://" : "wss://") +
@@ -60,6 +132,36 @@ async function main() {
           }
           term.write(message.output);
           return;
+        case "lspStarted":
+          const connection = createMessageConnection(
+            new RijuMessageReader(socket!),
+            new RijuMessageWriter(socket!)
+          );
+          const client = new MonacoLanguageClient({
+            name: "Riju",
+            clientOptions: {
+              documentSelector: [{ pattern: "**" }],
+              middleware: {
+                workspace: {
+                  configuration: () => {
+                    return [config.lspConfig || {}];
+                  },
+                },
+              },
+              initializationOptions: config.lspInit || {},
+            },
+            connectionProvider: {
+              get: (errorHandler, closeHandler) =>
+                Promise.resolve(
+                  createConnection(connection, errorHandler, closeHandler)
+                ),
+            },
+          });
+          clientDisposable = client.start();
+          return;
+        case "lspOutput":
+          // Should be handled by RijuMessageReader
+          return;
         default:
           console.error("Unexpected message from server:", message);
           return;
@@ -70,6 +172,9 @@ async function main() {
         console.log("Connection closed cleanly");
       } else {
         console.error("Connection died");
+      }
+      if (clientDisposable) {
+        clientDisposable.dispose();
       }
       scheduleConnect();
     });
@@ -102,6 +207,8 @@ async function main() {
   document.getElementById("runButton")!.addEventListener("click", () => {
     socket?.send(JSON.stringify({ event: "runCode", code: editor.getValue() }));
   });
+
+  MonacoServices.install(editor);
 }
 
 main().catch(console.error);

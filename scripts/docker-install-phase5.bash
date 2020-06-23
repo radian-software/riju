@@ -60,6 +60,15 @@ tar -xf powershell-*.tar.gz -C /opt/powershell
 ln -s /opt/powershell/pwsh /usr/bin/pwsh
 rm powershell-*.tar.gz
 
+# Python
+cd /tmp
+xml="$(curl -sSL "https://pvsc.blob.core.windows.net/python-language-server-stable?restype=container&comp=list&prefix=Python-Language-Server-linux-x64")"
+nupkg="$(echo "$xml" | grep -Eo 'https://[^<]+\.nupkg' | tail -n1)"
+wget -nv "${nupkg}"
+unzip -d /opt/mspyls Python-Language-Server-linux-x64.*.nupkg
+chmod +x /opt/mspyls/Microsoft.Python.LanguageServer
+ln -s /opt/mspyls/Microsoft.Python.LanguageServer /usr/bin/Microsoft.Python.LanguageServer
+
 # SNOBOL
 wget -nv ftp://ftp.snobol4.org/snobol/snobol4-2.0.tar.gz
 tar -xf snobol4-*.tar.gz

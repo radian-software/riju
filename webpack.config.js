@@ -1,11 +1,13 @@
 const path = require("path");
-const webpack = require("webpack");
+
+const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 
 function isProduction(argv) {
   return !argv.development;
 }
 
 module.exports = (_, argv) => ({
+  devtool: isProduction(argv) ? undefined : "source-map",
   entry: "./frontend/src/app.ts",
   mode: isProduction(argv) ? "production" : "development",
   module: {
@@ -26,7 +28,20 @@ module.exports = (_, argv) => ({
         test: /\.ttf$/,
         use: ["file-loader"],
       },
+      {
+        test: /\.js$/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env"],
+          },
+        },
+        include: /vscode-jsonrpc/,
+      },
     ],
+  },
+  node: {
+    net: "mock",
   },
   output: {
     path: path.resolve(__dirname, "frontend/out"),
@@ -35,5 +50,11 @@ module.exports = (_, argv) => ({
   },
   performance: {
     hints: false,
+  },
+  plugins: [new MonacoWebpackPlugin()],
+  resolve: {
+    alias: {
+      vscode: require.resolve("monaco-languageclient/lib/vscode-compatibility"),
+    },
   },
 });

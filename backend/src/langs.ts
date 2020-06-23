@@ -9,6 +9,9 @@ export interface LangConfig {
   alwaysCreate?: boolean;
   compile?: string;
   run: string;
+  lsp?: string;
+  lspInit?: any;
+  lspConfig?: any;
   template: string;
   hacks?: "ghci-config"[];
 }
@@ -720,6 +723,14 @@ main :-
     repl: "python3 -u",
     main: "main.py",
     run: "python3 -u -i main.py",
+    lsp: "Microsoft.Python.LanguageServer",
+    lspInit: {
+      interpreter: {
+        properties: {
+          InterpreterPath: "/usr/bin/python3",
+        },
+      },
+    },
     template: `print("Hello, world!")
 `,
   },

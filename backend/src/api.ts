@@ -1,8 +1,10 @@
+import { ChildProcess, spawn } from "child_process";
 import * as path from "path";
 import * as WebSocket from "ws";
 
 import * as pty from "node-pty";
 import { IPty } from "node-pty";
+import * as rpc from "vscode-jsonrpc";
 import { v4 as getUUID } from "uuid";
 
 import { PRIVILEGED } from "./config";
@@ -15,6 +17,11 @@ export class Session {
   code: string;
   config: LangConfig;
   term: { pty: IPty | null; live: boolean };
+  lsp: {
+    proc: ChildProcess;
+    reader: rpc.StreamMessageReader;
+    writer: rpc.StreamMessageWriter;
+  } | null;
   ws: WebSocket;
   homedir: string | null;
   uid: number | null;
@@ -28,6 +35,7 @@ export class Session {
     this.ws = ws;
     this.config = langs[lang];
     this.term = { pty: null, live: false };
+    this.lsp = null;
     this.code = "";
     this.homedir = null;
     this.uid = null;
@@ -83,6 +91,13 @@ export class Session {
           this.run();
         }
         break;
+      case "lspInput":
+        if (!this.lsp) {
+          this.log(`Got LSP input before language server was started`);
+        } else {
+          this.lsp.writer.write(msg.input);
+        }
+        break;
       default:
         this.log(`Got unknown message type: ${msg.event}`);
         break;
@@ -103,6 +118,7 @@ export class Session {
       alwaysCreate,
       compile,
       run,
+      lsp,
       hacks,
     } = this.config;
     if (this.term.pty) {
@@ -210,6 +226,31 @@ export class Session {
         }
       }
     });
+    if (lsp && this.lsp === null) {
+      const lspArgs = PRIVILEGED
+        ? [
+            "/home/docker/src/system/out/riju-system-privileged",
+            "spawn",
+            `${this.uid}`,
+            `${this.uuid}`,
+            "bash",
+            "-c",
+            lsp,
+          ]
+        : ["bash", "-c", lsp];
+      const proc = spawn(lspArgs[0], lspArgs.slice(1), {
+        env: getEnv(this.uuid),
+      });
+      this.lsp = {
+        proc,
+        reader: new rpc.StreamMessageReader(proc.stdout),
+        writer: new rpc.StreamMessageWriter(proc.stdin),
+      };
+      this.lsp.reader.listen((data) => {
+        this.ws.send(JSON.stringify({ event: "lspOutput", output: data }));
+      });
+      this.ws.send(JSON.stringify({ event: "lspStarted" }));
+    }
   };
   cleanup = async () => {
     this.log(`Cleaning up session`);
