@@ -42,6 +42,19 @@ export class Session {
     this.run().catch((err) => {
       this.log(`Error while setting up environment for pty`);
       console.log(err);
+      try {
+        this.ws.send(JSON.stringify({ event: "terminalClear" }));
+        this.ws.send(
+          JSON.stringify({
+            event: "terminalOutput",
+            output: `Riju encountered an unexpected error: ${err}
+\rYou may want to save your code and refresh the page.
+`,
+          })
+        );
+      } catch (err) {
+        //
+      }
     });
   }
   handleClientMessage = (event: string) => {
