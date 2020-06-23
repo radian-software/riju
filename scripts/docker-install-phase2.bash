@@ -15,6 +15,7 @@ python3-pip
 yarn
 
 # Handy utilities
+apt-file
 bsdmainutils
 curl
 emacs-nox
@@ -24,6 +25,7 @@ jq
 lsof
 make
 man-db
+moreutils
 nano
 sudo
 tmux

@@ -37,6 +37,9 @@ tcl
 # Tcsh
 tcsh
 
+# TeX
+texlive-binaries
+
 # Unlambda
 unlambda
 

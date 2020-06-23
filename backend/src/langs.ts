@@ -1007,6 +1007,16 @@ END
     template: `echo "Hello, world!"
 `,
   },
+  tex: {
+    aliases: ["latex", "xetex", "plaintex"],
+    name: "TeX",
+    monacoLang: "plaintext",
+    repl: "tex",
+    main: "main.tex",
+    run: "tex main.tex",
+    template: `\\message{Hello, world!}
+`,
+  },
   typescript: {
     aliases: ["ts", "tsnode", "tsc"],
     name: "TypeScript",
