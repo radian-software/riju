@@ -205,6 +205,7 @@ export class Session {
     }
     if (this.uidCleanup) {
       await this.uidCleanup();
+      this.log(`Returned uid ${this.uid}`);
     }
   };
 }
