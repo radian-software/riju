@@ -38,4 +38,4 @@ with tempfile.TemporaryDirectory() as tmpdir:
         check=True,
     )
     os.chdir("riju")
-    subprocess.run(["scripts/deploy-phase2.py"])
+    subprocess.run(["scripts/deploy-phase2.py"], check=True)
