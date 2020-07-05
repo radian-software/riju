@@ -123,6 +123,7 @@ export class Session {
       alwaysCreate,
       compile,
       run,
+      lspSetup,
       lsp,
       hacks,
     } = this.config;
@@ -230,6 +231,14 @@ export class Session {
       }
     });
     if (lsp && this.lsp === null) {
+      if (lspSetup) {
+        await spawnPrivileged(
+          this.uid!,
+          this.uuid,
+          ["bash", "-c", lspSetup],
+          this.log
+        );
+      }
       const lspArgs = [
         rijuSystemPrivileged,
         "spawn",
@@ -261,7 +270,7 @@ export class Session {
       await spawnPrivileged(
         this.uid!,
         this.uuid,
-        ["kill", "-9", `${this.term.pty.pid}`],
+        ["bash", "-c", `kill -9 ${this.term.pty.pid} 2>/dev/null || true`],
         this.log
       );
     }
@@ -269,7 +278,7 @@ export class Session {
       await spawnPrivileged(
         this.uid!,
         this.uuid,
-        ["kill", "-9", `${this.lsp.proc.pid}`],
+        ["bash", "-c", `kill -9 ${this.lsp.proc.pid} 2>/dev/null || true`],
         this.log
       );
     }

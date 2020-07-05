@@ -9,6 +9,7 @@ export interface LangConfig {
   alwaysCreate?: boolean;
   compile?: string;
   run: string;
+  lspSetup?: string;
   lsp?: string;
   lspInit?: any;
   lspConfig?: any;
@@ -147,6 +148,7 @@ implement main0 () = ()
     main: "main.c",
     compile: "clang -Wall -Wextra main.c -o main",
     run: "./main",
+    lspSetup: `echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
     lsp: "clangd",
     template: `#include <stdio.h>
 
@@ -202,6 +204,8 @@ int main() {
     main: "main.cpp",
     compile: "clang++ -Wall -Wextra main.cpp -o main",
     run: "./main",
+    lspSetup: `echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
+    lsp: "clangd",
     template: `#include <iostream>
 
 int main() {
@@ -640,6 +644,8 @@ require("repl").start()
     compile:
       "gcc $(gnustep-config --objc-flags) main.m $(gnustep-config --base-libs) -o main",
     run: "./main",
+    lspSetup: `(gnustep-config --objc-flags && gnustep-config --base-libs) | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
+    lsp: "clangd",
     template: `#import <Foundation/Foundation.h>
 
 int main() {
@@ -813,6 +819,7 @@ binding_irb.run(IRB.conf)
     main: "main.rs",
     compile: "rustc main.rs",
     run: "./main",
+    lsp: "rls",
     template: `fn main() {
     println!("Hello, world!");
 }

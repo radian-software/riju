@@ -58,9 +58,6 @@ qemu-user-static
 # Ruby
 ruby
 
-# Rust
-rustc
-
 "
 
 export DEBIAN_FRONTEND=noninteractive

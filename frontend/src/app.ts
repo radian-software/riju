@@ -3,6 +3,7 @@ import {
   createConnection,
   MonacoLanguageClient,
   MonacoServices,
+  Services,
 } from "monaco-languageclient";
 import { Disposable } from "vscode";
 import { createMessageConnection } from "vscode-jsonrpc";
@@ -117,6 +118,7 @@ async function main() {
 
   function tryConnect() {
     let clientDisposable: Disposable | null = null;
+    let servicesDisposable: Disposable | null = null;
     console.log("Connecting to server...");
     socket = new WebSocket(
       (document.location.protocol === "http:" ? "ws://" : "wss://") +
@@ -156,6 +158,10 @@ async function main() {
             console.error("Unexpected message from server:", message);
             return;
           }
+          const services = MonacoServices.create(editor, {
+            rootUri: `file://${message.root}`,
+          });
+          servicesDisposable = Services.install(services);
           editor.setModel(
             monaco.editor.createModel(
               editor.getModel()!.getValue(),
@@ -205,6 +211,11 @@ async function main() {
       }
       if (clientDisposable) {
         clientDisposable.dispose();
+        clientDisposable = null;
+      }
+      if (servicesDisposable) {
+        servicesDisposable.dispose();
+        servicesDisposable = null;
       }
       scheduleConnect();
     });
@@ -233,8 +244,6 @@ async function main() {
   document.getElementById("runButton")!.addEventListener("click", () => {
     sendMessage({ event: "runCode", code: editor.getValue() });
   });
-
-  MonacoServices.install(editor);
 }
 
 main().catch(console.error);

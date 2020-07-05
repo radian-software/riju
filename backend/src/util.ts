@@ -5,6 +5,7 @@ import * as appRoot from "app-root-path";
 
 interface Options extends SpawnOptions {
   input?: string;
+  check?: boolean;
 }
 
 export const rijuSystemPrivileged = appRoot.resolve(
@@ -32,7 +33,9 @@ export async function call(
 ) {
   options = options || {};
   const input = options.input;
+  const check = options.check === undefined ? true : options.check;
   delete options.input;
+  delete options.check;
   const proc = spawn(args[0], args.slice(1), options);
   if (input) {
     proc.stdin!.end(input);
@@ -51,7 +54,7 @@ export async function call(
       if (output) {
         log(`Output from ${args[0]}:\n` + output);
       }
-      if (code === 0) {
+      if (code === 0 || !check) {
         resolve();
       } else {
         reject(`command ${args[0]} failed with error code ${code}`);
