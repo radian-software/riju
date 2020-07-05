@@ -21,6 +21,12 @@ tar -xf linux-x86_64-static.tar.gz
 mv stack-*-linux-x86_64-static/stack /usr/bin/stack
 rm -rf stack-*-linux-x86_64-static linux-x86_64-static.tar.gz
 
+# Clojure
+cd /tmp
+wget -nv https://github.com/snoe/clojure-lsp/releases/download/release-20200629T153107/clojure-lsp
+chmod +x clojure-lsp
+mv clojure-lsp /usr/bin/clojure-lsp
+
 # D
 cd /tmp
 wget -nv http://downloads.dlang.org/releases/2.x/2.092.0/dmd_2.092.0-0_amd64.deb

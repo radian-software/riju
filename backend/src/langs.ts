@@ -244,6 +244,7 @@ int main() {
     repl: "clojure",
     main: "main.clj",
     run: "clojure -i main.clj -r",
+    lsp: "clojure-lsp",
     template: `(println "Hello, world!")
 `,
   },
