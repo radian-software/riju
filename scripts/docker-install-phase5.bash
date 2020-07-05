@@ -40,6 +40,12 @@ gunzip binary-for-linux-64-bit.gz
 chmod +x binary-for-linux-64-bit
 mv binary-for-linux-64-bit /usr/bin/elm
 
+# Go
+export GO111MODULE=on
+export GOPATH=/tmp/go
+mv /tmp/go/bin/gopls /usr/bin/gopls
+rm -rf /tmp/go
+
 # Ink
 cd /tmp
 wget -nv https://github.com/thesephist/ink/releases/download/v0.1.7/ink-linux
@@ -74,6 +80,7 @@ wget -nv "${nupkg}"
 unzip -d /opt/mspyls Python-Language-Server-linux-x64.*.nupkg
 chmod +x /opt/mspyls/Microsoft.Python.LanguageServer
 ln -s /opt/mspyls/Microsoft.Python.LanguageServer /usr/bin/Microsoft.Python.LanguageServer
+rm Python-Language-Server-linux-x64.*.nupkg
 
 # SNOBOL
 wget -nv ftp://ftp.snobol4.org/snobol/old/snobol4-2.1.4.tar.gz

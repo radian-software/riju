@@ -34,6 +34,9 @@ npm install -g coffeescript
 # Elm
 npm install -g @kachkaev/run-elm
 
+# FORTRAN
+pip3 install fortran-language-server
+
 # Perl
 cpanm -n Devel::REPL
 

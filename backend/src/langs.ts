@@ -401,6 +401,7 @@ main() ->
     main: "main.f",
     compile: "flang main.f -o main",
     run: "./main",
+    lsp: "fortls",
     template: `       program hello
           print *, "Hello, world!"
        end program hello
@@ -423,6 +424,7 @@ main() ->
     main: "main.go",
     compile: "go build main.go",
     run: "./main",
+    lsp: "gopls",
     template: `package main
 
 import "fmt"
