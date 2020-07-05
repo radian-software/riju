@@ -1,17 +1,23 @@
 import { spawn, SpawnOptions } from "child_process";
 import * as process from "process";
 
+import * as appRoot from "app-root-path";
+
 interface Options extends SpawnOptions {
   input?: string;
 }
+
+export const rijuSystemPrivileged = appRoot.resolve(
+  "system/out/riju-system-privileged"
+);
 
 export function getEnv(uuid: string) {
   const cwd = `/tmp/riju/${uuid}`;
   return {
     HOME: cwd,
     HOSTNAME: "riju",
-    LANG: "C.UTF-8",
-    LC_ALL: "C.UTF-8",
+    LANG: process.env.LANG || "",
+    LC_ALL: process.env.LC_ALL || "",
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin",
     PWD: cwd,
     SHELL: "/usr/bin/bash",
@@ -59,11 +65,7 @@ export async function callPrivileged(
   log: (msg: string) => void,
   options?: Options
 ) {
-  await call(
-    ["/home/docker/src/system/out/riju-system-privileged"].concat(args),
-    log,
-    options
-  );
+  await call([rijuSystemPrivileged].concat(args), log, options);
 }
 
 export async function spawnPrivileged(

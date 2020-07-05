@@ -70,7 +70,7 @@ chmod +x /opt/mspyls/Microsoft.Python.LanguageServer
 ln -s /opt/mspyls/Microsoft.Python.LanguageServer /usr/bin/Microsoft.Python.LanguageServer
 
 # SNOBOL
-wget -nv ftp://ftp.snobol4.org/snobol/snobol4-2.0.tar.gz
+wget -nv ftp://ftp.snobol4.org/snobol/old/snobol4-2.1.4.tar.gz
 tar -xf snobol4-*.tar.gz
 rm snobol4-*.tar.gz
 pushd snobol4-* >/dev/null

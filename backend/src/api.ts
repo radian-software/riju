@@ -10,7 +10,12 @@ import { v4 as getUUID } from "uuid";
 import { PRIVILEGED } from "./config";
 import { LangConfig, langs } from "./langs";
 import { borrowUser } from "./users";
-import { callPrivileged, getEnv, spawnPrivileged } from "./util";
+import {
+  callPrivileged,
+  getEnv,
+  rijuSystemPrivileged,
+  spawnPrivileged,
+} from "./util";
 
 export class Session {
   uuid: string;
@@ -193,17 +198,15 @@ export class Session {
         );
       }
     }
-    const args = PRIVILEGED
-      ? [
-          "/home/docker/src/system/out/riju-system-privileged",
-          "spawn",
-          `${this.uid}`,
-          `${this.uuid}`,
-          "bash",
-          "-c",
-          cmdline,
-        ]
-      : ["bash", "-c", cmdline];
+    const args = [
+      rijuSystemPrivileged,
+      "spawn",
+      `${this.uid}`,
+      `${this.uuid}`,
+      "bash",
+      "-c",
+      cmdline,
+    ];
     const env = getEnv(this.uuid);
     const term = {
       pty: pty.spawn(args[0], args.slice(1), {
@@ -227,17 +230,15 @@ export class Session {
       }
     });
     if (lsp && this.lsp === null) {
-      const lspArgs = PRIVILEGED
-        ? [
-            "/home/docker/src/system/out/riju-system-privileged",
-            "spawn",
-            `${this.uid}`,
-            `${this.uuid}`,
-            "bash",
-            "-c",
-            lsp,
-          ]
-        : ["bash", "-c", lsp];
+      const lspArgs = [
+        rijuSystemPrivileged,
+        "spawn",
+        `${this.uid}`,
+        `${this.uuid}`,
+        "bash",
+        "-c",
+        lsp,
+      ];
       const proc = spawn(lspArgs[0], lspArgs.slice(1), {
         env: getEnv(this.uuid),
       });
@@ -254,6 +255,22 @@ export class Session {
   };
   cleanup = async () => {
     this.log(`Cleaning up session`);
+    if (this.term.pty) {
+      await spawnPrivileged(
+        this.uid!,
+        this.uuid,
+        ["kill", "-9", `${this.term.pty.pid}`],
+        this.log
+      );
+    }
+    if (this.lsp !== null) {
+      await spawnPrivileged(
+        this.uid!,
+        this.uuid,
+        ["kill", "-9", `${this.lsp.proc.pid}`],
+        this.log
+      );
+    }
     if (this.homedir) {
       await callPrivileged(["teardown", this.uuid], this.log);
     }

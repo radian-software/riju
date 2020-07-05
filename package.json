@@ -49,9 +49,9 @@
     "frontend": "webpack --production",
     "frontend-dev": "webpack --development --watch",
     "server": "scripts/setup.bash && node backend/out/server.js",
-    "server-dev": "watchexec -w backend/out -r 'scripts/setup.bash && node backend/out/server.js'",
+    "server-dev": "watchexec --no-vcs-ignore -w backend/out -r 'scripts/setup.bash && node backend/out/server.js'",
     "system": "scripts/compile-system.bash",
-    "system-dev": "watchexec -w system/src -n scripts/compile-system.bash",
+    "system-dev": "watchexec --no-vcs-ignore -w system/src -n scripts/compile-system.bash",
     "build": "run-s backend frontend system",
     "dev": "run-p backend-dev frontend-dev system-dev server-dev"
   }

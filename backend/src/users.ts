@@ -1,5 +1,6 @@
 import { spawn } from "child_process";
 import * as fs from "fs";
+import * as os from "os";
 
 import * as AsyncLock from "async-lock";
 import * as _ from "lodash";
@@ -12,7 +13,7 @@ import { callPrivileged } from "./util";
 const MIN_UID = 2000;
 const MAX_UID = 65000;
 
-const CUR_UID = parseInt(process.env.UID || "") || null;
+const CUR_UID = os.userInfo().uid;
 
 let availIds: number[] | null = null;
 let nextId: number | null = null;
@@ -50,11 +51,7 @@ async function createUser(log: (msg: string) => void): Promise<number> {
 
 export async function borrowUser(log: (msg: string) => void) {
   if (!PRIVILEGED) {
-    if (CUR_UID === null) {
-      throw new Error("unable to determine current UID");
-    } else {
-      return { uid: CUR_UID, cleanup: async () => {} };
-    }
+    return { uid: CUR_UID, cleanup: async () => {} };
   } else {
     return await lock.acquire("key", async () => {
       if (availIds === null || nextId === null) {

@@ -12,6 +12,8 @@
 const int MIN_UID = 2000;
 const int MAX_UID = 65000;
 
+int privileged;
+
 void die(char *msg)
 {
   fprintf(stderr, "%s\n", msg);
@@ -29,6 +31,8 @@ void die_with_usage()
 
 int parseUID(char *str)
 {
+  if (!privileged)
+    return -1;
   char *endptr;
   long uid = strtol(str, &endptr, 10);
   if (!*str || *endptr)
@@ -50,6 +54,8 @@ char *parseUUID(char *uuid)
 
 void useradd(int uid)
 {
+  if (!privileged)
+    die("useradd not allowed without root privileges");
   char *cmdline;
   if (asprintf(&cmdline, "groupadd -g %1$d riju%1$d", uid) < 0)
     die("asprintf failed");
@@ -70,12 +76,14 @@ void spawn(int uid, char *uuid, char **cmdline)
     die("asprintf failed");
   if (chdir(cwd) < 0)
     die("chdir failed");
-  if (setgid(uid) < 0)
-    die("setgid failed");
-  if (setgroups(0, NULL) < 0)
-    die("setgroups failed");
-  if (setuid(uid) < 0)
-    die("setuid failed");
+  if (privileged) {
+    if (setgid(uid) < 0)
+      die("setgid failed");
+    if (setgroups(0, NULL) < 0)
+      die("setgroups failed");
+    if (setuid(uid) < 0)
+      die("setuid failed");
+  }
   umask(077);
   execvp(cmdline[0], cmdline);
   die("execvp failed");
@@ -84,7 +92,9 @@ void spawn(int uid, char *uuid, char **cmdline)
 void setup(int uid, char *uuid)
 {
   char *cmdline;
-  if (asprintf(&cmdline, "install -d -o riju%1$d -g riju%1$d -m 700 /tmp/riju/%2$s", uid, uuid) < 0)
+  if (asprintf(&cmdline, privileged
+               ? "install -d -o riju%1$d -g riju%1$d -m 700 /tmp/riju/%2$s"
+               : "install -d -m 700 /tmp/riju/%2$s", uid, uuid) < 0)
     die("asprintf failed");
   int status = system(cmdline);
   if (status)
@@ -103,7 +113,10 @@ void teardown(char *uuid)
 
 int main(int argc, char **argv)
 {
-  setuid(0);
+  int code = setuid(0);
+  if (code != 0 && code != -EPERM)
+    die("setuid failed");
+  privileged = code == 0;
   if (argc < 2)
     die_with_usage();
   if (!strcmp(argv[1], "useradd")) {
