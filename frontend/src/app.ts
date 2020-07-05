@@ -17,6 +17,8 @@ import { FitAddon } from "xterm-addon-fit";
 
 import "xterm/css/xterm.css";
 
+const DEBUG = window.location.hash === "#debug";
+
 interface RijuConfig {
   id: string;
   monacoLang: string;
@@ -61,6 +63,9 @@ class RijuMessageReader extends AbstractMessageReader {
       }
       switch (message?.event) {
         case "lspOutput":
+          if (DEBUG) {
+            console.log("RECEIVE LSP:", message?.output);
+          }
           this.callback!(message?.output);
           break;
       }
@@ -77,6 +82,9 @@ class RijuMessageWriter extends AbstractMessageWriter {
   }
 
   write(msg: Message): void {
+    if (DEBUG) {
+      console.log("SEND LSP:", msg);
+    }
     this.socket.send(JSON.stringify({ event: "lspInput", input: msg }));
   }
 }
@@ -99,6 +107,13 @@ async function main() {
   const initialRetryDelayMs = 200;
   let retryDelayMs = initialRetryDelayMs;
 
+  function sendMessage(message: any) {
+    if (DEBUG) {
+      console.log("SEND", message);
+    }
+    socket?.send(JSON.stringify(message));
+  }
+
   function tryConnect() {
     let clientDisposable: Disposable | null = null;
     console.log("Connecting to server...");
@@ -117,6 +132,9 @@ async function main() {
       } catch (err) {
         console.error("Malformed message from server:", event.data);
         return;
+      }
+      if (DEBUG && message?.event !== "lspOutput") {
+        console.log("RECEIVE:", message);
       }
       if (message?.event && message?.event !== "error") {
         retryDelayMs = initialRetryDelayMs;
@@ -190,11 +208,7 @@ async function main() {
   let socket: WebSocket | null = null;
   tryConnect();
 
-  term.onData(
-    (data) =>
-      socket &&
-      socket.send(JSON.stringify({ event: "terminalInput", input: data }))
-  );
+  term.onData((data) => sendMessage({ event: "terminalInput", input: data }));
 
   const editor = monaco.editor.create(document.getElementById("editor")!, {
     minimap: { enabled: false },
@@ -205,7 +219,7 @@ async function main() {
   monaco.editor.setModelLanguage(editor.getModel()!, config.monacoLang);
 
   document.getElementById("runButton")!.addEventListener("click", () => {
-    socket?.send(JSON.stringify({ event: "runCode", code: editor.getValue() }));
+    sendMessage({ event: "runCode", code: editor.getValue() });
   });
 
   MonacoServices.install(editor);
