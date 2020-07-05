@@ -250,7 +250,9 @@ export class Session {
       this.lsp.reader.listen((data) => {
         this.ws.send(JSON.stringify({ event: "lspOutput", output: data }));
       });
-      this.ws.send(JSON.stringify({ event: "lspStarted" }));
+      this.ws.send(
+        JSON.stringify({ event: "lspStarted", root: `/tmp/riju/${this.uuid}` })
+      );
     }
   };
   cleanup = async () => {

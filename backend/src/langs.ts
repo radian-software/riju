@@ -147,6 +147,7 @@ implement main0 () = ()
     main: "main.c",
     compile: "clang -Wall -Wextra main.c -o main",
     run: "./main",
+    lsp: "clangd",
     template: `#include <stdio.h>
 
 int main() {

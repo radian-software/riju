@@ -22,6 +22,7 @@ const DEBUG = window.location.hash === "#debug";
 interface RijuConfig {
   id: string;
   monacoLang: string;
+  main: string;
   lspInit?: any;
   lspConfig?: any;
   template: string;
@@ -151,6 +152,17 @@ async function main() {
           term.write(message.output);
           return;
         case "lspStarted":
+          if (typeof message.root !== "string") {
+            console.error("Unexpected message from server:", message);
+            return;
+          }
+          editor.setModel(
+            monaco.editor.createModel(
+              editor.getModel()!.getValue(),
+              undefined,
+              monaco.Uri.parse(`file://${message.root}/${config.main}`)
+            )
+          );
           const connection = createMessageConnection(
             new RijuMessageReader(socket!),
             new RijuMessageWriter(socket!)

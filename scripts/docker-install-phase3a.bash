@@ -30,6 +30,7 @@ beef
 
 # C/C++
 clang
+clangd
 
 # C#
 mono-mcs
