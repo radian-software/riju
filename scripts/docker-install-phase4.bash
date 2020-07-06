@@ -5,6 +5,10 @@ set -o pipefail
 set -x
 
 # Needed for project infrastructure
+cd /tmp
+mkdir /opt/julia
+export JULIA_DEPOT_PATH=/opt/julia
+
 npm config set unsafe-perm true
 PERL_MM_USE_DEFAULT=1 cpan App::cpanminus
 rm -rf /tmp/cpan_install_*.txt
@@ -36,6 +40,9 @@ npm install -g @kachkaev/run-elm
 
 # FORTRAN
 pip3 install fortran-language-server
+
+# Julia
+julia -e 'using Pkg; Pkg.add("LanguageServer")'
 
 # Perl
 cpanm -n Devel::REPL

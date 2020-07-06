@@ -518,6 +518,7 @@ PLEASE GIVE UP
     repl: "julia",
     main: "main.jl",
     run: "julia -L main.jl",
+    lsp: `JULIA_DEPOT_PATH=:/opt/julia julia -e 'using LanguageServer; run(LanguageServerInstance(stdin, stdout))'`,
     template: `println("Hello, world!")
 `,
   },

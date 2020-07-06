@@ -84,6 +84,9 @@ class RijuMessageWriter extends AbstractMessageWriter {
   }
 
   write(msg: Message): void {
+    if ((msg as any).method === "initialize") {
+      (msg as any).params.processId = null;
+    }
     if (DEBUG) {
       console.log("SEND LSP:", msg);
     }
@@ -184,8 +187,11 @@ async function main() {
               documentSelector: [{ pattern: "**" }],
               middleware: {
                 workspace: {
-                  configuration: () => {
-                    return [config.lspConfig || {}];
+                  configuration: (params, token, configuration) => {
+                    (window as any).config = configuration;
+                    return Array(
+                      (configuration(params, token) as {}[]).length
+                    ).fill(config.lspConfig || null);
                   },
                 },
               },
