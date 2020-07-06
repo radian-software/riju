@@ -55,21 +55,22 @@ export class Session {
     this.run().catch((err) => {
       this.log(`Error while setting up environment for pty`);
       console.log(err);
-      try {
-        this.ws.send(JSON.stringify({ event: "terminalClear" }));
-        this.ws.send(
-          JSON.stringify({
-            event: "terminalOutput",
-            output: `Riju encountered an unexpected error: ${err}
+      this.send({ event: "terminalClear" });
+      this.send({
+        event: "terminalOutput",
+        output: `Riju encountered an unexpected error: ${err}
 \rYou may want to save your code and refresh the page.
 `,
-          })
-        );
-      } catch (err) {
-        //
-      }
+      });
     });
   }
+  send = (msg: any) => {
+    try {
+      this.ws.send(JSON.stringify(msg));
+    } catch (err) {
+      //
+    }
+  };
   handleClientMessage = (event: string) => {
     let msg: any;
     try {
@@ -131,11 +132,7 @@ export class Session {
       this.term.pty.kill();
       this.term.live = false;
     }
-    try {
-      this.ws.send(JSON.stringify({ event: "terminalClear" }));
-    } catch (err) {
-      //
-    }
+    this.send({ event: "terminalClear" });
     if (this.homedir == null) {
       this.homedir = `/tmp/riju/${this.uuid}`;
       await callPrivileged(["setup", `${this.uid}`, this.uuid], this.log);
@@ -221,13 +218,7 @@ export class Session {
       // Capture term in closure so that we don't keep sending output
       // from the old pty even after it's been killed (see ghci).
       if (term.live) {
-        try {
-          this.ws.send(
-            JSON.stringify({ event: "terminalOutput", output: data })
-          );
-        } catch (err) {
-          //
-        }
+        this.send({ event: "terminalOutput", output: data });
       }
     });
     if (lsp && this.lsp === null) {
@@ -251,17 +242,19 @@ export class Session {
       const proc = spawn(lspArgs[0], lspArgs.slice(1), {
         env: getEnv(this.uuid),
       });
+      proc.on("exit", (code) => this.send({ event: "lspCrashed", code }));
+      proc.stderr.on("data", (data) =>
+        this.send({ event: "lspLog", output: data.toString("utf8") })
+      );
       this.lsp = {
         proc,
         reader: new rpc.StreamMessageReader(proc.stdout),
         writer: new rpc.StreamMessageWriter(proc.stdin),
       };
       this.lsp.reader.listen((data) => {
-        this.ws.send(JSON.stringify({ event: "lspOutput", output: data }));
+        this.send({ event: "lspOutput", output: data });
       });
-      this.ws.send(
-        JSON.stringify({ event: "lspStarted", root: `/tmp/riju/${this.uuid}` })
-      );
+      this.send({ event: "lspStarted", root: `/tmp/riju/${this.uuid}` });
     }
   };
   cleanup = async () => {

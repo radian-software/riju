@@ -119,6 +119,7 @@ async function main() {
   function tryConnect() {
     let clientDisposable: Disposable | null = null;
     let servicesDisposable: Disposable | null = null;
+    let lspLogBuffer = "";
     console.log("Connecting to server...");
     socket = new WebSocket(
       (document.location.protocol === "http:" ? "ws://" : "wss://") +
@@ -136,7 +137,11 @@ async function main() {
         console.error("Malformed message from server:", event.data);
         return;
       }
-      if (DEBUG && message?.event !== "lspOutput") {
+      if (
+        DEBUG &&
+        message?.event !== "lspOutput" &&
+        message?.event !== "lspLog"
+      ) {
         console.log("RECEIVE:", message);
       }
       if (message?.event && message?.event !== "error") {
@@ -197,6 +202,23 @@ async function main() {
           return;
         case "lspOutput":
           // Should be handled by RijuMessageReader
+          return;
+        case "lspLog":
+          if (typeof message.output !== "string") {
+            console.error("Unexpected message from server:", message);
+            return;
+          }
+          if (DEBUG) {
+            lspLogBuffer += message.output;
+            while (lspLogBuffer.includes("\n")) {
+              const idx = lspLogBuffer.indexOf("\n");
+              const line = lspLogBuffer.slice(0, idx);
+              lspLogBuffer = lspLogBuffer.slice(idx + 1);
+              console.log(`LSP || ${line}`);
+            }
+          }
+          return;
+        case "lspCrashed":
           return;
         default:
           console.error("Unexpected message from server:", message);
