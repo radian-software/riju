@@ -50,6 +50,9 @@ cpanm -n Devel::REPL
 # ReasonML
 npm install -g bs-platform
 
+# Ruby
+gem install solargraph
+
 # Rust
 rustup component add rls rust-analysis rust-src
 

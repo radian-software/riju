@@ -819,6 +819,7 @@ binding_irb = IRB::Irb.new(workspace)
 binding_irb.run(IRB.conf)
 `,
     run: "ruby main.rb",
+    lsp: "solargraph stdio",
     template: `puts "Hello, world!"
 `,
   },

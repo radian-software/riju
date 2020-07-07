@@ -57,6 +57,7 @@ qemu-user-static
 
 # Ruby
 ruby
+ruby-dev
 
 "
 
