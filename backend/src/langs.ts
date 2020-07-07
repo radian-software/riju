@@ -82,6 +82,7 @@ implement main0 () = ()
     repl: "bash --rcfile /dev/null",
     main: "main.bash",
     run: "bash --rcfile main.bash",
+    lsp: "bash-language-server start",
     template: `echo "Hello, world!"
 `,
   },

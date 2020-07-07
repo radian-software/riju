@@ -26,6 +26,9 @@ for file in /opt/rust/bin/*; do
     ln -s /opt/rust/wrapper /usr/bin/${file##*/}
 done
 
+# Bash
+npm install -g bash-language-server
+
 # Befunge
 npm install -g befunge93 prompt-sync
 
