@@ -25,6 +25,7 @@ export const langs: { [key: string]: LangConfig } = {
     main: "main.adb",
     compile: "x86_64-linux-gnu-gnatmake-9 main.adb",
     run: "./main",
+    lsp: "ada_language_server",
     template: `with Ada.Text_IO;
 
 procedure Main is

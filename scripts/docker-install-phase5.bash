@@ -21,6 +21,14 @@ tar -xf linux-x86_64-static.tar.gz
 mv stack-*-linux-x86_64-static/stack /usr/bin/stack
 rm -rf stack-*-linux-x86_64-static linux-x86_64-static.tar.gz
 
+# Ada
+cd /tmp
+wget -nv https://dl.bintray.com/reznikmm/ada-language-server/linux-latest.tar.gz
+tar -xf linux-latest.tar.gz
+mv linux/ada_language_server /usr/bin/ada_language_server
+mv linux/*.so* /usr/lib/x86_64-linux-gnu/
+rm linux-latest.tar.gz
+
 # Clojure
 cd /tmp
 wget -nv https://github.com/snoe/clojure-lsp/releases/download/release-20200629T153107/clojure-lsp
