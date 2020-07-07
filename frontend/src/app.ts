@@ -191,7 +191,9 @@ async function main() {
                     (window as any).config = configuration;
                     return Array(
                       (configuration(params, token) as {}[]).length
-                    ).fill(config.lspConfig || null);
+                    ).fill(
+                      config.lspConfig !== undefined ? config.lspConfig : {}
+                    );
                   },
                 },
               },

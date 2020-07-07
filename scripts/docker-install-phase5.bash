@@ -100,9 +100,15 @@ tar -xf swift.tar.gz -C /opt/swift --strip-components=2
 ln -s /opt/swift/bin/swiftc /usr/bin/swiftc
 rm swift.tar.gz
 
+# Haskell
+mkdir -p /opt/haskell
+gdown "https://drive.google.com/uc?export=download&id=1GPoR_ja4ns16KCamRgwB-JVag4HK0igz" /usr/bin/hie
+gdown "https://drive.google.com/uc?export=download&id=1qSxj8JjAeetAmNjUGayX0RBARgr5R4Ij" /opt/haskell/hoogle.hoo
+chmod +x /usr/bin/hie
+
 # Kalyn
 cd /tmp
-git clone https://github.com/raxod502/kalyn
+git clone https://github.com/raxod502/kalyn.git
 pushd kalyn >/dev/null
 stack build kalyn
 mv "$(stack exec which kalyn)" /usr/bin/kalyn
@@ -215,6 +221,14 @@ tee /opt/elm/elm.json >/dev/null <<"EOF"
         "indirect": {}
     }
 }
+EOF
+
+# Haskell
+mkdir -p /opt/haskell
+tee /opt/haskell/hie.yaml >/dev/null <<"EOF"
+cradle:
+  direct:
+    arguments: []
 EOF
 
 # Unlambda

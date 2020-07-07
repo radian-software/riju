@@ -450,6 +450,11 @@ func main() {
     repl: "ghci",
     main: "Main.hs",
     run: "ghci",
+    lspSetup: "cp /opt/haskell/hie.yaml hie.yaml",
+    lsp: "HIE_HOOGLE_DATABASE=/opt/haskell/hoogle.hoo hie --lsp",
+    lspInit: {
+      languageServerHaskell: {},
+    },
     template: `module Main where
 
 main :: IO ()
@@ -519,6 +524,7 @@ PLEASE GIVE UP
     main: "main.jl",
     run: "julia -L main.jl",
     lsp: `JULIA_DEPOT_PATH=:/opt/julia julia -e 'using LanguageServer; run(LanguageServerInstance(stdin, stdout))'`,
+    lspConfig: null,
     template: `println("Hello, world!")
 `,
   },
