@@ -81,6 +81,10 @@ cp kotlinc/bin/* /usr/bin/
 cp kotlinc/lib/* /usr/lib/
 rm -rf kotlin-*.zip kotlinc
 
+# Lua
+wget -nv https://github.com/EmmyLua/EmmyLua-LanguageServer/releases/download/0.3.6/EmmyLua-LS-all.jar
+mv EmmyLua-LS-all.jar /usr/lib/EmmyLua-LS.jar
+
 # PowerShell
 wget -nv https://github.com/PowerShell/PowerShell/releases/download/v7.0.1/powershell-7.0.1-linux-x64.tar.gz
 mkdir /opt/powershell

@@ -587,6 +587,7 @@ KTHXBYE
     repl: "lua",
     main: "main.lua",
     run: "lua -i main.lua",
+    lsp: "java -cp /usr/lib/EmmyLua-LS.jar com.tang.vscode.MainKt",
     template: `print("Hello, world!")
 `,
   },
