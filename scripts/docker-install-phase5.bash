@@ -119,6 +119,7 @@ gdown "https://drive.google.com/uc?export=download&id=1eE1-VuZz0gv-fITaGVT_r1Uun
 mkdir /opt/swift
 tar -xf swift.tar.gz -C /opt/swift --strip-components=2
 ln -s /opt/swift/bin/swiftc /usr/bin/swiftc
+ln -s /opt/swift/bin/sourcekit-lsp /usr/bin/sourcekit-lsp
 rm swift.tar.gz
 
 popd >/dev/null

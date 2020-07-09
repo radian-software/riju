@@ -1028,6 +1028,7 @@ END
     main: "main.swift",
     compile: "swiftc main.swift",
     run: "./main",
+    lsp: "sourcekit-lsp",
     template: `print("Hello, world!")
 `,
   },
