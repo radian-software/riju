@@ -24,7 +24,7 @@ RUSTUP_HOME=/opt/rust exec /opt/rust/bin/${0##*/} "$@"
 EOF
 chmod +x /opt/rust/wrapper
 for file in /opt/rust/bin/*; do
-    ln -s /opt/rust/wrapper /usr/bin/${file##*/}
+    ln -s /opt/rust/wrapper "/usr/bin/${file##*/}"
 done
 
 # Bash
