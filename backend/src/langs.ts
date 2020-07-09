@@ -331,6 +331,8 @@ void main() {
     repl: "elm repl",
     main: "Main.elm",
     run: "cp /opt/elm/elm.json elm.json && run-elm Main.elm; elm repl",
+    lsp: "elm-language-server --stdio",
+    lspSetup: "cp /opt/elm/elm.json elm.json",
     template: `module Main exposing (..)
 
 output : String

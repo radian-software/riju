@@ -41,6 +41,7 @@ npm install -g coffeescript
 
 # Elm
 npm install -g @kachkaev/run-elm
+npm install -g @elm-tooling/elm-language-server
 
 # FORTRAN
 pip3 install fortran-language-server
