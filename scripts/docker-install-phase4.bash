@@ -73,6 +73,9 @@ luarocks install digestif
 # TypeScript
 npm install -g ts-node typescript
 
+# Vim
+npm install -g vim-language-server
+
 # Whitespace
 pip3 install whitespace
 

@@ -1092,6 +1092,7 @@ END
     repl: "vim",
     main: "main.vim",
     run: `vim -c "$(< main.vim)"`,
+    lsp: "vim-language-server --stdio",
     template: `:echo "Hello, world!"
 `,
   },
