@@ -5,6 +5,14 @@ set -o pipefail
 set -x
 pushd /tmp >/dev/null
 
+# Erlang
+git clone https://github.com/erlang-ls/erlang_ls.git
+pushd erlang_ls >/dev/null
+make
+mv _build/default/bin/erlang_ls /usr/bin/erlang_ls
+popd >/dev/null
+rm -rf erlang_ls
+
 # Kalyn
 git clone https://github.com/raxod502/kalyn.git
 pushd kalyn >/dev/null

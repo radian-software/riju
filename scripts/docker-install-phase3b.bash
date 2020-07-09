@@ -17,6 +17,7 @@ emacs-nox
 
 # Erlang
 erlang
+rebar
 
 # F#
 fsharp

@@ -368,6 +368,7 @@ output = "Hello, world!"
     main: "main.erl",
     compile: "erl -compile main",
     run: "erl -s main main",
+    lsp: "erlang_ls",
     template: `-module(main).
 -export([main/0]).
 

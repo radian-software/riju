@@ -35,12 +35,18 @@ rm dmd_*.deb
 wget -nv https://github.com/elixir-lsp/elixir-ls/releases/download/v0.5.0/elixir-ls.zip
 unzip -d /opt/elixir-ls elixir-ls.zip
 ln -s /opt/elixir-ls/language_server.sh /usr/bin/elixir-ls
+rm elixir-ls.zip
 
 # Elm
 wget -nv https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz
 gunzip binary-for-linux-64-bit.gz
 chmod +x binary-for-linux-64-bit
 mv binary-for-linux-64-bit /usr/bin/elm
+
+# Erlang
+wget -nv https://s3.amazonaws.com/rebar3/rebar3
+chmod +x rebar3
+mv rebar3 /usr/bin/rebar3
 
 # Go
 export GO111MODULE=on
