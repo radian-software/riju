@@ -717,6 +717,7 @@ end.
     repl: "php -a",
     main: "main.php",
     run: "php -d auto_prepend_file=main.php -a",
+    lsp: "intelephense --stdio",
     template: `<?php
 
 echo "Hello, world!\\n";

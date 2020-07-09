@@ -52,6 +52,9 @@ julia -e 'using Pkg; Pkg.add("LanguageServer")'
 # Perl
 cpanm -n Devel::REPL
 
+# PHP
+npm install -g intelephense
+
 # ReasonML
 npm install -g bs-platform
 
