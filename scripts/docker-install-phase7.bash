@@ -35,5 +35,15 @@ git clone https://github.com/bipinu/malbolge.git
 clang malbolge/malbolge.c -o /usr/bin/malbolge
 rm -rf malbolge
 
+# SNOBOL
+wget -nv ftp://ftp.snobol4.org/snobol/old/snobol4-2.1.4.tar.gz
+tar -xf snobol4-*.tar.gz
+rm snobol4-*.tar.gz
+pushd snobol4-* >/dev/null
+make || true
+mv snobol4 /usr/bin/snobol4
+popd >/dev/null
+rm -rf snobol4-*
+
 popd >/dev/null
 rm "$0"

@@ -105,15 +105,14 @@ chmod +x /opt/mspyls/Microsoft.Python.LanguageServer
 ln -s /opt/mspyls/Microsoft.Python.LanguageServer /usr/bin/Microsoft.Python.LanguageServer
 rm Python-Language-Server-linux-x64.*.nupkg
 
-# SNOBOL
-wget -nv ftp://ftp.snobol4.org/snobol/old/snobol4-2.1.4.tar.gz
-tar -xf snobol4-*.tar.gz
-rm snobol4-*.tar.gz
-pushd snobol4-* >/dev/null
-make || true
-mv snobol4 /usr/bin/snobol4
-popd >/dev/null
-rm -rf snobol4-*
+# Scala
+wget -nv https://git.io/coursier-cli
+chmod +x coursier-cli
+mv coursier-cli /usr/bin/coursier
+coursier bootstrap --java-opt -Xss4m --java-opt -Xms100m --java-opt -Dmetals.client=emacs org.scalameta:metals_2.12:0.9.1 -r bintray:scalacenter/releases -r sonatype:snapshots -o /usr/bin/metals
+metals -version </dev/null
+mkdir /opt/coursier
+mv "$HOME/.cache/coursier" /opt/coursier/cache
 
 # Swift
 gdown "https://drive.google.com/uc?export=download&id=1eE1-VuZz0gv-fITaGVT_r1UunCLjS-JT" swift.tar.gz
