@@ -57,6 +57,9 @@ python3.7
 # x86
 clang
 
+# YAML
+jq
+
 # Zsh
 zsh
 

@@ -471,6 +471,16 @@ main = putStrLn "Hello, world!"
 `,
     hacks: ["ghci-config"],
   },
+  hcl: {
+    aliases: ["tf", "terraform", "hashicorp", "hc"],
+    name: "HCL",
+    monacoLang: "plaintext",
+    main: "main.hcl",
+    compile: "cat main.hcl | yj -cj > main.json",
+    run: "cat main.json | jq .",
+    template: `output = "Hello, world!"
+`,
+  },
   ink: {
     name: "Ink",
     monacoLang: "plaintext",
@@ -1066,6 +1076,16 @@ END
     template: `\\message{Hello, world!}
 `,
   },
+  toml: {
+    aliases: ["tom"],
+    name: "TOML",
+    monacoLang: "plaintext",
+    main: "main.toml",
+    compile: "cat main.toml | yj -tj > main.json",
+    run: "cat main.json | jq .",
+    template: `output = "Hello, world!"
+`,
+  },
   typescript: {
     aliases: ["ts", "tsnode", "tsc"],
     name: "TypeScript",
@@ -1157,6 +1177,16 @@ main:
 	.data
 message:
 	.string "Hello, world!\\n"
+`,
+  },
+  yaml: {
+    aliases: ["yml"],
+    name: "YAML",
+    monacoLang: "yaml",
+    main: "main.yaml",
+    compile: "cat main.yaml | yj -yj > main.json",
+    run: "cat main.json | jq .",
+    template: `output: "Hello, world!"
 `,
   },
   zsh: {

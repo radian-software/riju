@@ -65,6 +65,11 @@ gdown "https://drive.google.com/uc?export=download&id=1GPoR_ja4ns16KCamRgwB-JVag
 gdown "https://drive.google.com/uc?export=download&id=1qSxj8JjAeetAmNjUGayX0RBARgr5R4Ij" /opt/haskell/hoogle.hoo
 chmod +x /usr/bin/hie
 
+# HCL/TOML/YAML
+wget -nv https://github.com/sclevine/yj/releases/download/v4.0.0/yj-linux
+chmod +x yj-linux
+mv yj-linux /usr/bin/yj
+
 # Ink
 wget -nv https://github.com/thesephist/ink/releases/download/v0.1.7/ink-linux
 wget -nv https://github.com/thesephist/ink/releases/download/v0.1.7/std.ink
