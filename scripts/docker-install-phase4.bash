@@ -67,6 +67,9 @@ rustup component add rls rust-analysis rust-src
 # Shakespeare
 pip3 install shakespearelang
 
+# TeX
+luarocks install digestif
+
 # TypeScript
 npm install -g ts-node typescript
 

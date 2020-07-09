@@ -38,6 +38,8 @@ tcl
 tcsh
 
 # TeX
+liblua5.3-dev
+luarocks
 texlive-binaries
 
 # Unlambda

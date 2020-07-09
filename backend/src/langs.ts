@@ -1061,6 +1061,8 @@ END
     repl: "tex",
     main: "main.tex",
     run: "tex main.tex",
+    lsp: "digestif",
+    lspLang: "tex",
     template: `\\message{Hello, world!}
 `,
   },
