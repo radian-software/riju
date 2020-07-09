@@ -321,6 +321,7 @@ void main() {
     repl: "iex",
     main: "main.exs",
     run: "iex main.exs",
+    lsp: "/opt/elixir-ls/language_server.sh",
     template: `IO.puts("Hello, world!")
 `,
   },

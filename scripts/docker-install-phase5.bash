@@ -3,26 +3,18 @@
 set -e
 set -o pipefail
 set -x
+pushd /tmp >/dev/null
 
 # Needed for project infrastructure
-cd /tmp
 wget -nv https://github.com/watchexec/watchexec/releases/download/1.13.1/watchexec-1.13.1-x86_64-unknown-linux-gnu.deb
 dpkg -i watchexec-*.deb
 rm watchexec-*.deb
 
-cd /tmp
 git clone https://github.com/circulosmeos/gdown.pl.git
 mv gdown.pl/gdown.pl /usr/bin/gdown
 rm -rf gdown.pl
 
-cd /tmp
-wget https://get.haskellstack.org/stable/linux-x86_64-static.tar.gz
-tar -xf linux-x86_64-static.tar.gz
-mv stack-*-linux-x86_64-static/stack /usr/bin/stack
-rm -rf stack-*-linux-x86_64-static linux-x86_64-static.tar.gz
-
 # Ada
-cd /tmp
 wget -nv https://dl.bintray.com/reznikmm/ada-language-server/linux-latest.tar.gz
 tar -xf linux-latest.tar.gz
 mv linux/ada_language_server /usr/bin/ada_language_server
@@ -30,19 +22,21 @@ mv linux/*.so* /usr/lib/x86_64-linux-gnu/
 rm linux-latest.tar.gz
 
 # Clojure
-cd /tmp
 wget -nv https://github.com/snoe/clojure-lsp/releases/download/release-20200629T153107/clojure-lsp
 chmod +x clojure-lsp
 mv clojure-lsp /usr/bin/clojure-lsp
 
 # D
-cd /tmp
 wget -nv http://downloads.dlang.org/releases/2.x/2.092.0/dmd_2.092.0-0_amd64.deb
 dpkg -i dmd_*.deb
 rm dmd_*.deb
 
+# Elixir
+wget -nv https://github.com/elixir-lsp/elixir-ls/releases/download/v0.5.0/elixir-ls.zip
+unzip -d /opt/elixir-ls elixir-ls.zip
+ln -s /opt/elixir-ls/language_server.sh /usr/bin/elixir-ls
+
 # Elm
-cd /tmp
 wget -nv https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz
 gunzip binary-for-linux-64-bit.gz
 chmod +x binary-for-linux-64-bit
@@ -54,8 +48,18 @@ export GOPATH=/tmp/go
 mv /tmp/go/bin/gopls /usr/bin/gopls
 rm -rf /tmp/go
 
+# Haskell
+wget https://get.haskellstack.org/stable/linux-x86_64-static.tar.gz
+tar -xf linux-x86_64-static.tar.gz
+mv stack-*-linux-x86_64-static/stack /usr/bin/stack
+rm -rf stack-*-linux-x86_64-static linux-x86_64-static.tar.gz
+
+mkdir -p /opt/haskell
+gdown "https://drive.google.com/uc?export=download&id=1GPoR_ja4ns16KCamRgwB-JVag4HK0igz" /usr/bin/hie
+gdown "https://drive.google.com/uc?export=download&id=1qSxj8JjAeetAmNjUGayX0RBARgr5R4Ij" /opt/haskell/hoogle.hoo
+chmod +x /usr/bin/hie
+
 # Ink
-cd /tmp
 wget -nv https://github.com/thesephist/ink/releases/download/v0.1.7/ink-linux
 wget -nv https://github.com/thesephist/ink/releases/download/v0.1.7/std.ink
 wget -nv https://github.com/thesephist/ink/releases/download/v0.1.7/str.ink
@@ -65,7 +69,6 @@ mkdir /opt/ink
 mv std.ink str.ink /opt/ink/
 
 # Kotlin
-cd /tmp
 wget -nv https://github.com/JetBrains/kotlin/releases/download/v1.3.72/kotlin-compiler-1.3.72.zip
 unzip kotlin-*.zip
 cp kotlinc/bin/* /usr/bin/
@@ -73,7 +76,6 @@ cp kotlinc/lib/* /usr/lib/
 rm -rf kotlin-*.zip kotlinc
 
 # PowerShell
-cd /tmp
 wget -nv https://github.com/PowerShell/PowerShell/releases/download/v7.0.1/powershell-7.0.1-linux-x64.tar.gz
 mkdir /opt/powershell
 tar -xf powershell-*.tar.gz -C /opt/powershell
@@ -81,7 +83,6 @@ ln -s /opt/powershell/pwsh /usr/bin/pwsh
 rm powershell-*.tar.gz
 
 # Python
-cd /tmp
 xml="$(curl -sSL "https://pvsc.blob.core.windows.net/python-language-server-stable?restype=container&comp=list&prefix=Python-Language-Server-linux-x64")"
 nupkg="$(echo "$xml" | grep -Eo 'https://[^<]+\.nupkg' | tail -n1)"
 wget -nv "${nupkg}"
@@ -101,171 +102,11 @@ popd >/dev/null
 rm -rf snobol4-*
 
 # Swift
-cd /tmp
 gdown "https://drive.google.com/uc?export=download&id=1eE1-VuZz0gv-fITaGVT_r1UunCLjS-JT" swift.tar.gz
 mkdir /opt/swift
 tar -xf swift.tar.gz -C /opt/swift --strip-components=2
 ln -s /opt/swift/bin/swiftc /usr/bin/swiftc
 rm swift.tar.gz
 
-# Haskell
-mkdir -p /opt/haskell
-gdown "https://drive.google.com/uc?export=download&id=1GPoR_ja4ns16KCamRgwB-JVag4HK0igz" /usr/bin/hie
-gdown "https://drive.google.com/uc?export=download&id=1qSxj8JjAeetAmNjUGayX0RBARgr5R4Ij" /opt/haskell/hoogle.hoo
-chmod +x /usr/bin/hie
-
-# Kalyn
-cd /tmp
-git clone https://github.com/raxod502/kalyn.git
-pushd kalyn >/dev/null
-stack build kalyn
-mv "$(stack exec which kalyn)" /usr/bin/kalyn
-mkdir /opt/kalyn
-cp -R src-kalyn/Stdlib src-kalyn/Stdlib.kalyn /opt/kalyn/
 popd >/dev/null
-rm -rf kalyn
-
-# LOLCODE
-cd /tmp
-git clone https://github.com/justinmeza/lci.git
-pushd lci >/dev/null
-python3 install.py --prefix=/usr
-popd >/dev/null
-rm -rf lci
-
-# Malbolge
-cd /tmp
-git clone https://github.com/bipinu/malbolge.git
-clang malbolge/malbolge.c -o /usr/bin/malbolge
-rm -rf malbolge
-
-# Befunge
-tee /usr/bin/befunge-repl >/dev/null <<"EOF"
-#!/usr/bin/env -S NODE_PATH=/usr/lib/node_modules node
-const fs = require("fs");
-
-const Befunge = require("befunge93");
-const prompt = require("prompt-sync")();
-
-const befunge = new Befunge();
-befunge.onInput = prompt;
-befunge.onOutput = (output) => {
-  if (typeof output === "string") {
-    process.stdout.write(output);
-  } else {
-    process.stdout.write(output + " ");
-  }
-};
-
-const args = process.argv.slice(2);
-if (args.length !== 1) {
-  console.error("usage: befunge-repl FILE");
-  process.exit(1);
-}
-
-befunge.run(fs.readFileSync(args[0], { encoding: "utf-8" })).catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
-EOF
-chmod +x /usr/bin/befunge-repl
-
-# BrainF
-tee /usr/bin/brainf-repl >/dev/null <<"EOF"
-#!/usr/bin/env python3
-import argparse
-import readline
-import subprocess
-import tempfile
-
-parser = argparse.ArgumentParser()
-parser.add_argument("file", nargs="?")
-args = parser.parse_args()
-
-if args.file:
-    subprocess.run(["beef", args.file])
-while True:
-    try:
-        code = input("bf> ")
-    except KeyboardInterrupt:
-        print("^C")
-        continue
-    except EOFError:
-        print("^D")
-        break
-    if not code:
-        continue
-    with tempfile.NamedTemporaryFile(mode="w") as f:
-        f.write(code)
-        f.flush()
-        subprocess.run(["beef", f.name])
-EOF
-chmod +x /usr/bin/brainf-repl
-
-# Elm
-mkdir /opt/elm
-tee /opt/elm/elm.json >/dev/null <<"EOF"
-{
-    "type": "application",
-    "source-directories": [
-        "."
-    ],
-    "elm-version": "0.19.1",
-    "dependencies": {
-        "direct": {
-            "elm/browser": "1.0.2",
-            "elm/core": "1.0.5",
-            "elm/html": "1.0.0"
-        },
-        "indirect": {
-            "elm/json": "1.1.3",
-            "elm/time": "1.0.0",
-            "elm/url": "1.0.0",
-            "elm/virtual-dom": "1.0.2"
-        }
-    },
-    "test-dependencies": {
-        "direct": {},
-        "indirect": {}
-    }
-}
-EOF
-
-# Haskell
-mkdir -p /opt/haskell
-tee /opt/haskell/hie.yaml >/dev/null <<"EOF"
-cradle:
-  direct:
-    arguments: []
-EOF
-
-# Unlambda
-tee /usr/bin/unlambda-repl >/dev/null <<"EOF"
-#!/usr/bin/env python3
-import argparse
-import readline
-import subprocess
-
-parser = argparse.ArgumentParser()
-parser.add_argument("file", nargs="?")
-args = parser.parse_args()
-
-if args.file:
-    with open(args.file) as f:
-        subprocess.run(["unlambda"], input=f.read(), encoding="utf-8")
-while True:
-    try:
-        code = input("λ> ")
-    except KeyboardInterrupt:
-        print("^C")
-        continue
-    except EOFError:
-        print("^D")
-        break
-    if not code:
-        continue
-    subprocess.run(["unlambda"], input=code, encoding="utf-8")
-EOF
-chmod +x /usr/bin/unlambda-repl
-
 rm "$0"

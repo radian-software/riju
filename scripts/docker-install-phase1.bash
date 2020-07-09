@@ -3,6 +3,7 @@
 set -e
 set -o pipefail
 set -x
+pushd /tmp >/dev/null
 
 dpkg --add-architecture i386
 
@@ -17,7 +18,6 @@ curl -sSL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 curl -sSL https://keybase.io/crystal/pgp_keys.asc | apt-key add -
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
 
-cd /tmp
 wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
 dpkg -i packages-microsoft-prod.deb
 rm packages-microsoft-prod.deb
@@ -33,4 +33,5 @@ EOF
 
 add-apt-repository -y -n ppa:deadsnakes/ppa
 
+popd >/dev/null
 rm "$0"

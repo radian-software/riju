@@ -4,15 +4,16 @@ set -e
 set -o pipefail
 set -x
 
-# Needed for project infrastructure
-cd /tmp
+# Package manager - Julia
 mkdir /opt/julia
 export JULIA_DEPOT_PATH=/opt/julia
 
+# Package manager - Node.js
 npm config set unsafe-perm true
 PERL_MM_USE_DEFAULT=1 cpan App::cpanminus
 rm -rf /tmp/cpan_install_*.txt
 
+# Package manager - Rust
 export CARGO_HOME=/opt/rust
 export RUSTUP_HOME=/opt/rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
