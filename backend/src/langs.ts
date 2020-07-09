@@ -314,6 +314,15 @@ void main() {
 }
 `,
   },
+  dhall: {
+    name: "Dhall",
+    monacoLang: "plaintext",
+    main: "main.dhall",
+    compile: "cat main.dhall | dhall-to-json > main.json",
+    run: "cat main.json | jq .",
+    template: `{ output = "Hello, world!" }
+`,
+  },
   elixir: {
     aliases: ["iex", "exs"],
     name: "Elixir",

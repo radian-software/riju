@@ -31,6 +31,13 @@ wget -nv http://downloads.dlang.org/releases/2.x/2.092.0/dmd_2.092.0-0_amd64.deb
 dpkg -i dmd_*.deb
 rm dmd_*.deb
 
+# Dhall
+wget -nv https://github.com/dhall-lang/dhall-haskell/releases/download/1.33.1/dhall-json-1.7.0-x86_64-linux.tar.bz2
+mkdir dhall-json
+tar -xf dhall-json-*-x86_64-linux.tar.bz2 -C dhall-json
+mv dhall-json/bin/dhall-to-json dhall-json/bin/json-to-dhall /usr/bin/
+rm dhall-json dhall-json-*-x86_64-linux.tar.bz2
+
 # Elixir
 wget -nv https://github.com/elixir-lsp/elixir-ls/releases/download/v0.5.0/elixir-ls.zip
 unzip -d /opt/elixir-ls elixir-ls.zip

@@ -55,6 +55,9 @@ crystal
 # Dart
 dart
 
+# Dhall
+dhall
+
 "
 
 export DEBIAN_FRONTEND=noninteractive
