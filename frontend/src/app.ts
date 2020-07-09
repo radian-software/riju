@@ -19,13 +19,16 @@ import { FitAddon } from "xterm-addon-fit";
 import "xterm/css/xterm.css";
 
 const DEBUG = window.location.hash === "#debug";
+const config: RijuConfig = (window as any).rijuConfig;
 
 interface RijuConfig {
   id: string;
   monacoLang: string;
   main: string;
+  lspDisableDynamicRegistration?: boolean;
   lspInit?: any;
   lspConfig?: any;
+  lspLang?: string;
   template: string;
 }
 
@@ -84,19 +87,35 @@ class RijuMessageWriter extends AbstractMessageWriter {
   }
 
   write(msg: Message): void {
-    if ((msg as any).method === "initialize") {
-      (msg as any).params.processId = null;
+    switch ((msg as any).method) {
+      case "initialize":
+        (msg as any).params.processId = null;
+        if (config.lspDisableDynamicRegistration) {
+          this.disableDynamicRegistration(msg);
+        }
+        break;
+      case "textDocument/didOpen":
+        if (config.lspLang) {
+          (msg as any).params.textDocument.languageId = config.lspLang;
+        }
     }
     if (DEBUG) {
       console.log("SEND LSP:", msg);
     }
     this.socket.send(JSON.stringify({ event: "lspInput", input: msg }));
   }
+
+  disableDynamicRegistration(msg: any) {
+    if (!msg || typeof msg !== "object") return;
+    for (const [key, val] of Object.entries(msg)) {
+      if (key === "dynamicRegistration" && val === true)
+        msg.dynamicRegistration = false;
+      this.disableDynamicRegistration(val);
+    }
+  }
 }
 
 async function main() {
-  const config: RijuConfig = (window as any).rijuConfig;
-
   const term = new Terminal();
   const fitAddon = new FitAddon();
   term.loadAddon(fitAddon);
@@ -188,7 +207,6 @@ async function main() {
               middleware: {
                 workspace: {
                   configuration: (params, token, configuration) => {
-                    (window as any).config = configuration;
                     return Array(
                       (configuration(params, token) as {}[]).length
                     ).fill(

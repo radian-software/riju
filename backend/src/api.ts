@@ -19,7 +19,7 @@ import {
 
 export class Session {
   uuid: string;
-  code: string;
+  code: string | null;
   config: LangConfig;
   term: { pty: IPty | null; live: boolean };
   lsp: {
@@ -41,7 +41,7 @@ export class Session {
     this.config = langs[lang];
     this.term = { pty: null, live: false };
     this.lsp = null;
-    this.code = "";
+    this.code = null;
     this.homedir = null;
     this.uid = null;
     this.uidCleanup = null;
@@ -121,11 +121,12 @@ export class Session {
       repl,
       main,
       suffix,
-      alwaysCreate,
+      createEmpty,
       compile,
       run,
       lspSetup,
       lsp,
+      template,
       hacks,
     } = this.config;
     if (this.term.pty) {
@@ -141,42 +142,37 @@ export class Session {
     if (!run) {
       cmdline = `echo 'Support for ${this.config.name} is not yet implemented.'`;
     } else if (this.code) {
-      let code = this.code;
-      if (suffix) {
-        code += suffix;
-      }
-      if (main.includes("/")) {
-        await spawnPrivileged(
-          this.uid,
-          this.uuid,
-          ["mkdir", "-p", path.dirname(path.resolve(this.homedir, main))],
-          this.log
-        );
-      }
-      await spawnPrivileged(
-        this.uid,
-        this.uuid,
-        ["sh", "-c", `cat > ${path.resolve(this.homedir, main)}`],
-        this.log,
-        { input: code }
-      );
       cmdline = run;
       if (compile) {
         cmdline = `( ${compile} ) && ( ${run} )`;
       }
     } else if (repl) {
-      if (alwaysCreate) {
-        await spawnPrivileged(
-          this.uid,
-          this.uuid,
-          ["touch", `${path.resolve(this.homedir, main)}`],
-          this.log
-        );
-      }
       cmdline = repl;
     } else {
       cmdline = `echo '${name} has no REPL, press Run to see it in action'`;
     }
+    let code = this.code;
+    if (this.code === null) {
+      code = createEmpty ? "" : template;
+    }
+    if (code && suffix) {
+      code += suffix;
+    }
+    if (main.includes("/")) {
+      await spawnPrivileged(
+        this.uid,
+        this.uuid,
+        ["mkdir", "-p", path.dirname(path.resolve(this.homedir, main))],
+        this.log
+      );
+    }
+    await spawnPrivileged(
+      this.uid,
+      this.uuid,
+      ["sh", "-c", `cat > ${path.resolve(this.homedir, main)}`],
+      this.log,
+      { input: code as string }
+    );
     if (hacks && hacks.includes("ghci-config") && run) {
       if (this.code) {
         const contents = ":load Main\nmain\n";

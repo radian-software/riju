@@ -1,4 +1,5 @@
 *.log
 .log
+.lsp-repl-history
 node_modules
 out

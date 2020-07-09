@@ -6,13 +6,15 @@ export interface LangConfig {
   main: string;
   prefix?: string;
   suffix?: string;
-  alwaysCreate?: boolean;
+  createEmpty?: boolean;
   compile?: string;
   run: string;
   lspSetup?: string;
   lsp?: string;
+  lspDisableDynamicRegistration?: boolean;
   lspInit?: any;
   lspConfig?: any;
+  lspLang?: string;
   template: string;
   hacks?: "ghci-config"[];
 }
@@ -340,6 +342,7 @@ output = "Hello, world!"
     monacoLang: "plaintext",
     repl: `SHELL=/usr/bin/elvish HOME="$PWD" elvish`,
     main: ".elvish/rc.elv",
+    createEmpty: true,
     run: `SHELL=/usr/bin/elvish HOME="$PWD" elvish`,
     template: `echo "Hello, world!"
 `,
@@ -558,6 +561,7 @@ PLEASE GIVE UP
     monacoLang: "shell",
     repl: `SHELL=/usr/bin/ksh HOME="$PWD" ksh`,
     main: ".kshrc",
+    createEmpty: true,
     run: `SHELL=/usr/bin/ksh HOME="$PWD" ksh`,
     template: `echo "Hello, world!"
 `,
@@ -865,6 +869,7 @@ binding_irb.run(IRB.conf)
     monacoLang: "shell",
     repl: `SHELL=/usr/bin/sh HOME="$PWD" posh -l`,
     main: ".profile",
+    createEmpty: true,
     run: `SHELL=/usr/bin/sh HOME="$PWD" posh -l`,
     template: `echo "Hello, world!"
 `,
@@ -1025,6 +1030,7 @@ END
     monacoLang: "tcl",
     repl: "tclsh",
     main: ".tclshrc",
+    createEmpty: true,
     run: `HOME="$PWD" tclsh`,
     template: `puts {Hello, world!}
 `,
@@ -1035,6 +1041,7 @@ END
     monacoLang: "shell",
     repl: `SHELL=/usr/bin/tcsh HOME="$PWD" tcsh`,
     main: ".tcshrc",
+    createEmpty: true,
     run: `SHELL=/usr/bin/tcsh HOME="$PWD" tcsh`,
     template: `echo "Hello, world!"
 `,
@@ -1147,7 +1154,7 @@ message:
     monacoLang: "shell",
     repl: "SHELL=/usr/bin/zsh zsh",
     main: ".zshrc",
-    alwaysCreate: true,
+    createEmpty: true,
     run: `SHELL=/usr/bin/zsh ZDOTDIR="$PWD" zsh`,
     template: `echo "Hello, world!"
 `,

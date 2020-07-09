@@ -27,6 +27,7 @@ make
 man-db
 moreutils
 nano
+iputils-ping
 sudo
 tmux
 vim

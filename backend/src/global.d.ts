@@ -1,1 +1,1 @@
-declare module "heroku-ssl-redirect";
+declare module "historic-readline";

@@ -37,7 +37,7 @@ export async function call(
   delete options.input;
   delete options.check;
   const proc = spawn(args[0], args.slice(1), options);
-  if (input) {
+  if (typeof input === "string") {
     proc.stdin!.end(input);
   }
   let output = "";
