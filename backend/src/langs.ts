@@ -730,6 +730,7 @@ echo "Hello, world!\\n";
     repl: "SHELL=/usr/bin/pwsh pwsh",
     main: "main.ps1",
     run: "SHELL=/usr/bin/pwsh pwsh -NoExit main.ps1",
+    lsp: `pwsh -NoLogo -NoProfile -Command "/opt/powershell-editor-services/PowerShellEditorServices/Start-EditorServices.ps1 -BundledModulesPath /opt/powershell-editor-services -LogPath '$PWD/.powershell-editor-services/lsp.log' -SessionDetailsPath '$PWD/.powershell-editor-services/session.json' -FeatureFlags @() -AdditionalModules @() -HostName Riju -HostProfileId 'riju' -HostVersion 0.0 -Stdio -LogLevel Normal"`,
     template: `Write-Host "Hello, world!"
 `,
   },

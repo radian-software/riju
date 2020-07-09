@@ -92,6 +92,10 @@ tar -xf powershell-*.tar.gz -C /opt/powershell
 ln -s /opt/powershell/pwsh /usr/bin/pwsh
 rm powershell-*.tar.gz
 
+wget -nv https://github.com/PowerShell/PowerShellEditorServices/releases/download/v2.2.0/PowerShellEditorServices.zip
+unzip PowerShellEditorServices.zip
+mv PowerShellEditorServices /opt/powershell-editor-services
+
 # Python
 xml="$(curl -sSL "https://pvsc.blob.core.windows.net/python-language-server-stable?restype=container&comp=list&prefix=Python-Language-Server-linux-x64")"
 nupkg="$(echo "$xml" | grep -Eo 'https://[^<]+\.nupkg' | tail -n1)"
