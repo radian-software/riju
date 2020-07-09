@@ -446,9 +446,9 @@ func main() {
   groovy: {
     name: "Groovy",
     monacoLang: "plaintext",
-    repl: "groovysh",
+    repl: `JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" groovysh`,
     main: "main.groovy",
-    run: "groovysh main.groovy",
+    run: `JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" groovysh main.groovy`,
     template: `print "Hello, world!";
 `,
   },
