@@ -2,6 +2,7 @@ export interface LangConfig {
   aliases?: string[];
   name: string;
   monacoLang: string;
+  daemon?: string;
   repl?: string;
   main: string;
   prefix?: string;

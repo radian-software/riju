@@ -142,6 +142,7 @@ async function main() {
     let clientDisposable: Disposable | null = null;
     let servicesDisposable: Disposable | null = null;
     let lspLogBuffer = "";
+    let daemonLogBuffer = "";
     console.log("Connecting to server...");
     socket = new WebSocket(
       (document.location.protocol === "http:" ? "ws://" : "wss://") +
@@ -162,7 +163,8 @@ async function main() {
       if (
         DEBUG &&
         message?.event !== "lspOutput" &&
-        message?.event !== "lspLog"
+        message?.event !== "lspLog" &&
+        message?.event !== "daemonLog"
       ) {
         console.log("RECEIVE:", message);
       }
@@ -244,7 +246,23 @@ async function main() {
             }
           }
           return;
+        case "daemonLog":
+          if (typeof message.output !== "string") {
+            console.error("Unexpected message from server:", message);
+            return;
+          }
+          if (DEBUG) {
+            daemonLogBuffer += message.output;
+            while (daemonLogBuffer.includes("\n")) {
+              const idx = daemonLogBuffer.indexOf("\n");
+              const line = daemonLogBuffer.slice(0, idx);
+              daemonLogBuffer = daemonLogBuffer.slice(idx + 1);
+              console.log(`DAEMON || ${line}`);
+            }
+          }
+          return;
         case "lspCrashed":
+        case "daemonCrashed":
           return;
         default:
           console.error("Unexpected message from server:", message);

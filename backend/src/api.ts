@@ -7,7 +7,6 @@ import { IPty } from "node-pty";
 import * as rpc from "vscode-jsonrpc";
 import { v4 as getUUID } from "uuid";
 
-import { PRIVILEGED } from "./config";
 import { LangConfig, langs } from "./langs";
 import { borrowUser } from "./users";
 import {
@@ -27,6 +26,7 @@ export class Session {
     reader: rpc.StreamMessageReader;
     writer: rpc.StreamMessageWriter;
   } | null;
+  daemon: ChildProcess | null;
   ws: WebSocket;
   homedir: string | null;
   uid: number | null;
@@ -41,6 +41,7 @@ export class Session {
     this.config = langs[lang];
     this.term = { pty: null, live: false };
     this.lsp = null;
+    this.daemon = null;
     this.code = null;
     this.homedir = null;
     this.uid = null;
@@ -118,6 +119,7 @@ export class Session {
     }
     const {
       name,
+      daemon,
       repl,
       main,
       suffix,
@@ -217,6 +219,18 @@ export class Session {
         this.send({ event: "terminalOutput", output: data });
       }
     });
+    if (daemon && this.daemon === null) {
+      this.daemon = spawn("bash", ["-c", daemon], { env: getEnv(this.uuid) });
+      this.daemon.on("exit", (code) =>
+        this.send({ event: "daemonCrashed", code })
+      );
+      this.daemon.stdout!.on("data", (data) =>
+        this.send({ event: "daemonLog", output: data.toString("utf8") })
+      );
+      this.daemon.stderr!.on("data", (data) =>
+        this.send({ event: "daemonLog", output: data.toString("utf8") })
+      );
+    }
     if (lsp && this.lsp === null) {
       if (lspSetup) {
         await spawnPrivileged(

@@ -57,6 +57,7 @@
     "system-dev": "watchexec --no-vcs-ignore -w system/src -n scripts/compile-system.bash",
     "build": "run-s backend frontend system",
     "dev": "run-p backend-dev frontend-dev system-dev server-dev",
-    "lsp": "node backend/out/lsp-repl.js"
+    "lsp-repl": "node backend/out/lsp-repl.js",
+    "sandbox": "node backend/out/sandbox.js"
   }
 }
