@@ -62,7 +62,7 @@ void useradd(int uid)
   int status = system(cmdline);
   if (status)
     die("groupadd failed");
-  if (asprintf(&cmdline, "useradd -M -N -l -r -u %1$d -g %1$d -p '!' riju%1$d", uid) < 0)
+  if (asprintf(&cmdline, "useradd -M -N -l -r -u %1$d -g %1$d -p '!' -s /usr/bin/bash riju%1$d", uid) < 0)
     die("asprintf failed");
   status = system(cmdline);
   if (status)
