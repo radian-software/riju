@@ -16,6 +16,9 @@ algol68g
 gcc-arm-linux-gnueabihf
 qemu-user-static
 
+# AsciiDoc
+asciidoc
+
 # ATS
 ats2-lang
 

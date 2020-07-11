@@ -68,6 +68,16 @@ message:
 	.string "Hello, world!\\n"
 `,
   },
+  asciidoc: {
+    aliases: ["adoc", "asc"],
+    monacoLang: "plaintext",
+    name: "AsciiDoc",
+    main: "main.adoc",
+    compile: "asciidoc -s main.adoc",
+    run: "prettier --no-config main.html",
+    template: `Hello, world!
+`,
+  },
   ats: {
     aliases: ["dats"],
     name: "ATS",
