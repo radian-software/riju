@@ -644,6 +644,16 @@ PLEASE GIVE UP
 }
 `,
   },
+  livescript: {
+    aliases: ["lsc", "ls"],
+    name: "LiveScript",
+    monacoLang: "plaintext",
+    repl: "lsc",
+    main: "main.ls",
+    run: "lsc -r ./main.ls; lsc",
+    template: `console.log "Hello, world!"
+`,
+  },
   llvm: {
     name: "LLVM",
     monacoLang: "shell",

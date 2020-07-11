@@ -55,6 +55,9 @@ julia -e 'using Pkg; Pkg.add("LanguageServer")'
 # Less
 npm install -g less
 
+# LiveScript
+npm install -g livescript
+
 # Perl
 cpanm -n Devel::REPL
 
