@@ -906,6 +906,16 @@ main :-
     template: `print_string("Hello, world!\\n")
 `,
   },
+  restructuredtext: {
+    aliases: ["rst"],
+    name: "reStructuredText",
+    monacoLang: "restructuredtext",
+    main: "main.rst",
+    compile: "pandoc main.rst -o main.html",
+    run: "prettier --no-config main.html",
+    template: `Hello, world!
+`,
+  },
   riscv: {
     aliases: ["risc"],
     name: "RISC-V",

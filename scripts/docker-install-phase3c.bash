@@ -58,6 +58,9 @@ r-base
 # Racket
 racket
 
+# reStructuredText
+pandoc
+
 # RISC-V
 gcc-riscv64-linux-gnu
 qemu-user-static
