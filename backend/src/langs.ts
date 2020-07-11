@@ -816,6 +816,17 @@ main :-
     write("Hello, world!"), nl.
 `,
   },
+  pug: {
+    name: "Pug",
+    monacoLang: "pug",
+    main: "main.pug",
+    compile: "pug main.pug",
+    run: "prettier --no-config main.html",
+    template: `html
+  body
+    p Hello, world!
+`,
+  },
   python: {
     aliases: ["python3", "python2", "py"],
     name: "Python",

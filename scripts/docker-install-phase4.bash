@@ -55,6 +55,9 @@ cpanm -n Devel::REPL
 # PHP
 npm install -g intelephense
 
+# Pug
+npm install -g prettier pug-cli
+
 # ReasonML
 npm install -g bs-platform
 
