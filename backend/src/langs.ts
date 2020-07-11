@@ -633,6 +633,17 @@ PLEASE GIVE UP
     template: `echo "Hello, world!"
 `,
   },
+  less: {
+    aliases: ["lessc"],
+    name: "Less",
+    monacoLang: "less",
+    main: "main.less",
+    run: "lessc main.less",
+    template: `body:before {
+  content: "Hello, world!";
+}
+`,
+  },
   llvm: {
     name: "LLVM",
     monacoLang: "shell",
@@ -1036,6 +1047,15 @@ binding_irb.run(IRB.conf)
 }
 `,
   },
+  sass: {
+    name: "Sass",
+    monacoLang: "plaintext",
+    main: "main.sass",
+    run: "sass main.sass",
+    template: `body:before
+  content: "Hello, world!"
+`,
+  },
   scala: {
     name: "Scala",
     monacoLang: "plaintext",
@@ -1055,6 +1075,16 @@ binding_irb.run(IRB.conf)
     template: `(begin
   (display "Hello, world!")
   (newline))
+`,
+  },
+  scss: {
+    name: "SCSS",
+    monacoLang: "scss",
+    main: "main.scss",
+    run: "sass main.scss",
+    template: `body:before {
+  content: "Hello, world!";
+}
 `,
   },
   sh: {

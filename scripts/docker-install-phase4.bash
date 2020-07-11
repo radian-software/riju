@@ -52,6 +52,9 @@ pip3 install fortran-language-server
 # Julia
 julia -e 'using Pkg; Pkg.add("LanguageServer")'
 
+# Less
+npm install -g less
+
 # Perl
 cpanm -n Devel::REPL
 
@@ -69,6 +72,9 @@ gem install solargraph
 
 # Rust
 rustup component add rls rust-analysis rust-src
+
+# Sass/SCSS
+npm install -g sass
 
 # Shakespeare
 pip3 install shakespearelang
