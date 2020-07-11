@@ -738,6 +738,15 @@ int main() {
 }
 `,
   },
+  ocaml: {
+    name: "OCaml",
+    monacoLang: "plaintext",
+    main: "main.ml",
+    repl: "ocaml",
+    run: "ocaml -init main.ml",
+    template: `print_string "Hello, world!\\n";;
+`,
+  },
   octave: {
     aliases: ["matlab", "m", "mathworks"],
     name: "Octave",
