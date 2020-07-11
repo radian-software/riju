@@ -19,7 +19,7 @@ wget -nv https://dl.bintray.com/reznikmm/ada-language-server/linux-latest.tar.gz
 tar -xf linux-latest.tar.gz
 mv linux/ada_language_server /usr/bin/ada_language_server
 mv linux/*.so* /usr/lib/x86_64-linux-gnu/
-rm linux-latest.tar.gz
+rm -rf linux linux-latest.tar.gz
 
 # Clojure
 wget -nv https://github.com/snoe/clojure-lsp/releases/download/release-20200629T153107/clojure-lsp
@@ -108,6 +108,7 @@ rm powershell-*.tar.gz
 wget -nv https://github.com/PowerShell/PowerShellEditorServices/releases/download/v2.2.0/PowerShellEditorServices.zip
 unzip PowerShellEditorServices.zip
 mv PowerShellEditorServices /opt/powershell-editor-services
+rm PowerShellEditorServices.zip
 
 # Python
 xml="$(curl -sSL "https://pvsc.blob.core.windows.net/python-language-server-stable?restype=container&comp=list&prefix=Python-Language-Server-linux-x64")"
