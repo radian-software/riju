@@ -36,7 +36,7 @@ wget -nv https://github.com/dhall-lang/dhall-haskell/releases/download/1.33.1/dh
 mkdir dhall-json
 tar -xf dhall-json-*-x86_64-linux.tar.bz2 -C dhall-json
 mv dhall-json/bin/dhall-to-json dhall-json/bin/json-to-dhall /usr/bin/
-rm dhall-json dhall-json-*-x86_64-linux.tar.bz2
+rm -rf dhall-json dhall-json-*-x86_64-linux.tar.bz2
 
 # Elixir
 wget -nv https://github.com/elixir-lsp/elixir-ls/releases/download/v0.5.0/elixir-ls.zip
@@ -57,12 +57,13 @@ mv rebar3 /usr/bin/rebar3
 
 # Go
 export GO111MODULE=on
-export GOPATH=/tmp/go
-mv /tmp/go/bin/gopls /usr/bin/gopls
-rm -rf /tmp/go
+export GOPATH="$PWD/go"
+go get golang.org/x/tools/gopls@latest
+mv go/bin/gopls /usr/bin/gopls
+rm -rf go
 
 # Haskell
-wget https://get.haskellstack.org/stable/linux-x86_64-static.tar.gz
+wget -nv https://get.haskellstack.org/stable/linux-x86_64-static.tar.gz
 tar -xf linux-x86_64-static.tar.gz
 mv stack-*-linux-x86_64-static/stack /usr/bin/stack
 rm -rf stack-*-linux-x86_64-static linux-x86_64-static.tar.gz

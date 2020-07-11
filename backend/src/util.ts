@@ -3,9 +3,14 @@ import * as process from "process";
 
 import * as appRoot from "app-root-path";
 
-interface Options extends SpawnOptions {
+export interface Options extends SpawnOptions {
   input?: string;
   check?: boolean;
+}
+
+export interface Context {
+  uid: number;
+  uuid: string;
 }
 
 export const rijuSystemPrivileged = appRoot.resolve(
@@ -26,7 +31,7 @@ export function getEnv(uuid: string) {
   };
 }
 
-export async function call(
+export async function run(
   args: string[],
   log: (msg: string) => void,
   options?: Options
@@ -63,26 +68,22 @@ export async function call(
   });
 }
 
-export async function callPrivileged(
-  args: string[],
-  log: (msg: string) => void,
-  options?: Options
-) {
-  await call([rijuSystemPrivileged].concat(args), log, options);
+export function privilegedUseradd(uid: number) {
+  return [rijuSystemPrivileged, "useradd", `${uid}`];
 }
 
-export async function spawnPrivileged(
-  uid: number,
-  uuid: string,
-  args: string[],
-  log: (msg: string) => void,
-  options?: Options
-) {
-  options = options || {};
-  options.env = getEnv(uuid);
-  await callPrivileged(
-    ["spawn", `${uid}`, `${uuid}`].concat(args),
-    log,
-    options
-  );
+export function privilegedSetup({ uid, uuid }: Context) {
+  return [rijuSystemPrivileged, "setup", `${uid}`, uuid];
+}
+
+export function privilegedSpawn({ uid, uuid }: Context, args: string[]) {
+  return [rijuSystemPrivileged, "spawn", `${uid}`, uuid].concat(args);
+}
+
+export function privilegedTeardown({ uid, uuid }: Context) {
+  return [rijuSystemPrivileged, "teardown", `${uid}`, uuid];
+}
+
+export function bash(cmdline: string) {
+  return ["bash", "-c", cmdline];
 }

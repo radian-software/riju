@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "outDir": "./frontend/out",
-    "rootDir": "./frontend/src"
+    "rootDir": "./frontend/src",
+    "target": "ES3"
   },
   "extends": "./tsconfig.json",
   "include": ["frontend/src"]

@@ -100,7 +100,7 @@ if (useTLS) {
   httpsServer.listen(tlsPort, host, () =>
     console.log(`Listening on https://${host}:${tlsPort}`)
   );
-  http
+  const server = http
     .createServer((req, res) => {
       res.writeHead(301, {
         Location: "https://" + req.headers["host"] + req.url,
@@ -112,7 +112,7 @@ if (useTLS) {
     );
 } else {
   addWebsocket(app, undefined);
-  app.listen(port, host, () =>
+  const server = app.listen(port, host, () =>
     console.log(`Listening on http://${host}:${port}`)
   );
 }

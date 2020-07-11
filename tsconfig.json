@@ -4,7 +4,8 @@
     "resolveJsonModule": true,
     "rootDir": "./backend/src",
     "sourceMap": true,
-    "strict": true
+    "strict": true,
+    "target": "ES5"
   },
   "include": ["backend/src"]
 }

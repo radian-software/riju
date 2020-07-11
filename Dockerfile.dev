@@ -2,6 +2,8 @@ FROM ubuntu:focal
 
 ARG UID
 
+COPY scripts/my_init /usr/bin/my_init
+
 COPY scripts/docker-install-phase0.bash /tmp/
 RUN /tmp/docker-install-phase0.bash
 
@@ -44,6 +46,6 @@ RUN chmod go-rwx /home/docker
 EXPOSE 6119
 EXPOSE 6120
 
-ENTRYPOINT ["/usr/local/bin/pid1.bash"]
+ENTRYPOINT ["/usr/bin/my_init", "/usr/local/bin/pid1.bash"]
 COPY scripts/pid1.bash /usr/local/bin/
 CMD ["bash"]

@@ -14,7 +14,7 @@ const int MAX_UID = 65000;
 
 int privileged;
 
-void die(char *msg)
+void __attribute__ ((noreturn)) die(char *msg)
 {
   fprintf(stderr, "%s\n", msg);
   exit(1);
@@ -24,8 +24,8 @@ void die_with_usage()
 {
   die("usage:\n"
       "  riju-system-privileged useradd UID\n"
-      "  riju-system-privileged spawn UID CMDLINE...\n"
       "  riju-system-privileged setup UID UUID\n"
+      "  riju-system-privileged spawn UID UUID CMDLINE...\n"
       "  riju-system-privileged teardown UUID");
 }
 
@@ -60,12 +60,12 @@ void useradd(int uid)
   if (asprintf(&cmdline, "groupadd -g %1$d riju%1$d", uid) < 0)
     die("asprintf failed");
   int status = system(cmdline);
-  if (status)
+  if (status != 0)
     die("groupadd failed");
   if (asprintf(&cmdline, "useradd -M -N -l -r -u %1$d -g %1$d -p '!' -s /usr/bin/bash riju%1$d", uid) < 0)
     die("asprintf failed");
   status = system(cmdline);
-  if (status)
+  if (status != 0)
     die("useradd failed");
 }
 
@@ -97,17 +97,44 @@ void setup(int uid, char *uuid)
                : "install -d -m 700 /tmp/riju/%2$s", uid, uuid) < 0)
     die("asprintf failed");
   int status = system(cmdline);
-  if (status)
+  if (status != 0)
     die("install failed");
 }
 
-void teardown(char *uuid)
+void teardown(int uid, char *uuid)
 {
   char *cmdline;
+  int status;
+  char *users;
+  if (uid >= MIN_UID && uid < MAX_UID) {
+    if (asprintf(&users, "%d", uid) < 0)
+      die("asprintf failed");
+  } else {
+    cmdline = "getent passwd | grep -Eo '^riju[0-9]{4}' | paste -s -d, - | tr -d '\n'";
+    FILE *fp = popen(cmdline, "r");
+    if (fp == NULL)
+      die("popen failed");
+    static char buf[(MAX_UID - MIN_UID) * 9];
+    if (fgets(buf, sizeof(buf), fp) == NULL) {
+      if (feof(fp))
+        users = NULL;
+      else {
+        die("fgets failed");
+      }
+    } else
+      users = buf;
+  }
+  if (users != NULL) {
+    if (asprintf(&cmdline, "pkill -SIGKILL --uid %s", users) < 0)
+      die("asprintf failed");
+    status = system(cmdline);
+    if (status != 0 && status != 256)
+      die("pkill failed");
+  }
   if (asprintf(&cmdline, "rm -rf /tmp/riju/%s", uuid) < 0)
     die("asprintf failed");
-  int status = system(cmdline);
-  if (status)
+  status = system(cmdline);
+  if (status != 0)
     die("rm failed");
 }
 
@@ -140,10 +167,11 @@ int main(int argc, char **argv)
     return 0;
   }
   if (!strcmp(argv[1], "teardown")) {
-    if (argc != 3)
+    if (argc != 4)
       die_with_usage();
-    char *uuid = strcmp(argv[2], "*") ? parseUUID(argv[2]) : "*";
-    teardown(uuid);
+    int uid = strcmp(argv[2], "*") ? parseUID(argv[2]) : -1;
+    char *uuid = strcmp(argv[3], "*") ? parseUUID(argv[3]) : "*";
+    teardown(uid, uuid);
     return 0;
   }
   die_with_usage();

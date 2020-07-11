@@ -7,7 +7,7 @@ import * as _ from "lodash";
 import * as parsePasswd from "parse-passwd";
 
 import { PRIVILEGED } from "./config";
-import { callPrivileged } from "./util";
+import { privilegedUseradd, run } from "./util";
 
 // Keep in sync with system/src/riju-system-privileged.c
 const MIN_UID = 2000;
@@ -21,7 +21,7 @@ let lock = new AsyncLock();
 
 async function readExistingUsers(log: (msg: string) => void) {
   availIds = parsePasswd(
-    await new Promise((resolve, reject) =>
+    await new Promise((resolve: (result: string) => void, reject) =>
       fs.readFile("/etc/passwd", "utf-8", (err, data) => {
         if (err) {
           reject(err);
@@ -43,7 +43,7 @@ async function createUser(log: (msg: string) => void): Promise<number> {
     throw new Error("too many users");
   }
   const uid = nextId!;
-  await callPrivileged(["useradd", `${uid}`], log);
+  await run(privilegedUseradd(uid), log);
   log(`Created new user with ID ${uid}`);
   nextId! += 1;
   return uid;
@@ -51,7 +51,7 @@ async function createUser(log: (msg: string) => void): Promise<number> {
 
 export async function borrowUser(log: (msg: string) => void) {
   if (!PRIVILEGED) {
-    return { uid: CUR_UID, cleanup: async () => {} };
+    return { uid: CUR_UID, returnUID: async () => {} };
   } else {
     return await lock.acquire("key", async () => {
       if (availIds === null || nextId === null) {
@@ -65,7 +65,7 @@ export async function borrowUser(log: (msg: string) => void) {
       }
       return {
         uid,
-        cleanup: async () => {
+        returnUID: async () => {
           await lock.acquire("key", () => {
             availIds!.push(uid);
           });

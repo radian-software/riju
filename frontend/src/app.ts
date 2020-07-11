@@ -66,12 +66,12 @@ class RijuMessageReader extends AbstractMessageReader {
       } catch (err) {
         return;
       }
-      switch (message?.event) {
+      switch (message && message.event) {
         case "lspOutput":
           if (DEBUG) {
-            console.log("RECEIVE LSP:", message?.output);
+            console.log("RECEIVE LSP:", message.output);
           }
-          this.callback!(message?.output);
+          this.callback!(message.output);
           break;
       }
     }
@@ -135,14 +135,15 @@ async function main() {
     if (DEBUG) {
       console.log("SEND", message);
     }
-    socket?.send(JSON.stringify(message));
+    if (socket) {
+      socket.send(JSON.stringify(message));
+    }
   }
 
   function tryConnect() {
     let clientDisposable: Disposable | null = null;
     let servicesDisposable: Disposable | null = null;
-    let lspLogBuffer = "";
-    let daemonLogBuffer = "";
+    const serviceLogBuffers: { [index: string]: string } = {};
     console.log("Connecting to server...");
     socket = new WebSocket(
       (document.location.protocol === "http:" ? "ws://" : "wss://") +
@@ -162,16 +163,17 @@ async function main() {
       }
       if (
         DEBUG &&
-        message?.event !== "lspOutput" &&
-        message?.event !== "lspLog" &&
-        message?.event !== "daemonLog"
+        message &&
+        message.event !== "lspOutput" &&
+        message.event !== "lspLog" &&
+        message.event !== "daemonLog"
       ) {
         console.log("RECEIVE:", message);
       }
-      if (message?.event && message?.event !== "error") {
+      if (message && message.event && message.event !== "error") {
         retryDelayMs = initialRetryDelayMs;
       }
-      switch (message?.event) {
+      switch (message && message.event) {
         case "terminalClear":
           term.reset();
           return;
@@ -208,7 +210,11 @@ async function main() {
               documentSelector: [{ pattern: "**" }],
               middleware: {
                 workspace: {
-                  configuration: (params, token, configuration) => {
+                  configuration: (
+                    params: any,
+                    token: any,
+                    configuration: any
+                  ) => {
                     return Array(
                       (configuration(params, token) as {}[]).length
                     ).fill(
@@ -220,7 +226,7 @@ async function main() {
               initializationOptions: config.lspInit || {},
             },
             connectionProvider: {
-              get: (errorHandler, closeHandler) =>
+              get: (errorHandler: any, closeHandler: any) =>
                 Promise.resolve(
                   createConnection(connection, errorHandler, closeHandler)
                 ),
@@ -231,38 +237,27 @@ async function main() {
         case "lspOutput":
           // Should be handled by RijuMessageReader
           return;
-        case "lspLog":
-          if (typeof message.output !== "string") {
+        case "serviceLog":
+          if (
+            typeof message.service !== "string" ||
+            typeof message.output !== "string"
+          ) {
             console.error("Unexpected message from server:", message);
             return;
           }
           if (DEBUG) {
-            lspLogBuffer += message.output;
-            while (lspLogBuffer.includes("\n")) {
-              const idx = lspLogBuffer.indexOf("\n");
-              const line = lspLogBuffer.slice(0, idx);
-              lspLogBuffer = lspLogBuffer.slice(idx + 1);
-              console.log(`LSP || ${line}`);
+            let buffer = serviceLogBuffers[message.service] || "";
+            buffer += message.output;
+            while (buffer.includes("\n")) {
+              const idx = buffer.indexOf("\n");
+              const line = buffer.slice(0, idx);
+              buffer = buffer.slice(idx + 1);
+              console.log(`${message.service.toUpperCase()} || ${line}`);
             }
+            serviceLogBuffers[message.service] = buffer;
           }
           return;
-        case "daemonLog":
-          if (typeof message.output !== "string") {
-            console.error("Unexpected message from server:", message);
-            return;
-          }
-          if (DEBUG) {
-            daemonLogBuffer += message.output;
-            while (daemonLogBuffer.includes("\n")) {
-              const idx = daemonLogBuffer.indexOf("\n");
-              const line = daemonLogBuffer.slice(0, idx);
-              daemonLogBuffer = daemonLogBuffer.slice(idx + 1);
-              console.log(`DAEMON || ${line}`);
-            }
-          }
-          return;
-        case "lspCrashed":
-        case "daemonCrashed":
+        case "serviceCrashed":
           return;
         default:
           console.error("Unexpected message from server:", message);

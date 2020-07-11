@@ -882,6 +882,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/node-cleanup@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@types/node-cleanup/-/node-cleanup-2.1.1.tgz#c8f78a648897d2a40ed10632268ce15d343cc191"
+  integrity sha512-Q1s5Sszz6YfhaGr1pbaZihr9IYaiQT0aOK/3c2qb9lOUbEBhcAb9ZEU7RBTtopnHSIJF80adLRcOGTay2W5QVQ==
+
 "@types/node@*":
   version "14.0.11"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.11.tgz#61d4886e2424da73b7b25547f59fdcb534c165a3"
@@ -3449,11 +3454,6 @@ nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
   integrity sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
-
-node-cleanup@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/node-cleanup/-/node-cleanup-2.1.2.tgz#7ac19abd297e09a7f72a71545d951b517e4dde2c"
-  integrity sha1-esGavSl+Caf3KnFUXZUbUX5N3iw=
 
 node-libs-browser@^2.2.1:
   version "2.2.1"
