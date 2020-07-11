@@ -787,6 +787,16 @@ int main() {
     template: `disp("Hello, world!")
 `,
   },
+  org: {
+    aliases: ["orgmode"],
+    name: "Org",
+    monacoLang: "plaintext",
+    main: "main.org",
+    compile: "pandoc main.org -o main.html",
+    run: "prettier --no-config main.html",
+    template: `Hello, world!
+`,
+  },
   pascal: {
     aliases: ["pas", "fpc"],
     name: "Pascal",

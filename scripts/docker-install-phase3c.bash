@@ -34,6 +34,9 @@ ocaml
 # Octave
 octave
 
+# Org
+pandoc
+
 # Pascal
 fpc
 
