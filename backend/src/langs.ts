@@ -661,6 +661,26 @@ KTHXBYE
     template:
       " (=<`#9]~6ZY32Vx/4Rs+0No-&Jk)\"Fh}|Bcy?`=*z]Kw%oG4UUS0/@-ejc(:'8dc\n",
   },
+  markdown: {
+    aliases: [
+      "mdown",
+      "mkdn",
+      "md",
+      "mkd",
+      "mdwn",
+      "mdtxt",
+      "mdtext",
+      "text",
+      "rmd",
+    ],
+    name: "Markdown",
+    monacoLang: "markdown",
+    main: "main.md",
+    compile: "pandoc main.md -o main.html",
+    run: "prettier --no-config main.html",
+    template: `Hello, world!
+`,
+  },
   mips: {
     aliases: ["mips64"],
     name: "MIPS",

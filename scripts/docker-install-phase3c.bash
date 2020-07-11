@@ -6,6 +6,10 @@ set -x
 
 packages="
 
+# Markdown
+pandoc
+prettier
+
 # MIPS
 gcc-mips64-linux-gnuabi64
 qemu-user-static
