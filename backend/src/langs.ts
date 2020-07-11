@@ -949,6 +949,32 @@ message:
 	.string "Hello, world!\\n"
 `,
   },
+  roff: {
+    aliases: [
+      "groff",
+      "nroff",
+      "troff",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "man",
+      "manual",
+    ],
+    name: "roff",
+    monacoLang: "plaintext",
+    main: "main.roff",
+    compile: "pandoc main.roff -f man -o main.html",
+    run: "prettier --no-config main.html",
+    template: `.PP
+Hello, world!
+`,
+  },
   ruby: {
     aliases: ["irb", "rb"],
     name: "Ruby",

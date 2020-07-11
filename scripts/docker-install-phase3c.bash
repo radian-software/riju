@@ -68,6 +68,9 @@ pandoc
 gcc-riscv64-linux-gnu
 qemu-user-static
 
+# roff
+pandoc
+
 # Ruby
 ruby
 ruby-dev
