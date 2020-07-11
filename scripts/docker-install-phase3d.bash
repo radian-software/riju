@@ -42,6 +42,9 @@ liblua5.3-dev
 luarocks
 texlive-binaries
 
+# Textile
+pandoc
+
 # Unlambda
 unlambda
 

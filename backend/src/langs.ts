@@ -1177,6 +1177,15 @@ END
     template: `\\message{Hello, world!}
 `,
   },
+  textile: {
+    name: "Textile",
+    monacoLang: "plaintext",
+    main: "main.textile",
+    compile: "pandoc main.textile -o main.html",
+    run: "prettier --no-config main.html",
+    template: `Hello, world!
+`,
+  },
   toml: {
     aliases: ["tom"],
     name: "TOML",
