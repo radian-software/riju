@@ -53,6 +53,9 @@ julia
 # Ksh
 ksh
 
+# LLVM
+llvm
+
 # LOLCODE
 cmake
 
