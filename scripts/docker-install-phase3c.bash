@@ -6,10 +6,6 @@ set -x
 
 packages="
 
-# Markdown
-pandoc
-prettier
-
 # MIPS
 gcc-mips64-linux-gnuabi64
 qemu-user-static
@@ -33,9 +29,6 @@ ocaml
 
 # Octave
 octave
-
-# Org
-pandoc
 
 # Pascal
 fpc
@@ -61,15 +54,9 @@ r-base
 # Racket
 racket
 
-# reStructuredText
-pandoc
-
 # RISC-V
 gcc-riscv64-linux-gnu
 qemu-user-static
-
-# roff
-pandoc
 
 # Ruby
 ruby

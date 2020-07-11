@@ -27,6 +27,9 @@ for file in /opt/rust/bin/*; do
     ln -s /opt/rust/wrapper "/usr/bin/${file##*/}"
 done
 
+# Shared
+npm install -g prettier
+
 # Bash
 npm install -g bash-language-server
 
@@ -56,7 +59,7 @@ cpanm -n Devel::REPL
 npm install -g intelephense
 
 # Pug
-npm install -g prettier pug-cli
+npm install -g pug-cli
 
 # ReasonML
 npm install -g bs-platform

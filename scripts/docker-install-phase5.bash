@@ -14,6 +14,11 @@ git clone https://github.com/circulosmeos/gdown.pl.git
 mv gdown.pl/gdown.pl /usr/bin/gdown
 rm -rf gdown.pl
 
+# Shared
+wget -nv https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-linux-amd64.tar.gz
+tar -xf pandoc-*-linux-amd64.tar.gz -C /usr --strip-components=1
+rm pandoc-*-linux-amd64.tar.gz
+
 # Ada
 wget -nv https://dl.bintray.com/reznikmm/ada-language-server/linux-latest.tar.gz
 tar -xf linux-latest.tar.gz

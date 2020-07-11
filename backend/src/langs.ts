@@ -193,6 +193,16 @@ int main() {
     template: `(format t "Hello, world!")
 `,
   },
+  confluence: {
+    aliases: ["jira", "atlassian"],
+    name: "Confluence",
+    monacoLang: "plaintext",
+    main: "main.txt",
+    compile: "pandoc main.txt -f jira -o main.html",
+    run: "prettier --no-config main.html",
+    template: `Hello, world!
+`,
+  },
   cpp: {
     aliases: [
       "c++",
@@ -332,6 +342,16 @@ void main() {
     compile: "cat main.dhall | dhall-to-json > main.json",
     run: "cat main.json | jq .",
     template: `{ output = "Hello, world!" }
+`,
+  },
+  dokuwiki: {
+    aliases: ["doku"],
+    name: "DokuWiki",
+    monacoLang: "plaintext",
+    main: "main.txt",
+    compile: "pandoc main.txt -f dokuwiki -o main.html",
+    run: "prettier --no-config main.html",
+    template: `Hello, world!
 `,
   },
   elixir: {
@@ -687,6 +707,16 @@ KTHXBYE
     monacoLang: "markdown",
     main: "main.md",
     compile: "pandoc main.md -o main.html",
+    run: "prettier --no-config main.html",
+    template: `Hello, world!
+`,
+  },
+  mediawiki: {
+    aliases: ["media"],
+    name: "MediaWiki",
+    monacoLang: "plaintext",
+    main: "main.txt",
+    compile: "pandoc main.txt -f mediawiki -o main.html",
     run: "prettier --no-config main.html",
     template: `Hello, world!
 `,
@@ -1232,6 +1262,16 @@ END
     template: `Hello, world!
 `,
   },
+  tikiwiki: {
+    aliases: ["tiki"],
+    name: "Tiki Wiki",
+    monacoLang: "plaintext",
+    main: "main.txt",
+    compile: "pandoc main.txt -f tikiwiki -o main.html",
+    run: "prettier --no-config main.html",
+    template: `Hello, world!
+`,
+  },
   toml: {
     aliases: ["tom"],
     name: "TOML",
@@ -1240,6 +1280,15 @@ END
     compile: "cat main.toml | yj -tj > main.json",
     run: "cat main.json | jq .",
     template: `output = "Hello, world!"
+`,
+  },
+  twiki: {
+    name: "TWiki",
+    monacoLang: "plaintext",
+    main: "main.txt",
+    compile: "pandoc main.txt -f twiki -o main.html",
+    run: "prettier --no-config main.html",
+    template: `Hello, world!
 `,
   },
   typescript: {
@@ -1270,6 +1319,15 @@ END
     run: `vim -c "$(< main.vim)"`,
     lsp: "vim-language-server --stdio",
     template: `:echo "Hello, world!"
+`,
+  },
+  vimwiki: {
+    name: "Vimwiki",
+    monacoLang: "plaintext",
+    main: "main.txt",
+    compile: "pandoc main.txt -f vimwiki -o main.html",
+    run: "prettier --no-config main.html",
+    template: `Hello, world!
 `,
   },
   visualbasic: {
