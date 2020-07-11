@@ -386,6 +386,19 @@ main() ->
     io:fwrite("Hello, world!\\n").
 `,
   },
+  factor: {
+    aliases: ["fact"],
+    name: "Factor",
+    monacoLang: "plaintext",
+    repl: "factor-lang",
+    main: ".factor-rc",
+    createEmpty: true,
+    run: "factor-lang",
+    template: `USE: io
+
+"Hello, world!" print
+`,
+  },
   fish: {
     name: "Fish",
     monacoLang: "plaintext",

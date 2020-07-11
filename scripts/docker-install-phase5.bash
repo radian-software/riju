@@ -55,6 +55,13 @@ wget -nv https://s3.amazonaws.com/rebar3/rebar3
 chmod +x rebar3
 mv rebar3 /usr/bin/rebar3
 
+# Factor
+wget -nv https://downloads.factorcode.org/releases/0.98/factor-linux-x86-64-0.98.tar.gz
+tar -xf factor-linux-x86-64-*.tar.gz
+mv -T factor /opt/factor
+ln -s /opt/factor/factor /usr/bin/factor-lang
+rm factor-linux-x86-64-*.tar.gz
+
 # Go
 export GO111MODULE=on
 export GOPATH="$PWD/go"
