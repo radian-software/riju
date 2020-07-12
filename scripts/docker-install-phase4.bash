@@ -67,6 +67,9 @@ npm install -g intelephense
 # Pug
 npm install -g pug-cli
 
+# PureScript
+npm install -g purescript spago
+
 # ReasonML
 npm install -g bs-platform
 

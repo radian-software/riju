@@ -919,6 +919,26 @@ main :-
     p Hello, world!
 `,
   },
+  purescript: {
+    aliases: ["purs", "pure", "ps"],
+    name: "PureScript",
+    monacoLang: "plaintext",
+    setup: `shopt -s dotglob; cp -R /opt/purescript/project-template/* "$PWD/"`,
+    repl: "spago repl",
+    main: "src/Main.purs",
+    run: `if spago build -n; then spago run -n; (echo 'import Prelude'; echo 'import Main') > .purs-repl; spago repl; else echo 'import Prelude' > .purs-repl; spago repl -d; fi`,
+    template: `module Main where
+
+import Prelude
+
+import Effect (Effect)
+import Effect.Console (log)
+
+main :: Effect Unit
+main = do
+  log "Hello, world!"
+`,
+  },
   python: {
     aliases: ["python3", "python2", "py"],
     name: "Python",

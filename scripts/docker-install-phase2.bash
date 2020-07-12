@@ -30,6 +30,7 @@ nano
 iputils-ping
 sudo
 tmux
+tree
 vim
 wget
 

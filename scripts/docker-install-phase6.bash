@@ -3,6 +3,27 @@
 set -e
 set -o pipefail
 set -x
+pushd /tmp >/dev/null
+
+mkdir project-template
+pushd project-template >/dev/null
+spago init -C
+rm -rf .gitignore test
+sed -i 's#, "test/\*\*/\*\.purs"##' spago.dhall
+cat <<"EOF" > src/Main.spago
+import Prelude
+
+import Effect (Effect)
+
+main :: Effect Unit
+main = pure unit
+EOF
+spago build
+spago repl < /dev/null
+rm -rf src
+popd >/dev/null
+mkdir /opt/purescript
+mv project-template /opt/purescript/
 
 # Befunge
 tee /usr/bin/befunge-repl >/dev/null <<"EOF"
@@ -133,4 +154,5 @@ while True:
 EOF
 chmod +x /usr/bin/unlambda-repl
 
+popd >/dev/null
 rm "$0"

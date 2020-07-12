@@ -43,6 +43,9 @@ php
 # Prolog
 swi-prolog
 
+# PureScript
+libtinfo5
+
 # Python
 python3
 python3-pip
