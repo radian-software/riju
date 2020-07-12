@@ -10,8 +10,8 @@ import { PRIVILEGED } from "./config";
 import { privilegedUseradd, run } from "./util";
 
 // Keep in sync with system/src/riju-system-privileged.c
-const MIN_UID = 2000;
-const MAX_UID = 65000;
+export const MIN_UID = 2000;
+export const MAX_UID = 65000;
 
 const CUR_UID = os.userInfo().uid;
 
@@ -33,9 +33,10 @@ async function readExistingUsers(log: (msg: string) => void) {
   )
     .filter(({ username }) => username.startsWith("riju"))
     .map(({ uid }) => parseInt(uid))
-    .filter((uid) => !isNaN(uid) && uid >= MIN_UID && uid < MAX_UID);
+    .filter((uid) => !isNaN(uid) && uid >= MIN_UID && uid < MAX_UID)
+    .reverse();
   nextId = (_.max(availIds) || MIN_UID - 1) + 1;
-  log(`Found ${availIds.length} existing users, next ID is ${nextId}`);
+  log(`Found ${availIds.length} existing users, next is riju${nextId}`);
 }
 
 async function createUser(log: (msg: string) => void): Promise<number> {
@@ -47,6 +48,25 @@ async function createUser(log: (msg: string) => void): Promise<number> {
   log(`Created new user with ID ${uid}`);
   nextId! += 1;
   return uid;
+}
+
+export async function ignoreUsers(uids: number[], log: (msg: string) => void) {
+  await lock.acquire("key", async () => {
+    if (availIds === null || nextId === null) {
+      await readExistingUsers(log);
+    }
+    const uidSet = new Set(uids);
+    if (uidSet.size > 0) {
+      const plural = uidSet.size !== 1 ? "s" : "";
+      log(
+        `Ignoring user${plural} from open session${plural}: ${Array.from(uidSet)
+          .sort()
+          .map((uid) => `riju${uid}`)
+          .join(", ")}`
+      );
+    }
+    availIds = availIds!.filter((uid) => !uidSet.has(uid));
+  });
 }
 
 export async function borrowUser(log: (msg: string) => void) {
