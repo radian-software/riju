@@ -3,11 +3,12 @@ export interface LangConfig {
   name: string;
   monacoLang: string;
   daemon?: string;
+  setup?: string;
   repl?: string;
   main: string;
   prefix?: string;
   suffix?: string;
-  createEmpty?: boolean;
+  createEmpty?: string;
   compile?: string;
   run: string;
   lspSetup?: string;
@@ -385,7 +386,7 @@ output = "Hello, world!"
     monacoLang: "plaintext",
     repl: `SHELL=/usr/bin/elvish HOME="$PWD" elvish`,
     main: ".elvish/rc.elv",
-    createEmpty: true,
+    createEmpty: ``,
     run: `SHELL=/usr/bin/elvish HOME="$PWD" elvish`,
     template: `echo "Hello, world!"
 `,
@@ -422,7 +423,7 @@ main() ->
     monacoLang: "plaintext",
     repl: "factor-lang",
     main: ".factor-rc",
-    createEmpty: true,
+    createEmpty: ``,
     run: "factor-lang",
     template: `USE: io
 
@@ -628,7 +629,7 @@ PLEASE GIVE UP
     monacoLang: "shell",
     repl: `SHELL=/usr/bin/ksh HOME="$PWD" ksh`,
     main: ".kshrc",
-    createEmpty: true,
+    createEmpty: ``,
     run: `SHELL=/usr/bin/ksh HOME="$PWD" ksh`,
     template: `echo "Hello, world!"
 `,
@@ -1103,7 +1104,7 @@ binding_irb.run(IRB.conf)
     monacoLang: "shell",
     repl: `SHELL=/usr/bin/sh HOME="$PWD" posh -l`,
     main: ".profile",
-    createEmpty: true,
+    createEmpty: ``,
     run: `SHELL=/usr/bin/sh HOME="$PWD" posh -l`,
     template: `echo "Hello, world!"
 `,
@@ -1265,7 +1266,7 @@ END
     monacoLang: "tcl",
     repl: "tclsh",
     main: ".tclshrc",
-    createEmpty: true,
+    createEmpty: ``,
     run: `HOME="$PWD" tclsh`,
     template: `puts {Hello, world!}
 `,
@@ -1276,7 +1277,7 @@ END
     monacoLang: "shell",
     repl: `SHELL=/usr/bin/tcsh HOME="$PWD" tcsh`,
     main: ".tcshrc",
-    createEmpty: true,
+    createEmpty: ``,
     run: `SHELL=/usr/bin/tcsh HOME="$PWD" tcsh`,
     template: `echo "Hello, world!"
 `,
@@ -1449,7 +1450,7 @@ message:
     monacoLang: "shell",
     repl: "SHELL=/usr/bin/zsh zsh",
     main: ".zshrc",
-    createEmpty: true,
+    createEmpty: ``,
     run: `SHELL=/usr/bin/zsh ZDOTDIR="$PWD" zsh`,
     template: `echo "Hello, world!"
 `,

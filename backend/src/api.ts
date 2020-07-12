@@ -87,6 +87,9 @@ export class Session {
       this.uidInfo = { uid, returnUID };
       this.log(`Borrowed uid ${this.uid}`);
       await this.run(this.privilegedSetup());
+      if (this.config.setup) {
+        await this.run(this.privilegedSpawn(bash(this.config.setup)));
+      }
       await this.runCode();
       if (this.config.daemon) {
         const daemonArgs = this.privilegedSpawn(bash(this.config.daemon));
@@ -285,7 +288,7 @@ export class Session {
         cmdline = `echo '${name} has no REPL, press Run to see it in action'`;
       }
       if (code === undefined) {
-        code = createEmpty ? "" : template;
+        code = createEmpty !== undefined ? createEmpty : template;
       }
       if (code && suffix) {
         code += suffix;
