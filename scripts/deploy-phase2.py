@@ -10,8 +10,8 @@ import sys
 import tempfile
 import time
 
-subprocess.run(["make", "image-prod"], check=True)
 subprocess.run(["docker", "system", "prune", "-f"], check=True)
+subprocess.run(["make", "image-prod"], check=True)
 existing_containers = subprocess.run(
     ["docker", "ps", "-q"], check=True, stdout=subprocess.PIPE
 ).stdout.splitlines()
