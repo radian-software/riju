@@ -19,12 +19,22 @@ export const rijuSystemPrivileged = appRoot.resolve(
 
 export function getEnv(uuid: string) {
   const cwd = `/tmp/riju/${uuid}`;
+  const path = [
+    `${cwd}/.gem/ruby/2.7.0/bin`,
+    `${cwd}/.local/bin`,
+    `${cwd}/node_modules/.bin`,
+    `/usr/local/sbin`,
+    `/usr/local/bin`,
+    `/usr/sbin`,
+    `/usr/bin`,
+    `/bin`,
+  ];
   return {
     HOME: cwd,
     HOSTNAME: "riju",
     LANG: process.env.LANG || "",
     LC_ALL: process.env.LC_ALL || "",
-    PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin",
+    PATH: path.join(":"),
     PWD: cwd,
     SHELL: "/usr/bin/bash",
     TERM: "xterm-color",

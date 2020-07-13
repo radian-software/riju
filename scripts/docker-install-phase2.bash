@@ -20,6 +20,7 @@ bsdmainutils
 curl
 emacs-nox
 git
+httpie
 htop
 jq
 lsof

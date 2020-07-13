@@ -11,6 +11,12 @@ export interface LangConfig {
   createEmpty?: string;
   compile?: string;
   run: string;
+  pkg?: {
+    install: string;
+    uninstall?: string;
+    all?: string;
+    search?: string;
+  };
   lspSetup?: string;
   lsp?: string;
   lspDisableDynamicRegistration?: boolean;
@@ -19,6 +25,9 @@ export interface LangConfig {
   lspLang?: string;
   template: string;
   hacks?: "ghci-config"[];
+  test?: {
+    ensure?: string;
+  };
 }
 
 export const langs: { [key: string]: LangConfig } = {
@@ -395,9 +404,14 @@ output = "Hello, world!"
     aliases: ["emacslisp", "elisp", "gnuemacs", "xemacs", "ielm"],
     name: "Emacs Lisp",
     monacoLang: "plaintext",
-    repl: "emacs --eval '(ielm)'",
+    repl: `emacs --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (ielm))"`,
     main: "main.el",
-    run: "emacs --load main.el --eval '(ielm)'",
+    run: `emacs --load main.el --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (ielm))"`,
+    pkg: {
+      install: `emacs -Q --batch --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (unless (ignore-errors (>= (length (directory-files \"~/.emacs.d/elpa/archives\")) 4)) (package-refresh-contents)) (package-install 'NAME))"`,
+      uninstall: `ls ~/.emacs.d/elpa | grep -- - | grep '^NAME-[0-9]' | while read pkg; do emacs -Q --batch --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (unless (ignore-errors (>= (length (directory-files \"~/.emacs.d/elpa/archives\")) 4)) (package-refresh-contents)) (call-interactively 'package-delete))" <<< "$pkg"; done`,
+      all: `set -o pipefail; (curl -sS https://elpa.gnu.org/packages/ | grep '<td>' | grep -Eo '[^>]+</a>' | grep -Eo '^[^<]+' && curl -sS https://melpa.org/archive.json | jq -r 'keys | .[]') | sort | uniq`,
+    },
     template: `(message "Hello, world!")
 `,
   },
@@ -797,6 +811,12 @@ message:
 eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
 require("repl").start()
 '`,
+    pkg: {
+      install: "yarn add NAME",
+      uninstall: "yarn remove NAME",
+      search:
+        "curl -sS 'https://registry.npmjs.org/-/v1/search?text=NAME' | jq -r '.objects | map(.package.name) | .[]'",
+    },
     template: `console.log("Hello, world!")
 `,
   },
@@ -946,6 +966,11 @@ main = do
     repl: "python3 -u",
     main: "main.py",
     run: "python3 -u -i main.py",
+    pkg: {
+      install: "pip3 install --user NAME",
+      uninstall: "pip3 uninstall NAME",
+      search: `python3 -c 'import json; from xmlrpc import client; print(json.dumps(client.ServerProxy("https://pypi.org/pypi").search({"name": "NAME"})))' | jq -r 'map(.name) | .[]'`,
+    },
     lsp: "Microsoft.Python.LanguageServer",
     lspInit: {
       interpreter: {
@@ -1061,9 +1086,17 @@ binding_irb = IRB::Irb.new(workspace)
 binding_irb.run(IRB.conf)
 `,
     run: "ruby main.rb",
+    pkg: {
+      install: "gem install --user-install NAME",
+      uninstall: "gem uninstall --user-install NAME",
+      search: `curl -sS 'https://rubygems.org/api/v1/search.json?query=NAME' | jq -r 'map(.name) | .[]'`,
+    },
     lsp: "solargraph stdio",
     template: `puts "Hello, world!"
 `,
+    test: {
+      ensure: `ruby -e 'raise "version mismatch, expected #{RUBY_VERSION}" unless ENV["PATH"].include? ".gem/ruby/#{RUBY_VERSION}/bin"'`,
+    },
   },
   rust: {
     aliases: ["rs", "rustc"],
