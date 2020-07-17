@@ -5,6 +5,12 @@ set -o pipefail
 set -x
 pushd /tmp >/dev/null
 
+# Beatnik
+git clone https://github.com/catseye/Beatnik.git
+sed -i 's#env python#env python2#' Beatnik/script/beatnik.py
+mv Beatnik/script/beatnik.py /usr/bin/beatnik
+rm -rf Beatnik
+
 # Erlang
 git clone https://github.com/erlang-ls/erlang_ls.git
 pushd erlang_ls >/dev/null
