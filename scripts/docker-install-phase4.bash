@@ -70,6 +70,9 @@ cpanm -n Devel::REPL
 # PHP
 npm install -g intelephense
 
+# Pikachu
+pip3 install pikalang
+
 # Pug
 npm install -g pug-cli
 
