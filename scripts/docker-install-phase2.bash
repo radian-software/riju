@@ -28,6 +28,7 @@ make
 man-db
 moreutils
 nano
+ncdu
 iputils-ping
 ripgrep
 sudo

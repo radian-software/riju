@@ -14,8 +14,8 @@ else
     useradd --password "!" --create-home --groups sudo docker
 fi
 
-tee /etc/sudoers.d/99-passwordless >/dev/null <<"EOF"
-%sudo   ALL=(ALL:ALL) NOPASSWD: ALL
+tee /etc/sudoers.d/90-passwordless >/dev/null <<"EOF"
+%sudo ALL=(ALL:ALL) NOPASSWD: ALL
 EOF
 
 touch /home/docker/.zshrc
