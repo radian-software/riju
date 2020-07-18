@@ -40,6 +40,10 @@ perlconsole
 # PHP
 php
 
+# PostgreSQL
+postgresql
+postgresql-client
+
 # Prolog
 swi-prolog
 

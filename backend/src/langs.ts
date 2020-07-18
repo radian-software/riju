@@ -1147,6 +1147,16 @@ ka ka ka ka ka pikachu ka ka ka ka ka ka ka ka pikachu pipi pi pikachu
 pipi pikachu
 `,
   },
+  postgresql: {
+    aliases: ["psql", "postgres", "pgsql", "postgre"],
+    name: "PostgreSQL",
+    monacoLang: "pgsql",
+    repl: `rm -rf data && /usr/lib/postgresql/*/bin/initdb -D data && (echo "listen_addresses = ''" && echo "unix_socket_directories = '.'") >> data/postgresql.conf && /usr/lib/postgresql/*/bin/pg_ctl -D data -w start && psql -h "$PWD/data" postgres`,
+    main: "main.sql",
+    run: `rm -rf data && /usr/lib/postgresql/*/bin/initdb -D data && (echo "listen_addresses = ''" && echo "unix_socket_directories = '.'") >> data/postgresql.conf && /usr/lib/postgresql/*/bin/pg_ctl -D data -w start && (psql -h "$PWD/data" postgres -f main.sql; psql -h "$PWD/data" postgres)`,
+    template: `SELECT 'Hello, world!';
+`,
+  },
   powershell: {
     aliases: ["pwsh", "ps1"],
     name: "PowerShell",
