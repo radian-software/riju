@@ -145,6 +145,10 @@ metals -version </dev/null
 mkdir /opt/coursier
 mv "$HOME/.cache/coursier" /opt/coursier/cache
 
+# Snobol
+gdown "https://drive.google.com/file/d/1ygQkpgfirpq4b7s4YNsSijkK8IQgSLWk/view?usp=sharing" /usr/bin/snobol4
+chmod +x /usr/bin/snobol4
+
 # Swift
 gdown "https://drive.google.com/uc?export=download&id=1eE1-VuZz0gv-fITaGVT_r1UunCLjS-JT" swift.tar.gz
 mkdir /opt/swift
