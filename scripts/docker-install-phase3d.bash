@@ -60,6 +60,10 @@ clang
 # YAML
 jq
 
+# Zot
+qt5-qmake
+qtscript5-dev
+
 # Zsh
 zsh
 

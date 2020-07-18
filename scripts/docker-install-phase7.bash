@@ -56,5 +56,13 @@ mv bin/thue /usr/bin/thue
 popd >/dev/null
 rm -rf thue-*
 
+# Zot
+git clone https://github.com/manyoso/zot.git
+pushd zot >/dev/null
+./build.sh
+mv build/bin/zot /usr/bin/zot
+popd >/dev/null
+rm -rf zot
+
 popd >/dev/null
 rm "$0"
