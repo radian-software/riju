@@ -57,6 +57,9 @@ r-base
 # Racket
 racket
 
+# Redis
+redis
+
 # RISC-V
 gcc-riscv64-linux-gnu
 qemu-user-static

@@ -1251,6 +1251,17 @@ main = do
     template: `print_string("Hello, world!\\n")
 `,
   },
+  redis: {
+    name: "Redis",
+    monacoLang: "redis",
+    repl:
+      "rm -f socket; (redis-server --port 0 --unixsocket socket &); while [[ ! -e socket ]]; do sleep 0.01; done; redis-cli -s socket",
+    main: "main.redis",
+    run:
+      "rm -f socket; (redis-server --port 0 --unixsocket socket &); while [[ ! -e socket ]]; do sleep 0.01; done; redis-cli -s socket < main.redis; redis-cli -s socket",
+    template: `ECHO "Hello, world!"
+`,
+  },
   restructuredtext: {
     aliases: ["rst"],
     name: "reStructuredText",
