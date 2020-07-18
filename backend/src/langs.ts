@@ -1531,7 +1531,7 @@ END
     repl: "sqlite3",
     main: "main.sql",
     run: `sqlite3 -cmd "$(< main.sql)"`,
-    template: `SELECT "Hello, world!"
+    template: `SELECT 'Hello, world!';
 `,
   },
   standardml: {
