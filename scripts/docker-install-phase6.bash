@@ -5,6 +5,7 @@ set -o pipefail
 set -x
 pushd /tmp >/dev/null
 
+# PureScript
 mkdir project-template
 pushd project-template >/dev/null
 spago init -C
