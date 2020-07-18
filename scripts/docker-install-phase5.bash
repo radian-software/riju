@@ -19,6 +19,11 @@ wget -nv https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-linux-
 tar -xf pandoc-*-linux-amd64.tar.gz -C /usr --strip-components=1
 rm pandoc-*-linux-amd64.tar.gz
 
+# ><>
+wget -nv https://gist.githubusercontent.com/anonymous/6392418/raw/3b16018cb47f2f9ad1fa085c155cc5c0dc448b2d/fish.py -O /usr/bin/esofish
+sed -i 's:^#!.*:#!/usr/bin/env python3:' /usr/bin/esofish
+chmod +x /usr/bin/esofish
+
 # Ada
 wget -nv https://dl.bintray.com/reznikmm/ada-language-server/linux-latest.tar.gz
 tar -xf linux-latest.tar.gz

@@ -31,6 +31,15 @@ export interface LangConfig {
 }
 
 export const langs: { [key: string]: LangConfig } = {
+  "><>": {
+    aliases: ["esofish"],
+    name: "><>",
+    main: "main.fish",
+    run: "esofish main.fish",
+    template: `"Hello, world!"r\\
+           o;!?l<
+`,
+  },
   ada: {
     aliases: ["adb"],
     name: "Ada",
