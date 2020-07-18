@@ -521,6 +521,16 @@ void main() {
 }
 `,
   },
+  dogescript: {
+    aliases: ["doge", "ds", "wow"],
+    name: "Dogescript",
+    monacoLang: "plaintext",
+    repl: "dogescript",
+    main: "main.djs",
+    run: "dogescript main.djs | node; dogescript",
+    template: `plz console.loge with "Hello, world!"
+`,
+  },
   dhall: {
     name: "Dhall",
     monacoLang: "plaintext",

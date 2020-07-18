@@ -45,6 +45,9 @@ npm install -g lumo-cljs
 # CoffeeScript
 npm install -g coffeescript
 
+# Dogescript
+npm install -g dogescript
+
 # Elm
 npm install -g @kachkaev/run-elm
 npm install -g @elm-tooling/elm-language-server
