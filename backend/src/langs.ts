@@ -386,9 +386,9 @@ Refrigerate for 1 hour.
     template: `Hello, world!
 `,
   },
-  cpp: {
+  "c++": {
     aliases: [
-      "c++",
+      "cpp",
       "g++",
       "clang++",
       "c++98",
