@@ -709,6 +709,15 @@ func main() {
 }
 `,
   },
+  golfscript: {
+    aliases: ["gs", "golf"],
+    name: "GolfScript",
+    monacoLang: "plaintext",
+    main: "main.gs",
+    run: "golfscript main.gs",
+    template: `'Hello, world!'
+`,
+  },
   groovy: {
     name: "Groovy",
     monacoLang: "plaintext",

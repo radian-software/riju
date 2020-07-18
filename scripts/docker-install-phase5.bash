@@ -79,6 +79,10 @@ go get golang.org/x/tools/gopls@latest
 mv go/bin/gopls /usr/bin/gopls
 rm -rf go
 
+# GolfScript
+wget -nv http://www.golfscript.com/golfscript/golfscript.rb -O /usr/bin/golfscript
+chmod +x /usr/bin/golfscript
+
 # Haskell
 wget -nv https://get.haskellstack.org/stable/linux-x86_64-static.tar.gz
 tar -xf linux-x86_64-static.tar.gz
