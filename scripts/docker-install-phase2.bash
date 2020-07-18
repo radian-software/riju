@@ -29,6 +29,7 @@ man-db
 moreutils
 nano
 iputils-ping
+ripgrep
 sudo
 tmux
 tree
