@@ -119,6 +119,10 @@ rm -rf kotlin-*.zip kotlinc
 wget -nv https://github.com/EmmyLua/EmmyLua-LanguageServer/releases/download/0.3.6/EmmyLua-LS-all.jar
 mv EmmyLua-LS-all.jar /usr/lib/EmmyLua-LS.jar
 
+# Omgrofl
+mkdir /opt/omgrofl
+wget -nv https://github.com/OlegSmelov/omgrofl-interpreter/releases/download/v0.1/Omgrofl.jar -O /opt/omgrofl/Omgrofl.jar
+
 # PowerShell
 wget -nv https://github.com/PowerShell/PowerShell/releases/download/v7.0.1/powershell-7.0.1-linux-x64.tar.gz
 mkdir /opt/powershell
