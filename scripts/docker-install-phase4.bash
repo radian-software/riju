@@ -36,6 +36,9 @@ npm install -g bash-language-server
 # Befunge
 npm install -g befunge93 prompt-sync
 
+# Chef
+cpanm -n Acme::Chef
+
 # ClojureScript
 npm install -g lumo-cljs
 
