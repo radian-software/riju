@@ -23,7 +23,7 @@ const config: RijuConfig = (window as any).rijuConfig;
 
 interface RijuConfig {
   id: string;
-  monacoLang: string;
+  monacoLang?: string;
   main: string;
   lspDisableDynamicRegistration?: boolean;
   lspInit?: any;
@@ -300,7 +300,10 @@ async function main() {
   });
   window.addEventListener("resize", () => editor.layout());
   editor.getModel()!.setValue(config.template);
-  monaco.editor.setModelLanguage(editor.getModel()!, config.monacoLang);
+  monaco.editor.setModelLanguage(
+    editor.getModel()!,
+    config.monacoLang || "plaintext"
+  );
 
   document.getElementById("runButton")!.addEventListener("click", () => {
     sendMessage({ event: "runCode", code: editor.getValue() });

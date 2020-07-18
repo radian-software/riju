@@ -1,7 +1,7 @@
 export interface LangConfig {
   aliases?: string[];
   name: string;
-  monacoLang: string;
+  monacoLang?: string;
   daemon?: string;
   setup?: string;
   repl?: string;
@@ -34,7 +34,6 @@ export const langs: { [key: string]: LangConfig } = {
   ada: {
     aliases: ["adb"],
     name: "Ada",
-    monacoLang: "plaintext",
     main: "main.adb",
     compile: "x86_64-linux-gnu-gnatmake-9 main.adb",
     run: "./main",
@@ -50,7 +49,6 @@ end Main;
   algol: {
     aliases: ["alg"],
     name: "ALGOL 68",
-    monacoLang: "plaintext",
     main: "main.alg",
     run: "a68g main.alg",
     template: `print(("Hello, world!",new line))
@@ -58,7 +56,6 @@ end Main;
   },
   arm: {
     name: "ARM",
-    monacoLang: "plaintext",
     main: "main.S",
     compile: "arm-linux-gnueabihf-gcc main.S -o main -static",
     run: "qemu-arm-static main",
@@ -80,7 +77,6 @@ message:
   },
   asciidoc: {
     aliases: ["adoc", "asc"],
-    monacoLang: "plaintext",
     name: "AsciiDoc",
     main: "main.adoc",
     compile: "asciidoc -s main.adoc",
@@ -113,7 +109,6 @@ implement main0 () = ()
   basic: {
     aliases: ["bas", "qbasic"],
     name: "BASIC",
-    monacoLang: "plaintext",
     repl: "bwbasic",
     main: "main.bas",
     run: "bwbasic main.bas",
@@ -122,7 +117,6 @@ implement main0 () = ()
   },
   beatnik: {
     name: "Beatnik",
-    monacoLang: "plaintext",
     main: "main.beatnik",
     run: "beatnik main.beatnik",
     template: `Soars, larkspurs, rains.
@@ -219,7 +213,6 @@ Nude pagoda careens.
   befunge: {
     aliases: ["be"],
     name: "Befunge",
-    monacoLang: "plaintext",
     main: "main.be",
     run: "befunge-repl main.be",
     template: `64+"!dlrow ,olleH">:#,_@
@@ -234,7 +227,6 @@ Nude pagoda careens.
       "lambda",
     ],
     name: "Binary Lambda Calculus",
-    monacoLang: "plaintext",
     main: "main.blc",
     run: "cat main.blc | binary-to-text | tromp",
     template: `001010100100100001100101011011000110110001101111001011000010
@@ -244,7 +236,6 @@ Nude pagoda careens.
   brainf: {
     aliases: ["brainfuck", "bf"],
     name: "Brainf***",
-    monacoLang: "plaintext",
     repl: "brainf-repl",
     main: "main.bf",
     run: "brainf-repl main.bf",
@@ -297,7 +288,6 @@ int main() {
   },
   chef: {
     name: "Chef",
-    monacoLang: "plaintext",
     main: "main.chef",
     run: "chef main.chef",
     template: `Hello World Cake with Chocolate Sauce.
@@ -372,7 +362,6 @@ Refrigerate for 1 hour.
   commonlisp: {
     aliases: ["lisp", "sbcl"],
     name: "Common Lisp",
-    monacoLang: "plaintext",
     repl: "rlwrap sbcl",
     main: "main.lisp",
     run: "rlwrap sbcl --userinit main.lisp",
@@ -382,7 +371,6 @@ Refrigerate for 1 hour.
   confluence: {
     aliases: ["jira", "atlassian"],
     name: "Confluence",
-    monacoLang: "plaintext",
     main: "main.txt",
     compile: "pandoc main.txt -f jira -o main.html",
     run: "prettier --no-config main.html",
@@ -428,7 +416,6 @@ int main() {
   crystal: {
     aliases: ["cr"],
     name: "Crystal",
-    monacoLang: "plaintext",
     main: "main.cr",
     run: "crystal main.cr",
     template: `puts "Hello, world!"
@@ -472,7 +459,6 @@ int main() {
   cobol: {
     aliases: ["cbl", "cobc"],
     name: "COBOL",
-    monacoLang: "plaintext",
     main: "main.cbl",
     compile: "cobc -free -x main.cbl -o main",
     run: "./main",
@@ -500,7 +486,6 @@ require("/usr/lib/node_modules/coffeescript/repl").start()
   d: {
     aliases: ["dmd"],
     name: "D",
-    monacoLang: "plaintext",
     main: "main.d",
     compile: "dmd main.d",
     run: "./main",
@@ -524,7 +509,6 @@ void main() {
   dogescript: {
     aliases: ["doge", "ds", "wow"],
     name: "Dogescript",
-    monacoLang: "plaintext",
     repl: "dogescript",
     main: "main.djs",
     run: "dogescript main.djs | node; dogescript",
@@ -533,7 +517,6 @@ void main() {
   },
   dhall: {
     name: "Dhall",
-    monacoLang: "plaintext",
     main: "main.dhall",
     compile: "cat main.dhall | dhall-to-json > main.json",
     run: "cat main.json | jq .",
@@ -543,7 +526,6 @@ void main() {
   dokuwiki: {
     aliases: ["doku"],
     name: "DokuWiki",
-    monacoLang: "plaintext",
     main: "main.txt",
     compile: "pandoc main.txt -f dokuwiki -o main.html",
     run: "prettier --no-config main.html",
@@ -553,7 +535,6 @@ void main() {
   elixir: {
     aliases: ["iex", "exs"],
     name: "Elixir",
-    monacoLang: "plaintext",
     repl: "iex",
     main: "main.exs",
     run: "iex main.exs",
@@ -563,7 +544,6 @@ void main() {
   },
   elm: {
     name: "Elm",
-    monacoLang: "plaintext",
     repl: "elm repl",
     main: "Main.elm",
     run: "cp /opt/elm/elm.json elm.json && run-elm Main.elm; elm repl",
@@ -578,7 +558,6 @@ output = "Hello, world!"
   elvish: {
     aliases: ["elv"],
     name: "Elvish",
-    monacoLang: "plaintext",
     repl: `SHELL=/usr/bin/elvish HOME="$PWD" elvish`,
     main: ".elvish/rc.elv",
     createEmpty: ``,
@@ -589,7 +568,6 @@ output = "Hello, world!"
   emacs: {
     aliases: ["emacslisp", "elisp", "gnuemacs", "xemacs", "ielm"],
     name: "Emacs Lisp",
-    monacoLang: "plaintext",
     repl: `emacs --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (ielm))"`,
     main: "main.el",
     run: `emacs --load main.el --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (ielm))"`,
@@ -604,7 +582,6 @@ output = "Hello, world!"
   entropy: {
     aliases: ["ent", "entc", "vge"],
     name: "Entropy",
-    monacoLang: "plaintext",
     main: "main.vge",
     compile: `mono /opt/entropy/entc.exe main.vge | grep -Ev 'WARNING:|Using default' > main.cs && mcs -lib:/opt/entropy -r:Rottytooth.Esolang.Entropy main.cs`,
     run: "MONO_PATH=/opt/entropy mono main.exe",
@@ -616,7 +593,6 @@ output = "Hello, world!"
   erlang: {
     aliases: ["erl"],
     name: "Erlang",
-    monacoLang: "plaintext",
     repl: "erl",
     main: "main.erl",
     compile: "erl -compile main",
@@ -632,7 +608,6 @@ main() ->
   factor: {
     aliases: ["fact"],
     name: "Factor",
-    monacoLang: "plaintext",
     repl: "factor-lang",
     main: ".factor-rc",
     createEmpty: ``,
@@ -644,7 +619,6 @@ main() ->
   },
   fish: {
     name: "Fish",
-    monacoLang: "plaintext",
     repl: "SHELL=/usr/bin/fish fish",
     main: "main.fish",
     run: 'SHELL=/usr/bin/fish fish -C "$(< main.fish)"',
@@ -654,7 +628,6 @@ main() ->
   forth: {
     aliases: ["fs", "gforth"],
     name: "Forth",
-    monacoLang: "plaintext",
     repl: "gforth",
     main: "main.fs",
     run: "gforth main.fs",
@@ -672,7 +645,6 @@ main() ->
       "fortran2008",
     ],
     name: "FORTRAN",
-    monacoLang: "plaintext",
     main: "main.f",
     compile: "flang main.f -o main",
     run: "./main",
@@ -712,7 +684,6 @@ func main() {
   golfscript: {
     aliases: ["gs", "golf"],
     name: "GolfScript",
-    monacoLang: "plaintext",
     main: "main.gs",
     run: "golfscript main.gs",
     template: `'Hello, world!'
@@ -720,7 +691,6 @@ func main() {
   },
   groovy: {
     name: "Groovy",
-    monacoLang: "plaintext",
     repl: `JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" groovysh`,
     main: "main.groovy",
     run: `JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" groovysh main.groovy`,
@@ -730,7 +700,6 @@ func main() {
   haskell: {
     aliases: ["ghc", "ghci", "hs"],
     name: "Haskell",
-    monacoLang: "plaintext",
     repl: "ghci",
     main: "Main.hs",
     run: "ghci",
@@ -749,7 +718,6 @@ main = putStrLn "Hello, world!"
   hcl: {
     aliases: ["tf", "terraform", "hashicorp", "hc"],
     name: "HCL",
-    monacoLang: "plaintext",
     main: "main.hcl",
     compile: "cat main.hcl | yj -cj > main.json",
     run: "cat main.json | jq .",
@@ -758,7 +726,6 @@ main = putStrLn "Hello, world!"
   },
   ink: {
     name: "Ink",
-    monacoLang: "plaintext",
     repl: "ink",
     main: "main.ink",
     run: "ink main.ink; ink",
@@ -773,7 +740,6 @@ log('Hello, world!')
   intercal: {
     aliases: ["i", "ick"],
     name: "INTERCAL",
-    monacoLang: "plaintext",
     main: "main.i",
     compile: "ick main.i",
     run: "./main",
@@ -813,7 +779,6 @@ PLEASE GIVE UP
   julia: {
     aliases: ["jl"],
     name: "Julia",
-    monacoLang: "plaintext",
     repl: "julia",
     main: "main.jl",
     run: "julia -L main.jl",
@@ -824,7 +789,6 @@ PLEASE GIVE UP
   },
   kalyn: {
     name: "Kalyn",
-    monacoLang: "plaintext",
     main: "src-kalyn/Main.kalyn",
     compile: "kalyn",
     run: "out-kalyn/Main",
@@ -869,7 +833,6 @@ PLEASE GIVE UP
   livescript: {
     aliases: ["lsc", "ls"],
     name: "LiveScript",
-    monacoLang: "plaintext",
     repl: "lsc",
     main: "main.ls",
     run: "lsc -r ./main.ls; lsc",
@@ -907,7 +870,6 @@ define i32 @main() { ; i32()*
   lolcode: {
     aliases: ["lol", "lci"],
     name: "LOLCODE",
-    monacoLang: "plaintext",
     main: "main.lol",
     run: "lci main.lol",
     template: `HAI 1.2
@@ -928,7 +890,6 @@ KTHXBYE
   malbolge: {
     aliases: ["mb"],
     name: "Malbolge",
-    monacoLang: "plaintext",
     main: "main.mb",
     run: "malbolge main.mb",
     template:
@@ -957,7 +918,6 @@ KTHXBYE
   mediawiki: {
     aliases: ["media"],
     name: "MediaWiki",
-    monacoLang: "plaintext",
     main: "main.txt",
     compile: "pandoc main.txt -f mediawiki -o main.html",
     run: "prettier --no-config main.html",
@@ -990,7 +950,6 @@ message:
   mumps: {
     aliases: ["mlang", "gtm", "fisgtm"],
     name: "MUMPS",
-    monacoLang: "plaintext",
     main: "main.m",
     run:
       "gtm_dist=/usr/lib/x86_64-linux-gnu/fis-gtm/V6.3-007_x86_64 /usr/lib/x86_64-linux-gnu/fis-gtm/V6.3-007_x86_64/utf8/mumps -r main main.m",
@@ -1001,7 +960,6 @@ message:
   },
   nim: {
     name: "Nim",
-    monacoLang: "plaintext",
     main: "main.nim",
     compile: "nim compile main.nim",
     run: "./main",
@@ -1049,7 +1007,6 @@ int main() {
   },
   ocaml: {
     name: "OCaml",
-    monacoLang: "plaintext",
     main: "main.ml",
     repl: "ocaml",
     run: "ocaml -init main.ml",
@@ -1059,7 +1016,6 @@ int main() {
   octave: {
     aliases: ["matlab", "m", "mathworks"],
     name: "Octave",
-    monacoLang: "plaintext",
     repl: "octave",
     main: "main.m",
     run: "octave --persist main.m",
@@ -1069,7 +1025,6 @@ int main() {
   org: {
     aliases: ["orgmode"],
     name: "Org",
-    monacoLang: "plaintext",
     main: "main.org",
     compile: "pandoc main.org -o main.html",
     run: "prettier --no-config main.html",
@@ -1125,7 +1080,6 @@ echo "Hello, world!\\n";
   },
   prolog: {
     name: "Prolog",
-    monacoLang: "plaintext",
     repl: "prolog",
     main: "main.pl",
     run: "prolog main.pl",
@@ -1149,7 +1103,6 @@ main :-
   purescript: {
     aliases: ["purs", "pure", "ps"],
     name: "PureScript",
-    monacoLang: "plaintext",
     setup: `shopt -s dotglob; cp -R /opt/purescript/project-template/* "$PWD/"`,
     repl: "spago repl",
     main: "src/Main.purs",
@@ -1202,7 +1155,6 @@ main = do
   racket: {
     aliases: ["rkt"],
     name: "Racket",
-    monacoLang: "plaintext",
     repl: "racket",
     main: "main.rkt",
     run: `racket -i -e '(enter! "main.rkt") (display "[ type (enter! \\"main.rkt\\") to access local variables ]\\n")'`,
@@ -1213,7 +1165,6 @@ main = do
   reasonml: {
     aliases: ["re", "reason", "bsc", "buckle", "bucklescript"],
     name: "ReasonML",
-    monacoLang: "plaintext",
     main: "main.re",
     compile: "bsc main.re > main.js",
     run: "NODE_PATH=/usr/lib/node_modules node main.js",
@@ -1233,7 +1184,6 @@ main = do
   riscv: {
     aliases: ["risc"],
     name: "RISC-V",
-    monacoLang: "plaintext",
     main: "main.S",
     compile: "riscv64-linux-gnu-gcc main.S -o main -static",
     run: "qemu-riscv64-static main",
@@ -1271,7 +1221,6 @@ message:
       "manual",
     ],
     name: "roff",
-    monacoLang: "plaintext",
     main: "main.roff",
     compile: "pandoc main.roff -f man -o main.html",
     run: "prettier --no-config main.html",
@@ -1320,7 +1269,6 @@ binding_irb.run(IRB.conf)
   },
   sass: {
     name: "Sass",
-    monacoLang: "plaintext",
     main: "main.sass",
     run: "sass main.sass",
     template: `body:before
@@ -1329,7 +1277,6 @@ binding_irb.run(IRB.conf)
   },
   scala: {
     name: "Scala",
-    monacoLang: "plaintext",
     repl: "scala",
     main: "main.scala",
     run: "scala -i main.scala",
@@ -1372,7 +1319,6 @@ binding_irb.run(IRB.conf)
   shakespeare: {
     aliases: ["spl"],
     name: "Shakespeare",
-    monacoLang: "plaintext",
     repl: "shakespeare console",
     main: "main.spl",
     suffix: "\n[A pause]",
@@ -1471,7 +1417,6 @@ Ophelia:
   smalltalk: {
     aliases: ["gst", "st"],
     name: "Smalltalk",
-    monacoLang: "plaintext",
     repl: "gst",
     main: "main.st",
     run: "gst main.st; gst",
@@ -1481,7 +1426,6 @@ Ophelia:
   snobol: {
     aliases: ["snobol4", "spitbol", "sno"],
     name: "SNOBOL",
-    monacoLang: "plaintext",
     repl: "snobol4",
     main: "main.sno",
     run: "snobol4 main.sno; snobol4",
@@ -1502,7 +1446,6 @@ END
   standardml: {
     aliases: ["sml", "ml"],
     name: "Standard ML",
-    monacoLang: "plaintext",
     repl: "rlwrap sml",
     main: "main.sml",
     run: "rlwrap sml main.sml",
@@ -1545,7 +1488,6 @@ END
   tex: {
     aliases: ["latex", "xetex", "plaintex"],
     name: "TeX",
-    monacoLang: "plaintext",
     repl: "tex",
     main: "main.tex",
     run: "tex main.tex",
@@ -1556,7 +1498,6 @@ END
   },
   textile: {
     name: "Textile",
-    monacoLang: "plaintext",
     main: "main.textile",
     compile: "pandoc main.textile -o main.html",
     run: "prettier --no-config main.html",
@@ -1566,7 +1507,6 @@ END
   tikiwiki: {
     aliases: ["tiki"],
     name: "Tiki Wiki",
-    monacoLang: "plaintext",
     main: "main.txt",
     compile: "pandoc main.txt -f tikiwiki -o main.html",
     run: "prettier --no-config main.html",
@@ -1576,7 +1516,6 @@ END
   toml: {
     aliases: ["tom"],
     name: "TOML",
-    monacoLang: "plaintext",
     main: "main.toml",
     compile: "cat main.toml | yj -tj > main.json",
     run: "cat main.json | jq .",
@@ -1585,7 +1524,6 @@ END
   },
   twiki: {
     name: "TWiki",
-    monacoLang: "plaintext",
     main: "main.txt",
     compile: "pandoc main.txt -f twiki -o main.html",
     run: "prettier --no-config main.html",
@@ -1605,7 +1543,6 @@ END
   unlambda: {
     aliases: ["unl"],
     name: "Unlambda",
-    monacoLang: "plaintext",
     repl: "unlambda-repl",
     main: "main.unl",
     run: "unlambda-repl main.unl",
@@ -1614,7 +1551,6 @@ END
   vim: {
     aliases: ["viml", "vimscript"],
     name: "Vimscript",
-    monacoLang: "plaintext",
     repl: "vim",
     main: "main.vim",
     run: `vim -c "$(< main.vim)"`,
@@ -1624,7 +1560,6 @@ END
   },
   vimwiki: {
     name: "Vimwiki",
-    monacoLang: "plaintext",
     main: "main.txt",
     compile: "pandoc main.txt -f vimwiki -o main.html",
     run: "prettier --no-config main.html",
@@ -1648,7 +1583,6 @@ End Module
   whitespace: {
     aliases: ["ws"],
     name: "Whitespace",
-    monacoLang: "plaintext",
     main: "main.ws",
     run: "whitespace main.ws",
     template: `Hello, world!  \t  \t   \n\t\n     \t\t  \t \t\n\t\n     \t\t \t\t  \n\t\n     \t\t \t\t  \n\t\n     \t\t \t\t\t\t\n\t\n     \t \t\t  \n\t\n     \t     \n\t\n     \t\t\t \t\t\t\n\t\n     \t\t \t\t\t\t\n\t\n     \t\t\t  \t \n\t\n     \t\t \t\t  \n\t\n     \t\t  \t  \n\t\n  \n\n\n`,
@@ -1664,7 +1598,6 @@ End Module
       "symja",
     ],
     name: "Wolfram Language",
-    monacoLang: "plaintext",
     repl: "mathics",
     main: "main.wls",
     run: "mathics --persist main.wls",
@@ -1674,7 +1607,6 @@ End Module
   x86: {
     aliases: ["s", "asm", "assembly", "x86-64"],
     name: "x86",
-    monacoLang: "plaintext",
     main: "main.S",
     compile: "clang main.S -o main",
     run: "./main",
