@@ -724,6 +724,20 @@ main = putStrLn "Hello, world!"
     template: `output = "Hello, world!"
 `,
   },
+  hexagony: {
+    aliases: ["hxg", "hex"],
+    name: "Hexagony",
+    main: "main.hxg",
+    run: "/opt/hexagony/interpreter.rb main.hxg",
+    template: `   H ; e ;
+  l ; d ; *
+ ; r ; o ; w
+l ; ; o ; * 4
+ 3 3 ; @ . >
+  ; 2 3 < \\
+   4 ; * /
+`,
+  },
   ink: {
     name: "Ink",
     repl: "ink",

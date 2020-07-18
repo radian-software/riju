@@ -24,6 +24,9 @@ mv _build/default/bin/erlang_ls /usr/bin/erlang_ls
 popd >/dev/null
 rm -rf erlang_ls
 
+# Hexagony
+git clone https://github.com/m-ender/hexagony.git /opt/hexagony
+
 # Kalyn
 git clone https://github.com/raxod502/kalyn.git
 pushd kalyn >/dev/null
