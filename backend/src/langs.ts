@@ -225,6 +225,22 @@ Nude pagoda careens.
     template: `64+"!dlrow ,olleH">:#,_@
 `,
   },
+  blc: {
+    aliases: [
+      "binarylambdacalculus",
+      "lc",
+      "binary",
+      "lambdacalculus",
+      "lambda",
+    ],
+    name: "Binary Lambda Calculus",
+    monacoLang: "plaintext",
+    main: "main.blc",
+    run: "cat main.blc | binary-to-text | tromp",
+    template: `001010100100100001100101011011000110110001101111001011000010
+000001110111011011110111001001101100011001000010000100001010
+`,
+  },
   brainf: {
     aliases: ["brainfuck", "bf"],
     name: "Brainf***",

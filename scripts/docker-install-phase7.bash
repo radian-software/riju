@@ -11,6 +11,11 @@ sed -i 's#env python#env python2#' Beatnik/script/beatnik.py
 mv Beatnik/script/beatnik.py /usr/bin/beatnik
 rm -rf Beatnik
 
+# Binary Lambda Calculus
+wget -nv https://www.ioccc.org/2012/tromp/tromp.c
+clang tromp.c -Wno-everything -DInt=long -DX=8 -DA=500000 -o /usr/bin/tromp
+rm tromp.c
+
 # Erlang
 git clone https://github.com/erlang-ls/erlang_ls.git
 pushd erlang_ls >/dev/null

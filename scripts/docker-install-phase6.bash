@@ -56,6 +56,23 @@ befunge.run(fs.readFileSync(args[0], { encoding: "utf-8" })).catch((err) => {
 EOF
 chmod +x /usr/bin/befunge-repl
 
+# Binary Lambda Calculus
+tee /usr/bin/binary-to-text >/dev/null <<"EOF"
+#!/usr/bin/env python3
+
+import re
+import sys
+
+text = re.sub(r"[^01]", "", sys.stdin.read())
+out = []
+
+for m in re.finditer(r"([01]{8})", text):
+    out += chr(int(m.group(0), 2))
+
+print("".join(out), end="")
+EOF
+chmod +x /usr/bin/binary-to-text
+
 # BrainF
 tee /usr/bin/brainf-repl >/dev/null <<"EOF"
 #!/usr/bin/env python3
