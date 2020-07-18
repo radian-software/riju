@@ -981,6 +981,15 @@ message:
   quit
 `,
   },
+  mysql: {
+    aliases: ["my"],
+    name: "MySQL",
+    repl: `rm -rf data && mysqld -h "$PWD/data" --initialize-insecure && (mysqld -h "$PWD/data" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &) && while [[ ! -e socket ]]; do sleep 0.01; done && mysql --socket="$PWD/socket" -u root`,
+    main: "main.sql",
+    run: `rm -rf data && mysqld -h "$PWD/data" --initialize-insecure && (mysqld -h "$PWD/data" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &) && while [[ ! -e socket ]]; do sleep 0.01; done && (mysql --socket="$PWD/socket" -u root < main.sql; mysql --socket="$PWD/socket" -u root)`,
+    template: `SELECT 'Hello, world!'
+`,
+  },
   nim: {
     name: "Nim",
     main: "main.nim",

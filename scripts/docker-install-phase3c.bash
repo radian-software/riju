@@ -13,6 +13,9 @@ qemu-user-static
 # MUMPS
 fis-gtm
 
+# MySQL
+mysql-server
+
 # Nim
 nim
 
@@ -78,5 +81,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y $(grep -v "^#" <<< "$packages")
 rm -rf /var/lib/apt/lists/*
+
+rm /etc/mysql/mysql.conf.d/mysqld.cnf
 
 rm "$0"
