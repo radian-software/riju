@@ -55,6 +55,11 @@ gunzip binary-for-linux-64-bit.gz
 chmod +x binary-for-linux-64-bit
 mv binary-for-linux-64-bit /usr/bin/elm
 
+# Entropy
+wget -nv http://danieltemkin.com/Content/Entropy/Entropy.zip
+unzip -d /opt/entropy Entropy.zip
+rm Entropy.zip
+
 # Erlang
 wget -nv https://s3.amazonaws.com/rebar3/rebar3
 chmod +x rebar3

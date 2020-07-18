@@ -601,6 +601,18 @@ output = "Hello, world!"
     template: `(message "Hello, world!")
 `,
   },
+  entropy: {
+    aliases: ["ent", "entc", "vge"],
+    name: "Entropy",
+    monacoLang: "plaintext",
+    main: "main.vge",
+    compile: `mono /opt/entropy/entc.exe main.vge | grep -Ev 'WARNING:|Using default' > main.cs && mcs -lib:/opt/entropy -r:Rottytooth.Esolang.Entropy main.cs`,
+    run: "MONO_PATH=/opt/entropy mono main.exe",
+    template: `Program MyNamespace MyProgram [
+	print "Hello, world!";
+]
+`,
+  },
   erlang: {
     aliases: ["erl"],
     name: "Erlang",
