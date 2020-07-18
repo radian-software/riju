@@ -46,5 +46,15 @@ git clone https://github.com/bipinu/malbolge.git
 clang malbolge/malbolge.c -o /usr/bin/malbolge
 rm -rf malbolge
 
+# Thue
+wget -nv https://catseye.tc/distfiles/thue-1.5-2015.0827.zip
+unzip thue-*.zip
+rm thue-*.zip
+pushd thue-* >/dev/null
+./build.sh
+mv bin/thue /usr/bin/thue
+popd >/dev/null
+rm -rf thue-*
+
 popd >/dev/null
 rm "$0"

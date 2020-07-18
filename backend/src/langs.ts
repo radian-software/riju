@@ -1561,6 +1561,15 @@ END
     template: `Hello, world!
 `,
   },
+  thue: {
+    name: "Thue",
+    main: "main.thue",
+    run: "thue main.thue",
+    template: `a::=~Hello, world!
+::=
+a
+`,
+  },
   tikiwiki: {
     aliases: ["tiki"],
     name: "Tiki Wiki",
