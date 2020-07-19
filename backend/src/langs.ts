@@ -778,7 +778,6 @@ function main(): void {
 main :: IO ()
 main = putStrLn "Hello, world!"
 `,
-    hacks: ["ghci-config"],
   },
   haxe: {
     aliases: ["hx"],
