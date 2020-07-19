@@ -6,7 +6,6 @@ import { v4 as getUUID } from "uuid";
 import { langs } from "./langs";
 import { MIN_UID, MAX_UID, borrowUser, ignoreUsers } from "./users";
 import {
-  getEnv,
   privilegedSetup,
   privilegedSpawn,
   privilegedTeardown,
@@ -44,7 +43,6 @@ async function main() {
   await run(privilegedSetup({ uid, uuid }), log);
   const args = privilegedSpawn({ uid, uuid }, ["bash"]);
   const proc = spawn(args[0], args.slice(1), {
-    env: getEnv({ uid, uuid }),
     stdio: "inherit",
   });
   await new Promise((resolve, reject) => {

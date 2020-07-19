@@ -3,6 +3,7 @@ import * as os from "os";
 import * as process from "process";
 
 import * as appRoot from "app-root-path";
+import { quote } from "shell-quote";
 
 import { MIN_UID, MAX_UID } from "./users";
 
@@ -20,7 +21,7 @@ export const rijuSystemPrivileged = appRoot.resolve(
   "system/out/riju-system-privileged"
 );
 
-export function getEnv({ uid, uuid }: Context) {
+function getEnv({ uid, uuid }: Context) {
   const cwd = `/tmp/riju/${uuid}`;
   const path = [
     `${cwd}/.gem/ruby/2.7.0/bin`,
@@ -44,9 +45,16 @@ export function getEnv({ uid, uuid }: Context) {
     PWD: cwd,
     SHELL: "/usr/bin/bash",
     TERM: "xterm-256color",
+    TMPDIR: `${cwd}`,
     USER: username,
     USERNAME: username,
   };
+}
+
+function getEnvString(ctx: Context) {
+  return Object.entries(getEnv(ctx))
+    .map(([key, val]) => `${key}=${quote([val])}`)
+    .join(" ");
 }
 
 export async function run(
@@ -94,8 +102,18 @@ export function privilegedSetup({ uid, uuid }: Context) {
   return [rijuSystemPrivileged, "setup", `${uid}`, uuid];
 }
 
-export function privilegedSpawn({ uid, uuid }: Context, args: string[]) {
-  return [rijuSystemPrivileged, "spawn", `${uid}`, uuid].concat(args);
+export function privilegedSpawn(ctx: Context, args: string[]) {
+  const { uid, uuid } = ctx;
+  return [
+    rijuSystemPrivileged,
+    "spawn",
+    `${uid}`,
+    uuid,
+    "bash",
+    "-c",
+    `exec env -i ${getEnvString(ctx)} "$@"`,
+    "--",
+  ].concat(args);
 }
 
 export function privilegedTeardown({ uid, uuid }: Context) {

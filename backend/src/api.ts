@@ -56,10 +56,6 @@ export class Session {
     return { uid: this.uid, uuid: this.uuid };
   }
 
-  get env() {
-    return util.getEnv(this.context);
-  }
-
   log = (msg: string) => console.log(`[${this.uuid}] ${msg}`);
 
   constructor(ws: WebSocket, lang: string) {
@@ -93,9 +89,7 @@ export class Session {
       await this.runCode();
       if (this.config.daemon) {
         const daemonArgs = this.privilegedSpawn(bash(this.config.daemon));
-        const daemonProc = spawn(daemonArgs[0], daemonArgs.slice(1), {
-          env: this.env,
-        });
+        const daemonProc = spawn(daemonArgs[0], daemonArgs.slice(1));
         this.daemon = {
           proc: daemonProc,
         };
@@ -128,7 +122,7 @@ export class Session {
           await this.run(this.privilegedSpawn(bash(this.config.lspSetup)));
         }
         const lspArgs = this.privilegedSpawn(bash(this.config.lsp));
-        const lspProc = spawn(lspArgs[0], lspArgs.slice(1), { env: this.env });
+        const lspProc = spawn(lspArgs[0], lspArgs.slice(1));
         this.lsp = {
           proc: lspProc,
           reader: new rpc.StreamMessageReader(lspProc.stdout),
@@ -270,7 +264,7 @@ export class Session {
         const args = this.privilegedSpawn(
           bash(`kill -SIGTERM ${pid}; sleep 3; kill -SIGKILL ${pid}`)
         );
-        spawn(args[0], args.slice(1), { env: this.env });
+        spawn(args[0], args.slice(1));
         // Signal to terminalOutput message generator using closure.
         this.term.live = false;
         this.term = null;
@@ -326,7 +320,6 @@ export class Session {
       const term = {
         pty: pty.spawn(termArgs[0], termArgs.slice(1), {
           name: "xterm-color",
-          env: this.env,
         }),
         live: true,
       };
