@@ -6,6 +6,9 @@ set -x
 
 packages="
 
+# MariaDB
+libtinfo5
+
 # MIPS
 gcc-mips64-linux-gnuabi64
 qemu-user-static

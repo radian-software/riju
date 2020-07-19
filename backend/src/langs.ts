@@ -918,6 +918,15 @@ KTHXBYE
     template:
       " (=<`#9]~6ZY32Vx/4Rs+0No-&Jk)\"Fh}|Bcy?`=*z]Kw%oG4UUS0/@-ejc(:'8dc\n",
   },
+  mariadb: {
+    aliases: ["maria"],
+    name: "MariaDB",
+    repl: `rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && while [[ ! -e socket ]]; do sleep 0.01; done && mysql --socket="$PWD/socket"`,
+    main: "main.sql",
+    run: `rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && while [[ ! -e socket ]]; do sleep 0.01; done && (mysql --socket="$PWD/socket" < main.sql; mysql --socket="$PWD/socket")`,
+    template: `SELECT 'Hello, world!'
+`,
+  },
   markdown: {
     aliases: [
       "mdown",

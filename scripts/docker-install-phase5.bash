@@ -124,6 +124,14 @@ rm -rf kotlin-*.zip kotlinc
 wget -nv https://github.com/EmmyLua/EmmyLua-LanguageServer/releases/download/0.3.6/EmmyLua-LS-all.jar
 mv EmmyLua-LS-all.jar /usr/lib/EmmyLua-LS.jar
 
+# MariaDB
+wget -nv "https://downloads.mariadb.org/f/mariadb-10.5.4/bintar-linux-x86_64/mariadb-10.5.4-linux-x86_64.tar.gz/from/http%3A//mirror.vpsfree.cz/mariadb/?serve" -O mariadb.tar.gz
+tar -xf mariadb.tar.gz
+mkdir /opt/mariadb
+mv mariadb-*-linux-x86_64/* /opt/mariadb/
+chmod a=rx,u=rwx /opt/mariadb/lib/plugin/auth_pam_tool_dir
+chmod a=rx,u=rwxs /opt/mariadb/lib/plugin/auth_pam_tool_dir/auth_pam_tool
+
 # Omgrofl
 mkdir /opt/omgrofl
 wget -nv https://github.com/OlegSmelov/omgrofl-interpreter/releases/download/v0.1/Omgrofl.jar -O /opt/omgrofl/Omgrofl.jar
