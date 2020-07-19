@@ -44,7 +44,7 @@ async function main() {
   await run(privilegedSetup({ uid, uuid }), log);
   const args = privilegedSpawn({ uid, uuid }, ["bash"]);
   const proc = spawn(args[0], args.slice(1), {
-    env: getEnv(uuid),
+    env: getEnv({ uid, uuid }),
     stdio: "inherit",
   });
   await new Promise((resolve, reject) => {

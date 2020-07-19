@@ -57,7 +57,7 @@ export class Session {
   }
 
   get env() {
-    return util.getEnv(this.uuid);
+    return util.getEnv(this.context);
   }
 
   log = (msg: string) => console.log(`[${this.uuid}] ${msg}`);

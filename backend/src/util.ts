@@ -1,7 +1,10 @@
 import { spawn, SpawnOptions } from "child_process";
+import * as os from "os";
 import * as process from "process";
 
 import * as appRoot from "app-root-path";
+
+import { MIN_UID, MAX_UID } from "./users";
 
 export interface Options extends SpawnOptions {
   input?: string;
@@ -17,7 +20,7 @@ export const rijuSystemPrivileged = appRoot.resolve(
   "system/out/riju-system-privileged"
 );
 
-export function getEnv(uuid: string) {
+export function getEnv({ uid, uuid }: Context) {
   const cwd = `/tmp/riju/${uuid}`;
   const path = [
     `${cwd}/.gem/ruby/2.7.0/bin`,
@@ -29,15 +32,20 @@ export function getEnv(uuid: string) {
     `/usr/bin`,
     `/bin`,
   ];
+  const username =
+    uid >= MIN_UID && uid < MAX_UID ? `riju${uid}` : os.userInfo().username;
   return {
     HOME: cwd,
     HOSTNAME: "riju",
     LANG: process.env.LANG || "",
     LC_ALL: process.env.LC_ALL || "",
+    LOGNAME: username,
     PATH: path.join(":"),
     PWD: cwd,
     SHELL: "/usr/bin/bash",
-    TERM: "xterm-color",
+    TERM: "xterm-256color",
+    USER: username,
+    USERNAME: username,
   };
 }
 
