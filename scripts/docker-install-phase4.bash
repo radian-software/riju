@@ -55,6 +55,9 @@ npm install -g @elm-tooling/elm-language-server
 # FORTRAN
 pip3 install fortran-language-server
 
+# Hy
+pip3 install hy
+
 # Julia
 julia -e 'using Pkg; Pkg.add("LanguageServer")'
 

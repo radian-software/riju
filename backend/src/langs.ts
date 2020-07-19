@@ -747,6 +747,14 @@ l ; ; o ; * 4
    4 ; * /
 `,
   },
+  hy: {
+    name: "Hy",
+    repl: "hy",
+    main: "main.hy",
+    run: "hy -i main.hy",
+    template: `(print "Hello, world!")
+`,
+  },
   ink: {
     name: "Ink",
     repl: "ink",
