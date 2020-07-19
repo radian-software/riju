@@ -190,7 +190,7 @@ export class Session {
   };
 
   logBadMessage = (msg: any) => {
-    this.log(`Got malformed message from client: ${msg}`);
+    this.log(`Got malformed message from client: ${JSON.stringify(msg)}`);
   };
 
   receive = async (event: string) => {
@@ -202,7 +202,7 @@ export class Session {
       try {
         msg = JSON.parse(event);
       } catch (err) {
-        this.log(`Failed to parse message from client: ${msg}`);
+        this.log(`Failed to parse message from client: ${event}`);
         return;
       }
       switch (msg && msg.event) {
