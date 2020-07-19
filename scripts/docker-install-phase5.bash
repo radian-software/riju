@@ -135,6 +135,12 @@ mv ink-linux /usr/bin/ink
 mkdir /opt/ink
 mv std.ink str.ink /opt/ink/
 
+# Ioke
+wget -nv https://ioke.org/dist/ioke-P-ikj-0.4.0.tar.gz
+tar -xf ioke-P-ikj-*.tar.gz -C /opt
+rm ioke-P-ikj-*.tar.gz
+ln -s /opt/ioke/bin/ioke /usr/bin/ioke
+
 # Kotlin
 wget -nv https://github.com/JetBrains/kotlin/releases/download/v1.3.72/kotlin-compiler-1.3.72.zip
 unzip kotlin-*.zip

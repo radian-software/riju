@@ -852,6 +852,15 @@ PLEASE READ OUT ,1
 PLEASE GIVE UP
 `,
   },
+  ioke: {
+    aliases: ["ik"],
+    name: "Ioke",
+    repl: "ioke",
+    main: "main.ik",
+    run: "ioke main.ik; ioke",
+    template: `"Hello, world!" println
+`,
+  },
   java: {
     aliases: ["javac"],
     name: "Java",
