@@ -942,6 +942,7 @@ PLEASE GIVE UP
     monacoLang: "less",
     main: "main.less",
     run: "lessc main.less",
+    format: "prettier --no-config main.less",
     template: `body:before {
   content: "Hello, world!";
 }
@@ -1038,6 +1039,7 @@ KTHXBYE
     main: "main.md",
     compile: "pandoc main.md -o main.html",
     run: "prettier --no-config main.html",
+    format: "prettier --no-config main.md",
     template: `Hello, world!
 `,
   },
@@ -1120,6 +1122,7 @@ message:
 eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
 require("repl").start()
 '`,
+    format: "prettier --no-config main.js",
     pkg: {
       install: "yarn add NAME",
       uninstall: "yarn remove NAME",
@@ -1540,6 +1543,7 @@ binding_irb.run(IRB.conf)
     monacoLang: "scss",
     main: "main.scss",
     run: "sass main.scss",
+    format: "prettier --no-config main.scss",
     template: `body:before {
   content: "Hello, world!";
 }
@@ -1801,6 +1805,7 @@ a
     repl: "ts-node",
     main: "main.ts",
     run: `ts-node -i -e "$(< main.ts)"`,
+    format: "prettier --no-config main.ts",
     template: `console.log("Hello, world!");
 `,
   },
@@ -1897,6 +1902,7 @@ message:
     main: "main.yaml",
     compile: "cat main.yaml | yj -yj > main.json",
     run: "cat main.json | jq .",
+    format: "prettier --no-config main.yaml",
     template: `output: "Hello, world!"
 `,
   },
