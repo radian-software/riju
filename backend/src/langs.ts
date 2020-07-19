@@ -63,6 +63,14 @@ end Main;
     template: `print(("Hello, world!",new line))
 `,
   },
+  apl: {
+    name: "APL",
+    repl: "apl",
+    main: "main.apl",
+    run: "apl -f main.apl",
+    template: `'Hello, world!'
+`,
+  },
   arm: {
     name: "ARM",
     main: "main.S",

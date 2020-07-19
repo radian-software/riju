@@ -12,6 +12,9 @@ gnat
 # Algol
 algol68g
 
+# APL
+libtinfo5
+
 # ARM
 gcc-arm-linux-gnueabihf
 qemu-user-static
