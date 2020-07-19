@@ -199,6 +199,10 @@ metals -version </dev/null
 mkdir /opt/coursier
 mv "$HOME/.cache/coursier" /opt/coursier/cache
 
+# SETL
+wget -nv https://setl.org/setl/bin/Linux-x86-64bit/setlbin.tgz
+tar -xf setlbin.tgz -C /usr/local/bin
+
 # Snobol
 gdown "https://drive.google.com/file/d/1ygQkpgfirpq4b7s4YNsSijkK8IQgSLWk/view?usp=sharing" /usr/bin/snobol4
 chmod +x /usr/bin/snobol4

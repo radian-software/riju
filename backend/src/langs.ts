@@ -1543,6 +1543,13 @@ binding_irb.run(IRB.conf)
     template: `s/.*/Hello, world!/
 `,
   },
+  setl: {
+    name: "SETL",
+    main: "main.setl",
+    run: "setl main.setl",
+    template: `print("Hello, world!");
+`,
+  },
   sh: {
     aliases: ["shell", "posix", "posixsh", "ash", "dash", "posh"],
     name: "Sh",
