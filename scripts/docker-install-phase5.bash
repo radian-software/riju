@@ -65,6 +65,18 @@ gunzip binary-for-linux-64-bit.gz
 chmod +x binary-for-linux-64-bit
 mv binary-for-linux-64-bit /usr/bin/elm
 
+# Emojicode
+wget -nv https://github.com/emojicode/emojicode/releases/download/v1.0-beta.2/Emojicode-1.0-beta.2-Linux-x86_64.tar.gz
+tar -xf Emojicode-*-Linux-x86_64.tar.gz
+pushd Emojicode-*-Linux-x86_64 >/dev/null
+mv emojicodec /usr/local/bin/
+mkdir -p /usr/local/include/emojicode
+mv include/* /usr/local/include/emojicode/
+mkdir -p /usr/local/EmojicodePackages
+mv packages/* /usr/local/EmojicodePackages/
+popd >/dev/null
+rm -rf Emojicode-*-Linux-x86_64 Emojicode-*-Linux-x86_64.tar.gz
+
 # Entropy
 wget -nv http://danieltemkin.com/Content/Entropy/Entropy.zip
 unzip -d /opt/entropy Entropy.zip

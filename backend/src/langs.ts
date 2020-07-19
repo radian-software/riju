@@ -604,6 +604,17 @@ output = "Hello, world!"
     template: `(message "Hello, world!")
 `,
   },
+  emojicode: {
+    aliases: ["emoji", "emojic", "emojicodec"],
+    name: "Emojicode",
+    main: "main.emojic",
+    compile: "emojicodec main.emojic",
+    run: "./main",
+    template: `🏁 🍇
+  😀 🔤Hello, world!🔤❗️
+🍉
+`,
+  },
   entropy: {
     aliases: ["ent", "entc", "vge"],
     name: "Entropy",
