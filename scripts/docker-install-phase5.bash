@@ -36,6 +36,11 @@ wget -nv ftp://ftp.gnu.org/gnu/apl/apl_1.8-1_amd64.deb
 dpkg -i apl_*_amd64.deb
 rm apl_*_amd64.deb
 
+# Ceylon
+wget -nv https://ceylon-lang.org/download/dist/1_3_3_deb -O ceylon.deb
+dpkg -i ceylon.deb
+rm ceylon.deb
+
 # Clojure
 wget -nv https://github.com/snoe/clojure-lsp/releases/download/release-20200629T153107/clojure-lsp
 chmod +x clojure-lsp

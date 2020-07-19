@@ -311,6 +311,15 @@ int main() {
 }
 `,
   },
+  ceylon: {
+    name: "Ceylon",
+    main: "source/main.ceylon",
+    run: `PATH="/usr/lib/jvm/java-8-openjdk-amd64/bin:$PATH" ceylon run --compile=force default`,
+    template: `shared void run() {
+    print("Hello, world!");
+}
+`,
+  },
   chef: {
     name: "Chef",
     main: "main.chef",

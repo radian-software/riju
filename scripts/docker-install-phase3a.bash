@@ -44,6 +44,9 @@ clangd
 # C#
 mono-mcs
 
+# Ceylon
+openjdk-8-jdk-headless
+
 # Clojure
 clojure
 
