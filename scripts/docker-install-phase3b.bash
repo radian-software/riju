@@ -37,6 +37,9 @@ golang
 # Groovy
 groovy
 
+# Hack
+hhvm
+
 # Haskell
 cabal-install
 ghc

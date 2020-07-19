@@ -17,6 +17,7 @@ curl -sSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
 curl -sSL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 curl -sSL https://keybase.io/crystal/pgp_keys.asc | apt-key add -
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B4112585D386EB94
 
 wget -nv https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
 dpkg -i packages-microsoft-prod.deb
@@ -27,6 +28,7 @@ deb [arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debi
 deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/
 deb https://deb.nodesource.com/node_14.x focal main
 deb https://dist.crystal-lang.org/apt crystal main
+deb https://dl.hhvm.com/ubuntu focal main
 deb https://dl.yarnpkg.com/debian/ stable main
 deb-src https://deb.nodesource.com/node_14.x focal main
 EOF

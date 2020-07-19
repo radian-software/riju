@@ -706,6 +706,17 @@ func main() {
     template: `print "Hello, world!";
 `,
   },
+  hack: {
+    name: "Hack",
+    repl: "hhvm -a",
+    main: "main.hack",
+    run: "hhvm -a main.hack",
+    template: `<<__EntryPoint>>
+function main(): void {
+  echo "Hello, world!\\n";
+}
+`,
+  },
   haskell: {
     aliases: ["ghc", "ghci", "hs"],
     name: "Haskell",
