@@ -48,7 +48,7 @@
   },
   "scripts": {
     "backend": "tsc",
-    "backend-dev": "tsc --watch --preserveWatchOutput",
+    "backend-dev": "TSC_NONPOLLING_WATCHER=1 tsc --watch --preserveWatchOutput",
     "frontend": "webpack --production",
     "frontend-dev": "webpack --development --watch",
     "server": "scripts/setup.bash && node backend/out/server.js",
