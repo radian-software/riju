@@ -141,6 +141,11 @@ tar -xf ioke-P-ikj-*.tar.gz -C /opt
 rm ioke-P-ikj-*.tar.gz
 ln -s /opt/ioke/bin/ioke /usr/bin/ioke
 
+# Kitten
+wget -nv "https://drive.google.com/uc?export=download&id=11u0G2I8i0u4ez27zvEjAT6E9xF4RwuFZ" -O /usr/local/bin/kitten
+wget -nv "https://drive.google.com/uc?export=download&id=1h-U1iURWax8h18kTD1AyGS21UblEIT9K" -O /usr/local/bin/common.ktn
+chmod +x /usr/local/bin/kitten
+
 # Kotlin
 wget -nv https://github.com/JetBrains/kotlin/releases/download/v1.3.72/kotlin-compiler-1.3.72.zip
 unzip kotlin-*.zip

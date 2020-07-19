@@ -897,6 +897,15 @@ PLEASE GIVE UP
   (print "Hello, world!\\n"))
 `,
   },
+  kitten: {
+    aliases: ["ktn"],
+    name: "Kitten",
+    repl: "kitten",
+    main: "main.ktn",
+    run: "kitten main.ktn; kitten",
+    template: `"Hello, world!" say
+`,
+  },
   kotlin: {
     aliases: ["kts", "kotlinc"],
     name: "Kotlin",
