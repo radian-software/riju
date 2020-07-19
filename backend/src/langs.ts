@@ -1258,6 +1258,15 @@ main = do
     template: `print("Hello, world!")
 `,
   },
+  قلب: {
+    aliases: ["qalb"],
+    name: "قلب",
+    repl: "node /opt/qalb/repl.js",
+    main: "main.qalb",
+    run: "node /opt/qalb/repl.js main.qalb",
+    template: `(قول "مرحبا يا عالم")
+`,
+  },
   r: {
     aliases: ["rlang"],
     name: "R",
