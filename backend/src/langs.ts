@@ -770,6 +770,19 @@ main = putStrLn "Hello, world!"
 `,
     hacks: ["ghci-config"],
   },
+  haxe: {
+    aliases: ["hx"],
+    name: "Haxe",
+    main: "Main.hx",
+    compile: "haxe --main Main --js Main.js",
+    run: "node Main.js",
+    template: `class Main {
+    static public function main() {
+        trace("Hello, world!");
+    }
+}
+`,
+  },
   hcl: {
     aliases: ["tf", "terraform", "hashicorp", "hc"],
     name: "HCL",

@@ -44,6 +44,9 @@ hhvm
 cabal-install
 ghc
 
+# Haxe
+haxe
+
 # INTERCAL
 intercal
 
