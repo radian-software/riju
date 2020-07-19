@@ -10,7 +10,7 @@
     <i>Pick your favorite language to get started:</i>
     <div class="grid">
       <% for (const [id, {name}] of Object.entries(langs).sort(
-        ([id1, {name: name1}], [id2, {name: name2}]) => name1.localeCompare(name2))) { %>
+        ([id1, {name: name1}], [id2, {name: name2}]) => name1.toLowerCase().localeCompare(name2.toLowerCase()))) { %>
         <a href=<%= "/" + encodeURIComponent(id) %> class="language">
           <div class="language">
             <%= name %>
