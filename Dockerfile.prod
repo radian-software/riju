@@ -37,7 +37,7 @@ COPY scripts/docker-install-phase6.bash /tmp/
 RUN /tmp/docker-install-phase6.bash
 
 COPY scripts/docker-install-phase7.bash /tmp/
-RUN /tmp/docker-install-phase7.bash "$UID"
+RUN /tmp/docker-install-phase7.bash
 
 COPY scripts/docker-install-phase8.bash /tmp/
 RUN /tmp/docker-install-phase8.bash "$UID"
