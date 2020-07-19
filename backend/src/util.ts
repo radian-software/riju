@@ -109,7 +109,7 @@ export function privilegedSpawn(ctx: Context, args: string[]) {
     "spawn",
     `${uid}`,
     uuid,
-    "bash",
+    "sh",
     "-c",
     `exec env -i ${getEnvString(ctx)} "$@"`,
     "--",
