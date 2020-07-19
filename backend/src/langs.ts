@@ -614,6 +614,14 @@ main() ->
     io:fwrite("Hello, world!\\n").
 `,
   },
+  euphoria: {
+    aliases: ["ex", "exw", "exu", "euc", "eui", "eub"],
+    name: "Euphoria",
+    main: "main.exu",
+    run: "eui main.exu",
+    template: `puts(1, "Hello, world!\\n")
+`,
+  },
   factor: {
     aliases: ["fact"],
     name: "Factor",

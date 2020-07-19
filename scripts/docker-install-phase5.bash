@@ -70,6 +70,11 @@ wget -nv https://s3.amazonaws.com/rebar3/rebar3
 chmod +x rebar3
 mv rebar3 /usr/bin/rebar3
 
+# Euphoria
+wget -nv https://sourceforge.net/projects/rapideuphoria/files/Euphoria/4.0.5/euphoria_4.0.5_amd64.deb/download -O euphoria.deb
+dpkg -i euphoria.deb
+rm euphoria.deb
+
 # Factor
 wget -nv https://downloads.factorcode.org/releases/0.98/factor-linux-x86-64-0.98.tar.gz
 tar -xf factor-linux-x86-64-*.tar.gz
