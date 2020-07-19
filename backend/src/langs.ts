@@ -1484,6 +1484,14 @@ binding_irb.run(IRB.conf)
 }
 `,
   },
+  sed: {
+    aliases: ["gsed"],
+    name: "Sed",
+    main: "main.sed",
+    run: "echo 'Reading from stdin...' >&2; sed -f main.sed",
+    template: `s/.*/Hello, world!/
+`,
+  },
   sh: {
     aliases: ["shell", "posix", "posixsh", "ash", "dash", "posh"],
     name: "Sh",

@@ -12,6 +12,9 @@ scala
 # Scheme
 mit-scheme
 
+# Sed
+sed
+
 # Sh
 posh
 
