@@ -25,6 +25,9 @@ asciidoc
 # ATS
 ats2-lang
 
+# Awk
+mawk
+
 # BASIC
 bwbasic
 

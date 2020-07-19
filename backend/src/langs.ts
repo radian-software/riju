@@ -112,6 +112,14 @@ message:
 implement main0 () = ()
 `,
   },
+  awk: {
+    aliases: ["gawk", "mawk"],
+    name: "Awk",
+    main: "main.awk",
+    run: `awk -f main.awk`,
+    template: `BEGIN { print "Hello, world!" }
+`,
+  },
   bash: {
     aliases: ["bashrc", "bourneshell"],
     name: "Bash",
