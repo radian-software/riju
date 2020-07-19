@@ -964,9 +964,9 @@ KTHXBYE
   mariadb: {
     aliases: ["maria"],
     name: "MariaDB",
-    repl: `rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && while [[ ! -e socket ]]; do sleep 0.01; done && mysql --socket="$PWD/socket"`,
+    repl: `rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && mysql --socket="$PWD/socket"`,
     main: "main.sql",
-    run: `rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && while [[ ! -e socket ]]; do sleep 0.01; done && (mysql --socket="$PWD/socket" < main.sql; mysql --socket="$PWD/socket")`,
+    run: `rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && (mysql --socket="$PWD/socket" < main.sql; mysql --socket="$PWD/socket")`,
     template: `SELECT 'Hello, world!'
 `,
   },
@@ -1036,9 +1036,9 @@ message:
   mysql: {
     aliases: ["my"],
     name: "MySQL",
-    repl: `rm -rf data && mysqld -h "$PWD/data" --initialize-insecure && (mysqld -h "$PWD/data" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &) && while [[ ! -e socket ]]; do sleep 0.01; done && mysql --socket="$PWD/socket" -u root`,
+    repl: `rm -rf data && mysqld -h "$PWD/data" --initialize-insecure && (mysqld -h "$PWD/data" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && mysql --socket="$PWD/socket" -u root`,
     main: "main.sql",
-    run: `rm -rf data && mysqld -h "$PWD/data" --initialize-insecure && (mysqld -h "$PWD/data" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &) && while [[ ! -e socket ]]; do sleep 0.01; done && (mysql --socket="$PWD/socket" -u root < main.sql; mysql --socket="$PWD/socket" -u root)`,
+    run: `rm -rf data && mysqld -h "$PWD/data" --initialize-insecure && (mysqld -h "$PWD/data" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && (mysql --socket="$PWD/socket" -u root < main.sql; mysql --socket="$PWD/socket" -u root)`,
     template: `SELECT 'Hello, world!'
 `,
   },
@@ -1343,10 +1343,10 @@ main = do
     name: "Redis",
     monacoLang: "redis",
     repl:
-      "rm -f socket; (redis-server --port 0 --unixsocket socket &); while [[ ! -e socket ]]; do sleep 0.01; done; redis-cli -s socket",
+      "rm -f socket; (redis-server --port 0 --unixsocket socket &); until [[ -e socket ]]; do sleep 0.01; done; redis-cli -s socket",
     main: "main.redis",
     run:
-      "rm -f socket; (redis-server --port 0 --unixsocket socket &); while [[ ! -e socket ]]; do sleep 0.01; done; redis-cli -s socket < main.redis; redis-cli -s socket",
+      "rm -f socket; (redis-server --port 0 --unixsocket socket &); until [[ -e socket ]]; do sleep 0.01; done; redis-cli -s socket < main.redis; redis-cli -s socket",
     template: `ECHO "Hello, world!"
 `,
   },
