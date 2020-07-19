@@ -25,6 +25,7 @@ interface RijuConfig {
   id: string;
   monacoLang?: string;
   main: string;
+  format?: string;
   lspDisableDynamicRegistration?: boolean;
   lspInit?: any;
   lspConfig?: any;
@@ -133,7 +134,7 @@ async function main() {
 
   function sendMessage(message: any) {
     if (DEBUG) {
-      console.log("SEND", message);
+      console.log("SEND:", message);
     }
     if (socket) {
       socket.send(JSON.stringify(message));
@@ -165,8 +166,7 @@ async function main() {
         DEBUG &&
         message &&
         message.event !== "lspOutput" &&
-        message.event !== "lspLog" &&
-        message.event !== "daemonLog"
+        message.event !== "serviceLog"
       ) {
         console.log("RECEIVE:", message);
       }
@@ -183,6 +183,18 @@ async function main() {
             return;
           }
           term.write(message.output);
+          return;
+        case "formattedCode":
+          if (
+            typeof message.code !== "string" ||
+            typeof message.originalCode !== "string"
+          ) {
+            console.error("Unexpected message from server:", message);
+            return;
+          }
+          if (editor.getValue() === message.originalCode) {
+            editor.setValue(message.code);
+          }
           return;
         case "lspStarted":
           if (typeof message.root !== "string") {
@@ -308,6 +320,12 @@ async function main() {
   document.getElementById("runButton")!.addEventListener("click", () => {
     sendMessage({ event: "runCode", code: editor.getValue() });
   });
+  if (config.format) {
+    document.getElementById("formatButton")!.classList.add("visible");
+    document.getElementById("formatButton")!.addEventListener("click", () => {
+      sendMessage({ event: "formatCode", code: editor.getValue() });
+    });
+  }
 }
 
 main().catch(console.error);

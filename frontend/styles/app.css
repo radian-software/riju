@@ -27,6 +27,17 @@ body {
   right: calc(50% + 25px);
 }
 
+#formatButton {
+  position: absolute;
+  bottom: 25px;
+  right: calc(50% + 25px);
+  visibility: hidden;
+}
+
+#formatButton.visible {
+  visibility: visible;
+}
+
 #backButton {
   position: absolute;
   left: 25px;

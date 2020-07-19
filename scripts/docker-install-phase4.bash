@@ -82,6 +82,9 @@ npm install -g pug-cli
 # PureScript
 npm install -g purescript spago
 
+# Python
+pip3 install black
+
 # ReasonML
 npm install -g bs-platform
 

@@ -11,6 +11,7 @@ export interface LangConfig {
   createEmpty?: string;
   compile?: string;
   run: string;
+  format?: string;
   pkg?: {
     install: string;
     uninstall?: string;
@@ -24,7 +25,6 @@ export interface LangConfig {
   lspConfig?: any;
   lspLang?: string;
   template: string;
-  hacks?: "ghci-config"[];
   test?: {
     ensure?: string;
   };
@@ -764,9 +764,10 @@ function main(): void {
   haskell: {
     aliases: ["ghc", "ghci", "hs"],
     name: "Haskell",
-    repl: "ghci",
+    repl: "rm -f .ghci && ghci",
     main: "Main.hs",
-    run: "ghci",
+    run: "(echo ':load Main' && echo 'main') > .ghci && ghci",
+    format: "brittany Main.hs",
     lspSetup: "cp /opt/haskell/hie.yaml hie.yaml",
     lsp: "HIE_HOOGLE_DATABASE=/opt/haskell/hoogle.hoo hie --lsp",
     lspInit: {
@@ -1337,6 +1338,7 @@ main = do
     repl: "python3 -u",
     main: "main.py",
     run: "python3 -u -i main.py",
+    format: "cat main.py | black -",
     pkg: {
       install: "pip3 install --user NAME",
       uninstall: "pip3 uninstall NAME",
@@ -1350,7 +1352,7 @@ main = do
         },
       },
     },
-    template: `print("Hello, world!")
+    template: `print('Hello, world!')
 `,
   },
   قلب: {

@@ -35,6 +35,12 @@ export class Session {
     writer: rpc.StreamMessageWriter;
   } | null = null;
   daemon: { proc: ChildProcess } | null = null;
+  formatter: {
+    proc: ChildProcess;
+    live: boolean;
+    input: string;
+    output: string;
+  } | null = null;
 
   get homedir() {
     return `/tmp/riju/${this.uuid}`;
@@ -224,6 +230,13 @@ export class Session {
           }
           await this.runCode(msg.code);
           break;
+        case "formatCode":
+          if (typeof msg.code !== "string") {
+            this.logBadMessage(msg);
+            break;
+          }
+          await this.formatCode(msg.code);
+          break;
         case "lspInput":
           if (typeof msg.input !== "object" || !msg) {
             this.logBadMessage(msg);
@@ -257,12 +270,11 @@ export class Session {
         compile,
         run,
         template,
-        hacks,
       } = this.config;
       if (this.term) {
         const pid = this.term.pty.pid;
         const args = this.privilegedSpawn(
-          bash(`kill -SIGTERM ${pid}; sleep 3; kill -SIGKILL ${pid}`)
+          bash(`kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`)
         );
         spawn(args[0], args.slice(1));
         // Signal to terminalOutput message generator using closure.
@@ -304,18 +316,6 @@ export class Session {
         ]),
         { input: code }
       );
-      if (hacks && hacks.includes("ghci-config") && run) {
-        if (code) {
-          await this.run(
-            this.privilegedSpawn(["sh", "-c", `cat > ${this.homedir}/.ghci`]),
-            { input: ":load Main\nmain\n" }
-          );
-        } else {
-          await this.run(
-            this.privilegedSpawn(["rm", "-f", `${this.homedir}/.ghci`])
-          );
-        }
-      }
       const termArgs = this.privilegedSpawn(bash(cmdline));
       const term = {
         pty: pty.spawn(termArgs[0], termArgs.slice(1), {
@@ -336,6 +336,66 @@ export class Session {
       console.log(err);
       this.sendError(err);
     }
+  };
+
+  formatCode = async (code: string) => {
+    if (!this.config.format) {
+      this.log("formatCode ignored because format is null");
+      return;
+    }
+    if (this.formatter) {
+      const pid = this.formatter.proc.pid;
+      const args = this.privilegedSpawn(
+        bash(`kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`)
+      );
+      spawn(args[0], args.slice(1));
+      this.formatter.live = false;
+      this.formatter = null;
+    }
+    const args = this.privilegedSpawn(bash(this.config.format));
+    const formatter = {
+      proc: spawn(args[0], args.slice(1)),
+      live: true,
+      input: code,
+      output: "",
+    };
+    formatter.proc.stdout!.on("data", (data) => {
+      if (formatter.live) {
+        formatter.output += data.toString("utf8");
+      }
+    });
+    formatter.proc.stderr!.on("data", (data) => {
+      if (formatter.live) {
+        this.send({
+          event: "serviceLog",
+          service: "formatter",
+          output: data.toString("utf8"),
+        });
+      }
+    });
+    formatter.proc.on("exit", (code, signal) => {
+      if (code === 0) {
+        this.send({
+          event: "formattedCode",
+          code: formatter.output,
+          originalCode: formatter.input,
+        });
+      } else {
+        this.send({
+          event: "serviceFailed",
+          service: "formatter",
+          error: `Exited with status ${signal || code}`,
+        });
+      }
+    });
+    formatter.proc.on("error", (err) =>
+      this.send({
+        event: "serviceFailed",
+        service: "formatter",
+        error: `${err}`,
+      })
+    );
+    this.formatter = formatter;
   };
 
   teardown = async () => {

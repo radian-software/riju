@@ -121,6 +121,9 @@ tar -xf linux-x86_64-static.tar.gz
 mv stack-*-linux-x86_64-static/stack /usr/bin/stack
 rm -rf stack-*-linux-x86_64-static linux-x86_64-static.tar.gz
 
+wget "https://drive.google.com/uc?export=download&id=1MpozlNLmWeUaQuT-5t6gyE3Yv56gUbea" -O /usr/local/bin/brittany
+chmod +x /usr/local/bin/brittany
+
 mkdir -p /opt/haskell
 gdown "https://drive.google.com/uc?export=download&id=1GPoR_ja4ns16KCamRgwB-JVag4HK0igz" /usr/bin/hie
 gdown "https://drive.google.com/uc?export=download&id=1qSxj8JjAeetAmNjUGayX0RBARgr5R4Ij" /opt/haskell/hoogle.hoo
