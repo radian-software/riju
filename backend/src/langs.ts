@@ -724,6 +724,7 @@ main() ->
     main: "main.go",
     compile: "go build main.go",
     run: "./main",
+    format: "cat main.go | gofmt",
     lsp: "gopls",
     template: `package main
 
