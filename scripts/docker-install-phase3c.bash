@@ -13,6 +13,9 @@ libtinfo5
 gcc-mips64-linux-gnuabi64
 qemu-user-static
 
+# MongoDB
+mongodb
+
 # MUMPS
 fis-gtm
 

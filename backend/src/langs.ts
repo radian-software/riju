@@ -1022,6 +1022,15 @@ message:
 	.string "Hello, world!\\n"
 `,
   },
+  mongodb: {
+    aliases: ["mongo", "mongod"],
+    name: "MongoDB",
+    repl: `while ps -u "$(id -un)" -o comm | grep -q mongod; do sleep 0.01; done && rm -rf data && mkdir data && (mongod --dbpath=data --unixSocketPrefix="$PWD" --bind_ip=, &) && until mongo --host "$PWD/mongodb-27017.sock" --eval ' ' &>/dev/null; do sleep 0.01; done && mongo --host "$PWD/mongodb-27017.sock"`,
+    main: "main.js",
+    run: `while ps -u "$(id -un)" -o comm | grep -q mongod; do sleep 0.01; done && rm -rf data && mkdir data && (mongod --dbpath=data --unixSocketPrefix="$PWD" --bind_ip=, &) && until mongo --host "$PWD/mongodb-27017.sock" --eval ' ' &>/dev/null; do sleep 0.01; done && mongo --host "$PWD/mongodb-27017.sock" --shell main.js`,
+    template: `print("Hello, world!")
+`,
+  },
   mumps: {
     aliases: ["mlang", "gtm", "fisgtm"],
     name: "MUMPS",
