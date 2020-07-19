@@ -1278,6 +1278,14 @@ main = do
 (display "Hello, world!\\n")
 `,
   },
+  рапира: {
+    aliases: ["rap", "rerap", "rerap2", "rapira"],
+    name: "Рапира",
+    main: "main.rap",
+    run: "rapira main.rap",
+    template: `вывод: "Hello, world!"
+`,
+  },
   reasonml: {
     aliases: ["re", "reason", "bsc", "buckle", "bucklescript"],
     name: "ReasonML",

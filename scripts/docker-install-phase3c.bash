@@ -67,6 +67,9 @@ r-base
 # Racket
 racket
 
+# Rapira
+clang
+
 # Redis
 redis
 
