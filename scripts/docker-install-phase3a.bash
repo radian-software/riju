@@ -66,9 +66,6 @@ sbcl
 # Crystal
 crystal
 
-# D
-dmd
-
 # Dart
 dart
 
