@@ -51,6 +51,7 @@ haxe
 intercal
 
 # Java
+clang-format
 default-jdk
 
 # Julia

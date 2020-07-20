@@ -39,9 +39,11 @@ beef
 
 # C/C++
 clang
+clang-format
 clangd
 
 # C#
+clang-format
 mono-mcs
 
 # Ceylon

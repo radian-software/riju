@@ -50,6 +50,11 @@ npm install -g lumo-cljs
 # CoffeeScript
 npm install -g coffeescript
 
+# D
+dub fetch --version='~master' dfmt
+dub run dfmt -- --version
+mv "$HOME/.dub/packages/dfmt-master/dfmt/bin/dfmt" /usr/local/bin/
+
 # Dogescript
 npm install -g dogescript
 
@@ -126,7 +131,7 @@ pip3 install whitespace
 # Wolfram Language
 python3.7 -m pip install mathics
 
-rm -rf /root/.cache /root/.config /root/.cpan /root/.cpanm /root/.gem /root/.npm /root/.npmrc
+rm -rf /root/.cache /root/.config /root/.cpan /root/.cpanm /root/.dub /root/.gem /root/.npm /root/.npmrc
 rm -f /tmp/core-js-banners
 
 rm "$0"

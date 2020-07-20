@@ -301,6 +301,7 @@ Nude pagoda careens.
     main: "main.c",
     compile: "clang -Wall -Wextra main.c -o main",
     run: "./main",
+    format: "clang-format main.c",
     lspSetup: `echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
     lsp: "clangd",
     template: `#include <stdio.h>
@@ -437,6 +438,7 @@ Refrigerate for 1 hour.
     main: "main.cpp",
     compile: "clang++ -Wall -Wextra main.cpp -o main",
     run: "./main",
+    format: "clang-format main.cpp",
     lspSetup: `echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
     lsp: "clangd",
     template: `#include <iostream>
@@ -462,6 +464,7 @@ int main() {
     main: "main.cs",
     compile: "mcs main.cs",
     run: "mono main.exe",
+    format: `clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" main.cs`,
     template: `class main {
     static void Main(string[] args) {
         System.Console.WriteLine("Hello, world!");
@@ -523,10 +526,12 @@ require("/usr/lib/node_modules/coffeescript/repl").start()
     main: "main.d",
     compile: "dmd main.d",
     run: "./main",
+    format: "dfmt main.d",
     template: `import std.stdio;
 
-void main() {
-  writeln("Hello, world!");
+void main()
+{
+    writeln("Hello, world!");
 }
 `,
   },
@@ -878,6 +883,7 @@ PLEASE GIVE UP
     main: "Main.java",
     compile: "javac Main.java",
     run: "java Main",
+    format: `clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" Main.java`,
     template: `public class Main {
     public static void main(String[] args) {
         System.out.println("Hello, world!");
@@ -1141,6 +1147,7 @@ require("repl").start()
     compile:
       "gcc $(gnustep-config --objc-flags) main.m $(gnustep-config --base-libs) -o main",
     run: "./main",
+    format: "clang-format main.m",
     lspSetup: `(gnustep-config --objc-flags && gnustep-config --base-libs) | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
     lsp: "clangd",
     template: `#import <Foundation/Foundation.h>
