@@ -163,11 +163,11 @@ if (args.length > 1) {
   process.exit(1);
 }
 
-const program = args.length === 1 ? fs.readFileSync(args[0]) : null;
+const program = args.length === 1 ? fs.readFileSync(args[0], "utf-8") : null;
 
-eval(fs.readFileSync("public/qlb/qlb.js", "utf-8"));
-eval(fs.readFileSync("public/qlb/parser.js", "utf-8"));
-eval(fs.readFileSync("public/qlb/primitives.js", "utf-8"));
+eval(fs.readFileSync("/opt/qalb/qlb.js", "utf-8"));
+eval(fs.readFileSync("/opt/qalb/parser.js", "utf-8"));
+eval(fs.readFileSync("/opt/qalb/primitives.js", "utf-8"));
 
 Qlb.init({console});
 
