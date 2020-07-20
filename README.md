@@ -43,9 +43,8 @@ container first:
 
     $ make docker
 
-Note that building the image can take up to 45 minutes even on
-high-end hardware and internet, and it requires about 15 GB of disk
-space.
+Note that building the image typically requires over an hour and 20 GB
+of disk space.
 
 ## Flag
 
