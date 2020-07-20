@@ -92,6 +92,7 @@ pip3 install black
 npm install -g bs-platform
 
 # Ruby
+gem install rufo
 gem install solargraph
 
 # Rust

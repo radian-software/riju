@@ -1500,6 +1500,7 @@ binding_irb = IRB::Irb.new(workspace)
 binding_irb.run(IRB.conf)
 `,
     run: "ruby main.rb",
+    format: "cat main.rb | rufo -x",
     pkg: {
       install: "gem install --user-install NAME",
       uninstall: "gem uninstall --user-install NAME",
