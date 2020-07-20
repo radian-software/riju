@@ -26,6 +26,14 @@ popd >/dev/null
 mkdir /opt/purescript
 mv project-template /opt/purescript/
 
+# ReasonML
+mkdir -p /opt/reasonml/project-template
+pushd /opt/reasonml/project-template >/dev/null
+bsb -init .
+cat bsconfig.json | jq '.name = "riju-project"' | sponge bsconfig.json
+yarn install
+popd >/dev/null
+
 # Befunge
 tee /usr/bin/befunge-repl >/dev/null <<"EOF"
 #!/usr/bin/env -S NODE_PATH=/usr/lib/node_modules node

@@ -1404,6 +1404,9 @@ main = do
     main: "main.re",
     compile: "bsc main.re > main.js",
     run: "NODE_PATH=/usr/lib/node_modules node main.js",
+    format: "ocamlformat main.re",
+    lspSetup: `cp -a /opt/reasonml/project-template/* ./`,
+    lsp: "reason-language-server",
     template: `print_string("Hello, world!\\n")
 `,
   },

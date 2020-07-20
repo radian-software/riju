@@ -198,6 +198,12 @@ chmod +x /opt/mspyls/Microsoft.Python.LanguageServer
 ln -s /opt/mspyls/Microsoft.Python.LanguageServer /usr/bin/Microsoft.Python.LanguageServer
 rm Python-Language-Server-linux-x64.*.nupkg
 
+# ReasonML
+wget -nv https://github.com/jaredly/reason-language-server/releases/download/1.7.10/rls-linux.zip
+unzip rls-linux.zip
+mv rls-linux/reason-language-server /usr/local/bin/
+rm rls-linux.zip
+
 # Scala
 wget -nv https://git.io/coursier-cli
 chmod +x coursier-cli
