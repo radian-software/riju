@@ -33,8 +33,9 @@ yarn
 gcc
 gnustep-devel
 
-# Ocaml
+# OCaml
 ocaml
+opam
 
 # Octave
 octave

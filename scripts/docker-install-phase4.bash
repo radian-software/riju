@@ -8,6 +8,11 @@ set -x
 mkdir /opt/julia
 export JULIA_DEPOT_PATH=/opt/julia
 
+# Package manager - OCaml
+export OPAMROOT=/opt/opam
+export OPAMROOTISOK=1
+opam init -n --disable-sandboxing
+
 # Package manager - Node.js
 npm config set unsafe-perm true
 PERL_MM_USE_DEFAULT=1 cpan App::cpanminus
@@ -66,6 +71,12 @@ npm install -g less
 
 # LiveScript
 npm install -g livescript
+
+# OCaml
+opam install -y ocamlformat
+opam pin add -y ocaml-lsp-server https://github.com/ocaml/ocaml-lsp.git
+ln -s /opt/opam/default/bin/ocamlformat /usr/local/bin/ocamlformat
+ln -s /opt/opam/default/bin/ocamllsp /usr/local/bin/ocamllsp
 
 # Perl
 cpanm -n Devel::REPL

@@ -1158,6 +1158,9 @@ int main() {
     main: "main.ml",
     repl: "ocaml",
     run: "ocaml -init main.ml",
+    format: "ocamlformat main.ml",
+    lsp: "ocamllsp",
+    lspLang: "ocaml",
     template: `print_string "Hello, world!\\n";;
 `,
   },
