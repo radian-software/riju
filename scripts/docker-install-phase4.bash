@@ -85,6 +85,7 @@ ln -s /opt/opam/default/bin/ocamllsp /usr/local/bin/ocamllsp
 
 # Perl
 cpanm -n Devel::REPL
+cpanm -n Perl::Tidy
 
 # PHP
 npm install -g intelephense

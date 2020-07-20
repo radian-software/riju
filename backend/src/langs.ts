@@ -1241,6 +1241,7 @@ end.
     repl: "re.pl",
     main: "main.pl",
     run: "re.pl --rcfile ./main.pl",
+    format: "cat main.pl | perltidy",
     template: `print("Hello, world!\\n")
 `,
   },
