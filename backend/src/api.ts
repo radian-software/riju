@@ -259,6 +259,26 @@ export class Session {
     }
   };
 
+  writeCode = async (code: string) => {
+    if (this.config.main.includes("/")) {
+      await this.run(
+        this.privilegedSpawn([
+          "mkdir",
+          "-p",
+          path.dirname(`${this.homedir}/${this.config.main}`),
+        ])
+      );
+    }
+    await this.run(
+      this.privilegedSpawn([
+        "sh",
+        "-c",
+        `cat > ${path.resolve(this.homedir, this.config.main)}`,
+      ]),
+      { input: code }
+    );
+  };
+
   runCode = async (code?: string) => {
     try {
       const {
@@ -299,23 +319,7 @@ export class Session {
       if (code && suffix) {
         code += suffix;
       }
-      if (main.includes("/")) {
-        await this.run(
-          this.privilegedSpawn([
-            "mkdir",
-            "-p",
-            path.dirname(`${this.homedir}/${main}`),
-          ])
-        );
-      }
-      await this.run(
-        this.privilegedSpawn([
-          "sh",
-          "-c",
-          `cat > ${path.resolve(this.homedir, main)}`,
-        ]),
-        { input: code }
-      );
+      await this.writeCode(code);
       const termArgs = this.privilegedSpawn(bash(cmdline));
       const term = {
         pty: pty.spawn(termArgs[0], termArgs.slice(1), {
@@ -339,63 +343,70 @@ export class Session {
   };
 
   formatCode = async (code: string) => {
-    if (!this.config.format) {
-      this.log("formatCode ignored because format is null");
-      return;
-    }
-    if (this.formatter) {
-      const pid = this.formatter.proc.pid;
-      const args = this.privilegedSpawn(
-        bash(`kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`)
-      );
-      spawn(args[0], args.slice(1));
-      this.formatter.live = false;
-      this.formatter = null;
-    }
-    const args = this.privilegedSpawn(bash(this.config.format));
-    const formatter = {
-      proc: spawn(args[0], args.slice(1)),
-      live: true,
-      input: code,
-      output: "",
-    };
-    formatter.proc.stdout!.on("data", (data) => {
-      if (formatter.live) {
-        formatter.output += data.toString("utf8");
+    try {
+      if (!this.config.format) {
+        this.log("formatCode ignored because format is null");
+        return;
       }
-    });
-    formatter.proc.stderr!.on("data", (data) => {
-      if (formatter.live) {
+      if (this.formatter) {
+        const pid = this.formatter.proc.pid;
+        const args = this.privilegedSpawn(
+          bash(`kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`)
+        );
+        spawn(args[0], args.slice(1));
+        this.formatter.live = false;
+        this.formatter = null;
+      }
+      await this.writeCode(code);
+      const args = this.privilegedSpawn(bash(this.config.format));
+      const formatter = {
+        proc: spawn(args[0], args.slice(1)),
+        live: true,
+        input: code,
+        output: "",
+      };
+      formatter.proc.stdout!.on("data", (data) => {
+        if (!formatter.live) return;
+        formatter.output += data.toString("utf8");
+      });
+      formatter.proc.stderr!.on("data", (data) => {
+        if (!formatter.live) return;
         this.send({
           event: "serviceLog",
           service: "formatter",
           output: data.toString("utf8"),
         });
-      }
-    });
-    formatter.proc.on("exit", (code, signal) => {
-      if (code === 0) {
-        this.send({
-          event: "formattedCode",
-          code: formatter.output,
-          originalCode: formatter.input,
-        });
-      } else {
+      });
+      formatter.proc.on("exit", (code, signal) => {
+        if (!formatter.live) return;
+        if (code === 0) {
+          this.send({
+            event: "formattedCode",
+            code: formatter.output,
+            originalCode: formatter.input,
+          });
+        } else {
+          this.send({
+            event: "serviceFailed",
+            service: "formatter",
+            error: `Exited with status ${signal || code}`,
+          });
+        }
+      });
+      formatter.proc.on("error", (err) => {
+        if (!formatter.live) return;
         this.send({
           event: "serviceFailed",
           service: "formatter",
-          error: `Exited with status ${signal || code}`,
+          error: `${err}`,
         });
-      }
-    });
-    formatter.proc.on("error", (err) =>
-      this.send({
-        event: "serviceFailed",
-        service: "formatter",
-        error: `${err}`,
-      })
-    );
-    this.formatter = formatter;
+      });
+      this.formatter = formatter;
+    } catch (err) {
+      this.log(`Error while running code formatter`);
+      console.log(err);
+      this.sendError(err);
+    }
   };
 
   teardown = async () => {
