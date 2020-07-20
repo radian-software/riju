@@ -18,10 +18,6 @@ npm config set unsafe-perm true
 PERL_MM_USE_DEFAULT=1 cpan App::cpanminus
 rm -rf /tmp/cpan_install_*.txt
 
-# Package manager - Rust
-export CARGO_HOME=/opt/rust
-export RUSTUP_HOME=/opt/rust
-
 # Shared
 npm install -g prettier
 
