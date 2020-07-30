@@ -72,7 +72,6 @@ export class Session {
     this.lang = lang;
     this.logPrimitive = log;
     this.log(`Creating session, language ${this.lang}`);
-    this.setup();
   }
 
   run = async (args: string[], options?: Options) => {

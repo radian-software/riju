@@ -75,6 +75,7 @@ class Test {
         this.timedOut = true;
         this.handleUpdate();
       }, TIMEOUT_MS);
+      await session.setup();
       switch (this.type) {
         case "ensure":
           await this.testEnsure();
@@ -273,6 +274,7 @@ async function main() {
     } catch (err) {
       console.error("failed:");
       console.error(test.getLog());
+      console.error(err);
     }
   }
 }
