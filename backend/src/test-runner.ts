@@ -452,7 +452,8 @@ class Test {
         params: {
           textDocument: {
             uri: `file://${root}/${this.config.main}`,
-            languageId: "python", // FIXME
+            languageId:
+              this.config.lsp!.lang || this.config.monacoLang || "plaintext",
             version: 1,
             text: code,
           },
