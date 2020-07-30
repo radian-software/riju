@@ -10,8 +10,8 @@ import { v4 as getUUID } from "uuid";
 import * as api from "./api";
 import { LangConfig, langs } from "./langs";
 
-const TIMEOUT_MS = 10000;
-const CONCURRENCY = 16;
+const TIMEOUT_MS = 16000;
+const CONCURRENCY = 24;
 
 function findPosition(str: string, idx: number) {
   const lines = str.substring(0, idx).split("\n");

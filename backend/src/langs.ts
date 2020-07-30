@@ -1443,7 +1443,7 @@ main = do
     repl: "node /opt/qalb/repl.js",
     input: "(ضرب ١٢٣ ٢٣٤)",
     main: "main.qalb",
-    hello: "قو",
+    hello: "مرحبا يا عالم",
     run: "node /opt/qalb/repl.js main.qalb",
     template: `(قول "مرحبا يا عالم")
 `,
