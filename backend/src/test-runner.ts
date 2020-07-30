@@ -128,11 +128,11 @@ class Test {
     }
   };
 
-  wait = async <T>(handler: (msg: any) => T) => {
+  wait = async <T>(desc: string, handler: (msg: any) => T) => {
     return await new Promise((resolve, reject) => {
       this.handleUpdate = () => {
         if (this.timedOut) {
-          reject("timeout");
+          reject(`timeout while waiting for ${desc}`);
         } else {
           while (this.handledMessages < this.messages.length) {
             const msg = this.messages[this.handledMessages];
@@ -150,7 +150,7 @@ class Test {
 
   waitForOutput = async (pattern: string) => {
     let output = "";
-    return await this.wait((msg: any) => {
+    return await this.wait(`output ${JSON.stringify(pattern)}`, (msg: any) => {
       const prevLength = output.length;
       if (msg.event === "terminalOutput") {
         output += msg.output;
@@ -161,7 +161,7 @@ class Test {
 
   testEnsure = async () => {
     this.send({ event: "ensure" });
-    const code = await this.wait((msg: any) => {
+    const code = await this.wait("ensure response", (msg: any) => {
       if (msg.event === "ensured") {
         return msg.code;
       }
@@ -210,7 +210,7 @@ class Test {
     const input = this.config.format!.input;
     const output = this.config.format!.output || this.config.template;
     this.send({ event: "formatCode", code: input });
-    const result = await this.wait((msg: any) => {
+    const result = await this.wait("formatter response", (msg: any) => {
       if (msg.event === "formattedCode") {
         return msg.code;
       }
@@ -230,7 +230,7 @@ class Test {
       this.config.template.slice(0, idx) +
       insertedCode +
       this.config.template.slice(idx);
-    const root = await this.wait((msg: any) => {
+    const root = await this.wait("lspStarted message", (msg: any) => {
       if (msg.event === "lspStarted") {
         return msg.root;
       }
@@ -441,7 +441,7 @@ class Test {
         },
       },
     });
-    await this.wait((msg: any) => {
+    await this.wait("response to lsp initialize", (msg: any) => {
       return (
         msg.event === "lspOutput" &&
         msg.output.id === "0d75333a-47d8-4da8-8030-c81d7bd9eed7"
@@ -482,26 +482,29 @@ class Test {
         },
       },
     });
-    const items: any = await this.wait((msg: any) => {
-      if (msg.event === "lspOutput") {
-        if (msg.output.method === "workspace/configuration") {
-          this.send({
-            event: "lspInput",
-            input: {
-              jsonrpc: "2.0",
-              id: msg.output.id,
-              result: Array(msg.output.params.items.length).fill(
-                this.config.lsp!.config !== undefined
-                  ? this.config.lsp!.config
-                  : {}
-              ),
-            },
-          });
-        } else if (msg.output.id === "ecdb8a55-f755-4553-ae8e-91d6ebbc2045") {
-          return msg.output.result.items;
+    const items: any = await this.wait(
+      "response to lsp completion request",
+      (msg: any) => {
+        if (msg.event === "lspOutput") {
+          if (msg.output.method === "workspace/configuration") {
+            this.send({
+              event: "lspInput",
+              input: {
+                jsonrpc: "2.0",
+                id: msg.output.id,
+                result: Array(msg.output.params.items.length).fill(
+                  this.config.lsp!.config !== undefined
+                    ? this.config.lsp!.config
+                    : {}
+                ),
+              },
+            });
+          } else if (msg.output.id === "ecdb8a55-f755-4553-ae8e-91d6ebbc2045") {
+            return msg.output.result.items;
+          }
         }
       }
-    });
+    );
     if (
       !(items && items.filter(({ label }: any) => label === item).length > 0)
     ) {
@@ -550,11 +553,11 @@ const testTypes: {
 };
 
 function getTestList() {
-  const tests: { lang: string; test: string }[] = [];
+  const tests: { lang: string; type: string }[] = [];
   for (const [id, cfg] of Object.entries(langs)) {
-    for (const [test, { pred }] of Object.entries(testTypes)) {
+    for (const [type, { pred }] of Object.entries(testTypes)) {
       if (pred(cfg)) {
-        tests.push({ lang: id, test });
+        tests.push({ lang: id, type });
       }
     }
   }
@@ -571,11 +574,11 @@ async function main() {
   const args = process.argv.slice(2);
   for (const arg of args) {
     tests = tests.filter(
-      ({ lang, test }) =>
+      ({ lang, type }) =>
         arg
           .split(",")
           .filter((arg) =>
-            [lang, test].concat(langs[lang].aliases || []).includes(arg)
+            [lang, type].concat(langs[lang].aliases || []).includes(arg)
           ).length > 0
     );
   }
@@ -610,9 +613,9 @@ async function main() {
   }
   await promisify(rimraf)("tests");
   const queue = new PQueue({ concurrency: CONCURRENCY });
-  let passed = 0;
-  let failed = 0;
-  for (const { lang, test: type } of tests) {
+  let passed = new Set();
+  let failed = new Map();
+  for (const { lang, type } of tests) {
     let test: Test;
     queue
       .add(() => {
@@ -620,7 +623,7 @@ async function main() {
         return test.run();
       })
       .then(async () => {
-        passed += 1;
+        passed.add({ lang, type });
         console.error(`PASSED: ${lang}/${type}`);
         await writeLog(
           lang,
@@ -629,7 +632,7 @@ async function main() {
         );
       })
       .catch(async (err) => {
-        failed += 1;
+        failed.set({ lang, type }, err);
         console.error(`FAILED: ${lang}/${type}`);
         console.error(test.getLog());
         console.error(err);
@@ -646,7 +649,21 @@ async function main() {
       .catch(console.error);
   }
   await queue.onIdle();
-  process.exit(failed ? 1 : 0);
+  console.error();
+  console.error(
+    "================================================================================"
+  );
+  console.error();
+  if (passed.size > 0) {
+    console.error(`${passed.size} test${passed.size !== 1 ? "s" : ""} PASSED`);
+  }
+  if (failed.size > 0) {
+    console.error(`${failed.size} test${failed.size !== 1 ? "s" : ""} FAILED`);
+    Array.from(failed).forEach(([{ lang, type }, err]) =>
+      console.error(`  - ${lang}/${type} (${err})`)
+    );
+  }
+  process.exit(failed.size > 0 ? 1 : 0);
 }
 
 main().catch(console.error);
