@@ -78,7 +78,7 @@ function addWebsocket(
       );
       ws.close();
     } else {
-      new api.Session(ws, lang);
+      new api.Session(ws, lang, console.log);
     }
   });
   return app;

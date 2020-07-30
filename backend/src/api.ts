@@ -42,6 +42,8 @@ export class Session {
     output: string;
   } | null = null;
 
+  logPrimitive: (msg: string) => void;
+
   get homedir() {
     return `/tmp/riju/${this.uuid}`;
   }
@@ -62,12 +64,13 @@ export class Session {
     return { uid: this.uid, uuid: this.uuid };
   }
 
-  log = (msg: string) => console.log(`[${this.uuid}] ${msg}`);
+  log = (msg: string) => this.logPrimitive(`[${this.uuid}] ${msg}`);
 
-  constructor(ws: WebSocket, lang: string) {
+  constructor(ws: WebSocket, lang: string, log: (msg: string) => void) {
     this.ws = ws;
     this.uuid = getUUID();
     this.lang = lang;
+    this.logPrimitive = log;
     this.log(`Creating session, language ${this.lang}`);
     this.setup();
   }
@@ -248,6 +251,12 @@ export class Session {
           }
           this.lsp.writer.write(msg.input);
           break;
+        case "ensure":
+          if (!(this.config.test && this.config.test.ensure)) {
+            this.log(`ensure ignored because of missing configuration`);
+            break;
+          }
+          await this.ensure();
         default:
           this.logBadMessage(msg);
           break;
@@ -407,6 +416,16 @@ export class Session {
       console.log(err);
       this.sendError(err);
     }
+  };
+
+  ensure = async () => {
+    const code = await this.run(
+      this.privilegedSpawn(bash(this.config.test!.ensure!)),
+      {
+        check: false,
+      }
+    );
+    this.send({ event: "ensured", code });
   };
 
   teardown = async () => {

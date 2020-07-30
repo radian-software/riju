@@ -86,7 +86,7 @@ export async function run(
         log(`Output from ${args[0]}:\n` + output);
       }
       if (code === 0 || !check) {
-        resolve();
+        resolve(code);
       } else {
         reject(`command ${args[0]} failed with error code ${code}`);
       }

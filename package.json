@@ -58,6 +58,7 @@
     "build": "run-s backend frontend system",
     "dev": "run-p backend-dev frontend-dev system-dev server-dev",
     "lsp-repl": "node backend/out/lsp-repl.js",
-    "sandbox": "node backend/out/sandbox.js"
+    "sandbox": "node backend/out/sandbox.js",
+    "test": "node backend/out/test-runner.js"
   }
 }

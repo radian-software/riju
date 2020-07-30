@@ -27,6 +27,28 @@ export interface LangConfig {
   template: string;
   test?: {
     ensure?: string;
+    hello?: {
+      pattern?: string;
+    };
+    repl?: {
+      input?: string;
+      output?: string;
+    };
+    scope?: {
+      code: string;
+      after?: string;
+      input?: string;
+      output?: string;
+    };
+    format?: {
+      input: string;
+      output?: string;
+    };
+    lsp?: {
+      after?: string;
+      code?: string;
+      item: string;
+    };
   };
 }
 
