@@ -1,12 +1,16 @@
-import * as path from "path";
+import * as fs from "fs";
 import * as process from "process";
+import { promisify } from "util";
 
+import PQueue from "p-queue";
+import * as rimraf from "rimraf";
 import { v4 as getUUID } from "uuid";
 
 import * as api from "./api";
 import { LangConfig, langs } from "./langs";
 
 const TIMEOUT_MS = 3000;
+const CONCURRENCY = 16;
 
 function findPosition(str: string, idx: number) {
   const lines = str.substring(0, idx).split("\n");
@@ -40,8 +44,11 @@ class Test {
     this.type = type;
   }
 
-  getLog = () => {
-    return this.messages.map((msg: any) => JSON.stringify(msg)).join("\n");
+  getLog = (opts?: any) => {
+    opts = opts || {};
+    return this.messages
+      .map((msg: any) => JSON.stringify(msg, null, opts.pretty && 2))
+      .join("\n");
   };
 
   run = async () => {
@@ -508,6 +515,14 @@ function lint(lang: string) {
   if (!config.template.endsWith("\n")) {
     throw new Error("template is missing a trailing newline");
   }
+  // These can be removed when the types are adjusted to make these
+  // situations impossible.
+  if (config.format && !config.format.input) {
+    throw new Error("formatter is missing test");
+  }
+  if (config.lsp && !(config.lsp.code && config.lsp.item)) {
+    throw new Error("LSP is missing test");
+  }
 }
 
 const testTypes: {
@@ -546,6 +561,11 @@ function getTestList() {
   return tests;
 }
 
+async function writeLog(lang: string, type: string, log: string) {
+  await promisify(fs.mkdir)(`tests/${lang}`, { recursive: true });
+  await promisify(fs.writeFile)(`tests/${lang}/${type}.log`, log);
+}
+
 async function main() {
   let tests = getTestList();
   const args = process.argv.slice(2);
@@ -564,42 +584,68 @@ async function main() {
     process.exit(1);
   }
   const lintSeen = new Set();
-  let lintPassed = 0;
-  let lintFailed = 0;
+  let lintPassed = new Set();
+  let lintFailed = new Map();
   for (const { lang } of tests) {
     if (!lintSeen.has(lang)) {
       lintSeen.add(lang);
-      console.error(`===== LANGUAGE ${lang}, LINT`);
       try {
         lint(lang);
-        console.error("passed");
-        lintPassed += 1;
+        lintPassed.add(lang);
       } catch (err) {
-        console.error("failed");
-        console.error(err);
-        lintFailed += 1;
+        lintFailed.set(lang, err);
       }
     }
   }
-  if (lintFailed) {
+  if (lintFailed.size > 0) {
+    console.error(
+      `Language${lintFailed.size !== 1 ? "s" : ""} failed linting:`
+    );
+    console.error(
+      Array.from(lintFailed)
+        .map(([lang, err]) => `  - ${lang} (${err})`)
+        .join("\n")
+    );
     process.exit(1);
   }
+  await promisify(rimraf)("tests");
+  const queue = new PQueue({ concurrency: CONCURRENCY });
   let passed = 0;
   let failed = 0;
   for (const { lang, test: type } of tests) {
-    console.error(`===== LANGUAGE ${lang}, TEST ${type}`);
-    const test = new Test(lang, type);
-    try {
-      await test.run();
-      console.error("passed");
-      passed += 1;
-    } catch (err) {
-      console.error("failed");
-      console.error(test.getLog());
-      console.error(err);
-      failed += 1;
-    }
+    let test: Test;
+    queue
+      .add(() => {
+        test = new Test(lang, type);
+        return test.run();
+      })
+      .then(async () => {
+        passed += 1;
+        console.error(`PASSED: ${lang}/${type}`);
+        await writeLog(
+          lang,
+          type,
+          `PASSED: ${lang}/${type}\n` + test.getLog({ pretty: true }) + "\n"
+        );
+      })
+      .catch(async (err) => {
+        failed += 1;
+        console.error(`FAILED: ${lang}/${type}`);
+        console.error(test.getLog());
+        console.error(err);
+        await writeLog(
+          lang,
+          type,
+          `FAILED: ${lang}/${type}\n` +
+            test.getLog({ pretty: true }) +
+            "\n" +
+            err.stack +
+            "\n"
+        );
+      })
+      .catch(console.error);
   }
+  await queue.onIdle();
   process.exit(failed ? 1 : 0);
 }
 
