@@ -37,6 +37,7 @@ class Test {
 
   run = async () => {
     let session = null;
+    let timeout = null;
     try {
       const that = this;
       this.ws = {
@@ -70,7 +71,7 @@ class Test {
       session = new api.Session(this.ws, this.lang, (msg: string) => {
         this.messages.push({ event: "serverLog", message: msg });
       });
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         this.timedOut = true;
         this.handleUpdate();
       }, TIMEOUT_MS);
@@ -98,6 +99,9 @@ class Test {
       }
     } finally {
       this.ws = null;
+      if (timeout) {
+        clearTimeout(timeout);
+      }
       if (session) {
         await session.teardown();
       }
@@ -228,7 +232,7 @@ const testTypes: {
   repl: {
     pred: ({ repl }) => (repl ? true : false),
   },
-  runRepl: {
+  runrepl: {
     pred: ({ repl }) => (repl ? true : false),
   },
   scope: {
@@ -266,7 +270,6 @@ async function main() {
     try {
       await test.run();
       console.error("succeeded");
-      console.error(test.getLog());
     } catch (err) {
       console.error("failed:");
       console.error(test.getLog());

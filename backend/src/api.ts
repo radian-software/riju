@@ -436,9 +436,10 @@ export class Session {
       this.log(`Tearing down session`);
       this.tearingDown = true;
       allSessions.delete(this);
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      await this.run(this.privilegedTeardown());
-      await this.returnUID();
+      if (this.uidInfo) {
+        await this.run(this.privilegedTeardown());
+        await this.returnUID();
+      }
       this.ws.terminate();
     } catch (err) {
       this.log(`Error during teardown`);

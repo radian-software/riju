@@ -26,7 +26,7 @@ void die_with_usage()
       "  riju-system-privileged useradd UID\n"
       "  riju-system-privileged setup UID UUID\n"
       "  riju-system-privileged spawn UID UUID CMDLINE...\n"
-      "  riju-system-privileged teardown UUID");
+      "  riju-system-privileged teardown UID UUID");
 }
 
 int parseUID(char *str)
@@ -125,7 +125,7 @@ void teardown(int uid, char *uuid)
       users = buf;
   }
   if (users != NULL) {
-    if (asprintf(&cmdline, "pkill -SIGKILL --uid %s", users) < 0)
+    if (asprintf(&cmdline, "while pkill -9 --uid %1$s; do sleep 0.01; done", users) < 0)
       die("asprintf failed");
     status = system(cmdline);
     if (status != 0 && status != 256)
