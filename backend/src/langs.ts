@@ -39,7 +39,7 @@ export interface LangConfig {
     init?: any;
     config?: any;
     lang?: string;
-    code?: string;
+    code?: string; // FIXME
     after?: string;
     item?: string; // FIXME
   };
@@ -1404,6 +1404,8 @@ main = do
           },
         },
       },
+      code: "import func",
+      item: "functools",
     },
     template: `print("Hello, world!")
 `,

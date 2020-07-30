@@ -25,11 +25,13 @@ interface RijuConfig {
   id: string;
   monacoLang?: string;
   main: string;
-  format?: string;
-  lspDisableDynamicRegistration?: boolean;
-  lspInit?: any;
-  lspConfig?: any;
-  lspLang?: string;
+  format?: any;
+  lsp?: {
+    disableDynamicRegistration?: boolean;
+    init?: any;
+    config?: any;
+    lang?: string;
+  };
   template: string;
 }
 
@@ -91,13 +93,13 @@ class RijuMessageWriter extends AbstractMessageWriter {
     switch ((msg as any).method) {
       case "initialize":
         (msg as any).params.processId = null;
-        if (config.lspDisableDynamicRegistration) {
+        if (config.lsp!.disableDynamicRegistration) {
           this.disableDynamicRegistration(msg);
         }
         break;
       case "textDocument/didOpen":
-        if (config.lspLang) {
-          (msg as any).params.textDocument.languageId = config.lspLang;
+        if (config.lsp!.lang) {
+          (msg as any).params.textDocument.languageId = config.lsp!.lang;
         }
     }
     if (DEBUG) {
@@ -201,7 +203,7 @@ async function main() {
             console.error("Unexpected message from server:", message);
             return;
           }
-          const services = MonacoServices.create(editor, {
+          const services = MonacoServices.create(editor as any, {
             rootUri: `file://${message.root}`,
           });
           servicesDisposable = Services.install(services);
@@ -230,12 +232,12 @@ async function main() {
                     return Array(
                       (configuration(params, token) as {}[]).length
                     ).fill(
-                      config.lspConfig !== undefined ? config.lspConfig : {}
+                      config.lsp!.config !== undefined ? config.lsp!.config : {}
                     );
                   },
                 },
               },
-              initializationOptions: config.lspInit || {},
+              initializationOptions: config.lsp!.init || {},
             },
             connectionProvider: {
               get: (errorHandler: any, closeHandler: any) =>

@@ -26,11 +26,7 @@ if (["-h", "-help", "--help", "help"].includes(args[0])) {
 }
 
 let cmdline;
-if (
-  args.length === 1 &&
-  langs[args[0]] &&
-  typeof langs[args[0]].lsp === "string"
-) {
+if (args.length === 1 && langs[args[0]] && langs[args[0]].lsp) {
   cmdline = ["bash", "-c", langs[args[0]].lsp!.start];
 } else {
   cmdline = args;

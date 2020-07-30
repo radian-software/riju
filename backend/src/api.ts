@@ -187,6 +187,7 @@ export class Session {
       this.ws.send(JSON.stringify(msg));
     } catch (err) {
       this.log(`Failed to send websocket message: ${err}`);
+      console.log(err);
       await this.teardown();
     }
   };

@@ -8,6 +8,13 @@ import { LangConfig, langs } from "./langs";
 
 const TIMEOUT_MS = 3000;
 
+function findPosition(str: string, idx: number) {
+  const lines = str.substring(0, idx).split("\n");
+  const line = lines.length - 1;
+  const character = lines[lines.length - 1].length;
+  return { line, character };
+}
+
 class Test {
   lang: string;
   type: string;
@@ -24,6 +31,8 @@ class Test {
 
   send = (msg: any) => {
     this.ws.onMessage(JSON.stringify(msg));
+    this.messages.push(msg);
+    this.handledMessages += 1;
   };
 
   constructor(lang: string, type: string) {
@@ -112,7 +121,7 @@ class Test {
     }
   };
 
-  wait = async (handler: (msg: any) => boolean) => {
+  wait = async <T>(handler: (msg: any) => T) => {
     return await new Promise((resolve, reject) => {
       this.handleUpdate = () => {
         if (this.timedOut) {
@@ -203,7 +212,320 @@ class Test {
       throw new Error("formatted code did not match");
     }
   };
-  testLsp = async () => {};
+  testLsp = async () => {
+    const code = this.config.lsp!.code!; // FIXME
+    const after = this.config.lsp!.after;
+    const item = this.config.lsp!.item!; // FIXME
+    const root = await this.wait((msg: any) => {
+      if (msg.event === "lspStarted") {
+        return msg.root;
+      }
+    });
+    const idx = after
+      ? this.config.template.indexOf(after)
+      : this.config.template.length;
+    const pos = findPosition(this.config.template, idx);
+    const newCode =
+      this.config.template.slice(0, idx) +
+      code +
+      this.config.template.slice(idx);
+    const newIdx = idx + code.length;
+    const newPos = findPosition(newCode, newIdx);
+    this.send({
+      event: "lspInput",
+      input: {
+        jsonrpc: "2.0",
+        id: "0d75333a-47d8-4da8-8030-c81d7bd9eed7",
+        method: "initialize",
+        params: {
+          processId: null,
+          clientInfo: { name: "vscode" },
+          rootPath: root,
+          rootUri: `file://${root}`,
+          capabilities: {
+            workspace: {
+              applyEdit: true,
+              workspaceEdit: {
+                documentChanges: true,
+                resourceOperations: ["create", "rename", "delete"],
+                failureHandling: "textOnlyTransactional",
+              },
+              didChangeConfiguration: { dynamicRegistration: true },
+              didChangeWatchedFiles: { dynamicRegistration: true },
+              symbol: {
+                dynamicRegistration: true,
+                symbolKind: {
+                  valueSet: [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    25,
+                    26,
+                  ],
+                },
+              },
+              executeCommand: { dynamicRegistration: true },
+              configuration: true,
+              workspaceFolders: true,
+            },
+            textDocument: {
+              publishDiagnostics: {
+                relatedInformation: true,
+                versionSupport: false,
+                tagSupport: { valueSet: [1, 2] },
+              },
+              synchronization: {
+                dynamicRegistration: true,
+                willSave: true,
+                willSaveWaitUntil: true,
+                didSave: true,
+              },
+              completion: {
+                dynamicRegistration: true,
+                contextSupport: true,
+                completionItem: {
+                  snippetSupport: true,
+                  commitCharactersSupport: true,
+                  documentationFormat: ["markdown", "plaintext"],
+                  deprecatedSupport: true,
+                  preselectSupport: true,
+                  tagSupport: { valueSet: [1] },
+                },
+                completionItemKind: {
+                  valueSet: [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    25,
+                  ],
+                },
+              },
+              hover: {
+                dynamicRegistration: true,
+                contentFormat: ["markdown", "plaintext"],
+              },
+              signatureHelp: {
+                dynamicRegistration: true,
+                signatureInformation: {
+                  documentationFormat: ["markdown", "plaintext"],
+                  parameterInformation: { labelOffsetSupport: true },
+                },
+                contextSupport: true,
+              },
+              definition: { dynamicRegistration: true, linkSupport: true },
+              references: { dynamicRegistration: true },
+              documentHighlight: { dynamicRegistration: true },
+              documentSymbol: {
+                dynamicRegistration: true,
+                symbolKind: {
+                  valueSet: [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    25,
+                    26,
+                  ],
+                },
+                hierarchicalDocumentSymbolSupport: true,
+              },
+              codeAction: {
+                dynamicRegistration: true,
+                isPreferredSupport: true,
+                codeActionLiteralSupport: {
+                  codeActionKind: {
+                    valueSet: [
+                      "",
+                      "quickfix",
+                      "refactor",
+                      "refactor.extract",
+                      "refactor.inline",
+                      "refactor.rewrite",
+                      "source",
+                      "source.organizeImports",
+                    ],
+                  },
+                },
+              },
+              codeLens: { dynamicRegistration: true },
+              formatting: { dynamicRegistration: true },
+              rangeFormatting: { dynamicRegistration: true },
+              onTypeFormatting: { dynamicRegistration: true },
+              rename: { dynamicRegistration: true, prepareSupport: true },
+              documentLink: { dynamicRegistration: true, tooltipSupport: true },
+              typeDefinition: { dynamicRegistration: true, linkSupport: true },
+              implementation: { dynamicRegistration: true, linkSupport: true },
+              colorProvider: { dynamicRegistration: true },
+              foldingRange: {
+                dynamicRegistration: true,
+                rangeLimit: 5000,
+                lineFoldingOnly: true,
+              },
+              declaration: { dynamicRegistration: true, linkSupport: true },
+            },
+          },
+          initializationOptions: this.config.lsp!.init || {},
+          trace: "off",
+          workspaceFolders: [
+            {
+              uri: `file://${root}`,
+              name: `file://${root}`,
+            },
+          ],
+        },
+      },
+    });
+    await this.wait((msg: any) => {
+      return (
+        msg.event === "lspOutput" &&
+        msg.output.id === "0d75333a-47d8-4da8-8030-c81d7bd9eed7"
+      );
+    });
+    this.send({
+      event: "lspInput",
+      input: { jsonrpc: "2.0", method: "initialized", params: {} },
+    });
+    this.send({
+      event: "lspInput",
+      input: {
+        jsonrpc: "2.0",
+        method: "textDocument/didOpen",
+        params: {
+          textDocument: {
+            uri: `file://${root}/${this.config.main}`,
+            languageId: "python", // FIXME
+            version: 1,
+            text: `${this.config.template}`,
+          },
+        },
+      },
+    });
+    this.send({
+      event: "lspInput",
+      input: {
+        jsonrpc: "2.0",
+        method: "textDocument/didChange",
+        params: {
+          textDocument: {
+            uri: `file://${root}/${this.config.main}`,
+            version: 3,
+          },
+          contentChanges: [
+            {
+              range: {
+                start: pos,
+                end: pos,
+              },
+              rangeLength: 0,
+              text: code,
+            },
+          ],
+        },
+      },
+    });
+    this.send({
+      event: "lspInput",
+      input: {
+        jsonrpc: "2.0",
+        id: "ecdb8a55-f755-4553-ae8e-91d6ebbc2045",
+        method: "textDocument/completion",
+        params: {
+          textDocument: {
+            uri: `file://${root}/${this.config.main}`,
+          },
+          position: newPos,
+          context: { triggerKind: 1 },
+        },
+      },
+    });
+    const items: any = await this.wait((msg: any) => {
+      if (msg.event === "lspOutput") {
+        if (msg.output.method === "workspace/configuration") {
+          this.send({
+            event: "lspInput",
+            input: {
+              jsonrpc: "2.0",
+              id: msg.output.id,
+              result: Array(msg.output.params.items.length).fill(
+                this.config.lsp!.config !== undefined
+                  ? this.config.lsp!.config
+                  : {}
+              ),
+            },
+          });
+        } else if (msg.output.id === "ecdb8a55-f755-4553-ae8e-91d6ebbc2045") {
+          return msg.output.result.items;
+        }
+      }
+    });
+    if (
+      !(items && items.filter(({ label }: any) => label === item).length > 0)
+    ) {
+      throw new Error("completion item did not appear");
+    }
+  };
 }
 
 function lint(lang: string) {
