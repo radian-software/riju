@@ -213,24 +213,21 @@ class Test {
     }
   };
   testLsp = async () => {
-    const code = this.config.lsp!.code!; // FIXME
+    const insertedCode = this.config.lsp!.code!; // FIXME
     const after = this.config.lsp!.after;
     const item = this.config.lsp!.item!; // FIXME
+    const idx = after
+      ? this.config.template.indexOf(after)
+      : this.config.template.length;
+    const code =
+      this.config.template.slice(0, idx) +
+      insertedCode +
+      this.config.template.slice(idx);
     const root = await this.wait((msg: any) => {
       if (msg.event === "lspStarted") {
         return msg.root;
       }
     });
-    const idx = after
-      ? this.config.template.indexOf(after)
-      : this.config.template.length;
-    const pos = findPosition(this.config.template, idx);
-    const newCode =
-      this.config.template.slice(0, idx) +
-      code +
-      this.config.template.slice(idx);
-    const newIdx = idx + code.length;
-    const newPos = findPosition(newCode, newIdx);
     this.send({
       event: "lspInput",
       input: {
@@ -457,31 +454,8 @@ class Test {
             uri: `file://${root}/${this.config.main}`,
             languageId: "python", // FIXME
             version: 1,
-            text: `${this.config.template}`,
+            text: code,
           },
-        },
-      },
-    });
-    this.send({
-      event: "lspInput",
-      input: {
-        jsonrpc: "2.0",
-        method: "textDocument/didChange",
-        params: {
-          textDocument: {
-            uri: `file://${root}/${this.config.main}`,
-            version: 3,
-          },
-          contentChanges: [
-            {
-              range: {
-                start: pos,
-                end: pos,
-              },
-              rangeLength: 0,
-              text: code,
-            },
-          ],
         },
       },
     });
@@ -495,7 +469,7 @@ class Test {
           textDocument: {
             uri: `file://${root}/${this.config.main}`,
           },
-          position: newPos,
+          position: findPosition(code, idx + insertedCode.length),
           context: { triggerKind: 1 },
         },
       },
