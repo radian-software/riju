@@ -48,6 +48,8 @@ export interface LangConfig {
     item?: string; // FIXME
   };
   template: string;
+  timeout?: number;
+  skip?: string[];
 }
 
 export const langs: { [key: string]: LangConfig } = {
@@ -349,6 +351,7 @@ int main() {
     print("Hello, world!");
 }
 `,
+    timeout: 15,
   },
   chef: {
     name: "Chef",
@@ -424,11 +427,13 @@ Refrigerate for 1 hour.
     run: `wine cmd /k main.bat`,
     template: `echo "Hello, world!"
 `,
+    timeout: 15,
   },
   commonlisp: {
     aliases: ["lisp", "sbcl"],
     name: "Common Lisp",
     repl: "rlwrap sbcl",
+    input: "(* 123 234)",
     main: "main.lisp",
     run: "rlwrap sbcl --userinit main.lisp",
     template: `(format t "Hello, world!")
@@ -489,6 +494,7 @@ int main() {
     run: "crystal main.cr",
     template: `puts "Hello, world!"
 `,
+    timeout: 15,
   },
   csharp: {
     aliases: ["cs", "mcs"],
@@ -617,6 +623,7 @@ void main()
     lsp: { start: "/opt/elixir-ls/language_server.sh" },
     template: `IO.puts("Hello, world!")
 `,
+    skip: ["repl", "runrepl"],
   },
   elm: {
     name: "Elm",
@@ -733,7 +740,7 @@ main() ->
     aliases: ["fs", "gforth"],
     name: "Forth",
     repl: "gforth",
-    input: ". 123 234 *",
+    input: "123 234 * .",
     main: "main.fs",
     run: "gforth main.fs",
     template: `." Hello, world!" CR
@@ -769,6 +776,7 @@ main() ->
     run: "fsharpi --use:main.fsx",
     template: `printfn "Hello, world!"
 `,
+    timeout: 15,
   },
   go: {
     aliases: ["golang"],
@@ -803,6 +811,7 @@ func main() {
     run: `JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" groovysh main.groovy`,
     template: `print "Hello, world!";
 `,
+    timeout: 15,
   },
   hack: {
     name: "Hack",
@@ -923,11 +932,12 @@ PLEASE GIVE UP
   ioke: {
     aliases: ["ik"],
     name: "Ioke",
-    repl: "ioke",
+    repl: `JAVA_OPTS="-Duser.home=$PWD" ioke`,
     main: "main.ik",
-    run: "ioke main.ik; ioke",
+    run: `JAVA_OPTS="-Duser.home=$PWD" ioke main.ik; JAVA_OPTS="-Duser.home=$PWD" ioke`,
     template: `"Hello, world!" println
 `,
+    timeout: 15,
   },
   java: {
     aliases: ["javac"],
@@ -979,6 +989,7 @@ PLEASE GIVE UP
     run: "kitten main.ktn; kitten",
     template: `"Hello, world!" say
 `,
+    timeout: 15,
   },
   kotlin: {
     aliases: ["kts", "kotlinc"],
@@ -989,6 +1000,7 @@ PLEASE GIVE UP
     run: `JAVA_OPTS="-Duser.home=$PWD" kotlinc -script main.kts; kotlinc`,
     template: `println("Hello, world!")
 `,
+    timeout: 30,
   },
   ksh: {
     aliases: ["kshell"],
@@ -1019,9 +1031,10 @@ PLEASE GIVE UP
     name: "LiveScript",
     repl: "lsc",
     main: "main.ls",
-    run: "lsc -r ./main.ls; lsc",
+    run: "lsc -r ./main.ls",
     template: `console.log "Hello, world!"
 `,
+    skip: ["repl", "runrepl"],
   },
   llvm: {
     name: "LLVM",
@@ -1161,6 +1174,7 @@ message:
     run: `rm -rf data && mysqld -h "$PWD/data" --initialize-insecure && (mysqld -h "$PWD/data" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && (mysql --socket="$PWD/socket" -u root < main.sql; mysql --socket="$PWD/socket" -u root)`,
     template: `SELECT 'Hello, world!';
 `,
+    timeout: 15,
   },
   nim: {
     name: "Nim",
@@ -1348,6 +1362,7 @@ pipi pikachu
     run: `rm -rf data && /usr/lib/postgresql/*/bin/initdb -D data && (echo "listen_addresses = ''" && echo "unix_socket_directories = '.'") >> data/postgresql.conf && /usr/lib/postgresql/*/bin/pg_ctl -D data -w start && (psql -h "$PWD/data" postgres -f main.sql; psql -h "$PWD/data" postgres)`,
     template: `SELECT 'Hello, world!';
 `,
+    timeout: 15,
   },
   powershell: {
     aliases: ["pwsh", "ps1"],
@@ -1362,6 +1377,7 @@ pipi pikachu
     },
     template: `Write-Host "Hello, world!"
 `,
+    skip: ["repl", "runrepl"],
   },
   prolog: {
     name: "Prolog",
@@ -1404,6 +1420,7 @@ main :: Effect Unit
 main = do
   log "Hello, world!"
 `,
+    timeout: 45,
   },
   python: {
     aliases: ["python3", "python2", "py"],
@@ -1502,6 +1519,7 @@ main = do
       "rm -f socket; (redis-server --port 0 --unixsocket socket &); until [[ -e socket ]]; do sleep 0.01; done; redis-cli -s socket < main.redis; redis-cli -s socket",
     template: `ECHO "Hello, world!"
 `,
+    skip: ["repl", "runrepl"],
   },
   restructuredtext: {
     aliases: ["rst"],
@@ -1584,6 +1602,7 @@ binding_irb.run(IRB.conf)
     lsp: { start: "solargraph stdio" },
     template: `puts "Hello, world!"
 `,
+    skip: ["repl", "runrepl"],
   },
   rust: {
     aliases: ["rs", "rustc"],
@@ -1613,6 +1632,7 @@ binding_irb.run(IRB.conf)
     run: "scala -i main.scala",
     template: `println("Hello, world!")
 `,
+    timeout: 30,
   },
   scheme: {
     aliases: ["scm", "mitscheme"],
@@ -1769,6 +1789,7 @@ Ophelia:
 
 [Exeunt]
 `,
+    timeout: 15,
   },
   smalltalk: {
     aliases: ["gst", "st"],
@@ -1914,6 +1935,7 @@ a
     format: { run: "prettier --no-config main.ts" },
     template: `console.log("Hello, world!");
 `,
+    timeout: 15,
   },
   unlambda: {
     aliases: ["unl"],
@@ -1956,6 +1978,7 @@ a
     End Sub
 End Module
 `,
+    timeout: 15,
   },
   whitespace: {
     aliases: ["ws"],
@@ -1981,6 +2004,7 @@ End Module
     run: "mathics --persist main.wls",
     template: `Print["Hello, world!"]
 `,
+    timeout: 15,
   },
   x86: {
     aliases: ["s", "asm", "assembly", "x86-64"],
@@ -2043,6 +2067,7 @@ message:
 010011000110110010011101111011011101110000001000011010011110
 11000110110001101101010011000010010
 `,
+    timeout: 30,
   },
   zsh: {
     aliases: ["zshell", "zshrc"],

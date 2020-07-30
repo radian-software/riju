@@ -78,9 +78,9 @@ export async function run(
   proc.stderr!.on("data", (data: Buffer) => {
     output += `${data}`;
   });
-  await new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     proc.on("error", reject);
-    proc.on("close", (code: number) => {
+    proc.on("close", (code: number, signal: string) => {
       output = output.trim();
       if (output) {
         log(`Output from ${args[0]}:\n` + output);
@@ -88,7 +88,7 @@ export async function run(
       if (code === 0 || !check) {
         resolve(code);
       } else {
-        reject(`command ${args[0]} failed with error code ${code}`);
+        reject(`command ${args[0]} failed with error code ${signal || code}`);
       }
     });
   });

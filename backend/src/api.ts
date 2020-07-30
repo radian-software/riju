@@ -262,6 +262,7 @@ export class Session {
             break;
           }
           await this.ensure(this.config.ensure);
+          break;
         default:
           this.logBadMessage(msg);
           break;

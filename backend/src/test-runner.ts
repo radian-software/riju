@@ -10,8 +10,8 @@ import { v4 as getUUID } from "uuid";
 import * as api from "./api";
 import { LangConfig, langs } from "./langs";
 
-const TIMEOUT_MS = 16000;
-const CONCURRENCY = 24;
+const TIMEOUT_SECS = 5;
+const CONCURRENCY = 16;
 
 function findPosition(str: string, idx: number) {
   const lines = str.substring(0, idx).split("\n");
@@ -57,6 +57,9 @@ class Test {
   };
 
   run = async () => {
+    if ((this.config.skip || []).includes(this.type)) {
+      return "skipped";
+    }
     let session = null;
     let timeout = null;
     try {
@@ -95,7 +98,7 @@ class Test {
       timeout = setTimeout(() => {
         this.timedOut = true;
         this.handleUpdate();
-      }, TIMEOUT_MS);
+      }, (this.config.timeout || TIMEOUT_SECS) * 1000);
       await session.setup();
       switch (this.type) {
         case "ensure":
@@ -142,7 +145,7 @@ class Test {
           while (this.handledMessages < this.messages.length) {
             const msg = this.messages[this.handledMessages];
             const result = handler(msg);
-            if (result) {
+            if (![undefined, null, false].includes(result as any)) {
               resolve(result);
             }
             this.handledMessages += 1;
@@ -539,12 +542,12 @@ function lint(lang: string) {
   }
   // These can be removed when the types are adjusted to make these
   // situations impossible.
-  if (config.format && !config.format.input) {
-    throw new Error("formatter is missing test");
-  }
-  if (config.lsp && !(config.lsp.code && config.lsp.item)) {
-    throw new Error("LSP is missing test");
-  }
+  // if (config.format && !config.format.input) {
+  //   throw new Error("formatter is missing test");
+  // }
+  // if (config.lsp && !(config.lsp.code && config.lsp.item)) {
+  //   throw new Error("LSP is missing test");
+  // }
 }
 
 const testTypes: {
@@ -565,10 +568,10 @@ const testTypes: {
   scope: {
     pred: ({ scope }) => (scope ? true : false),
   },
-  format: {
-    pred: ({ format }) => (format ? true : false),
-  },
-  lsp: { pred: ({ lsp }) => (lsp ? true : false) },
+  // format: {
+  //   pred: ({ format }) => (format ? true : false),
+  // },
+  // lsp: { pred: ({ lsp }) => (lsp ? true : false) },
 };
 
 function getTestList() {
@@ -583,9 +586,25 @@ function getTestList() {
   return tests;
 }
 
-async function writeLog(lang: string, type: string, log: string) {
+async function writeLog(
+  lang: string,
+  type: string,
+  result: string,
+  log: string
+) {
+  log = `${result.toUpperCase()}: ${lang}/${type}\n` + log;
   await promisify(fs.mkdir)(`tests/${lang}`, { recursive: true });
   await promisify(fs.writeFile)(`tests/${lang}/${type}.log`, log);
+  await promisify(fs.mkdir)(`tests-run/${lang}`, { recursive: true });
+  await promisify(fs.symlink)(
+    `../../tests/${lang}/${type}.log`,
+    `tests-run/${lang}/${type}.log`
+  );
+  await promisify(fs.mkdir)(`tests-${result}/${lang}`, { recursive: true });
+  await promisify(fs.symlink)(
+    `../../tests/${lang}/${type}.log`,
+    `tests-${result}/${lang}/${type}.log`
+  );
 }
 
 async function main() {
@@ -630,26 +649,35 @@ async function main() {
     );
     process.exit(1);
   }
-  await promisify(rimraf)("tests");
+  await promisify(rimraf)("tests-run");
+  await promisify(rimraf)("tests-passed");
+  await promisify(rimraf)("tests-skipped");
+  await promisify(rimraf)("tests-failed");
   const queue = new PQueue({ concurrency: CONCURRENCY });
   let passed = new Set();
+  let skipped = new Set();
   let failed = new Map();
   for (const { lang, type } of tests) {
     queue.add(async () => {
       const test = new Test(lang, type);
-      let err = null;
+      let err;
       try {
-        await test.run();
+        err = await test.run();
       } catch (error) {
         err = error;
       }
-      if (!err) {
+      if (err === "skipped") {
+        skipped.add({ lang, type });
+        console.error(`SKIPPED: ${lang}/${type}`);
+        await writeLog(lang, type, "skipped", "");
+      } else if (!err) {
         passed.add({ lang, type });
         console.error(`PASSED: ${lang}/${type}`);
         await writeLog(
           lang,
           type,
-          `PASSED: ${lang}/${type}\n` + test.getLog({ pretty: true }) + "\n"
+          "passed",
+          test.getLog({ pretty: true }) + "\n"
         );
       } else {
         failed.set({ lang, type }, err);
@@ -659,8 +687,8 @@ async function main() {
         await writeLog(
           lang,
           type,
-          `FAILED: ${lang}/${type}\n` +
-            test.getLog({ pretty: true }) +
+          "failed",
+          test.getLog({ pretty: true }) +
             "\n" +
             (err.stack ? err.stack + "\n" : err ? `${err}` : "")
         );
@@ -675,6 +703,11 @@ async function main() {
   console.error();
   if (passed.size > 0) {
     console.error(`${passed.size} test${passed.size !== 1 ? "s" : ""} PASSED`);
+  }
+  if (skipped.size > 0) {
+    console.error(
+      `${skipped.size} test${skipped.size !== 1 ? "s" : ""} SKIPPED`
+    );
   }
   if (failed.size > 0) {
     console.error(`${failed.size} test${failed.size !== 1 ? "s" : ""} FAILED`);
