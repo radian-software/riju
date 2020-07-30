@@ -4,6 +4,7 @@ import * as WebSocket from "ws";
 
 import * as pty from "node-pty";
 import { IPty } from "node-pty";
+import PQueue from "p-queue";
 import * as rpc from "vscode-jsonrpc";
 import { v4 as getUUID } from "uuid";
 
@@ -43,6 +44,8 @@ export class Session {
   } | null = null;
 
   logPrimitive: (msg: string) => void;
+
+  msgQueue: PQueue = new PQueue({ concurrency: 1 });
 
   get homedir() {
     return `/tmp/riju/${this.uuid}`;
@@ -158,7 +161,9 @@ export class Session {
         );
         this.send({ event: "lspStarted", root: this.homedir });
       }
-      this.ws.on("message", this.receive);
+      this.ws.on("message", (msg: string) =>
+        this.msgQueue.add(() => this.receive(msg))
+      );
       this.ws.on("close", async () => {
         await this.teardown();
       });

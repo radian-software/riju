@@ -1388,8 +1388,14 @@ main = do
         },
       },
     },
-    template: `print('Hello, world!')
+    template: `print("Hello, world!")
 `,
+    test: {
+      format: {
+        input: `print('Hello, world!')
+`,
+      },
+    },
   },
   قلب: {
     aliases: ["qalb"],

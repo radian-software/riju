@@ -86,6 +86,9 @@ class Test {
         case "repl":
           await this.testRepl();
           break;
+        case "runrepl":
+          await this.testRunRepl();
+          break;
         case "scope":
           await this.testScope();
           break;
@@ -265,18 +268,48 @@ async function main() {
       [lang, test].concat(langs[lang].aliases || []).includes(arg)
     );
   }
+  if (tests.length === 0) {
+    console.error("no tests selected");
+    process.exit(1);
+  }
+  const lintSeen = new Set();
+  let lintPassed = 0;
+  let lintFailed = 0;
+  for (const { lang } of tests) {
+    if (!lintSeen.has(lang)) {
+      lintSeen.add(lang);
+      console.error(`===== LANGUAGE ${lang}, LINT`);
+      try {
+        lint(lang);
+        console.error("passed");
+        lintPassed += 1;
+      } catch (err) {
+        console.error("failed");
+        console.error(err);
+        lintFailed += 1;
+      }
+    }
+  }
+  if (lintFailed) {
+    process.exit(1);
+  }
+  let passed = 0;
+  let failed = 0;
   for (const { lang, test: type } of tests) {
     console.error(`===== LANGUAGE ${lang}, TEST ${type}`);
     const test = new Test(lang, type);
     try {
       await test.run();
-      console.error("succeeded");
+      console.error("passed");
+      passed += 1;
     } catch (err) {
-      console.error("failed:");
+      console.error("failed");
       console.error(test.getLog());
       console.error(err);
+      failed += 1;
     }
   }
+  process.exit(failed ? 1 : 0);
 }
 
 main().catch(console.error);
