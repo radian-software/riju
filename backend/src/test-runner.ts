@@ -10,8 +10,8 @@ import { v4 as getUUID } from "uuid";
 import * as api from "./api";
 import { LangConfig, langs } from "./langs";
 
-const TIMEOUT_MS = 5000;
-const CONCURRENCY = 32;
+const TIMEOUT_MS = 10000;
+const CONCURRENCY = 16;
 
 function findPosition(str: string, idx: number) {
   const lines = str.substring(0, idx).split("\n");
@@ -101,8 +101,8 @@ class Test {
         case "ensure":
           await this.testEnsure();
           break;
-        case "hello":
-          await this.testHello();
+        case "run":
+          await this.testRun();
           break;
         case "repl":
           await this.testRepl();
@@ -153,14 +153,22 @@ class Test {
     });
   };
 
-  waitForOutput = async (pattern: string) => {
+  waitForOutput = async (pattern: string, maxLength?: number) => {
     let output = "";
     return await this.wait(`output ${JSON.stringify(pattern)}`, (msg: any) => {
       const prevLength = output.length;
       if (msg.event === "terminalOutput") {
         output += msg.output;
       }
-      return output.indexOf(pattern, prevLength - pattern.length) != -1;
+      if (typeof maxLength === "number") {
+        return (
+          output
+            .substring(prevLength - maxLength)
+            .match(new RegExp(pattern)) !== null
+        );
+      } else {
+        return output.indexOf(pattern, prevLength - pattern.length) != -1;
+      }
     });
   };
 
@@ -175,7 +183,7 @@ class Test {
       throw new Error(`ensure failed with code ${code}`);
     }
   };
-  testHello = async () => {
+  testRun = async () => {
     const pattern = this.config.hello || "Hello, world!";
     this.send({ event: "runCode", code: this.config.template });
     if (this.config.helloInput !== undefined) {
@@ -184,7 +192,7 @@ class Test {
         input: forTTY(this.config.helloInput),
       });
     }
-    await this.waitForOutput(pattern);
+    await this.waitForOutput(pattern, this.config.helloMaxLength);
   };
   testRepl = async () => {
     const input = this.config.input || "123 * 234";
@@ -547,7 +555,7 @@ const testTypes: {
   ensure: {
     pred: ({ ensure }) => (ensure ? true : false),
   },
-  hello: { pred: (config) => true },
+  run: { pred: (config) => true },
   repl: {
     pred: ({ repl }) => (repl ? true : false),
   },
@@ -653,8 +661,7 @@ async function main() {
           `FAILED: ${lang}/${type}\n` +
             test.getLog({ pretty: true }) +
             "\n" +
-            err.stack +
-            "\n"
+            (err.stack ? err.stack + "\n" : err ? `${err}` : "")
         );
       })
       .catch(console.error);
@@ -671,8 +678,8 @@ async function main() {
   if (failed.size > 0) {
     console.error(`${failed.size} test${failed.size !== 1 ? "s" : ""} FAILED`);
     _.sortBy(Array.from(failed), [
-      "lang",
-      "type",
+      ([{ lang }, _]: any) => lang,
+      ([{ type }, _]: any) => type,
     ]).forEach(([{ lang, type }, err]) =>
       console.error(`  - ${lang}/${type} (${err})`)
     );

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "downlevelIteration": true,
     "outDir": "./backend/out",
     "resolveJsonModule": true,
     "rootDir": "./backend/src",

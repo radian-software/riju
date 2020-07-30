@@ -15,6 +15,7 @@ export interface LangConfig {
   run: string;
   helloInput?: string;
   hello?: string;
+  helloMaxLength?: number;
   runReplInput?: string;
   runReplOutput?: string;
   scope?: {
@@ -675,6 +676,8 @@ output = "Hello, world!"
     main: "main.vge",
     compile: `mono /opt/entropy/entc.exe main.vge | grep -Ev 'WARNING:|Using default' > main.cs && mcs -lib:/opt/entropy -r:Rottytooth.Esolang.Entropy main.cs`,
     run: "MONO_PATH=/opt/entropy mono main.exe",
+    hello: `[F-J][c-g][j-n][j-n][m-q][*-.][\\x1e-"][u-y][m-q][p-t][j-n][b-f][\\x1f-#]`,
+    helloMaxLength: "Hello, world!".length,
     template: `Program MyNamespace MyProgram [
 	print "Hello, world!";
 ]
@@ -896,7 +899,7 @@ log('Hello, world!')
     aliases: ["i", "ick"],
     name: "INTERCAL",
     main: "main.i",
-    compile: "ick main.i",
+    compile: "ick -b main.i",
     run: "./main",
     template: `DO ,1 <- #14
 PLEASE DO ,1 SUB #1 <- #238
@@ -1016,7 +1019,6 @@ PLEASE GIVE UP
     name: "LiveScript",
     repl: "lsc",
     main: "main.ls",
-    hello: "Hello World",
     run: "lsc -r ./main.ls; lsc",
     template: `console.log "Hello, world!"
 `,
@@ -1063,6 +1065,7 @@ KTHXBYE
     name: "Malbolge",
     main: "main.mb",
     run: "malbolge main.mb",
+    hello: "Hello World!",
     template:
       " (=<`#9]~6ZY32Vx/4Rs+0No-&Jk)\"Fh}|Bcy?`=*z]Kw%oG4UUS0/@-ejc(:'8dc\n",
   },
@@ -1302,7 +1305,6 @@ end.
     repl: "php -a",
     input: "print 123 * 234;",
     main: "main.php",
-    hello: "Hello World!",
     run: "php -d auto_prepend_file=main.php -a",
     lsp: { start: "intelephense --stdio" },
     template: `<?php
@@ -1326,6 +1328,7 @@ echo "Hello, world!\\n";
     name: "Pikachu",
     main: "main.pokeball",
     run: "pikalang main.pokeball",
+    hello: "Hello World!",
     template: `pi pi pi pi pi pi pi pi pi pi pika pipi pi pi pi pi pi pi pi pipi pi pi
 pi pi pi pi pi pi pi pi pipi pi pi pi pipi pi pichu pichu pichu pichu ka
 chu pipi pi pi pikachu pipi pi pikachu pi pi pi pi pi pi pi pikachu
