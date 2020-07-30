@@ -550,8 +550,13 @@ async function main() {
   let tests = getTestList();
   const args = process.argv.slice(2);
   for (const arg of args) {
-    tests = tests.filter(({ lang, test }) =>
-      [lang, test].concat(langs[lang].aliases || []).includes(arg)
+    tests = tests.filter(
+      ({ lang, test }) =>
+        arg
+          .split(",")
+          .filter((arg) =>
+            [lang, test].concat(langs[lang].aliases || []).includes(arg)
+          ).length > 0
     );
   }
   if (tests.length === 0) {
