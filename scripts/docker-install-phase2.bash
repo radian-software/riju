@@ -16,6 +16,7 @@ yarn
 
 # Handy utilities
 apt-file
+bbe
 bsdmainutils
 curl
 emacs-nox

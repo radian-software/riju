@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as process from "process";
 import { promisify } from "util";
 
+import * as _ from "lodash";
 import PQueue from "p-queue";
 import * as rimraf from "rimraf";
 import { v4 as getUUID } from "uuid";
@@ -9,14 +10,18 @@ import { v4 as getUUID } from "uuid";
 import * as api from "./api";
 import { LangConfig, langs } from "./langs";
 
-const TIMEOUT_MS = 3000;
-const CONCURRENCY = 16;
+const TIMEOUT_MS = 5000;
+const CONCURRENCY = 32;
 
 function findPosition(str: string, idx: number) {
   const lines = str.substring(0, idx).split("\n");
   const line = lines.length - 1;
   const character = lines[lines.length - 1].length;
   return { line, character };
+}
+
+function forTTY(input: string) {
+  return input.replace(/\n/g, "\r") + "\r";
 }
 
 class Test {
@@ -173,19 +178,25 @@ class Test {
   testHello = async () => {
     const pattern = this.config.hello || "Hello, world!";
     this.send({ event: "runCode", code: this.config.template });
+    if (this.config.helloInput !== undefined) {
+      this.send({
+        event: "terminalInput",
+        input: forTTY(this.config.helloInput),
+      });
+    }
     await this.waitForOutput(pattern);
   };
   testRepl = async () => {
-    const input = this.config.input || "111111 + 111111";
-    const output = this.config.output || "222222";
-    this.send({ event: "terminalInput", input: input + "\r" });
+    const input = this.config.input || "123 * 234";
+    const output = this.config.output || "28782";
+    this.send({ event: "terminalInput", input: forTTY(input) });
     await this.waitForOutput(output);
   };
   testRunRepl = async () => {
-    const input = this.config.input || "111111 + 111111";
-    const output = this.config.output || "222222";
+    const input = this.config.runReplInput || this.config.input || "123 * 234";
+    const output = this.config.runReplOutput || this.config.output || "28782";
     this.send({ event: "runCode", code: this.config.template });
-    this.send({ event: "terminalInput", input: input + "\r" });
+    this.send({ event: "terminalInput", input: forTTY(input) });
     await this.waitForOutput(output);
   };
   testScope = async () => {
@@ -203,7 +214,7 @@ class Test {
       allCode = allCode + code + "\n";
     }
     this.send({ event: "runCode", code: allCode });
-    this.send({ event: "terminalInput", input: input + "\r" });
+    this.send({ event: "terminalInput", input: forTTY(input) });
     await this.waitForOutput(output);
   };
   testFormat = async () => {
@@ -659,7 +670,10 @@ async function main() {
   }
   if (failed.size > 0) {
     console.error(`${failed.size} test${failed.size !== 1 ? "s" : ""} FAILED`);
-    Array.from(failed).forEach(([{ lang, type }, err]) =>
+    _.sortBy(Array.from(failed), [
+      "lang",
+      "type",
+    ]).forEach(([{ lang, type }, err]) =>
       console.error(`  - ${lang}/${type} (${err})`)
     );
   }

@@ -13,7 +13,10 @@ export interface LangConfig {
   createEmpty?: string;
   compile?: string;
   run: string;
+  helloInput?: string;
   hello?: string;
+  runReplInput?: string;
+  runReplOutput?: string;
   scope?: {
     code: string;
     after?: string;
@@ -82,6 +85,7 @@ end Main;
   apl: {
     name: "APL",
     repl: "apl",
+    input: "123 × 234",
     main: "main.apl",
     run: "apl -f main.apl",
     template: `'Hello, world!'
@@ -141,6 +145,7 @@ implement main0 () = ()
     name: "Bash",
     monacoLang: "shell",
     repl: "bash --rcfile /dev/null",
+    input: `expr 123 \\* 234`,
     main: "main.bash",
     run: "bash --rcfile main.bash",
     lsp: { start: "bash-language-server start" },
@@ -151,6 +156,7 @@ implement main0 () = ()
     aliases: ["bas", "qbasic"],
     name: "BASIC",
     repl: "bwbasic",
+    input: "PRINT 123 * 234",
     main: "main.bas",
     run: "bwbasic main.bas",
     template: `PRINT "Hello, world!"
@@ -278,8 +284,12 @@ Nude pagoda careens.
     aliases: ["brainfuck", "bf"],
     name: "Brainf***",
     repl: "brainf-repl",
+    input:
+      ">++>+[>++++[-<++++>]<<]> [>>+>+<<<-]>>>[<<<+>>>-]<<+>[<->[>++++++++++<[->-[>+>>]>[+[-<+>]>+>>]<<<<<]>[-]++++++++[<++++++>-]>[<<+>>-]>[<<+>>-]<<]>]<[->>++++++++[<++++++>-]]<[.[-]<]<",
+    output: "86",
     main: "main.bf",
     run: "brainf-repl main.bf",
+    hello: "Hello World",
     template: `++++++++
 [
     >++++
@@ -343,6 +353,7 @@ int main() {
     name: "Chef",
     main: "main.chef",
     run: "chef main.chef",
+    hello: "Hello world!",
     template: `Hello World Cake with Chocolate Sauce.
 
 Ingredients.
@@ -407,6 +418,7 @@ Refrigerate for 1 hour.
     name: "Cmd",
     monacoLang: "bat",
     repl: "wine cmd",
+    input: "set /a 123 * 234",
     main: "main.bat",
     run: `wine cmd /k main.bat`,
     template: `echo "Hello, world!"
@@ -499,6 +511,7 @@ int main() {
     name: "Clojure",
     monacoLang: "clojure",
     repl: "clojure",
+    input: "(* 123 234)",
     main: "main.clj",
     run: "clojure -i main.clj -r",
     lsp: { start: "clojure-lsp" },
@@ -510,6 +523,7 @@ int main() {
     name: "ClojureScript",
     monacoLang: "clojure",
     repl: "lumo -r",
+    input: "(* 123 234)",
     main: "main.cljs",
     run: "lumo -i main.cljs -r",
     template: `(println "Hello, world!")
@@ -622,6 +636,7 @@ output = "Hello, world!"
     aliases: ["elv"],
     name: "Elvish",
     repl: `SHELL=/usr/bin/elvish HOME="$PWD" elvish`,
+    input: `expr 123 "*" 234`,
     main: ".elvish/rc.elv",
     createEmpty: ``,
     run: `SHELL=/usr/bin/elvish HOME="$PWD" elvish`,
@@ -632,6 +647,7 @@ output = "Hello, world!"
     aliases: ["emacslisp", "elisp", "gnuemacs", "xemacs", "ielm"],
     name: "Emacs Lisp",
     repl: `emacs --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (ielm))"`,
+    input: "(* 123 234)",
     main: "main.el",
     run: `emacs --load main.el --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (ielm))"`,
     pkg: {
@@ -668,6 +684,7 @@ output = "Hello, world!"
     aliases: ["erl"],
     name: "Erlang",
     repl: "erl",
+    input: "123 * 234.",
     main: "main.erl",
     compile: "erl -compile main",
     run: "erl -s main main",
@@ -691,6 +708,7 @@ main() ->
     aliases: ["fact"],
     name: "Factor",
     repl: "factor-lang",
+    input: "123 234 *",
     main: ".factor-rc",
     createEmpty: ``,
     run: "factor-lang",
@@ -702,6 +720,7 @@ main() ->
   fish: {
     name: "Fish",
     repl: "SHELL=/usr/bin/fish fish",
+    input: `expr 123 \\* 234`,
     main: "main.fish",
     run: 'SHELL=/usr/bin/fish fish -C "$(< main.fish)"',
     template: `echo "Hello, world!"
@@ -711,6 +730,7 @@ main() ->
     aliases: ["fs", "gforth"],
     name: "Forth",
     repl: "gforth",
+    input: ". 123 234 *",
     main: "main.fs",
     run: "gforth main.fs",
     template: `." Hello, world!" CR
@@ -741,6 +761,7 @@ main() ->
     name: "F#",
     monacoLang: "fsharp",
     repl: "fsharpi",
+    input: "123 * 234 ;;",
     main: "main.fsx",
     run: "fsharpi --use:main.fsx",
     template: `printfn "Hello, world!"
@@ -783,8 +804,10 @@ func main() {
   hack: {
     name: "Hack",
     repl: "hhvm -a",
+    input: "print 123 * 234",
     main: "main.hack",
     run: "hhvm -a main.hack",
+    helloInput: "r",
     template: `<<__EntryPoint>>
 function main(): void {
   echo "Hello, world!\\n";
@@ -850,6 +873,7 @@ l ; ; o ; * 4
   hy: {
     name: "Hy",
     repl: "hy",
+    input: "(* 123 234)",
     main: "main.hy",
     run: "hy -i main.hy",
     template: `(print "Hello, world!")
@@ -947,6 +971,7 @@ PLEASE GIVE UP
     aliases: ["ktn"],
     name: "Kitten",
     repl: "kitten",
+    input: "(123 * 234) say",
     main: "main.ktn",
     run: "kitten main.ktn; kitten",
     template: `"Hello, world!" say
@@ -956,9 +981,9 @@ PLEASE GIVE UP
     aliases: ["kts", "kotlinc"],
     name: "Kotlin",
     monacoLang: "kotlin",
-    repl: "kotlinc",
+    repl: `JAVA_OPTS="-Duser.home=$PWD" kotlinc`,
     main: "main.kts",
-    run: "kotlinc -script main.kts; kotlinc",
+    run: `JAVA_OPTS="-Duser.home=$PWD" kotlinc -script main.kts; kotlinc`,
     template: `println("Hello, world!")
 `,
   },
@@ -967,6 +992,7 @@ PLEASE GIVE UP
     name: "Ksh",
     monacoLang: "shell",
     repl: `SHELL=/usr/bin/ksh HOME="$PWD" ksh`,
+    input: "expr 123 * 234",
     main: ".kshrc",
     createEmpty: ``,
     run: `SHELL=/usr/bin/ksh HOME="$PWD" ksh`,
@@ -990,6 +1016,7 @@ PLEASE GIVE UP
     name: "LiveScript",
     repl: "lsc",
     main: "main.ls",
+    hello: "Hello World",
     run: "lsc -r ./main.ls; lsc",
     template: `console.log "Hello, world!"
 `,
@@ -1043,9 +1070,10 @@ KTHXBYE
     aliases: ["maria"],
     name: "MariaDB",
     repl: `rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && mysql --socket="$PWD/socket"`,
+    input: "SELECT 123 * 234;",
     main: "main.sql",
     run: `rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && (mysql --socket="$PWD/socket" < main.sql; mysql --socket="$PWD/socket")`,
-    template: `SELECT 'Hello, world!'
+    template: `SELECT 'Hello, world!';
 `,
   },
   markdown: {
@@ -1125,9 +1153,10 @@ message:
     aliases: ["my"],
     name: "MySQL",
     repl: `rm -rf data && mysqld -h "$PWD/data" --initialize-insecure && (mysqld -h "$PWD/data" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && mysql --socket="$PWD/socket" -u root`,
+    input: "SELECT 123 * 234;",
     main: "main.sql",
     run: `rm -rf data && mysqld -h "$PWD/data" --initialize-insecure && (mysqld -h "$PWD/data" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && (mysql --socket="$PWD/socket" -u root < main.sql; mysql --socket="$PWD/socket" -u root)`,
-    template: `SELECT 'Hello, world!'
+    template: `SELECT 'Hello, world!';
 `,
   },
   nim: {
@@ -1185,6 +1214,7 @@ int main() {
     name: "OCaml",
     main: "main.ml",
     repl: "ocaml",
+    input: "123 * 234 ;;",
     run: "ocaml -init main.ml",
     format: { run: "ocamlformat main.ml" },
     lsp: { start: "ocamllsp", lang: "ocaml" },
@@ -1270,7 +1300,9 @@ end.
     name: "PHP",
     monacoLang: "php",
     repl: "php -a",
+    input: "print 123 * 234;",
     main: "main.php",
+    hello: "Hello World!",
     run: "php -d auto_prepend_file=main.php -a",
     lsp: { start: "intelephense --stdio" },
     template: `<?php
@@ -1308,6 +1340,7 @@ pipi pikachu
     name: "PostgreSQL",
     monacoLang: "pgsql",
     repl: `rm -rf data && /usr/lib/postgresql/*/bin/initdb -D data && (echo "listen_addresses = ''" && echo "unix_socket_directories = '.'") >> data/postgresql.conf && /usr/lib/postgresql/*/bin/pg_ctl -D data -w start && psql -h "$PWD/data" postgres`,
+    input: "SELECT 123 * 234;",
     main: "main.sql",
     run: `rm -rf data && /usr/lib/postgresql/*/bin/initdb -D data && (echo "listen_addresses = ''" && echo "unix_socket_directories = '.'") >> data/postgresql.conf && /usr/lib/postgresql/*/bin/pg_ctl -D data -w start && (psql -h "$PWD/data" postgres -f main.sql; psql -h "$PWD/data" postgres)`,
     template: `SELECT 'Hello, world!';
@@ -1318,6 +1351,7 @@ pipi pikachu
     name: "PowerShell",
     monacoLang: "powershell",
     repl: "SHELL=/usr/bin/pwsh pwsh",
+    input: `expr 123 "*" 234`,
     main: "main.ps1",
     run: "SHELL=/usr/bin/pwsh pwsh -NoExit main.ps1",
     lsp: {
@@ -1329,6 +1363,7 @@ pipi pikachu
   prolog: {
     name: "Prolog",
     repl: "prolog",
+    input: "ANS is 123 * 234.",
     main: "main.pl",
     run: "prolog main.pl",
     template: `:- initialization main.
@@ -1403,7 +1438,9 @@ main = do
     aliases: ["qalb"],
     name: "قلب",
     repl: "node /opt/qalb/repl.js",
+    input: "(ضرب ١٢٣ ٢٣٤)",
     main: "main.qalb",
+    hello: "قو",
     run: "node /opt/qalb/repl.js main.qalb",
     template: `(قول "مرحبا يا عالم")
 `,
@@ -1422,6 +1459,7 @@ main = do
     aliases: ["rkt"],
     name: "Racket",
     repl: "racket",
+    input: "(* 123 234)",
     main: "main.rkt",
     run: `racket -i -e '(enter! "main.rkt") (display "[ type (enter! \\"main.rkt\\") to access local variables ]\\n")'`,
     template: `#lang racket/base
@@ -1455,6 +1493,7 @@ main = do
     monacoLang: "redis",
     repl:
       "rm -f socket; (redis-server --port 0 --unixsocket socket &); until [[ -e socket ]]; do sleep 0.01; done; redis-cli -s socket",
+    input: `EVAL "return 123 * 234" 0`,
     main: "main.redis",
     run:
       "rm -f socket; (redis-server --port 0 --unixsocket socket &); until [[ -e socket ]]; do sleep 0.01; done; redis-cli -s socket < main.redis; redis-cli -s socket",
@@ -1577,6 +1616,7 @@ binding_irb.run(IRB.conf)
     name: "Scheme",
     monacoLang: "scheme",
     repl: "mit-scheme",
+    input: "(* 123 234)",
     main: "main.scm",
     run: "mit-scheme --load main.scm",
     template: `(begin
@@ -1599,6 +1639,7 @@ binding_irb.run(IRB.conf)
     aliases: ["gsed"],
     name: "Sed",
     main: "main.sed",
+    helloInput: "",
     run: "echo 'Reading from stdin...' >&2; sed -f main.sed",
     template: `s/.*/Hello, world!/
 `,
@@ -1615,6 +1656,7 @@ binding_irb.run(IRB.conf)
     name: "Sh",
     monacoLang: "shell",
     repl: `SHELL=/usr/bin/sh HOME="$PWD" posh -l`,
+    input: `expr 123 \\* 234`,
     main: ".profile",
     createEmpty: ``,
     run: `SHELL=/usr/bin/sh HOME="$PWD" posh -l`,
@@ -1625,9 +1667,15 @@ binding_irb.run(IRB.conf)
     aliases: ["spl"],
     name: "Shakespeare",
     repl: "shakespeare console",
+    input: `Hamlet, a placeholder.
+done
+stage`,
+    output: "Off stage",
     main: "main.spl",
+    hello: "Hello World!",
     suffix: "\n[A pause]",
     run: "shakespeare debug main.spl",
+    runReplInput: "stage",
     template: `The Infamous Hello World Program.
 
 Romeo, a young man with a remarkable patience.
@@ -1732,6 +1780,8 @@ Ophelia:
     aliases: ["snobol4", "spitbol", "sno"],
     name: "SNOBOL",
     repl: "snobol4",
+    input: ` OUTPUT = 123 * 234
+END`,
     main: "main.sno",
     run: "snobol4 main.sno; snobol4",
     template: ` OUTPUT = "Hello, world!"
@@ -1743,6 +1793,7 @@ END
     name: "SQLite",
     monacoLang: "sql",
     repl: "sqlite3",
+    input: "SELECT 123 * 234;",
     main: "main.sql",
     run: `sqlite3 -cmd "$(< main.sql)"`,
     template: `SELECT 'Hello, world!';
@@ -1752,6 +1803,7 @@ END
     aliases: ["sml", "ml"],
     name: "Standard ML",
     repl: "rlwrap sml",
+    input: "123 * 234;",
     main: "main.sml",
     run: "rlwrap sml main.sml",
     template: `print "Hello, world!\\n";
@@ -1773,6 +1825,7 @@ END
     name: "Tcl",
     monacoLang: "tcl",
     repl: "tclsh",
+    input: "expr 123 * 234",
     main: ".tclshrc",
     createEmpty: ``,
     run: `HOME="$PWD" tclsh`,
@@ -1784,6 +1837,7 @@ END
     name: "Tcsh",
     monacoLang: "shell",
     repl: `SHELL=/usr/bin/tcsh HOME="$PWD" tcsh`,
+    input: `expr 123 \\* 234`,
     main: ".tcshrc",
     createEmpty: ``,
     run: `SHELL=/usr/bin/tcsh HOME="$PWD" tcsh`,
@@ -1794,6 +1848,10 @@ END
     aliases: ["latex", "xetex", "plaintex"],
     name: "TeX",
     repl: "tex",
+    input: `\\newcount\\ans
+\\advance\\ans by 123
+\\multiply\\ans by 234
+\\message{\\the\\ans}`,
     main: "main.tex",
     run: "tex main.tex",
     lsp: { start: "digestif", lang: "tex" },
@@ -1858,6 +1916,7 @@ a
     aliases: ["unl"],
     name: "Unlambda",
     repl: "unlambda-repl",
+    input: "`.2`.8`.7`.8`.2i",
     main: "main.unl",
     run: "unlambda-repl main.unl",
     template: "`.\n`.!`.d`.l`.r`.o`.w`. `.,`.o`.l`.l`.e`.Hi\n",
@@ -1866,6 +1925,7 @@ a
     aliases: ["viml", "vimscript"],
     name: "Vimscript",
     repl: "vim",
+    input: ":echo 123 * 234",
     main: "main.vim",
     run: `vim -c "$(< main.vim)"`,
     lsp: { start: "vim-language-server --stdio" },
@@ -1899,7 +1959,8 @@ End Module
     name: "Whitespace",
     main: "main.ws",
     run: "whitespace main.ws",
-    template: `Hello, world!  \t  \t   \n\t\n     \t\t  \t \t\n\t\n     \t\t \t\t  \n\t\n     \t\t \t\t  \n\t\n     \t\t \t\t\t\t\n\t\n     \t \t\t  \n\t\n     \t     \n\t\n     \t\t\t \t\t\t\n\t\n     \t\t \t\t\t\t\n\t\n     \t\t\t  \t \n\t\n     \t\t \t\t  \n\t\n     \t\t  \t  \n\t\n  \n\n\n`,
+    hello: "Hello, world",
+    template: `Hello, world  \t  \t   \n\t\n     \t\t  \t \t\n\t\n     \t\t \t\t  \n\t\n     \t\t \t\t  \n\t\n     \t\t \t\t\t\t\n\t\n     \t \t\t  \n\t\n     \t     \n\t\n     \t\t\t \t\t\t\n\t\n     \t\t \t\t\t\t\n\t\n     \t\t\t  \t \n\t\n     \t\t \t\t  \n\t\n     \t\t  \t  \n\t\n  \n\n\n`,
   },
   wolframlanguage: {
     aliases: [
@@ -1955,6 +2016,7 @@ message:
     name: "Zot",
     main: "main.zot",
     run: "zot --file main.zot",
+    hello: `0100100001100101011011000110110001101111001011000010000001110111011011110111001001101100011001000010000100001010`,
     template: `111101010100111010101001001101010010010011101010100111010101
 001101010010101010011101010100110101001101010100110101001010
 101001110101010011101010100110101001010101001110101010011010
@@ -1984,6 +2046,7 @@ message:
     name: "Zsh",
     monacoLang: "shell",
     repl: "SHELL=/usr/bin/zsh zsh",
+    input: `expr 123 \\* 234`,
     main: ".zshrc",
     createEmpty: ``,
     run: `SHELL=/usr/bin/zsh ZDOTDIR="$PWD" zsh`,
