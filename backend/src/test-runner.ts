@@ -155,31 +155,28 @@ class Test {
     }
   };
   testHello = async () => {
-    const pattern =
-      ((this.config.test || {}).hello || {}).pattern || "Hello, world!";
+    const pattern = this.config.hello || "Hello, world!";
     this.send({ event: "runCode", code: this.config.template });
     await this.waitForOutput(pattern);
   };
   testRepl = async () => {
-    const input =
-      ((this.config.test || {}).repl || {}).input || "111111 + 111111";
-    const output = ((this.config.test || {}).repl || {}).output || "222222";
+    const input = this.config.input || "111111 + 111111";
+    const output = this.config.output || "222222";
     this.send({ event: "terminalInput", input: input + "\r" });
     await this.waitForOutput(output);
   };
   testRunRepl = async () => {
-    const input =
-      ((this.config.test || {}).repl || {}).input || "111111 + 111111";
-    const output = ((this.config.test || {}).repl || {}).output || "222222";
+    const input = this.config.input || "111111 + 111111";
+    const output = this.config.output || "222222";
     this.send({ event: "runCode", code: this.config.template });
     this.send({ event: "terminalInput", input: input + "\r" });
     await this.waitForOutput(output);
   };
   testScope = async () => {
-    const code = this.config.test!.scope!.code;
-    const after = this.config.test!.scope!.after;
-    const input = this.config.test!.scope!.input || "x";
-    const output = this.config.test!.scope!.output || "222222";
+    const code = this.config.scope!.code;
+    const after = this.config.scope!.after;
+    const input = this.config.scope!.input || "x";
+    const output = this.config.scope!.output || "222222";
     let allCode = this.config.template;
     if (!allCode.endsWith("\n")) {
       allCode += "\n";
@@ -194,10 +191,8 @@ class Test {
     await this.waitForOutput(output);
   };
   testFormat = async () => {
-    const input = this.config.test!.format!.input;
-    const output =
-      ((this.config.test || {}).format || { output: undefined }).output ||
-      this.config.template;
+    const input = this.config.format!.input;
+    const output = this.config.format!.output || this.config.template;
     this.send({ event: "formatCode", code: input });
     const result = await this.wait((msg: any) => {
       if (msg.event === "formattedCode") {
@@ -216,12 +211,6 @@ function lint(lang: string) {
   if (!config.template.endsWith("\n")) {
     throw new Error("template is missing a trailing newline");
   }
-  if (config.format && !(config.test && config.test.format)) {
-    throw new Error("formatter is missing test");
-  }
-  if (config.lsp && !(config.test && config.test.lsp)) {
-    throw new Error("LSP is missing test");
-  }
 }
 
 const testTypes: {
@@ -230,7 +219,7 @@ const testTypes: {
   };
 } = {
   ensure: {
-    pred: ({ test }) => (test && test.ensure ? true : false),
+    pred: ({ ensure }) => (ensure ? true : false),
   },
   hello: { pred: (config) => true },
   repl: {
@@ -240,7 +229,7 @@ const testTypes: {
     pred: ({ repl }) => (repl ? true : false),
   },
   scope: {
-    pred: ({ test }) => (test && test.scope ? true : false),
+    pred: ({ scope }) => (scope ? true : false),
   },
   format: {
     pred: ({ format }) => (format ? true : false),

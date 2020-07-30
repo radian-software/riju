@@ -129,10 +129,10 @@ export class Session {
         }
       }
       if (this.config.lsp) {
-        if (this.config.lspSetup) {
-          await this.run(this.privilegedSpawn(bash(this.config.lspSetup)));
+        if (this.config.lsp.setup) {
+          await this.run(this.privilegedSpawn(bash(this.config.lsp.setup)));
         }
-        const lspArgs = this.privilegedSpawn(bash(this.config.lsp));
+        const lspArgs = this.privilegedSpawn(bash(this.config.lsp.start));
         const lspProc = spawn(lspArgs[0], lspArgs.slice(1));
         this.lsp = {
           proc: lspProc,
@@ -256,11 +256,11 @@ export class Session {
           this.lsp.writer.write(msg.input);
           break;
         case "ensure":
-          if (!(this.config.test && this.config.test.ensure)) {
+          if (!this.config.ensure) {
             this.log(`ensure ignored because of missing configuration`);
             break;
           }
-          await this.ensure();
+          await this.ensure(this.config.ensure);
         default:
           this.logBadMessage(msg);
           break;
@@ -371,7 +371,7 @@ export class Session {
         this.formatter = null;
       }
       await this.writeCode(code);
-      const args = this.privilegedSpawn(bash(this.config.format));
+      const args = this.privilegedSpawn(bash(this.config.format.run));
       const formatter = {
         proc: spawn(args[0], args.slice(1)),
         live: true,
@@ -422,13 +422,10 @@ export class Session {
     }
   };
 
-  ensure = async () => {
-    const code = await this.run(
-      this.privilegedSpawn(bash(this.config.test!.ensure!)),
-      {
-        check: false,
-      }
-    );
+  ensure = async (cmd: string) => {
+    const code = await this.run(this.privilegedSpawn(bash(cmd)), {
+      check: false,
+    });
     this.send({ event: "ensured", code });
   };
 

@@ -31,7 +31,7 @@ if (
   langs[args[0]] &&
   typeof langs[args[0]].lsp === "string"
 ) {
-  cmdline = ["bash", "-c", langs[args[0]].lsp as string];
+  cmdline = ["bash", "-c", langs[args[0]].lsp!.start];
 } else {
   cmdline = args;
 }

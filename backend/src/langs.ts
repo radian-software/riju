@@ -5,51 +5,45 @@ export interface LangConfig {
   daemon?: string;
   setup?: string;
   repl?: string;
+  input?: string;
+  output?: string;
   main: string;
   prefix?: string;
   suffix?: string;
   createEmpty?: string;
   compile?: string;
   run: string;
-  format?: string;
+  hello?: string;
+  scope?: {
+    code: string;
+    after?: string;
+    input?: string;
+    output?: string;
+  };
+  ensure?: string;
+  format?: {
+    run: string;
+    input?: string; // FIXME
+    output?: string;
+  };
   pkg?: {
     install: string;
     uninstall?: string;
     all?: string;
     search?: string;
   };
-  lspSetup?: string;
-  lsp?: string;
-  lspDisableDynamicRegistration?: boolean;
-  lspInit?: any;
-  lspConfig?: any;
-  lspLang?: string;
-  template: string;
-  test?: {
-    ensure?: string;
-    hello?: {
-      pattern?: string;
-    };
-    repl?: {
-      input?: string;
-      output?: string;
-    };
-    scope?: {
-      code: string;
-      after?: string;
-      input?: string;
-      output?: string;
-    };
-    format?: {
-      input: string;
-      output?: string;
-    };
-    lsp?: {
-      after?: string;
-      code?: string;
-      item: string;
-    };
+  lsp?: {
+    setup?: string;
+    start: string;
+    disableDynamicRegistration?: boolean;
+    init?: any;
+    config?: any;
+    lang?: string;
+    code?: string;
+    after?: string;
+    item?: string; // FIXME
   };
+  template: string;
 }
 
 export const langs: { [key: string]: LangConfig } = {
@@ -68,7 +62,7 @@ export const langs: { [key: string]: LangConfig } = {
     main: "main.adb",
     compile: "x86_64-linux-gnu-gnatmake-9 main.adb",
     run: "./main",
-    lsp: "ada_language_server",
+    lsp: { start: "ada_language_server" },
     template: `with Ada.Text_IO;
 
 procedure Main is
@@ -149,7 +143,7 @@ implement main0 () = ()
     repl: "bash --rcfile /dev/null",
     main: "main.bash",
     run: "bash --rcfile main.bash",
-    lsp: "bash-language-server start",
+    lsp: { start: "bash-language-server start" },
     template: `echo "Hello, world!"
 `,
   },
@@ -323,9 +317,11 @@ Nude pagoda careens.
     main: "main.c",
     compile: "clang -Wall -Wextra main.c -o main",
     run: "./main",
-    format: "clang-format main.c",
-    lspSetup: `echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
-    lsp: "clangd",
+    format: { run: "clang-format main.c" },
+    lsp: {
+      setup: `echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
+      start: "clangd",
+    },
     template: `#include <stdio.h>
 
 int main() {
@@ -460,9 +456,11 @@ Refrigerate for 1 hour.
     main: "main.cpp",
     compile: "clang++ -Wall -Wextra main.cpp -o main",
     run: "./main",
-    format: "clang-format main.cpp",
-    lspSetup: `echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
-    lsp: "clangd",
+    format: { run: "clang-format main.cpp" },
+    lsp: {
+      setup: `echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
+      start: "clangd",
+    },
     template: `#include <iostream>
 
 int main() {
@@ -486,7 +484,9 @@ int main() {
     main: "main.cs",
     compile: "mcs main.cs",
     run: "mono main.exe",
-    format: `clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" main.cs`,
+    format: {
+      run: `clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" main.cs`,
+    },
     template: `class main {
     static void Main(string[] args) {
         System.Console.WriteLine("Hello, world!");
@@ -501,7 +501,7 @@ int main() {
     repl: "clojure",
     main: "main.clj",
     run: "clojure -i main.clj -r",
-    lsp: "clojure-lsp",
+    lsp: { start: "clojure-lsp" },
     template: `(println "Hello, world!")
 `,
   },
@@ -548,7 +548,7 @@ require("/usr/lib/node_modules/coffeescript/repl").start()
     main: "main.d",
     compile: "dmd main.d",
     run: "./main",
-    format: "dfmt main.d",
+    format: { run: "dfmt main.d" },
     template: `import std.stdio;
 
 void main()
@@ -599,7 +599,7 @@ void main()
     repl: "iex",
     main: "main.exs",
     run: "iex main.exs",
-    lsp: "/opt/elixir-ls/language_server.sh",
+    lsp: { start: "/opt/elixir-ls/language_server.sh" },
     template: `IO.puts("Hello, world!")
 `,
   },
@@ -608,8 +608,10 @@ void main()
     repl: "elm repl",
     main: "Main.elm",
     run: "cp /opt/elm/elm.json elm.json && run-elm Main.elm; elm repl",
-    lsp: "elm-language-server --stdio",
-    lspSetup: "cp /opt/elm/elm.json elm.json",
+    lsp: {
+      setup: "cp /opt/elm/elm.json elm.json",
+      start: "elm-language-server --stdio",
+    },
     template: `module Main exposing (..)
 
 output : String
@@ -669,7 +671,7 @@ output = "Hello, world!"
     main: "main.erl",
     compile: "erl -compile main",
     run: "erl -s main main",
-    lsp: "erlang_ls",
+    lsp: { start: "erlang_ls" },
     template: `-module(main).
 -export([main/0]).
 
@@ -728,7 +730,7 @@ main() ->
     main: "main.f",
     compile: "flang main.f -o main",
     run: "./main",
-    lsp: "fortls",
+    lsp: { start: "fortls" },
     template: `       program hello
           print *, "Hello, world!"
        end program hello
@@ -751,8 +753,8 @@ main() ->
     main: "main.go",
     compile: "go build main.go",
     run: "./main",
-    format: "cat main.go | gofmt",
-    lsp: "gopls",
+    format: { run: "cat main.go | gofmt" },
+    lsp: { start: "gopls" },
     template: `package main
 
 import "fmt"
@@ -795,11 +797,13 @@ function main(): void {
     repl: "rm -f .ghci && ghci",
     main: "Main.hs",
     run: "(echo ':load Main' && echo 'main') > .ghci && ghci",
-    format: "brittany Main.hs",
-    lspSetup: "cp /opt/haskell/hie.yaml hie.yaml",
-    lsp: "HIE_HOOGLE_DATABASE=/opt/haskell/hoogle.hoo hie --lsp",
-    lspInit: {
-      languageServerHaskell: {},
+    format: { run: "brittany Main.hs" },
+    lsp: {
+      setup: "cp /opt/haskell/hie.yaml hie.yaml",
+      start: "HIE_HOOGLE_DATABASE=/opt/haskell/hoogle.hoo hie --lsp",
+      init: {
+        languageServerHaskell: {},
+      },
     },
     template: `module Main where
 
@@ -905,7 +909,9 @@ PLEASE GIVE UP
     main: "Main.java",
     compile: "javac Main.java",
     run: "java Main",
-    format: `clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" Main.java`,
+    format: {
+      run: `clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" Main.java`,
+    },
     template: `public class Main {
     public static void main(String[] args) {
         System.out.println("Hello, world!");
@@ -919,8 +925,10 @@ PLEASE GIVE UP
     repl: "julia",
     main: "main.jl",
     run: "julia -L main.jl",
-    lsp: `JULIA_DEPOT_PATH=:/opt/julia julia -e 'using LanguageServer; run(LanguageServerInstance(stdin, stdout))'`,
-    lspConfig: null,
+    lsp: {
+      start: `JULIA_DEPOT_PATH=:/opt/julia julia -e 'using LanguageServer; run(LanguageServerInstance(stdin, stdout))'`,
+      config: null,
+    },
     template: `println("Hello, world!")
 `,
   },
@@ -971,7 +979,7 @@ PLEASE GIVE UP
     monacoLang: "less",
     main: "main.less",
     run: "lessc main.less",
-    format: "prettier --no-config main.less",
+    format: { run: "prettier --no-config main.less" },
     template: `body:before {
   content: "Hello, world!";
 }
@@ -1030,7 +1038,7 @@ KTHXBYE
     repl: "lua",
     main: "main.lua",
     run: "lua -i main.lua",
-    lsp: "java -cp /usr/lib/EmmyLua-LS.jar com.tang.vscode.MainKt",
+    lsp: { start: "java -cp /usr/lib/EmmyLua-LS.jar com.tang.vscode.MainKt" },
     template: `print("Hello, world!")
 `,
   },
@@ -1068,7 +1076,7 @@ KTHXBYE
     main: "main.md",
     compile: "pandoc main.md -o main.html",
     run: "prettier --no-config main.html",
-    format: "prettier --no-config main.md",
+    format: { run: "prettier --no-config main.md" },
     template: `Hello, world!
 `,
   },
@@ -1151,7 +1159,7 @@ message:
 eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
 require("repl").start()
 '`,
-    format: "prettier --no-config main.js",
+    format: { run: "prettier --no-config main.js" },
     pkg: {
       install: "yarn add NAME",
       uninstall: "yarn remove NAME",
@@ -1169,9 +1177,11 @@ require("repl").start()
     compile:
       "gcc $(gnustep-config --objc-flags) main.m $(gnustep-config --base-libs) -o main",
     run: "./main",
-    format: "clang-format main.m",
-    lspSetup: `(gnustep-config --objc-flags && gnustep-config --base-libs) | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
-    lsp: "clangd",
+    format: { run: "clang-format main.m" },
+    lsp: {
+      setup: `(gnustep-config --objc-flags && gnustep-config --base-libs) | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
+      start: "clangd",
+    },
     template: `#import <Foundation/Foundation.h>
 
 int main() {
@@ -1187,9 +1197,8 @@ int main() {
     main: "main.ml",
     repl: "ocaml",
     run: "ocaml -init main.ml",
-    format: "ocamlformat main.ml",
-    lsp: "ocamllsp",
-    lspLang: "ocaml",
+    format: { run: "ocamlformat main.ml" },
+    lsp: { start: "ocamllsp", lang: "ocaml" },
     template: `print_string "Hello, world!\\n";;
 `,
   },
@@ -1263,7 +1272,7 @@ end.
     repl: "re.pl",
     main: "main.pl",
     run: "re.pl --rcfile ./main.pl",
-    format: "cat main.pl | perltidy",
+    format: { run: "cat main.pl | perltidy" },
     template: `print("Hello, world!\\n")
 `,
   },
@@ -1274,7 +1283,7 @@ end.
     repl: "php -a",
     main: "main.php",
     run: "php -d auto_prepend_file=main.php -a",
-    lsp: "intelephense --stdio",
+    lsp: { start: "intelephense --stdio" },
     template: `<?php
 
 echo "Hello, world!\\n";
@@ -1322,7 +1331,9 @@ pipi pikachu
     repl: "SHELL=/usr/bin/pwsh pwsh",
     main: "main.ps1",
     run: "SHELL=/usr/bin/pwsh pwsh -NoExit main.ps1",
-    lsp: `pwsh -NoLogo -NoProfile -Command "/opt/powershell-editor-services/PowerShellEditorServices/Start-EditorServices.ps1 -BundledModulesPath /opt/powershell-editor-services -LogPath '$PWD/.powershell-editor-services/lsp.log' -SessionDetailsPath '$PWD/.powershell-editor-services/session.json' -FeatureFlags @() -AdditionalModules @() -HostName Riju -HostProfileId 'riju' -HostVersion 0.0 -Stdio -LogLevel Normal"`,
+    lsp: {
+      start: `pwsh -NoLogo -NoProfile -Command "/opt/powershell-editor-services/PowerShellEditorServices/Start-EditorServices.ps1 -BundledModulesPath /opt/powershell-editor-services -LogPath '$PWD/.powershell-editor-services/lsp.log' -SessionDetailsPath '$PWD/.powershell-editor-services/session.json' -FeatureFlags @() -AdditionalModules @() -HostName Riju -HostProfileId 'riju' -HostVersion 0.0 -Stdio -LogLevel Normal"`,
+    },
     template: `Write-Host "Hello, world!"
 `,
   },
@@ -1374,28 +1385,28 @@ main = do
     repl: "python3 -u",
     main: "main.py",
     run: "python3 -u -i main.py",
-    format: "cat main.py | black -",
+    format: {
+      run: "cat main.py | black -",
+      input: `print('Hello, world!')
+`,
+    },
     pkg: {
       install: "pip3 install --user NAME",
       uninstall: "pip3 uninstall NAME",
       search: `python3 -c 'import json; from xmlrpc import client; print(json.dumps(client.ServerProxy("https://pypi.org/pypi").search({"name": "NAME"})))' | jq -r 'map(.name) | .[]'`,
     },
-    lsp: "Microsoft.Python.LanguageServer",
-    lspInit: {
-      interpreter: {
-        properties: {
-          InterpreterPath: "/usr/bin/python3",
+    lsp: {
+      start: "Microsoft.Python.LanguageServer",
+      init: {
+        interpreter: {
+          properties: {
+            InterpreterPath: "/usr/bin/python3",
+          },
         },
       },
     },
     template: `print("Hello, world!")
 `,
-    test: {
-      format: {
-        input: `print('Hello, world!')
-`,
-      },
-    },
   },
   قلب: {
     aliases: ["qalb"],
@@ -1440,9 +1451,11 @@ main = do
     main: "main.re",
     compile: "bsc main.re > main.js",
     run: "NODE_PATH=/usr/lib/node_modules node main.js",
-    format: "ocamlformat main.re",
-    lspSetup: `cp -a /opt/reasonml/project-template/* ./`,
-    lsp: "reason-language-server",
+    format: { run: "ocamlformat main.re" },
+    lsp: {
+      setup: `cp -a /opt/reasonml/project-template/* ./`,
+      start: "reason-language-server",
+    },
     template: `print_string("Hello, world!\\n")
 `,
   },
@@ -1528,18 +1541,16 @@ binding_irb = IRB::Irb.new(workspace)
 binding_irb.run(IRB.conf)
 `,
     run: "ruby main.rb",
-    format: "cat main.rb | rufo -x",
+    ensure: `ruby -e 'raise "version mismatch, expected #{RUBY_VERSION}" unless ENV["PATH"].include? ".gem/ruby/#{RUBY_VERSION}/bin"'`,
+    format: { run: "cat main.rb | rufo -x" },
     pkg: {
       install: "gem install --user-install NAME",
       uninstall: "gem uninstall --user-install NAME",
       search: `curl -sS 'https://rubygems.org/api/v1/search.json?query=NAME' | jq -r 'map(.name) | .[]'`,
     },
-    lsp: "solargraph stdio",
+    lsp: { start: "solargraph stdio" },
     template: `puts "Hello, world!"
 `,
-    test: {
-      ensure: `ruby -e 'raise "version mismatch, expected #{RUBY_VERSION}" unless ENV["PATH"].include? ".gem/ruby/#{RUBY_VERSION}/bin"'`,
-    },
   },
   rust: {
     aliases: ["rs", "rustc"],
@@ -1548,7 +1559,7 @@ binding_irb.run(IRB.conf)
     main: "main.rs",
     compile: "rustc main.rs",
     run: "./main",
-    lsp: "rls",
+    lsp: { start: "rls" },
     template: `fn main() {
     println!("Hello, world!");
 }
@@ -1587,7 +1598,7 @@ binding_irb.run(IRB.conf)
     monacoLang: "scss",
     main: "main.scss",
     run: "sass main.scss",
-    format: "prettier --no-config main.scss",
+    format: { run: "prettier --no-config main.scss" },
     template: `body:before {
   content: "Hello, world!";
 }
@@ -1762,7 +1773,7 @@ END
     main: "main.swift",
     compile: "swiftc main.swift",
     run: "./main",
-    lsp: "sourcekit-lsp",
+    lsp: { start: "sourcekit-lsp" },
     template: `print("Hello, world!")
 `,
   },
@@ -1794,8 +1805,7 @@ END
     repl: "tex",
     main: "main.tex",
     run: "tex main.tex",
-    lsp: "digestif",
-    lspLang: "tex",
+    lsp: { start: "digestif", lang: "tex" },
     template: `\\message{Hello, world!}
 `,
   },
@@ -1849,7 +1859,7 @@ a
     repl: "ts-node",
     main: "main.ts",
     run: `ts-node -i -e "$(< main.ts)"`,
-    format: "prettier --no-config main.ts",
+    format: { run: "prettier --no-config main.ts" },
     template: `console.log("Hello, world!");
 `,
   },
@@ -1867,7 +1877,7 @@ a
     repl: "vim",
     main: "main.vim",
     run: `vim -c "$(< main.vim)"`,
-    lsp: "vim-language-server --stdio",
+    lsp: { start: "vim-language-server --stdio" },
     template: `:echo "Hello, world!"
 `,
   },
@@ -1946,7 +1956,7 @@ message:
     main: "main.yaml",
     compile: "cat main.yaml | yj -yj > main.json",
     run: "cat main.json | jq .",
-    format: "prettier --no-config main.yaml",
+    format: { run: "prettier --no-config main.yaml" },
     template: `output: "Hello, world!"
 `,
   },
