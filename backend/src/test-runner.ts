@@ -137,7 +137,7 @@ class Test {
     return await new Promise((resolve, reject) => {
       this.handleUpdate = () => {
         if (this.timedOut) {
-          reject(`timeout while waiting for ${desc}`);
+          reject(new Error(`timeout while waiting for ${desc}`));
         } else {
           while (this.handledMessages < this.messages.length) {
             const msg = this.messages[this.handledMessages];
@@ -635,13 +635,15 @@ async function main() {
   let passed = new Set();
   let failed = new Map();
   for (const { lang, type } of tests) {
-    let test: Test;
-    queue
-      .add(() => {
-        test = new Test(lang, type);
-        return test.run();
-      })
-      .then(async () => {
+    queue.add(async () => {
+      const test = new Test(lang, type);
+      let err = null;
+      try {
+        await test.run();
+      } catch (error) {
+        err = error;
+      }
+      if (!err) {
         passed.add({ lang, type });
         console.error(`PASSED: ${lang}/${type}`);
         await writeLog(
@@ -649,8 +651,7 @@ async function main() {
           type,
           `PASSED: ${lang}/${type}\n` + test.getLog({ pretty: true }) + "\n"
         );
-      })
-      .catch(async (err) => {
+      } else {
         failed.set({ lang, type }, err);
         console.error(`FAILED: ${lang}/${type}`);
         console.error(test.getLog());
@@ -663,8 +664,8 @@ async function main() {
             "\n" +
             (err.stack ? err.stack + "\n" : err ? `${err}` : "")
         );
-      })
-      .catch(console.error);
+      }
+    });
   }
   await queue.onIdle();
   console.error();
