@@ -350,6 +350,15 @@ export class Session {
           this.send({ event: "terminalOutput", output: data });
         }
       });
+      this.term.pty.on("exit", (code, signal) => {
+        if (term.live) {
+          this.send({
+            event: "serviceFailed",
+            service: "terminal",
+            error: `Exited with status ${signal || code}`,
+          });
+        }
+      });
     } catch (err) {
       this.log(`Error while running user code`);
       console.log(err);
