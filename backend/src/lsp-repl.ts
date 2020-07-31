@@ -36,7 +36,7 @@ console.error(quote(cmdline));
 const proc = child_process.spawn(cmdline[0], cmdline.slice(1));
 
 proc.stderr.on("data", (data) => process.stderr.write(data));
-proc.on("exit", (code, signal) => {
+proc.on("close", (code, signal) => {
   if (code) {
     console.error(`Language server exited with code ${code}`);
     process.exit(code);

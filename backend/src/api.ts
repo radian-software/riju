@@ -112,7 +112,7 @@ export class Session {
               output: data.toString("utf8"),
             })
           );
-          daemonProc.on("exit", (code, signal) =>
+          daemonProc.on("close", (code, signal) =>
             this.send({
               event: "serviceFailed",
               service: "daemon",
@@ -149,7 +149,7 @@ export class Session {
             output: data.toString("utf8"),
           })
         );
-        lspProc.on("exit", (code, signal) =>
+        lspProc.on("close", (code, signal) =>
           this.send({
             event: "serviceFailed",
             service: "lsp",
@@ -372,7 +372,6 @@ export class Session {
         this.formatter.live = false;
         this.formatter = null;
       }
-      await this.writeCode(code);
       const args = this.privilegedSpawn(bash(this.config.format.run));
       const formatter = {
         proc: spawn(args[0], args.slice(1)),
@@ -380,6 +379,7 @@ export class Session {
         input: code,
         output: "",
       };
+      formatter.proc.stdin!.end(code);
       formatter.proc.stdout!.on("data", (data) => {
         if (!formatter.live) return;
         formatter.output += data.toString("utf8");
@@ -392,7 +392,7 @@ export class Session {
           output: data.toString("utf8"),
         });
       });
-      formatter.proc.on("exit", (code, signal) => {
+      formatter.proc.on("close", (code, signal) => {
         if (!formatter.live) return;
         if (code === 0) {
           this.send({

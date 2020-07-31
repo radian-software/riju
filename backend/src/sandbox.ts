@@ -47,7 +47,7 @@ async function main() {
   });
   await new Promise((resolve, reject) => {
     proc.on("error", reject);
-    proc.on("exit", resolve);
+    proc.on("close", resolve);
   });
   await run(privilegedTeardown({ uid, uuid }), log);
   await returnUID();

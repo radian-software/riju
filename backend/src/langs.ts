@@ -331,7 +331,7 @@ Nude pagoda careens.
     compile: "clang -Wall -Wextra main.c -o main",
     run: "./main",
     format: {
-      run: "clang-format main.c",
+      run: "clang-format --assume-filename=format.c",
       input: `#include <stdio.h>
 
 int main()
@@ -485,7 +485,7 @@ Refrigerate for 1 hour.
     compile: "clang++ -Wall -Wextra main.cpp -o main",
     run: "./main",
     format: {
-      run: "clang-format main.cpp",
+      run: "clang-format --assume-filename=format.cpp",
       input: `#include <iostream>
 
 int main()
@@ -524,7 +524,7 @@ int main() {
     compile: "mcs main.cs",
     run: "mono main.exe",
     format: {
-      run: `clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" main.cs`,
+      run: `clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" --assume-filename=format.cs`,
       input: `class main
 {
     static void Main(string[] args)
@@ -598,7 +598,7 @@ require("/usr/lib/node_modules/coffeescript/repl").start()
     compile: "dmd main.d",
     run: "./main",
     format: {
-      run: "dfmt main.d",
+      run: "dfmt",
       input: `import std.stdio;
 
 void main() {
@@ -822,7 +822,7 @@ main() ->
     compile: "go build main.go",
     run: "./main",
     format: {
-      run: "cat main.go | gofmt",
+      run: "gofmt",
       input: `package main
 
 import "fmt"
@@ -879,7 +879,7 @@ function main(): void {
     main: "Main.hs",
     run: "(echo ':load Main' && echo 'main') > .ghci && ghci",
     format: {
-      run: "brittany Main.hs",
+      run: "brittany",
       input: `module Main where
 
 main :: IO ()
@@ -1001,7 +1001,7 @@ PLEASE GIVE UP
     compile: "javac Main.java",
     run: "java Main",
     format: {
-      run: `clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" Main.java`,
+      run: `clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" --assume-filename=Format.java`,
       input: `public class Main
 {
     public static void main(String[] args)
@@ -1029,7 +1029,7 @@ eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
 require("repl").start()
 '`,
     format: {
-      run: "prettier --no-config main.js",
+      run: "prettier --no-config --stdin-filepath=format.js",
       input: `console.log('Hello, world!');
 `,
     },
@@ -1107,7 +1107,7 @@ require("repl").start()
     main: "main.less",
     run: "lessc main.less",
     format: {
-      run: "prettier --no-config main.less",
+      run: "prettier --no-config --stdin-filepath=format.less",
       input: `body:before {
     content: "Hello, world!";
 }
@@ -1202,7 +1202,7 @@ KTHXBYE
     compile: "pandoc main.md -o main.html",
     run: "prettier --no-config main.html",
     format: {
-      run: "prettier --no-config main.md",
+      run: "prettier --no-config --stdin-filepath=format.md",
       input: `Hello, world!
 
 `,
@@ -1290,7 +1290,7 @@ message:
       "gcc $(gnustep-config --objc-flags) main.m $(gnustep-config --base-libs) -o main",
     run: "./main",
     format: {
-      run: "clang-format main.m",
+      run: "clang-format --assume-filename=format.m",
       input: `#import <Foundation/Foundation.h>
 
 int main() {
@@ -1322,7 +1322,7 @@ int main() {
     input: "123 * 234 ;;",
     run: "ocaml -init main.ml",
     format: {
-      run: "touch .ocamlformat; ocamlformat main.ml",
+      run: "touch .ocamlformat; ocamlformat --name=format.ml -",
       input: `print_string "Hello, world!\\n";;
 `,
     },
@@ -1402,7 +1402,7 @@ end.
     main: "main.pl",
     run: "re.pl --rcfile ./main.pl",
     format: {
-      run: "cat main.pl | perltidy",
+      run: "perltidy",
       input: `print ("Hello, world!\\n")
 `,
     },
@@ -1527,7 +1527,7 @@ main = do
     main: "main.py",
     run: "python3 -u -i main.py",
     format: {
-      run: "cat main.py | black -",
+      run: "black -",
       input: `print('Hello, world!')
 `,
     },
@@ -1598,7 +1598,7 @@ main = do
     compile: "bsc main.re > main.js",
     run: "NODE_PATH=/usr/lib/node_modules node main.js",
     format: {
-      run: "refmt main.re",
+      run: "refmt",
       input: `print_string("Hello, world!\\n")
 `,
     },
@@ -1695,7 +1695,7 @@ binding_irb.run(IRB.conf)
     run: "ruby main.rb",
     ensure: `ruby -e 'raise "version mismatch, expected #{RUBY_VERSION}" unless ENV["PATH"].include? ".gem/ruby/#{RUBY_VERSION}/bin"'`,
     format: {
-      run: "cat main.rb | rufo -x",
+      run: "rufo -x",
       input: `puts "Hello, world!";
 `,
     },
@@ -1758,7 +1758,7 @@ binding_irb.run(IRB.conf)
     main: "main.scss",
     run: "sass main.scss",
     format: {
-      run: "prettier --no-config main.scss",
+      run: "prettier --no-config --stdin-filepath=format.scss",
       input: `body:before {
     content: "Hello, world!";
 }
@@ -2044,7 +2044,7 @@ a
     main: "main.ts",
     run: `ts-node -i -e "$(< main.ts)"`,
     format: {
-      run: "prettier --no-config main.ts",
+      run: "prettier --no-config --stdin-filepath=format.ts",
       input: `console.log('Hello, world!');
 `,
     },
@@ -2151,7 +2151,7 @@ message:
     compile: "cat main.yaml | yj -yj > main.json",
     run: "cat main.json | jq .",
     format: {
-      run: "prettier --no-config main.yaml",
+      run: "prettier --no-config --stdin-filepath=format.yaml",
       input: `output: 'Hello, world!'
 `,
     },
