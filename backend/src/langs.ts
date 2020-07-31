@@ -68,7 +68,13 @@ export const langs: { [key: string]: LangConfig } = {
     main: "main.adb",
     compile: "x86_64-linux-gnu-gnatmake-9 main.adb",
     run: "./main",
-    lsp: { start: "ada_language_server" },
+    lsp: {
+      start: "ada_language_server",
+      code: `
+   Ada.IO`,
+      after: `);`,
+      item: "IO_Exceptions",
+    },
     template: `with Ada.Text_IO;
 
 procedure Main is
@@ -155,7 +161,11 @@ implement main0 () = ()
     main: "main.bash",
     run: "bash --rcfile main.bash",
     scope: { code: `x="$(expr 123 \\* 234)"`, input: `echo "$x"` },
-    lsp: { start: "bash-language-server start" },
+    lsp: {
+      start: "bash-language-server start",
+      code: "read",
+      item: "readonly",
+    },
     template: `echo "Hello, world!"
 `,
   },

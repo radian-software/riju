@@ -246,7 +246,7 @@ class Test {
     const after = this.config.lsp!.after;
     const item = this.config.lsp!.item!; // FIXME
     const idx = after
-      ? this.config.template.indexOf(after)
+      ? this.config.template.indexOf(after) + after.length
       : this.config.template.length;
     const code =
       this.config.template.slice(0, idx) +
@@ -522,7 +522,7 @@ class Test {
               },
             });
           } else if (msg.output.id === "ecdb8a55-f755-4553-ae8e-91d6ebbc2045") {
-            return msg.output.result.items;
+            return msg.output.result.items || msg.output.result;
           }
         }
       }
