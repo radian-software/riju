@@ -1686,6 +1686,7 @@ main = do
     },
     template: `print("Hello, world!")
 `,
+    timeout: 15,
   },
   قلب: {
     aliases: ["qalb"],
