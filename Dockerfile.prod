@@ -68,3 +68,4 @@ RUN sudo cp -a /tmp/riju/* /home/docker/src/ && rm -rf /tmp/riju
 
 WORKDIR /home/docker/src
 RUN sudo deluser docker sudo
+RUN yarn test
