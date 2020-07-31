@@ -27,7 +27,7 @@ export interface LangConfig {
   ensure?: string;
   format?: {
     run: string;
-    input?: string; // FIXME
+    input?: string;
     output?: string;
   };
   pkg?: {
@@ -692,7 +692,7 @@ end`,
     lsp: { start: "/opt/elixir-ls/language_server.sh" },
     template: `IO.puts("Hello, world!")
 `,
-    skip: ["repl", "runrepl"],
+    skip: ["repl", "runrepl", "scope"],
   },
   elm: {
     name: "Elm",
@@ -828,16 +828,25 @@ USE: io
     input: `expr 123 \\* 234`,
     main: "main.fish",
     run: 'SHELL=/usr/bin/fish fish -C "$(< main.fish)"',
+    scope: {
+      code: `set x (expr 123 \\* 234)`,
+      input: `echo $x`,
+    },
     template: `echo "Hello, world!"
 `,
   },
   forth: {
-    aliases: ["fs", "gforth"],
+    aliases: ["gforth"],
     name: "Forth",
     repl: "gforth",
     input: "123 234 * .",
     main: "main.fs",
     run: "gforth main.fs",
+    scope: {
+      code: `VARIABLE X
+123 234 * X !`,
+      input: `X @ .`,
+    },
     template: `." Hello, world!" CR
 `,
   },
@@ -869,6 +878,10 @@ USE: io
     input: "123 * 234 ;;",
     main: "main.fsx",
     run: "fsharpi --use:main.fsx",
+    scope: {
+      code: `let x = 123 * 234`,
+      input: `x ;;`,
+    },
     template: `printfn "Hello, world!"
 `,
     timeout: 15,
@@ -914,17 +927,28 @@ func main() {
     repl: `JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" groovysh`,
     main: "main.groovy",
     run: `JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" groovysh main.groovy`,
+    scope: {
+      code: `x = 123 * 234;`,
+    },
     template: `print "Hello, world!";
 `,
     timeout: 15,
   },
   hack: {
+    aliases: ["hhvm"],
     name: "Hack",
     repl: "hhvm -a",
     input: "print 123 * 234",
     main: "main.hack",
     run: "hhvm -a main.hack",
     helloInput: "r",
+    scope: {
+      code: `function x() : int {
+  return 123 * 234;
+}`,
+      input: `r
+p x()`,
+    },
     template: `<<__EntryPoint>>
 function main(): void {
   echo "Hello, world!\\n";
@@ -937,6 +961,9 @@ function main(): void {
     repl: "rm -f .ghci && ghci",
     main: "Main.hs",
     run: "(echo ':load Main' && echo 'main') > .ghci && ghci",
+    scope: {
+      code: `x = 123 * 234`,
+    },
     format: {
       run: "brittany",
       input: `module Main where
@@ -1001,6 +1028,9 @@ l ; ; o ; * 4
     input: "(* 123 234)",
     main: "main.hy",
     run: "hy -i main.hy",
+    scope: {
+      code: `(setv x (* 123 234))`,
+    },
     template: `(print "Hello, world!")
 `,
   },
@@ -1083,10 +1113,10 @@ PLEASE GIVE UP
     monacoLang: "javascript",
     repl: "node",
     main: "main.js",
-    run: `node -e '
-eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
-require("repl").start()
-'`,
+    run: `node -e "$(< main.js)" -i`,
+    scope: {
+      code: `let x = 123 * 234;`,
+    },
     format: {
       run: "prettier --no-config --stdin-filepath=format.js",
       input: `console.log('Hello, world!');
@@ -1107,6 +1137,9 @@ require("repl").start()
     repl: "julia",
     main: "main.jl",
     run: "julia -L main.jl",
+    scope: {
+      code: `x = 123 * 234`,
+    },
     lsp: {
       start: `JULIA_DEPOT_PATH=:/opt/julia julia -e 'using LanguageServer; run(LanguageServerInstance(stdin, stdout))'`,
       config: null,
@@ -1156,6 +1189,10 @@ require("repl").start()
     main: ".kshrc",
     createEmpty: ``,
     run: `SHELL=/usr/bin/ksh HOME="$PWD" ksh`,
+    scope: {
+      code: `x="$(expr 123 * 234)"`,
+      input: `echo "$x"`,
+    },
     template: `echo "Hello, world!"
 `,
   },
@@ -1220,6 +1257,9 @@ KTHXBYE
     repl: "lua",
     main: "main.lua",
     run: "lua -i main.lua",
+    scope: {
+      code: `x = 123 * 234`,
+    },
     lsp: { start: "java -cp /usr/lib/EmmyLua-LS.jar com.tang.vscode.MainKt" },
     template: `print("Hello, world!")
 `,
@@ -1380,6 +1420,11 @@ int main() {
     repl: "ocaml",
     input: "123 * 234 ;;",
     run: "ocaml -init main.ml",
+    scope: {
+      code: `;;
+let x = 123 * 234`,
+      input: `x ;;`,
+    },
     format: {
       run: "touch .ocamlformat; ocamlformat --name=format.ml -",
       input: `print_string "Hello, world!\\n";;
@@ -1396,6 +1441,9 @@ print_string "Hello, world!\\n"
     repl: "octave",
     main: "main.m",
     run: "octave --persist main.m",
+    scope: {
+      code: `x = 123 * 234`,
+    },
     template: `disp("Hello, world!")
 `,
   },
@@ -1460,12 +1508,16 @@ end.
     repl: "re.pl",
     main: "main.pl",
     run: "re.pl --rcfile ./main.pl",
+    scope: {
+      code: `my $x = 123 * 234;`,
+      input: `$x`,
+    },
     format: {
       run: "perltidy",
-      input: `print ("Hello, world!\\n")
+      input: `print ("Hello, world!\\n");
 `,
     },
-    template: `print("Hello, world!\\n")
+    template: `print("Hello, world!\\n");
 `,
   },
   php: {
@@ -1476,6 +1528,10 @@ end.
     input: "print 123 * 234;",
     main: "main.php",
     run: "php -d auto_prepend_file=main.php -a",
+    scope: {
+      code: `$x = 123 * 234;`,
+      input: `echo $x;`,
+    },
     lsp: { start: "intelephense --stdio" },
     template: `<?php
 
@@ -1528,19 +1584,27 @@ pipi pikachu
     input: `expr 123 "*" 234`,
     main: "main.ps1",
     run: "SHELL=/usr/bin/pwsh pwsh -NoExit main.ps1",
+    scope: {
+      code: `Set-Variable x "$(expr 123 "*" 234)"`,
+      input: `echo $x`,
+    },
     lsp: {
       start: `pwsh -NoLogo -NoProfile -Command "/opt/powershell-editor-services/PowerShellEditorServices/Start-EditorServices.ps1 -BundledModulesPath /opt/powershell-editor-services -LogPath '$PWD/.powershell-editor-services/lsp.log' -SessionDetailsPath '$PWD/.powershell-editor-services/session.json' -FeatureFlags @() -AdditionalModules @() -HostName Riju -HostProfileId 'riju' -HostVersion 0.0 -Stdio -LogLevel Normal"`,
     },
     template: `Write-Host "Hello, world!"
 `,
-    skip: ["repl", "runrepl"],
+    skip: ["repl", "runrepl", "scope"],
   },
   prolog: {
     name: "Prolog",
     repl: "prolog",
-    input: "ANS is 123 * 234.",
+    input: "X is 123 * 234.",
     main: "main.pl",
     run: "prolog main.pl",
+    scope: {
+      code: `x(X) :- X is 123 * 234.`,
+      input: `x(X).`,
+    },
     template: `:- initialization main.
 
 main :-
@@ -1585,6 +1649,9 @@ main = do
     repl: "python3 -u",
     main: "main.py",
     run: "python3 -u -i main.py",
+    scope: {
+      code: `x = 123 * 234`,
+    },
     format: {
       run: "black -",
       input: `print('Hello, world!')
@@ -1618,6 +1685,10 @@ main = do
     main: "main.qalb",
     hello: "مرحبا يا عالم",
     run: "node /opt/qalb/repl.js main.qalb",
+    scope: {
+      code: `(حدد خ (ضرب ١٢٣ ٢٣٤))`,
+      input: `خ`,
+    },
     template: `(قول "مرحبا يا عالم")
 `,
   },
@@ -1628,6 +1699,9 @@ main = do
     repl: "R",
     main: ".Rprofile",
     run: "R --no-save",
+    scope: {
+      code: `x = 123 * 234`,
+    },
     template: `print("Hello, world!")
 `,
   },
@@ -1638,6 +1712,11 @@ main = do
     input: "(* 123 234)",
     main: "main.rkt",
     run: `racket -i -e '(enter! "main.rkt") (display "[ type (enter! \\"main.rkt\\") to access local variables ]\\n")'`,
+    scope: {
+      code: `(define x (* 123 234))`,
+      input: `(enter! "main.rkt")
+x`,
+    },
     template: `#lang racket/base
 (display "Hello, world!\\n")
 `,
@@ -1752,6 +1831,9 @@ binding_irb = IRB::Irb.new(workspace)
 binding_irb.run(IRB.conf)
 `,
     run: "ruby main.rb",
+    scope: {
+      code: `x = 5`,
+    },
     ensure: `ruby -e 'raise "version mismatch, expected #{RUBY_VERSION}" unless ENV["PATH"].include? ".gem/ruby/#{RUBY_VERSION}/bin"'`,
     format: {
       run: "rufo -x",
@@ -1766,7 +1848,7 @@ binding_irb.run(IRB.conf)
     lsp: { start: "solargraph stdio" },
     template: `puts "Hello, world!"
 `,
-    skip: ["repl", "runrepl"],
+    skip: ["repl", "runrepl", "scope"],
   },
   rust: {
     aliases: ["rs", "rustc"],
@@ -1794,6 +1876,9 @@ binding_irb.run(IRB.conf)
     repl: "scala",
     main: "main.scala",
     run: "scala -i main.scala",
+    scope: {
+      code: `val x = 123 * 234`,
+    },
     template: `println("Hello, world!")
 `,
     timeout: 30,
@@ -1806,9 +1891,11 @@ binding_irb.run(IRB.conf)
     input: "(* 123 234)",
     main: "main.scm",
     run: "mit-scheme --load main.scm",
-    template: `(begin
-  (display "Hello, world!")
-  (newline))
+    scope: {
+      code: `(define x (* 123 234))`,
+    },
+    template: `(display "Hello, world!")
+(newline)
 `,
   },
   scss: {
@@ -1853,6 +1940,10 @@ binding_irb.run(IRB.conf)
     main: ".profile",
     createEmpty: ``,
     run: `SHELL=/usr/bin/sh HOME="$PWD" posh -l`,
+    scope: {
+      code: `x="$(expr 123 \\* 234)"`,
+      input: `echo "$x"`,
+    },
     template: `echo "Hello, world!"
 `,
   },
@@ -2000,6 +2091,10 @@ END
     input: "123 * 234;",
     main: "main.sml",
     run: "rlwrap sml main.sml",
+    scope: {
+      code: `val x = 123 * 234;`,
+      input: `x;`,
+    },
     template: `print "Hello, world!\\n";
 `,
   },
@@ -2023,11 +2118,15 @@ END
     main: ".tclshrc",
     createEmpty: ``,
     run: `HOME="$PWD" tclsh`,
+    scope: {
+      code: `set x [expr 123 * 234]`,
+      input: `echo $x`,
+    },
     template: `puts {Hello, world!}
 `,
   },
   tcsh: {
-    aliases: ["tcshell", "tcshrc"],
+    aliases: ["tcshell", "tcshrc", "csh"],
     name: "Tcsh",
     monacoLang: "shell",
     repl: `SHELL=/usr/bin/tcsh HOME="$PWD" tcsh`,
@@ -2035,6 +2134,10 @@ END
     main: ".tcshrc",
     createEmpty: ``,
     run: `SHELL=/usr/bin/tcsh HOME="$PWD" tcsh`,
+    scope: {
+      code: "set x=`expr 123 \\* 234`",
+      input: `echo "$x"`,
+    },
     template: `echo "Hello, world!"
 `,
   },
@@ -2042,12 +2145,18 @@ END
     aliases: ["latex", "xetex", "plaintex"],
     name: "TeX",
     repl: "tex",
-    input: `\\newcount\\ans
-\\advance\\ans by 123
-\\multiply\\ans by 234
-\\message{\\the\\ans}`,
+    input: `\\newcount\\x
+\\advance\\x by 123
+\\multiply\\x by 234
+\\message{\\the\\x}`,
     main: "main.tex",
     run: "tex main.tex",
+    scope: {
+      code: `\\newcount\\x
+\\advance\\x by 123
+\\multiply\\x by 234`,
+      input: `\\message{\\the\\x}`,
+    },
     lsp: { start: "digestif", lang: "tex" },
     template: `\\message{Hello, world!}
 `,
@@ -2102,6 +2211,9 @@ a
     repl: "ts-node",
     main: "main.ts",
     run: `ts-node -i -e "$(< main.ts)"`,
+    scope: {
+      code: `let x = 123 * 234;`,
+    },
     format: {
       run: "prettier --no-config --stdin-filepath=format.ts",
       input: `console.log('Hello, world!');
@@ -2127,6 +2239,10 @@ a
     input: ":echo 123 * 234",
     main: "main.vim",
     run: `vim -c "$(< main.vim)"`,
+    scope: {
+      code: `:let x = 123 * 234`,
+      input: `:echo x`,
+    },
     lsp: { start: "vim-language-server --stdio" },
     template: `:echo "Hello, world!"
 `,
@@ -2176,6 +2292,9 @@ End Module
     repl: "mathics",
     main: "main.wls",
     run: "mathics --persist main.wls",
+    scope: {
+      code: `x = 123 * 234`,
+    },
     template: `Print["Hello, world!"]
 `,
     timeout: 15,
@@ -2256,6 +2375,10 @@ message:
     main: ".zshrc",
     createEmpty: ``,
     run: `SHELL=/usr/bin/zsh ZDOTDIR="$PWD" zsh`,
+    scope: {
+      code: `x="$(expr 123 \\* 234)"`,
+      input: `echo "$x"`,
+    },
     template: `echo "Hello, world!"
 `,
   },
