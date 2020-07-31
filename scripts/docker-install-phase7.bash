@@ -5,6 +5,14 @@ set -o pipefail
 set -x
 pushd /tmp >/dev/null
 
+# Cmd
+useradd -m -N -l -r -p '!' build
+sudo -u build wine cmd < /dev/null
+mkdir -p /opt/cmd/home-template
+cp -R /home/build/.wine /opt/cmd/home-template/
+chmod -R a=u,go-w /opt/cmd/home-template
+userdel -r build
+
 # PureScript
 mkdir project-template
 pushd project-template >/dev/null

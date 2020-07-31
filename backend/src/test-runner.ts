@@ -214,7 +214,7 @@ class Test {
     const code = this.config.scope!.code;
     const after = this.config.scope!.after;
     const input = this.config.scope!.input || "x";
-    const output = this.config.scope!.output || "222222";
+    const output = this.config.scope!.output || "28782";
     let allCode = this.config.template;
     if (!allCode.endsWith("\n")) {
       allCode += "\n";

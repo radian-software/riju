@@ -91,6 +91,9 @@ end Main;
     input: "123 × 234",
     main: "main.apl",
     run: "apl -f main.apl",
+    scope: {
+      code: `x ← 123 × 234`,
+    },
     template: `'Hello, world!'
 `,
   },
@@ -151,6 +154,7 @@ implement main0 () = ()
     input: `expr 123 \\* 234`,
     main: "main.bash",
     run: "bash --rcfile main.bash",
+    scope: { code: `x="$(expr 123 \\* 234)"`, input: `echo "$x"` },
     lsp: { start: "bash-language-server start" },
     template: `echo "Hello, world!"
 `,
@@ -162,6 +166,10 @@ implement main0 () = ()
     input: "PRINT 123 * 234",
     main: "main.bas",
     run: "bwbasic main.bas",
+    scope: {
+      code: `x = 123 * 234`,
+      input: `PRINT x`,
+    },
     template: `PRINT "Hello, world!"
 `,
   },
@@ -431,10 +439,15 @@ Refrigerate for 1 hour.
     aliases: ["bat", "batch", "wine"],
     name: "Cmd",
     monacoLang: "bat",
+    setup: "shopt -s dotglob; cp -R /opt/cmd/home-template/* ./",
     repl: "wine cmd",
     input: "set /a 123 * 234",
     main: "main.bat",
     run: `wine cmd /k main.bat`,
+    scope: {
+      code: `set /a x = 123 * 234`,
+      input: `echo %x%`,
+    },
     template: `echo "Hello, world!"
 `,
     timeout: 15,
@@ -446,6 +459,9 @@ Refrigerate for 1 hour.
     input: "(* 123 234)",
     main: "main.lisp",
     run: "rlwrap sbcl --userinit main.lisp",
+    scope: {
+      code: `(defvar x (* 123 234))`,
+    },
     template: `(format t "Hello, world!")
 `,
   },
@@ -549,6 +565,9 @@ int main() {
     input: "(* 123 234)",
     main: "main.clj",
     run: "clojure -i main.clj -r",
+    scope: {
+      code: `(def x (* 123 234))`,
+    },
     lsp: { start: "clojure-lsp" },
     template: `(println "Hello, world!")
 `,
@@ -561,6 +580,9 @@ int main() {
     input: "(* 123 234)",
     main: "main.cljs",
     run: "lumo -i main.cljs -r",
+    scope: {
+      code: `(def x (* 123 234))`,
+    },
     template: `(println "Hello, world!")
 `,
   },
@@ -588,6 +610,9 @@ PROCEDURE DIVISION.
 eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
 require("/usr/lib/node_modules/coffeescript/repl").start()
 '`,
+    scope: {
+      code: `x = 123 * 234`,
+    },
     template: `console.log "Hello, world!"
 `,
   },
@@ -656,6 +681,14 @@ void main()
     repl: "iex",
     main: "main.exs",
     run: "iex main.exs",
+    scope: {
+      code: `defmodule Scope do
+  def x do
+    123 * 234
+  end
+end`,
+      input: `Scope.x`,
+    },
     lsp: { start: "/opt/elixir-ls/language_server.sh" },
     template: `IO.puts("Hello, world!")
 `,
@@ -666,6 +699,11 @@ void main()
     repl: "elm repl",
     main: "Main.elm",
     run: "cp /opt/elm/elm.json elm.json && run-elm Main.elm; elm repl",
+    scope: {
+      code: `x = 123 * 234`,
+      input: `import Main
+Main.x`,
+    },
     lsp: {
       setup: "cp /opt/elm/elm.json elm.json",
       start: "elm-language-server --stdio",
@@ -680,10 +718,14 @@ output = "Hello, world!"
     aliases: ["elv"],
     name: "Elvish",
     repl: `SHELL=/usr/bin/elvish HOME="$PWD" elvish`,
-    input: `expr 123 "*" 234`,
+    input: `* 123 234`,
     main: ".elvish/rc.elv",
     createEmpty: ``,
     run: `SHELL=/usr/bin/elvish HOME="$PWD" elvish`,
+    scope: {
+      code: `x = (* 123 234)`,
+      input: `echo $x`,
+    },
     template: `echo "Hello, world!"
 `,
   },
@@ -694,6 +736,9 @@ output = "Hello, world!"
     input: "(* 123 234)",
     main: "main.el",
     run: `emacs --load main.el --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (ielm))"`,
+    scope: {
+      code: `(defvar x (* 123 234))`,
+    },
     pkg: {
       install: `emacs -Q --batch --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (unless (ignore-errors (>= (length (directory-files \"~/.emacs.d/elpa/archives\")) 4)) (package-refresh-contents)) (package-install 'NAME))"`,
       uninstall: `ls ~/.emacs.d/elpa | grep -- - | grep '^NAME-[0-9]' | while read pkg; do emacs -Q --batch --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (unless (ignore-errors (>= (length (directory-files \"~/.emacs.d/elpa/archives\")) 4)) (package-refresh-contents)) (call-interactively 'package-delete))" <<< "$pkg"; done`,
@@ -735,6 +780,13 @@ output = "Hello, world!"
     compile: "erl -compile main",
     run: "erl -s main main",
     lsp: { start: "erlang_ls" },
+    scope: {
+      code: `-export([x/0]).
+x() -> 123 * 234.
+`,
+      after: `-export([main/0]).`,
+      input: `main:x().`,
+    },
     template: `-module(main).
 -export([main/0]).
 
@@ -758,7 +810,14 @@ main() ->
     main: ".factor-rc",
     createEmpty: ``,
     run: "factor-lang",
-    template: `USE: io
+    scope: {
+      code: `USE: math
+: x ( -- x ) 123 234 * ;`,
+      input: `USE: main
+x`,
+    },
+    template: `IN: main
+USE: io
 
 "Hello, world!" print
 `,
