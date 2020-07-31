@@ -542,9 +542,9 @@ function lint(lang: string) {
   }
   // These can be removed when the types are adjusted to make these
   // situations impossible.
-  // if (config.format && !config.format.input) {
-  //   throw new Error("formatter is missing test");
-  // }
+  if (config.format && !config.format.input) {
+    throw new Error("formatter is missing test");
+  }
   // if (config.lsp && !(config.lsp.code && config.lsp.item)) {
   //   throw new Error("LSP is missing test");
   // }
@@ -568,9 +568,9 @@ const testTypes: {
   scope: {
     pred: ({ scope }) => (scope ? true : false),
   },
-  // format: {
-  //   pred: ({ format }) => (format ? true : false),
-  // },
+  format: {
+    pred: ({ format }) => (format ? true : false),
+  },
   // lsp: { pred: ({ lsp }) => (lsp ? true : false) },
 };
 

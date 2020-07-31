@@ -46,6 +46,13 @@ container first:
 Note that building the image typically requires over an hour and 20 GB
 of disk space.
 
+## Maintainer guide
+### Updating brittany
+
+Install latest version of Cabal v3, then use it with `--installdir` to
+create a binary linked to `/usr/lib/ghc` and slap this on Google
+Drive.
+
 ## Flag
 
 [![Flag](flag.png)](https://www.reddit.com/r/Breath_of_the_Wild/comments/947ewf/flag_of_the_gerudo_based_on_the_flag_of_kazakhstan/)

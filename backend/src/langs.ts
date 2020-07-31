@@ -330,7 +330,17 @@ Nude pagoda careens.
     main: "main.c",
     compile: "clang -Wall -Wextra main.c -o main",
     run: "./main",
-    format: { run: "clang-format main.c" },
+    format: {
+      run: "clang-format main.c",
+      input: `#include <stdio.h>
+
+int main()
+{
+  printf("Hello, world!\\n");
+  return 0;
+}
+`,
+    },
     lsp: {
       setup: `echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
       start: "clangd",
@@ -474,7 +484,17 @@ Refrigerate for 1 hour.
     main: "main.cpp",
     compile: "clang++ -Wall -Wextra main.cpp -o main",
     run: "./main",
-    format: { run: "clang-format main.cpp" },
+    format: {
+      run: "clang-format main.cpp",
+      input: `#include <iostream>
+
+int main()
+{
+  std::cout << "Hello, world!" << std::endl;
+  return 0;
+}
+`,
+    },
     lsp: {
       setup: `echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
       start: "clangd",
@@ -505,6 +525,14 @@ int main() {
     run: "mono main.exe",
     format: {
       run: `clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" main.cs`,
+      input: `class main
+{
+    static void Main(string[] args)
+    {
+        System.Console.WriteLine("Hello, world!");
+    }
+}
+`,
     },
     template: `class main {
     static void Main(string[] args) {
@@ -569,7 +597,15 @@ require("/usr/lib/node_modules/coffeescript/repl").start()
     main: "main.d",
     compile: "dmd main.d",
     run: "./main",
-    format: { run: "dfmt main.d" },
+    format: {
+      run: "dfmt main.d",
+      input: `import std.stdio;
+
+void main() {
+    writeln("Hello, world!");
+}
+`,
+    },
     template: `import std.stdio;
 
 void main()
@@ -785,7 +821,17 @@ main() ->
     main: "main.go",
     compile: "go build main.go",
     run: "./main",
-    format: { run: "cat main.go | gofmt" },
+    format: {
+      run: "cat main.go | gofmt",
+      input: `package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("Hello, world!");
+}
+`,
+    },
     lsp: { start: "gopls" },
     template: `package main
 
@@ -832,7 +878,15 @@ function main(): void {
     repl: "rm -f .ghci && ghci",
     main: "Main.hs",
     run: "(echo ':load Main' && echo 'main') > .ghci && ghci",
-    format: { run: "brittany Main.hs" },
+    format: {
+      run: "brittany Main.hs",
+      input: `module Main where
+
+main :: IO ()
+main =
+  putStrLn "Hello, world!"
+`,
+    },
     lsp: {
       setup: "cp /opt/haskell/hie.yaml hie.yaml",
       start: "HIE_HOOGLE_DATABASE=/opt/haskell/hoogle.hoo hie --lsp",
@@ -948,12 +1002,44 @@ PLEASE GIVE UP
     run: "java Main",
     format: {
       run: `clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" Main.java`,
+      input: `public class Main
+{
+    public static void main(String[] args)
+    {
+        System.out.println("Hello, world!");
+    }
+}
+`,
     },
     template: `public class Main {
     public static void main(String[] args) {
         System.out.println("Hello, world!");
     }
 }
+`,
+  },
+  javascript: {
+    aliases: ["node", "js", "web", "jsx", "v8", "closure", "nodejs"],
+    name: "Node.js",
+    monacoLang: "javascript",
+    repl: "node",
+    main: "main.js",
+    run: `node -e '
+eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
+require("repl").start()
+'`,
+    format: {
+      run: "prettier --no-config main.js",
+      input: `console.log('Hello, world!');
+`,
+    },
+    pkg: {
+      install: "yarn add NAME",
+      uninstall: "yarn remove NAME",
+      search:
+        "curl -sS 'https://registry.npmjs.org/-/v1/search?text=NAME' | jq -r '.objects | map(.package.name) | .[]'",
+    },
+    template: `console.log("Hello, world!");
 `,
   },
   julia: {
@@ -1020,7 +1106,13 @@ PLEASE GIVE UP
     monacoLang: "less",
     main: "main.less",
     run: "lessc main.less",
-    format: { run: "prettier --no-config main.less" },
+    format: {
+      run: "prettier --no-config main.less",
+      input: `body:before {
+    content: "Hello, world!";
+}
+`,
+    },
     template: `body:before {
   content: "Hello, world!";
 }
@@ -1109,7 +1201,12 @@ KTHXBYE
     main: "main.md",
     compile: "pandoc main.md -o main.html",
     run: "prettier --no-config main.html",
-    format: { run: "prettier --no-config main.md" },
+    format: {
+      run: "prettier --no-config main.md",
+      input: `Hello, world!
+
+`,
+    },
     template: `Hello, world!
 `,
   },
@@ -1184,26 +1281,6 @@ message:
     template: `echo "Hello, world!"
 `,
   },
-  nodejs: {
-    aliases: ["node", "js", "javascript", "web", "jsx", "v8", "closure"],
-    name: "Node.js",
-    monacoLang: "javascript",
-    repl: "node",
-    main: "main.js",
-    run: `node -e '
-eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
-require("repl").start()
-'`,
-    format: { run: "prettier --no-config main.js" },
-    pkg: {
-      install: "yarn add NAME",
-      uninstall: "yarn remove NAME",
-      search:
-        "curl -sS 'https://registry.npmjs.org/-/v1/search?text=NAME' | jq -r '.objects | map(.package.name) | .[]'",
-    },
-    template: `console.log("Hello, world!")
-`,
-  },
   objectivec: {
     aliases: ["objc", "gnustep"],
     name: "Objective-C",
@@ -1212,7 +1289,18 @@ require("repl").start()
     compile:
       "gcc $(gnustep-config --objc-flags) main.m $(gnustep-config --base-libs) -o main",
     run: "./main",
-    format: { run: "clang-format main.m" },
+    format: {
+      run: "clang-format main.m",
+      input: `#import <Foundation/Foundation.h>
+
+int main() {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    NSLog(@"Hello, world!");
+    [pool drain];
+    return 0;
+}
+`,
+    },
     lsp: {
       setup: `(gnustep-config --objc-flags && gnustep-config --base-libs) | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
       start: "clangd",
@@ -1233,9 +1321,14 @@ int main() {
     repl: "ocaml",
     input: "123 * 234 ;;",
     run: "ocaml -init main.ml",
-    format: { run: "ocamlformat main.ml" },
+    format: {
+      run: "touch .ocamlformat; ocamlformat main.ml",
+      input: `print_string "Hello, world!\\n";;
+`,
+    },
     lsp: { start: "ocamllsp", lang: "ocaml" },
-    template: `print_string "Hello, world!\\n";;
+    template: `;;
+print_string "Hello, world!\\n"
 `,
   },
   octave: {
@@ -1308,7 +1401,11 @@ end.
     repl: "re.pl",
     main: "main.pl",
     run: "re.pl --rcfile ./main.pl",
-    format: { run: "cat main.pl | perltidy" },
+    format: {
+      run: "cat main.pl | perltidy",
+      input: `print ("Hello, world!\\n")
+`,
+    },
     template: `print("Hello, world!\\n")
 `,
   },
@@ -1500,12 +1597,16 @@ main = do
     main: "main.re",
     compile: "bsc main.re > main.js",
     run: "NODE_PATH=/usr/lib/node_modules node main.js",
-    format: { run: "ocamlformat main.re" },
+    format: {
+      run: "refmt main.re",
+      input: `print_string("Hello, world!\\n")
+`,
+    },
     lsp: {
       setup: `cp -a /opt/reasonml/project-template/* ./`,
       start: "reason-language-server",
     },
-    template: `print_string("Hello, world!\\n")
+    template: `print_string("Hello, world!\\n");
 `,
   },
   redis: {
@@ -1593,7 +1694,11 @@ binding_irb.run(IRB.conf)
 `,
     run: "ruby main.rb",
     ensure: `ruby -e 'raise "version mismatch, expected #{RUBY_VERSION}" unless ENV["PATH"].include? ".gem/ruby/#{RUBY_VERSION}/bin"'`,
-    format: { run: "cat main.rb | rufo -x" },
+    format: {
+      run: "cat main.rb | rufo -x",
+      input: `puts "Hello, world!";
+`,
+    },
     pkg: {
       install: "gem install --user-install NAME",
       uninstall: "gem uninstall --user-install NAME",
@@ -1652,7 +1757,13 @@ binding_irb.run(IRB.conf)
     monacoLang: "scss",
     main: "main.scss",
     run: "sass main.scss",
-    format: { run: "prettier --no-config main.scss" },
+    format: {
+      run: "prettier --no-config main.scss",
+      input: `body:before {
+    content: "Hello, world!";
+}
+`,
+    },
     template: `body:before {
   content: "Hello, world!";
 }
@@ -1932,7 +2043,11 @@ a
     repl: "ts-node",
     main: "main.ts",
     run: `ts-node -i -e "$(< main.ts)"`,
-    format: { run: "prettier --no-config main.ts" },
+    format: {
+      run: "prettier --no-config main.ts",
+      input: `console.log('Hello, world!');
+`,
+    },
     template: `console.log("Hello, world!");
 `,
     timeout: 15,
@@ -2035,7 +2150,11 @@ message:
     main: "main.yaml",
     compile: "cat main.yaml | yj -yj > main.json",
     run: "cat main.json | jq .",
-    format: { run: "prettier --no-config main.yaml" },
+    format: {
+      run: "prettier --no-config main.yaml",
+      input: `output: 'Hello, world!'
+`,
+    },
     template: `output: "Hello, world!"
 `,
   },

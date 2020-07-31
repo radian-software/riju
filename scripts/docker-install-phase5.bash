@@ -68,6 +68,7 @@ opam install -y ocamlformat
 opam pin add -y ocaml-lsp-server https://github.com/ocaml/ocaml-lsp.git
 ln -s /opt/opam/default/bin/ocamlformat /usr/local/bin/ocamlformat
 ln -s /opt/opam/default/bin/ocamllsp /usr/local/bin/ocamllsp
+ln -s /opt/opam/default/bin/refmt /usr/local/bin/refmt
 
 # Perl
 cpanm -n Devel::REPL
@@ -90,6 +91,7 @@ pip3 install black
 
 # ReasonML
 npm install -g bs-platform
+opam install -y reason
 
 # Ruby
 gem install rufo
