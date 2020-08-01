@@ -1650,7 +1650,7 @@ main :: Effect Unit
 main = do
   log "Hello, world!"
 `,
-    timeout: 45,
+    timeout: 60,
   },
   python: {
     aliases: ["python3", "python2", "py"],

@@ -11,7 +11,7 @@ import * as api from "./api";
 import { LangConfig, langs } from "./langs";
 
 const TIMEOUT_SECS = 5;
-const CONCURRENCY = 16;
+const CONCURRENCY = 2;
 
 function findPosition(str: string, idx: number) {
   const lines = str.substring(0, idx).split("\n");
