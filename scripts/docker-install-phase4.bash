@@ -5,73 +5,81 @@ set -o pipefail
 set -x
 pushd /tmp >/dev/null
 
+latest_release() {
+    curl -sSL "https://api.github.com/repos/$1/releases/latest" | jq -r .tag_name
+}
+
 # Needed for project infrastructure
-wget -nv https://github.com/watchexec/watchexec/releases/download/1.13.1/watchexec-1.13.1-x86_64-unknown-linux-gnu.deb
+ver="$(latest_release watchexec/watchexec)"
+wget -nv "https://github.com/watchexec/watchexec/releases/download/${rel}/watchexec-${ver}-x86_64-unknown-linux-gnu.deb"
 dpkg -i watchexec-*.deb
 rm watchexec-*.deb
 
 git clone https://github.com/circulosmeos/gdown.pl.git
-mv gdown.pl/gdown.pl /usr/bin/gdown
+mv gdown.pl/gdown.pl /usr/local/bin/gdown
 rm -rf gdown.pl
 
 # Shared
-wget -nv https://github.com/jgm/pandoc/releases/download/2.10/pandoc-2.10-linux-amd64.tar.gz
+ver="$(latest_release jgm/pandoc)"
+wget -nv "https://github.com/jgm/pandoc/releases/download/${ver}/pandoc-${ver}-linux-amd64.tar.gz"
 tar -xf pandoc-*-linux-amd64.tar.gz -C /usr --strip-components=1
 rm pandoc-*-linux-amd64.tar.gz
 
 # ><>
-wget -nv https://gist.githubusercontent.com/anonymous/6392418/raw/3b16018cb47f2f9ad1fa085c155cc5c0dc448b2d/fish.py -O /usr/bin/esofish
-sed -i 's:^#!.*:#!/usr/bin/env python3:' /usr/bin/esofish
-chmod +x /usr/bin/esofish
+wget -nv https://gist.githubusercontent.com/anonymous/6392418/raw/fish.py -O /usr/local/bin/esofish
+sed -i 's:^#!.*:#!/usr/bin/env python3:' /usr/local/bin/esofish
+chmod +x /usr/local/bin/esofish
 
 # Ada
 wget -nv https://dl.bintray.com/reznikmm/ada-language-server/linux-latest.tar.gz
 tar -xf linux-latest.tar.gz
-mv linux/ada_language_server /usr/bin/ada_language_server
+mv linux/ada_language_server /usr/local/bin/ada_language_server
 mv linux/*.so* /usr/lib/x86_64-linux-gnu/
 rm -rf linux linux-latest.tar.gz
 
 # APL
-wget -nv ftp://ftp.gnu.org/gnu/apl/apl_1.8-1_amd64.deb
+file="$(curl -sS ftp://ftp.gnu.org/gnu/apl/ | grep -Eo 'apl_[-0-9.]+_amd64.deb$' | sort -rV | head -n1)"
+wget -nv "ftp://ftp.gnu.org/gnu/apl/${file}"
 dpkg -i apl_*_amd64.deb
 rm apl_*_amd64.deb
 
-# Ceylon
-wget -nv https://ceylon-lang.org/download/dist/1_3_3_deb -O ceylon.deb
-dpkg -i ceylon.deb
-rm ceylon.deb
-
 # Clojure
-wget -nv https://github.com/snoe/clojure-lsp/releases/download/release-20200629T153107/clojure-lsp
+ver="$(latest_release snoe/clojure-lsp)"
+wget -nv "https://github.com/snoe/clojure-lsp/releases/download/${ver}/clojure-lsp"
 chmod +x clojure-lsp
-mv clojure-lsp /usr/bin/clojure-lsp
+mv clojure-lsp /usr/local/bin/clojure-lsp
 
 # D
-wget -nv http://downloads.dlang.org/releases/2.x/2.092.0/dmd_2.092.0-0_amd64.deb
+wget -nv "$(curl -sSL https://dlang.org/download.html | grep -Eo '"http://[^"]+amd64.deb"' | tr -d '"')"
 dpkg -i dmd_*.deb
 rm dmd_*.deb
 
 # Dhall
-wget -nv https://github.com/dhall-lang/dhall-haskell/releases/download/1.33.1/dhall-json-1.7.0-x86_64-linux.tar.bz2
+ver="$(latest_release dhall-lang/dhall-haskell)"
+file="$(curl -sSL "https://api.github.com/repos/dhall-lang/dhall-haskell/releases/tags/${ver}" | jq -r '.assets | map(select(.name | (contains("dhall-json") and contains("x86_64-linux.tar.bz2")))) | .[0].name')"
+wget -nv "https://github.com/dhall-lang/dhall-haskell/releases/download/${ver}/${file}"
 mkdir dhall-json
 tar -xf dhall-json-*-x86_64-linux.tar.bz2 -C dhall-json
-mv dhall-json/bin/dhall-to-json dhall-json/bin/json-to-dhall /usr/bin/
+mv dhall-json/bin/dhall-to-json dhall-json/bin/json-to-dhall /usr/local/bin/
 rm -rf dhall-json dhall-json-*-x86_64-linux.tar.bz2
 
 # Elixir
-wget -nv https://github.com/elixir-lsp/elixir-ls/releases/download/v0.5.0/elixir-ls.zip
+ver="$(latest_release elixir-lsp/elixir-ls)"
+wget -nv "https://github.com/elixir-lsp/elixir-ls/releases/download/${ver}/elixir-ls.zip"
 unzip -d /opt/elixir-ls elixir-ls.zip
-ln -s /opt/elixir-ls/language_server.sh /usr/bin/elixir-ls
+ln -s /opt/elixir-ls/language_server.sh /usr/local/bin/elixir-ls
 rm elixir-ls.zip
 
 # Elm
-wget -nv https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz
+ver="$(latest_release elm/compiler)"
+wget -nv "https://github.com/elm/compiler/releases/download/${ver}/binary-for-linux-64-bit.gz"
 gunzip binary-for-linux-64-bit.gz
 chmod +x binary-for-linux-64-bit
-mv binary-for-linux-64-bit /usr/bin/elm
+mv binary-for-linux-64-bit /usr/local/bin/elm
 
 # Emojicode
-wget -nv https://github.com/emojicode/emojicode/releases/download/v1.0-beta.2/Emojicode-1.0-beta.2-Linux-x86_64.tar.gz
+ver="$(latest_release emojicode/emojicode)"
+wget -nv "https://github.com/emojicode/emojicode/releases/download/${ver}/Emojicode-$(sed 's/^v//' <<< "$ver")-Linux-x86_64.tar.gz"
 tar -xf Emojicode-*-Linux-x86_64.tar.gz
 pushd Emojicode-*-Linux-x86_64 >/dev/null
 mv emojicodec /usr/local/bin/
@@ -90,64 +98,67 @@ rm Entropy.zip
 # Erlang
 wget -nv https://s3.amazonaws.com/rebar3/rebar3
 chmod +x rebar3
-mv rebar3 /usr/bin/rebar3
+mv rebar3 /usr/local/bin/rebar3
 
 # Euphoria
-wget -nv https://sourceforge.net/projects/rapideuphoria/files/Euphoria/4.0.5/euphoria_4.0.5_amd64.deb/download -O euphoria.deb
+wget -nv "$(curl -sSL https://sourceforge.net/projects/rapideuphoria/best_release.json | jq -r '.platform_releases.linux.url')" -O euphoria.deb
 dpkg -i euphoria.deb
 rm euphoria.deb
 
 # Factor
-wget -nv https://downloads.factorcode.org/releases/0.98/factor-linux-x86-64-0.98.tar.gz
+ver="$(curl -sSL https://factorcode.org/ | grep -Eo 'release\?os=linux[^>]+>[^<]+' | sed -E 's/[^>]+>//' | head -n1)"
+wget -nv "https://downloads.factorcode.org/releases/${ver}/factor-linux-x86-64-${ver}.tar.gz"
 tar -xf factor-linux-x86-64-*.tar.gz
 mv -T factor /opt/factor
-ln -s /opt/factor/factor /usr/bin/factor-lang
+ln -s /opt/factor/factor /usr/local/bin/factor-lang
 rm factor-linux-x86-64-*.tar.gz
 
 # Go
 export GO111MODULE=on
 export GOPATH="$PWD/go"
 go get golang.org/x/tools/gopls@latest
-mv go/bin/gopls /usr/bin/gopls
+mv go/bin/gopls /usr/local/bin/gopls
 rm -rf go
 
 # GolfScript
-wget -nv http://www.golfscript.com/golfscript/golfscript.rb -O /usr/bin/golfscript
-chmod +x /usr/bin/golfscript
+wget -nv http://www.golfscript.com/golfscript/golfscript.rb -O /usr/local/bin/golfscript
+chmod +x /usr/local/bin/golfscript
 
 # Haskell
 wget -nv https://get.haskellstack.org/stable/linux-x86_64-static.tar.gz
 tar -xf linux-x86_64-static.tar.gz
-mv stack-*-linux-x86_64-static/stack /usr/bin/stack
+mv stack-*-linux-x86_64-static/stack /usr/local/bin/stack
 rm -rf stack-*-linux-x86_64-static linux-x86_64-static.tar.gz
 
 wget "https://drive.google.com/uc?export=download&id=1MpozlNLmWeUaQuT-5t6gyE3Yv56gUbea" -O /usr/local/bin/brittany
 chmod +x /usr/local/bin/brittany
 
 mkdir -p /opt/haskell
-gdown "https://drive.google.com/uc?export=download&id=1GPoR_ja4ns16KCamRgwB-JVag4HK0igz" /usr/bin/hie
+gdown "https://drive.google.com/uc?export=download&id=1GPoR_ja4ns16KCamRgwB-JVag4HK0igz" /usr/local/bin/hie
 gdown "https://drive.google.com/uc?export=download&id=1qSxj8JjAeetAmNjUGayX0RBARgr5R4Ij" /opt/haskell/hoogle.hoo
-chmod +x /usr/bin/hie
+chmod +x /usr/local/bin/hie
 
 # HCL/TOML/YAML
-wget -nv https://github.com/sclevine/yj/releases/download/v4.0.0/yj-linux
+ver="$(latest_release sclevine/yj)"
+wget -nv "https://github.com/sclevine/yj/releases/download/${ver}/yj-linux"
 chmod +x yj-linux
-mv yj-linux /usr/bin/yj
+mv yj-linux /usr/local/bin/yj
 
 # Ink
-wget -nv https://github.com/thesephist/ink/releases/download/v0.1.7/ink-linux
-wget -nv https://github.com/thesephist/ink/releases/download/v0.1.7/std.ink
-wget -nv https://github.com/thesephist/ink/releases/download/v0.1.7/str.ink
+ver="$(latest_release thesephist/ink)"
+wget -nv "https://github.com/thesephist/ink/releases/download/${ver}/ink-linux"
+wget -nv "https://github.com/thesephist/ink/releases/download/${ver}/std.ink"
+wget -nv "https://github.com/thesephist/ink/releases/download/${ver}/str.ink"
 chmod +x ink-linux
-mv ink-linux /usr/bin/ink
+mv ink-linux /usr/local/bin/ink
 mkdir /opt/ink
 mv std.ink str.ink /opt/ink/
 
 # Ioke
-wget -nv https://ioke.org/dist/ioke-P-ikj-0.4.0.tar.gz
+wget -nv https://ioke.org/dist/ioke-P-ikj-latest.tar.gz
 tar -xf ioke-P-ikj-*.tar.gz -C /opt
 rm ioke-P-ikj-*.tar.gz
-ln -s /opt/ioke/bin/ioke /usr/bin/ioke
+ln -s /opt/ioke/bin/ioke /usr/local/bin/ioke
 
 # Kitten
 wget -nv "https://drive.google.com/uc?export=download&id=11u0G2I8i0u4ez27zvEjAT6E9xF4RwuFZ" -O /usr/local/bin/kitten
@@ -155,18 +166,21 @@ wget -nv "https://drive.google.com/uc?export=download&id=1h-U1iURWax8h18kTD1AyGS
 chmod +x /usr/local/bin/kitten
 
 # Kotlin
-wget -nv https://github.com/JetBrains/kotlin/releases/download/v1.3.72/kotlin-compiler-1.3.72.zip
+ver="$(latest_release JetBrains/kotlin)"
+wget -nv "https://github.com/JetBrains/kotlin/releases/download/${ver}/kotlin-compiler-$(sed 's/^v//' <<< "$ver").zip"
 unzip kotlin-*.zip
-cp kotlinc/bin/* /usr/bin/
-cp kotlinc/lib/* /usr/lib/
+cp kotlinc/bin/* /usr/local/bin/
+cp kotlinc/lib/* /usr/local/lib/
 rm -rf kotlin-*.zip kotlinc
 
 # Lua
-wget -nv https://github.com/EmmyLua/EmmyLua-LanguageServer/releases/download/0.3.6/EmmyLua-LS-all.jar
+ver="$(latest_release EmmyLua/EmmyLua-LanguageServer)"
+wget -nv "https://github.com/EmmyLua/EmmyLua-LanguageServer/releases/download/${ver}/EmmyLua-LS-all.jar"
 mv EmmyLua-LS-all.jar /usr/lib/EmmyLua-LS.jar
 
 # MariaDB
-wget -nv "https://downloads.mariadb.org/f/mariadb-10.5.4/bintar-linux-x86_64/mariadb-10.5.4-linux-x86_64.tar.gz/from/http%3A//mirror.vpsfree.cz/mariadb/?serve" -O mariadb.tar.gz
+ver="$(curl -sSL https://downloads.mariadb.org/ | grep 'href="/mariadb/[0-9]' | grep -Eo '[0-9][^/]+' | sort -rV | head -n1)"
+wget -nv "https://downloads.mariadb.org/f/mariadb-${ver}/bintar-linux-x86_64/mariadb-${ver}-linux-x86_64.tar.gz/from/http%3A//mirror.vpsfree.cz/mariadb/?serve" -O mariadb.tar.gz
 tar -xf mariadb.tar.gz
 mkdir /opt/mariadb
 mv mariadb-*-linux-x86_64/* /opt/mariadb/
@@ -174,17 +188,20 @@ chmod a=rx,u=rwx /opt/mariadb/lib/plugin/auth_pam_tool_dir
 chmod a=rx,u=rwxs /opt/mariadb/lib/plugin/auth_pam_tool_dir/auth_pam_tool
 
 # Omgrofl
+ver="$(latest_release OlegSmelov/omgrofl-interpreter)"
 mkdir /opt/omgrofl
-wget -nv https://github.com/OlegSmelov/omgrofl-interpreter/releases/download/v0.1/Omgrofl.jar -O /opt/omgrofl/Omgrofl.jar
+wget -nv "https://github.com/OlegSmelov/omgrofl-interpreter/releases/download/${ver}/Omgrofl.jar" -O /opt/omgrofl/Omgrofl.jar
 
 # PowerShell
-wget -nv https://github.com/PowerShell/PowerShell/releases/download/v7.0.1/powershell-7.0.1-linux-x64.tar.gz
+ver="$(latest_release PowerShell/PowerShell)"
+wget -nv "https://github.com/PowerShell/PowerShell/releases/download/${ver}/powershell-$(sed 's/^v//' <<< "$ver")-linux-x64.tar.gz"
 mkdir /opt/powershell
 tar -xf powershell-*.tar.gz -C /opt/powershell
-ln -s /opt/powershell/pwsh /usr/bin/pwsh
+ln -s /opt/powershell/pwsh /usr/local/bin/pwsh
 rm powershell-*.tar.gz
 
-wget -nv https://github.com/PowerShell/PowerShellEditorServices/releases/download/v2.2.0/PowerShellEditorServices.zip
+ver="$(latest_release PowerShell/PowerShellEditorServices)"
+wget -nv "https://github.com/PowerShell/PowerShellEditorServices/releases/download/${ver}/PowerShellEditorServices.zip"
 unzip PowerShellEditorServices.zip
 mv PowerShellEditorServices /opt/powershell-editor-services
 rm PowerShellEditorServices.zip
@@ -195,11 +212,12 @@ nupkg="$(echo "$xml" | grep -Eo 'https://[^<]+\.nupkg' | tail -n1)"
 wget -nv "${nupkg}"
 unzip -d /opt/mspyls Python-Language-Server-linux-x64.*.nupkg
 chmod +x /opt/mspyls/Microsoft.Python.LanguageServer
-ln -s /opt/mspyls/Microsoft.Python.LanguageServer /usr/bin/Microsoft.Python.LanguageServer
+ln -s /opt/mspyls/Microsoft.Python.LanguageServer /usr/local/bin/Microsoft.Python.LanguageServer
 rm Python-Language-Server-linux-x64.*.nupkg
 
 # ReasonML
-wget -nv https://github.com/jaredly/reason-language-server/releases/download/1.7.10/rls-linux.zip
+ver="$(latest_release jaredly/reason-language-server)"
+wget -nv "https://github.com/jaredly/reason-language-server/releases/download/${ver}/rls-linux.zip"
 unzip rls-linux.zip
 mv rls-linux/reason-language-server /usr/local/bin/
 rm rls-linux.zip
@@ -215,14 +233,15 @@ RUSTUP_HOME=/opt/rust exec /opt/rust/bin/${0##*/} "$@"
 EOF
 chmod +x /opt/rust/wrapper
 for file in /opt/rust/bin/*; do
-    ln -s /opt/rust/wrapper "/usr/bin/${file##*/}"
+    ln -s /opt/rust/wrapper "/usr/local/bin/${file##*/}"
 done
 
 # Scala
+file="$(curl -sSL https://scalameta.org/metals/docs/editors/emacs.html | grep -Eo 'org.scalameta[^ ]+')"
 wget -nv https://git.io/coursier-cli
 chmod +x coursier-cli
-mv coursier-cli /usr/bin/coursier
-coursier bootstrap --java-opt -Xss4m --java-opt -Xms100m --java-opt -Dmetals.client=emacs org.scalameta:metals_2.12:0.9.1 -r bintray:scalacenter/releases -r sonatype:snapshots -o /usr/bin/metals
+mv coursier-cli /usr/local/bin/coursier
+coursier bootstrap --java-opt -Xss4m --java-opt -Xms100m --java-opt -Dmetals.client=emacs "${file}" -r bintray:scalacenter/releases -r sonatype:snapshots -o /usr/local/bin/metals
 metals -version </dev/null
 mkdir /opt/coursier
 mv "$HOME/.cache/coursier" /opt/coursier/cache
@@ -232,15 +251,22 @@ wget -nv https://setl.org/setl/bin/Linux-x86-64bit/setlbin.tgz
 tar -xf setlbin.tgz -C /usr/local/bin
 
 # Snobol
-gdown "https://drive.google.com/file/d/1ygQkpgfirpq4b7s4YNsSijkK8IQgSLWk/view?usp=sharing" /usr/bin/snobol4
-chmod +x /usr/bin/snobol4
+file="$(curl -sSL ftp://ftp.snobol4.org/snobol/ | grep -Eo 'snobol4-.*\.tar\.gz')"
+wget -nv "ftp://ftp.snobol4.org/snobol/${file}"
+tar -xf snobol4-*.tar.gz
+rm snobol4-*.tar.gz
+pushd snobol4-* >/dev/null
+make || true
+mv snobol4 /usr/local/bin/snobol4
+popd >/dev/null
+rm -rf snobol4-*
 
 # Swift
 gdown "https://drive.google.com/uc?export=download&id=1eE1-VuZz0gv-fITaGVT_r1UunCLjS-JT" swift.tar.gz
 mkdir /opt/swift
 tar -xf swift.tar.gz -C /opt/swift --strip-components=2
-ln -s /opt/swift/bin/swiftc /usr/bin/swiftc
-ln -s /opt/swift/bin/sourcekit-lsp /usr/bin/sourcekit-lsp
+ln -s /opt/swift/bin/swiftc /usr/local/bin/swiftc
+ln -s /opt/swift/bin/sourcekit-lsp /usr/local/bin/sourcekit-lsp
 rm swift.tar.gz
 
 popd >/dev/null

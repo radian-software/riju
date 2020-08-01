@@ -4,6 +4,12 @@ set -e
 set -o pipefail
 set -x
 
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+
+lua_ver="$(grep-aptavail -XF Provides lua -s Version -n | sort -Vr | head -n1)"
+lua_name="$(grep-aptavail -XF Provides lua -a -XF Version "${lua_ver}" -s Package -n | head -n1)"
+
 packages="
 
 # Elixir
@@ -26,7 +32,7 @@ fsharp
 fish
 
 # FORTRAN
-flang-7
+flang
 
 # Forth
 gforth
@@ -67,12 +73,10 @@ llvm
 cmake
 
 # Lua
-lua5.3
+${lua_name}
 
 "
 
-export DEBIAN_FRONTEND=noninteractive
-apt-get update
 apt-get install -y $(grep -v "^#" <<< "$packages")
 rm -rf /var/lib/apt/lists/*
 

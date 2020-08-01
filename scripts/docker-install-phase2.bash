@@ -8,6 +8,7 @@ packages="
 
 # Needed for project infrastructure
 bash
+dctrl-tools
 git
 make
 nodejs

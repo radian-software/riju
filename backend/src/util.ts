@@ -1,4 +1,4 @@
-import { spawn, SpawnOptions } from "child_process";
+import { SpawnOptions, spawn, spawnSync } from "child_process";
 import * as os from "os";
 import * as process from "process";
 
@@ -21,10 +21,20 @@ export const rijuSystemPrivileged = appRoot.resolve(
   "system/out/riju-system-privileged"
 );
 
+const rubyVersion = (() => {
+  try {
+    return spawnSync("ruby", ["-e", "puts RUBY_VERSION"])
+      .stdout.toString()
+      .trim();
+  } catch (err) {
+    return null;
+  }
+})();
+
 function getEnv({ uid, uuid }: Context) {
   const cwd = `/tmp/riju/${uuid}`;
   const path = [
-    `${cwd}/.gem/ruby/2.7.0/bin`,
+    rubyVersion && `${cwd}/.gem/ruby/${rubyVersion}/bin`,
     `${cwd}/.local/bin`,
     `${cwd}/node_modules/.bin`,
     `/usr/local/sbin`,
@@ -32,7 +42,7 @@ function getEnv({ uid, uuid }: Context) {
     `/usr/sbin`,
     `/usr/bin`,
     `/bin`,
-  ];
+  ].filter((x) => x);
   const username =
     uid >= MIN_UID && uid < MAX_UID ? `riju${uid}` : os.userInfo().username;
   return {

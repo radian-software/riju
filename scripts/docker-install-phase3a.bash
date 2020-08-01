@@ -4,6 +4,11 @@ set -e
 set -o pipefail
 set -x
 
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+
+ceylon="$(grep-aptavail -F Package ceylon -s Package -n | sort -rV | head -n1)"
+
 packages="
 
 # Ada
@@ -47,6 +52,7 @@ clang-format
 mono-mcs
 
 # Ceylon
+${ceylon}
 openjdk-8-jdk-headless
 
 # Clojure
@@ -74,8 +80,6 @@ dhall
 
 "
 
-export DEBIAN_FRONTEND=noninteractive
-apt-get update
 apt-get install -y $(grep -v "^#" <<< "$packages")
 rm -rf /var/lib/apt/lists/*
 

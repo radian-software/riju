@@ -4,14 +4,22 @@ set -e
 set -o pipefail
 set -x
 pushd /tmp >/dev/null
+useradd -m -N -l -r -p '!' build
 
 # Cmd
-useradd -m -N -l -r -p '!' build
 sudo -u build wine cmd < /dev/null
 mkdir -p /opt/cmd/home-template
 cp -R /home/build/.wine /opt/cmd/home-template/
 chmod -R a=u,go-w /opt/cmd/home-template
-userdel -r build
+
+# Elm
+mkdir -p /opt/elm
+mkdir elm-project
+pushd elm-project >/dev/null
+yes | elm init
+cat elm.json | jq '."source-directories" = ["."]' > /opt/elm/elm.json
+popd >/dev/null
+rm -rf elm-project
 
 # PureScript
 mkdir project-template
@@ -43,7 +51,7 @@ yarn install
 popd >/dev/null
 
 # Befunge
-tee /usr/bin/befunge-repl >/dev/null <<"EOF"
+tee /usr/local/bin/befunge-repl >/dev/null <<"EOF"
 #!/usr/bin/env -S NODE_PATH=/usr/lib/node_modules node
 const fs = require("fs");
 
@@ -71,10 +79,10 @@ befunge.run(fs.readFileSync(args[0], { encoding: "utf-8" })).catch((err) => {
   process.exit(1);
 });
 EOF
-chmod +x /usr/bin/befunge-repl
+chmod +x /usr/local/bin/befunge-repl
 
 # Binary Lambda Calculus
-tee /usr/bin/binary-to-text >/dev/null <<"EOF"
+tee /usr/local/bin/binary-to-text >/dev/null <<"EOF"
 #!/usr/bin/env python3
 
 import re
@@ -88,10 +96,10 @@ for m in re.finditer(r"([01]{8})", text):
 
 print("".join(out), end="")
 EOF
-chmod +x /usr/bin/binary-to-text
+chmod +x /usr/local/bin/binary-to-text
 
 # BrainF
-tee /usr/bin/brainf-repl >/dev/null <<"EOF"
+tee /usr/local/bin/brainf-repl >/dev/null <<"EOF"
 #!/usr/bin/env python3
 import argparse
 import readline
@@ -120,36 +128,7 @@ while True:
         f.flush()
         subprocess.run(["beef", f.name])
 EOF
-chmod +x /usr/bin/brainf-repl
-
-# Elm
-mkdir /opt/elm
-tee /opt/elm/elm.json >/dev/null <<"EOF"
-{
-    "type": "application",
-    "source-directories": [
-        "."
-    ],
-    "elm-version": "0.19.1",
-    "dependencies": {
-        "direct": {
-            "elm/browser": "1.0.2",
-            "elm/core": "1.0.5",
-            "elm/html": "1.0.0"
-        },
-        "indirect": {
-            "elm/json": "1.1.3",
-            "elm/time": "1.0.0",
-            "elm/url": "1.0.0",
-            "elm/virtual-dom": "1.0.2"
-        }
-    },
-    "test-dependencies": {
-        "direct": {},
-        "indirect": {}
-    }
-}
-EOF
+chmod +x /usr/local/bin/brainf-repl
 
 # Haskell
 mkdir -p /opt/haskell
@@ -187,7 +166,7 @@ repl.start({prompt: "قلب> ", eval: (cmd, context, filename, callback) => call
 EOF
 
 # Unlambda
-tee /usr/bin/unlambda-repl >/dev/null <<"EOF"
+tee /usr/local/bin/unlambda-repl >/dev/null <<"EOF"
 #!/usr/bin/env python3
 import argparse
 import readline
@@ -213,7 +192,8 @@ while True:
         continue
     subprocess.run(["unlambda"], input=code, encoding="utf-8")
 EOF
-chmod +x /usr/bin/unlambda-repl
+chmod +x /usr/local/bin/unlambda-repl
 
+userdel -r build
 popd >/dev/null
 rm "$0"

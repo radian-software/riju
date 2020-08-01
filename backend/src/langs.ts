@@ -1845,7 +1845,6 @@ binding_irb.run(IRB.conf)
     scope: {
       code: `x = 5`,
     },
-    ensure: `ruby -e 'raise "version mismatch, expected #{RUBY_VERSION}" unless ENV["PATH"].include? ".gem/ruby/#{RUBY_VERSION}/bin"'`,
     format: {
       run: "rufo -x",
       input: `puts "Hello, world!";

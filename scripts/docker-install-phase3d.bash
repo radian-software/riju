@@ -4,6 +4,12 @@ set -e
 set -o pipefail
 set -x
 
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+
+lua_ver="$(grep-aptavail -XF Provides lua -s Version -n | sort -Vr | head -n1)"
+liblua_name="$(grep-aptavail -eF Package "liblua[0-9.]+-dev" -a -XF Version "${lua_ver}" -s Package | head -n1)"
+
 packages="
 
 # Scala
@@ -41,7 +47,7 @@ tcl
 tcsh
 
 # TeX
-liblua5.3-dev
+${liblua_name}
 luarocks
 texlive-binaries
 
@@ -72,8 +78,6 @@ zsh
 
 "
 
-export DEBIAN_FRONTEND=noninteractive
-apt-get update
 apt-get install -y $(grep -v "^#" <<< "$packages")
 rm -rf /var/lib/apt/lists/*
 
