@@ -14,6 +14,7 @@ const host = process.env.HOST || "localhost";
 const port = parseInt(process.env.PORT || "") || 6119;
 const tlsPort = parseInt(process.env.TLS_PORT || "") || 6120;
 const useTLS = process.env.TLS ? true : false;
+const analyticsEnabled = process.env.ANALYTICS ? true : false;
 
 const app = express();
 
@@ -27,7 +28,10 @@ function getQueryParams(req: Request): URLSearchParams {
 }
 
 app.get("/", (_, res) => {
-  res.render(appRoot.path + "/frontend/pages/index", { langs });
+  res.render(appRoot.path + "/frontend/pages/index", {
+    langs,
+    analyticsEnabled,
+  });
 });
 for (const [lang, { aliases }] of Object.entries(langs)) {
   if (aliases) {
@@ -46,6 +50,7 @@ app.get("/:lang", (req, res) => {
   } else if (langs[lang]) {
     res.render(appRoot.path + "/frontend/pages/app", {
       config: { id: lang, ...langs[lang] },
+      analyticsEnabled,
     });
   } else {
     res.send(`No such language: ${lang}`);
