@@ -657,10 +657,17 @@ void main()
     monacoLang: "dart",
     main: "main.dart",
     run: "dart main.dart",
+    lsp: {
+      start:
+        "dart /usr/lib/dart/bin/snapshots/analysis_server.dart.snapshot --lsp",
+      disableDynamicRegistration: true,
+      lang: "dart",
+    },
     template: `void main() {
   print('Hello, world!');
 }
 `,
+    skip: ["lsp"],
   },
   dogescript: {
     aliases: ["doge", "ds", "wow"],
