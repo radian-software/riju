@@ -562,6 +562,9 @@ int main() {
 }
 `,
     },
+    lsp: {
+      start: "/opt/omnisharp/run -lsp",
+    },
     template: `class main {
     static void Main(string[] args) {
         System.Console.WriteLine("Hello, world!");

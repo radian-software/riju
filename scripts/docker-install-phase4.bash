@@ -39,6 +39,12 @@ wget -nv "ftp://ftp.gnu.org/gnu/apl/${file}"
 dpkg -i apl_*_amd64.deb
 rm apl_*_amd64.deb
 
+# C#
+wget -nv https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.35.3/omnisharp-linux-x64.tar.gz
+mkdir /opt/omnisharp
+tar -xf omnisharp-linux-x64.tar.gz -C /opt/omnisharp
+rm omnisharp-linux-x64.tar.gz
+
 # Clojure
 ver="$(latest_release snoe/clojure-lsp)"
 wget -nv "https://github.com/snoe/clojure-lsp/releases/download/${ver}/clojure-lsp"
