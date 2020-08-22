@@ -45,6 +45,14 @@ wget -nv "https://github.com/snoe/clojure-lsp/releases/download/${ver}/clojure-l
 chmod +x clojure-lsp
 mv clojure-lsp /usr/local/bin/clojure-lsp
 
+# Crystal
+ver="$(latest_release crystal-lang-tools/scry)"
+wget -nv "https://github.com/crystal-lang-tools/scry/releases/download/${ver}/scry_linux.tar.gz"
+mkdir scry
+tar -xf scry_linux.tar.gz -C scry
+mv scry/bin/linux/scry /usr/local/bin/scry
+rm -rf scry
+
 # D
 wget -nv "$(curl -sSL https://dlang.org/download.html | grep -Eo '"http://[^"]+amd64.deb"' | tr -d '"')"
 dpkg -i dmd_*.deb
