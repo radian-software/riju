@@ -250,7 +250,7 @@ wget -nv https://setl.org/setl/bin/Linux-x86-64bit/setlbin.tgz
 tar -xf setlbin.tgz -C /usr/local/bin
 
 # Snobol
-file="$(curl -sSL ftp://ftp.snobol4.org/snobol/ | grep -Eo 'snobol4-.*\.tar\.gz')"
+file="$(curl -sSL ftp://ftp.snobol4.org/snobol/ | grep -Eo 'snobol4-.*\.tar\.gz' | sort -rV | head -n1)"
 wget -nv "ftp://ftp.snobol4.org/snobol/${file}"
 tar -xf snobol4-*.tar.gz
 rm snobol4-*.tar.gz
