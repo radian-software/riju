@@ -16,7 +16,7 @@ chmod -R a=u,go-w /opt/cmd/home-template
 mkdir -p /opt/elm
 mkdir elm-project
 pushd elm-project >/dev/null
-yes | elm init
+(yes || true) | elm init
 cat elm.json | jq '."source-directories" = ["."]' > /opt/elm/elm.json
 popd >/dev/null
 rm -rf elm-project
