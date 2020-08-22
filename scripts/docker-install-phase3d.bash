@@ -8,7 +8,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 
 lua_ver="$(grep-aptavail -XF Provides lua -s Version -n | sort -Vr | head -n1)"
-liblua_name="$(grep-aptavail -eF Package "liblua[0-9.]+-dev" -a -XF Version "${lua_ver}" -s Package | head -n1)"
+liblua_name="$(grep-aptavail -eF Package "liblua[0-9.]+-dev" -a -XF Version "${lua_ver}" -s Package -n | head -n1)"
 
 packages="
 
