@@ -42,6 +42,7 @@ octave
 
 # Pascal
 fpc
+lazarus
 
 # Perl
 perl

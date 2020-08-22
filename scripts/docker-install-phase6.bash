@@ -49,6 +49,13 @@ git clone https://github.com/bipinu/malbolge.git
 clang malbolge/malbolge.c -o /usr/local/bin/malbolge
 rm -rf malbolge
 
+# Pascal
+git clone https://github.com/arjanadriaanse/pascal-language-server.git
+pushd pascal-language-server >/dev/null
+lazbuild pasls.lpi
+popd >/dev/null
+rm -rf pascal-language-server
+
 # Rapira
 git clone https://github.com/freeduke33/rerap2.git
 pushd rerap2 >/dev/null
