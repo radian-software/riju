@@ -24,6 +24,15 @@ mv _build/default/bin/erlang_ls /usr/local/bin/erlang_ls
 popd >/dev/null
 rm -rf erlang_ls
 
+# Groovy
+git clone https://github.com/prominic/groovy-language-server.git
+pushd groovy-language-server >/dev/null
+./gradlew build
+mkdir /opt/groovy
+mv build/libs/groovy-language-server-all.jar /opt/groovy/language-server.jar
+popd >/dev/null
+rm -rf groovy-language-server
+
 # Hexagony
 git clone https://github.com/m-ender/hexagony.git /opt/hexagony
 

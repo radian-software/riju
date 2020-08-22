@@ -954,6 +954,9 @@ func main() {
     scope: {
       code: `x = 123 * 234;`,
     },
+    lsp: {
+      start: `JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" java -jar /opt/groovy/language-server.jar`,
+    },
     template: `print "Hello, world!";
 `,
     timeout: 15,
