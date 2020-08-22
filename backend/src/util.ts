@@ -131,5 +131,10 @@ export function privilegedTeardown({ uid, uuid }: Context) {
 }
 
 export function bash(cmdline: string) {
+  if (!cmdline.match(/[;|&(){}=]/)) {
+    // Reduce number of subshells we generate, if we're just running a
+    // single command (no shell logic).
+    cmdline = "exec " + cmdline;
+  }
   return ["bash", "-c", cmdline];
 }
