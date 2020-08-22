@@ -19,6 +19,7 @@ existing_containers = subprocess.run(
 subprocess.run(["scripts/install-scripts.bash"], check=True)
 if existing_containers:
     subprocess.run(["docker", "kill", *existing_containers], check=True)
+subprocess.run(["systemctl", "enable", "riju"], check=True)
 subprocess.run(["systemctl", "restart", "riju"], check=True)
 
 print("==> Successfully deployed Riju! <==", file=sys.stderr)
