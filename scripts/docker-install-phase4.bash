@@ -11,7 +11,7 @@ latest_release() {
 
 # Needed for project infrastructure
 ver="$(latest_release watchexec/watchexec)"
-wget -nv "https://github.com/watchexec/watchexec/releases/download/${rel}/watchexec-${ver}-x86_64-unknown-linux-gnu.deb"
+wget -nv "https://github.com/watchexec/watchexec/releases/download/${ver}/watchexec-${ver}-x86_64-unknown-linux-gnu.deb"
 dpkg -i watchexec-*.deb
 rm watchexec-*.deb
 
