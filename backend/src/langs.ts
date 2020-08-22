@@ -813,7 +813,7 @@ main() ->
     aliases: ["ex", "exw", "exu", "euc", "eui", "eub"],
     name: "Euphoria",
     main: "main.exu",
-    run: "eui main.exu",
+    run: "exu main.exu",
     template: `puts(1, "Hello, world!\\n")
 `,
   },

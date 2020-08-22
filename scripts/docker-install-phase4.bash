@@ -101,12 +101,11 @@ chmod +x rebar3
 mv rebar3 /usr/local/bin/rebar3
 
 # Euphoria
-# It's not possible to rolling-release because they don't upload a
-# consistent set of files for every version. In particular there's no
-# .deb file for 4.1.0. Besides, the latest release was in 2014.
-wget -nv https://sourceforge.net/projects/rapideuphoria/files/Euphoria/4.0.5/euphoria_4.0.5_amd64.deb/download -O euphoria.deb
-dpkg -i euphoria.deb
-rm euphoria.deb
+wget -nv http://www.rapideuphoria.com/31/euphor31.tar
+mkdir /opt/euphoria
+tar -xf euphor*.tar -C /opt/euphoria --strip-components=1
+ln -s /opt/euphoria/bin/exu /usr/bin/
+rm euphor*.tar
 
 # Factor
 ver="$(curl -sSL https://factorcode.org/ | grep -Eo 'release\?os=linux[^>]+>[^<]+' | sed -E 's/[^>]+>//' | head -n1)"
