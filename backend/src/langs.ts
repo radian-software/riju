@@ -957,7 +957,7 @@ func main() {
     repl: "hhvm -a",
     input: "print 123 * 234",
     main: "main.hack",
-    run: "hhvm -a main.hack",
+    run: `echo "Type 'r' at the debugger prompt to run the code" && hhvm -a main.hack`,
     helloInput: "r",
     scope: {
       code: `function x() : int {
