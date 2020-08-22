@@ -103,6 +103,11 @@ tar -xf euphor*.tar -C /opt/euphoria --strip-components=1
 ln -s /opt/euphoria/bin/exu /usr/bin/
 rm euphor*.tar
 
+# F#
+wget -nv https://github.com/fsharp/FsAutoComplete/releases/download/0.41.1/fsautocomplete.netcore.zip
+unzip -d /opt/fsautocomplete fsautocomplete.netcore.zip
+rm fsautocomplete.netcore.zip
+
 # Factor
 ver="$(curl -sSL https://factorcode.org/ | grep -Eo 'release\?os=linux[^>]+>[^<]+' | sed -E 's/[^>]+>//' | head -n1)"
 wget -nv "https://downloads.factorcode.org/releases/${ver}/factor-linux-x86-64-${ver}.tar.gz"

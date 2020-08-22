@@ -905,6 +905,9 @@ USE: io
       code: `let x = 123 * 234`,
       input: `x ;;`,
     },
+    lsp: {
+      start: "mono /opt/fsautocomplete/fsautocomplete.dll",
+    },
     template: `printfn "Hello, world!"
 `,
     timeout: 15,
