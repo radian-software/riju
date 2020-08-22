@@ -46,12 +46,7 @@ container first:
 Note that building the image typically requires over an hour and 20 GB
 of disk space.
 
-## Maintainer guide
-### Updating brittany
-
-Install latest version of Cabal v3, then use it with `--installdir` to
-create a binary linked to `/usr/lib/ghc` and slap this on Google
-Drive.
+See also [riju-cdn](https://github.com/raxod502/riju-cdn).
 
 ## Flag
 
