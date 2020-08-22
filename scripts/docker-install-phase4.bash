@@ -163,9 +163,10 @@ chmod +x /usr/local/bin/kitten
 ver="$(latest_release JetBrains/kotlin)"
 wget -nv "https://github.com/JetBrains/kotlin/releases/download/${ver}/kotlin-compiler-$(sed 's/^v//' <<< "$ver").zip"
 unzip kotlin-*.zip
-cp kotlinc/bin/* /usr/local/bin/
-cp kotlinc/lib/* /usr/local/lib/
-rm -rf kotlin-*.zip kotlinc
+mv kotlinc /opt/kotlin
+ln -s /opt/kotlin/bin/* /usr/local/bin/
+ln -s /opt/kotlin/lib/* /usr/local/lib/
+rm kotlin-*.zip
 
 # Lua
 ver="$(latest_release EmmyLua/EmmyLua-LanguageServer)"

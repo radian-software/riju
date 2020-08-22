@@ -33,7 +33,7 @@ pushd kalyn >/dev/null
 stack build kalyn
 mv "$(stack exec which kalyn)" /usr/local/bin/kalyn
 mkdir /opt/kalyn
-cp -R src-kalyn/Stdlib src-kalyn/Stdlib.kalyn /opt/kalyn/
+mv src-kalyn/Stdlib src-kalyn/Stdlib.kalyn /opt/kalyn/
 popd >/dev/null
 rm -rf kalyn
 

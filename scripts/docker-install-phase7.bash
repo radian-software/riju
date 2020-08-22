@@ -9,7 +9,7 @@ useradd -m -N -l -r -p '!' build
 # Cmd
 sudo -u build wine cmd < /dev/null
 mkdir -p /opt/cmd/home-template
-cp -R /home/build/.wine /opt/cmd/home-template/
+mv /home/build/.wine /opt/cmd/home-template/
 chmod -R a=u,go-w /opt/cmd/home-template
 
 # Elm
