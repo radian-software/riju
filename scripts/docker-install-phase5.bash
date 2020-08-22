@@ -73,6 +73,7 @@ ln -s /opt/opam/default/bin/refmt /usr/local/bin/refmt
 # Perl
 cpanm -n Devel::REPL
 cpanm -n Perl::Tidy
+cpanm -n Perl::LanguageServer
 
 # PHP
 npm install -g intelephense

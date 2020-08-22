@@ -44,6 +44,7 @@ octave
 fpc
 
 # Perl
+libperl-dev
 perl
 perlconsole
 

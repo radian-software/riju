@@ -1678,6 +1678,9 @@ end.
       input: `print ("Hello, world!\\n");
 `,
     },
+    lsp: {
+      start: `perl -MPerl::LanguageServer -e Perl::LanguageServer::run`,
+    },
     template: `print("Hello, world!\\n");
 `,
   },
