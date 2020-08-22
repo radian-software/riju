@@ -45,6 +45,16 @@ wget -nv "https://github.com/snoe/clojure-lsp/releases/download/${ver}/clojure-l
 chmod +x clojure-lsp
 mv clojure-lsp /usr/local/bin/clojure-lsp
 
+# Crystal
+git clone https://github.com/crystal-lang-tools/scry.git
+pushd scry >/dev/null
+git fetch origin pull/174/head:hotfix
+git checkout hotfix
+shards build --release
+mv bin/scry /usr/local/bin/scry
+popd >/dev/null
+rm -rf scry
+
 # D
 wget -nv "$(curl -sSL https://dlang.org/download.html | grep -Eo '"http://[^"]+amd64.deb"' | tr -d '"')"
 dpkg -i dmd_*.deb

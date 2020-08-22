@@ -540,6 +540,9 @@ int main() {
     name: "Crystal",
     main: "main.cr",
     run: "crystal main.cr",
+    lsp: {
+      start: "scry",
+    },
     template: `puts "Hello, world!"
 `,
     timeout: 15,
