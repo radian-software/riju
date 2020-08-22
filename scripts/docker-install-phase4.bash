@@ -101,7 +101,10 @@ chmod +x rebar3
 mv rebar3 /usr/local/bin/rebar3
 
 # Euphoria
-wget -nv "$(curl -sSL https://sourceforge.net/projects/rapideuphoria/best_release.json | jq -r '.platform_releases.linux.url')" -O euphoria.deb
+# It's not possible to rolling-release because they don't upload a
+# consistent set of files for every version. In particular there's no
+# .deb file for 4.1.0. Besides, the latest release was in 2014.
+wget -nv https://sourceforge.net/projects/rapideuphoria/files/Euphoria/4.0.5/euphoria_4.0.5_amd64.deb/download -O euphoria.deb
 dpkg -i euphoria.deb
 rm euphoria.deb
 
