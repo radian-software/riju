@@ -65,6 +65,17 @@ mv public/qlb/*.js /opt/qalb/
 popd >/dev/null
 rm -rf qalb
 
+# Snobol
+file="$(curl -sSL ftp://ftp.snobol4.org/snobol/ | grep -Eo 'snobol4-.*\.tar\.gz' | sort -rV | head -n1)"
+wget -nv "ftp://ftp.snobol4.org/snobol/${file}"
+tar -xf snobol4-*.tar.gz
+rm snobol4-*.tar.gz
+pushd snobol4-* >/dev/null
+make || true
+mv snobol4 /usr/local/bin/snobol4
+popd >/dev/null
+rm -rf snobol4-*
+
 # Thue
 wget -nv "$(curl -sSL https://catseye.tc/distribution/Thue_distribution | grep -Eo 'https://catseye.tc/distfiles/thue-[^"]+\.zip' | head -n1)"
 unzip thue-*.zip

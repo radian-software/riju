@@ -244,17 +244,6 @@ mv "$HOME/.cache/coursier" /opt/coursier/cache
 wget -nv https://setl.org/setl/bin/Linux-x86-64bit/setlbin.tgz
 tar -xf setlbin.tgz -C /usr/local/bin
 
-# Snobol
-file="$(curl -sSL ftp://ftp.snobol4.org/snobol/ | grep -Eo 'snobol4-.*\.tar\.gz' | sort -rV | head -n1)"
-wget -nv "ftp://ftp.snobol4.org/snobol/${file}"
-tar -xf snobol4-*.tar.gz
-rm snobol4-*.tar.gz
-pushd snobol4-* >/dev/null
-make || true
-mv snobol4 /usr/local/bin/snobol4
-popd >/dev/null
-rm -rf snobol4-*
-
 # Swift
 wget -nv https://github.com/raxod502/riju-cdn/releases/download/swift-5.2.4-20.04/swift.tar.gz -O swift.tar.gz
 mkdir /opt/swift
