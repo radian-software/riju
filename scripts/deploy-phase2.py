@@ -10,6 +10,7 @@ import sys
 import tempfile
 import time
 
+subprocess.run(["docker", "pull", "ubuntu:rolling"], check=True)
 subprocess.run(["docker", "system", "prune", "-f"], check=True)
 subprocess.run(["make", "image-prod"], check=True)
 existing_containers = subprocess.run(
