@@ -1118,12 +1118,151 @@ PLEASE GIVE UP
 }
 `,
     },
+    lsp: {
+      setup: "rm -rf jdt && cp -RT /opt/jdt/config_linux jdt",
+      start: `java -Declipse.application=org.eclipse.jdt.ls.core.id1 -Dosgi.bundles.defaultStartLevel=4 -Declipse.product=org.eclipse.jdt.ls.core.product -Dlog.level=ALL -noverify -Xmx1G -jar /opt/jdt/plugins/org.eclipse.equinox.launcher_*.jar -configuration "$PWD/jdt" -data "$PWD" --add-modules=ALL-SYSTEM --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED`,
+      init: {
+        settings: {
+          java: {
+            codeGeneration: {
+              toString: {
+                limitElements: 0,
+                listArrayContents: true,
+                skipNullValues: false,
+                codeStyle: "STRING_CONCATENATION",
+                template:
+                  "${object.className} [${member.name()}=${member.value}, ${otherMembers}]",
+              },
+              generateComments: false,
+              useBlocks: false,
+              hashCodeEquals: {
+                useInstanceof: false,
+                useJava7Objects: false,
+              },
+            },
+            format: {
+              onType: {
+                enabled: true,
+              },
+              comments: {
+                enabled: true,
+              },
+              enabled: true,
+            },
+            progressReports: {
+              enabled: true,
+            },
+            foldingRange: {
+              enabled: true,
+            },
+            completion: {
+              importOrder: ["java", "javax", "com", "org"],
+              favoriteStaticMembers: [
+                "org.junit.Assert.*",
+                "org.junit.Assume.*",
+                "org.junit.jupiter.api.Assertions.*",
+                "org.junit.jupiter.api.Assumptions.*",
+                "org.junit.jupiter.api.DynamicContainer.*",
+                "org.junit.jupiter.api.DynamicTest.*",
+                "org.mockito.Mockito.*",
+                "org.mockito.ArgumentMatchers.*",
+                "org.mockito.Answers.*",
+              ],
+              guessMethodArguments: true,
+              overwrite: true,
+              enabled: true,
+              filteredTypes: ["java.awt.*", "com.sun.*"],
+            },
+            maxConcurrentBuilds: 1,
+            autobuild: {
+              enabled: true,
+            },
+            selection: {
+              enabled: true,
+            },
+            import: {
+              exclusions: [
+                "**/node_modules/**",
+                "**/.metadata/**",
+                "**/archetype-resources/**",
+                "**/META-INF/maven/**",
+              ],
+              maven: {
+                enabled: true,
+              },
+              gradle: {
+                enabled: true,
+                wrapper: {
+                  enabled: true,
+                },
+              },
+            },
+            saveActions: {
+              organizeImports: false,
+            },
+            implementationsCodeLens: {
+              enabled: false,
+            },
+            signatureHelp: {
+              enabled: true,
+            },
+            referencesCodeLens: {
+              enabled: false,
+            },
+            maven: {
+              downloadSources: false,
+            },
+            trace: {
+              server: "off",
+            },
+            configuration: {
+              updateBuildConfiguration: "automatic",
+              checkProjectSettingsExclusions: true,
+            },
+            errors: {
+              incompleteClasspath: {
+                severity: "warning",
+              },
+            },
+            dependency: {
+              packagePresentation: "flat",
+            },
+          },
+        },
+        extendedClientCapabilities: {
+          progressReportProvider: true,
+          classFileContentsSupport: true,
+          overrideMethodsPromptSupport: true,
+          hashCodeEqualsPromptSupport: true,
+          advancedOrganizeImportsSupport: true,
+          generateConstructorsPromptSupport: true,
+          generateToStringPromptSupport: true,
+          advancedGenerateAccessorsSupport: true,
+          advancedExtractRefactoringSupport: true,
+          moveRefactoringSupport: true,
+        },
+        bundles: [
+          "/opt/jdt/bundles/com.microsoft.java.test.plugin-0.19.0.jar",
+          "/opt/jdt/bundles/com.microsoft.jdtls.ext.core-0.5.1.jar",
+          "/opt/jdt/bundles/dg.jdt.ls.decompiler.cfr-0.0.2-201802221740.jar",
+          "/opt/jdt/bundles/dg.jdt.ls.decompiler.common-0.0.2-201802221740.jar",
+          "/opt/jdt/bundles/dg.jdt.ls.decompiler.fernflower-0.0.2-201802221740.jar",
+          "/opt/jdt/bundles/dg.jdt.ls.decompiler.procyon-0.0.2-201802221740.jar",
+          "/opt/jdt/bundles/io.projectreactor.reactor-core.jar",
+          "/opt/jdt/bundles/java.debug.plugin.jar",
+          "/opt/jdt/bundles/jdt-ls-commons.jar",
+          "/opt/jdt/bundles/jdt-ls-extension.jar",
+          "/opt/jdt/bundles/org.reactivestreams.reactive-streams.jar",
+        ],
+      },
+    },
     template: `public class Main {
     public static void main(String[] args) {
         System.out.println("Hello, world!");
     }
 }
 `,
+    skip: ["lsp"],
   },
   javascript: {
     aliases: ["node", "js", "web", "jsx", "v8", "closure", "nodejs"],

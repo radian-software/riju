@@ -154,6 +154,12 @@ tar -xf ioke-ikj-*.tar.gz -C /opt
 rm ioke-ikj-*.tar.gz
 ln -s /opt/ioke/bin/ioke /usr/local/bin/ioke
 
+# Java
+wget -nv https://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz
+mkdir /opt/jdt
+tar -C /opt/jdt -xf jdt-language-server-latest.tar.gz
+rm jdt-language-server-latest.tar.gz
+
 # Kitten
 wget -nv https://github.com/raxod502/riju-cdn/releases/download/kitten-0.1-bcaffa109c7f93959b3c2e9e7ae74462f840088d.ktn/kitten -O /usr/local/bin/kitten
 wget -nv https://github.com/raxod502/riju-cdn/releases/download/kitten-0.1-bcaffa109c7f93959b3c2e9e7ae74462f840088d.ktn/common.ktn -O /usr/local/bin/common.ktn
