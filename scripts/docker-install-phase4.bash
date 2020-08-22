@@ -155,9 +155,9 @@ mkdir /opt/ink
 mv std.ink str.ink /opt/ink/
 
 # Ioke
-wget -nv https://ioke.org/dist/ioke-P-ikj-latest.tar.gz
-tar -xf ioke-P-ikj-*.tar.gz -C /opt
-rm ioke-P-ikj-*.tar.gz
+wget -nv https://ioke.org/dist/ioke-ikj-latest.tar.gz
+tar -xf ioke-ikj-*.tar.gz -C /opt
+rm ioke-ikj-*.tar.gz
 ln -s /opt/ioke/bin/ioke /usr/local/bin/ioke
 
 # Kitten
