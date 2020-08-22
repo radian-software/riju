@@ -23,6 +23,7 @@ emacs-nox
 
 # Erlang
 erlang
+libodbc1  # workaround bug in APT
 rebar
 
 # F#
@@ -77,7 +78,7 @@ ${lua_name}
 
 "
 
-apt-get install -y $(grep -v "^#" <<< "$packages")
+apt-get install -y $(sed 's/#.*//' <<< "$packages")
 rm -rf /var/lib/apt/lists/*
 
 rm "$0"
