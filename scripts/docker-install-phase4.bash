@@ -15,10 +15,6 @@ wget -nv "https://github.com/watchexec/watchexec/releases/download/${ver}/watche
 dpkg -i watchexec-*.deb
 rm watchexec-*.deb
 
-git clone https://github.com/circulosmeos/gdown.pl.git
-mv gdown.pl/gdown.pl /usr/local/bin/gdown
-rm -rf gdown.pl
-
 # Shared
 ver="$(latest_release jgm/pandoc)"
 wget -nv "https://github.com/jgm/pandoc/releases/download/${ver}/pandoc-${ver}-linux-amd64.tar.gz"
@@ -128,13 +124,12 @@ chmod +x /usr/local/bin/golfscript
 
 # Haskell
 curl -sSL https://get.haskellstack.org/ | sh
-
-wget "https://drive.google.com/uc?export=download&id=1MpozlNLmWeUaQuT-5t6gyE3Yv56gUbea" -O /usr/local/bin/brittany
+wget -nv https://github.com/raxod502/riju-cdn/releases/download/brittany-0.12.1.1/brittany -O /usr/local/bin/brittany
 chmod +x /usr/local/bin/brittany
 
 mkdir -p /opt/haskell
-gdown "https://drive.google.com/uc?export=download&id=1GPoR_ja4ns16KCamRgwB-JVag4HK0igz" /usr/local/bin/hie
-gdown "https://drive.google.com/uc?export=download&id=1qSxj8JjAeetAmNjUGayX0RBARgr5R4Ij" /opt/haskell/hoogle.hoo
+wget -nv https://github.com/raxod502/riju-cdn/releases/download/hie-1.4-a9005b2ba2050bdfdd4438f1d471a3f7985492cd-ghc8.6.5/hie -O /usr/local/bin/hie
+wget -nv https://github.com/raxod502/riju-cdn/releases/download/hie-1.4-a9005b2ba2050bdfdd4438f1d471a3f7985492cd-ghc8.6.5/hoogle.hoo -O /opt/haskell/hoogle.hoo
 chmod +x /usr/local/bin/hie
 
 # HCL/TOML/YAML
@@ -160,8 +155,8 @@ rm ioke-ikj-*.tar.gz
 ln -s /opt/ioke/bin/ioke /usr/local/bin/ioke
 
 # Kitten
-wget -nv "https://drive.google.com/uc?export=download&id=11u0G2I8i0u4ez27zvEjAT6E9xF4RwuFZ" -O /usr/local/bin/kitten
-wget -nv "https://drive.google.com/uc?export=download&id=1h-U1iURWax8h18kTD1AyGS21UblEIT9K" -O /usr/local/bin/common.ktn
+wget -nv https://github.com/raxod502/riju-cdn/releases/download/kitten-0.1-bcaffa109c7f93959b3c2e9e7ae74462f840088d.ktn/kitten -O /usr/local/bin/kitten
+wget -nv https://github.com/raxod502/riju-cdn/releases/download/kitten-0.1-bcaffa109c7f93959b3c2e9e7ae74462f840088d.ktn/common.ktn -O /usr/local/bin/common.ktn
 chmod +x /usr/local/bin/kitten
 
 # Kotlin
@@ -261,7 +256,7 @@ popd >/dev/null
 rm -rf snobol4-*
 
 # Swift
-gdown "https://drive.google.com/uc?export=download&id=1eE1-VuZz0gv-fITaGVT_r1UunCLjS-JT" swift.tar.gz
+wget -nv https://github.com/raxod502/riju-cdn/releases/download/swift-5.2.4-20.04/swift.tar.gz -O swift.tar.gz
 mkdir /opt/swift
 tar -xf swift.tar.gz -C /opt/swift --strip-components=2
 ln -s /opt/swift/bin/swiftc /usr/local/bin/swiftc
