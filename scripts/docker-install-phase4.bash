@@ -180,7 +180,7 @@ mv EmmyLua-LS-all.jar /usr/lib/EmmyLua-LS.jar
 
 # MariaDB
 ver="$(curl -sSL https://downloads.mariadb.org/ | grep 'href="/mariadb/[0-9]' | grep -Eo '[0-9][^/]+' | sort -rV | head -n1)"
-wget -nv "https://downloads.mariadb.org/f/mariadb-${ver}/bintar-linux-x86_64/mariadb-${ver}-linux-x86_64.tar.gz/from/http%3A//mirror.vpsfree.cz/mariadb/?serve" -O mariadb.tar.gz
+wget -nv "https://downloads.mariadb.org/f/mariadb-${ver}/bintar-linux-x86_64/mariadb-${ver}-linux-x86_64.tar.gz/from/http%3A//mirror.dal.ca/mariadb/?serve" -O mariadb.tar.gz
 tar -xf mariadb.tar.gz
 mkdir /opt/mariadb
 mv mariadb-*-linux-x86_64/* /opt/mariadb/
