@@ -242,9 +242,9 @@ class Test {
     }
   };
   testLsp = async () => {
-    const insertedCode = this.config.lsp!.code!; // FIXME
+    const insertedCode = this.config.lsp!.code!;
     const after = this.config.lsp!.after;
-    const item = this.config.lsp!.item!; // FIXME
+    const item = this.config.lsp!.item!;
     const idx = after
       ? this.config.template.indexOf(after) + after.length
       : this.config.template.length;
@@ -542,12 +542,20 @@ function lint(lang: string) {
   }
   // These can be removed when the types are adjusted to make these
   // situations impossible.
-  if (config.format && !config.format.input) {
+  if (
+    config.format &&
+    !config.format.input &&
+    !(config.skip || []).includes("format")
+  ) {
     throw new Error("formatter is missing test");
   }
-  // if (config.lsp && !(config.lsp.code && config.lsp.item)) {
-  //   throw new Error("LSP is missing test");
-  // }
+  if (
+    config.lsp &&
+    !(config.lsp.code && config.lsp.item) &&
+    !(config.skip || []).includes("lsp")
+  ) {
+    throw new Error("LSP is missing test");
+  }
 }
 
 const testTypes: {

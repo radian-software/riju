@@ -43,9 +43,9 @@ export interface LangConfig {
     init?: any;
     config?: any;
     lang?: string;
-    code?: string; // FIXME
+    code?: string; // required unless test is skipped
     after?: string;
-    item?: string; // FIXME
+    item?: string; // required unless test is skipped
   };
   template: string;
   timeout?: number;
@@ -370,6 +370,7 @@ int main() {
   return 0;
 }
 `,
+    skip: ["lsp"],
   },
   ceylon: {
     name: "Ceylon",
@@ -532,6 +533,7 @@ int main() {
   return 0;
 }
 `,
+    skip: ["lsp"],
   },
   crystal: {
     aliases: ["cr"],
@@ -581,6 +583,7 @@ int main() {
     lsp: { start: "clojure-lsp" },
     template: `(println "Hello, world!")
 `,
+    skip: ["lsp"],
   },
   clojurescript: {
     aliases: ["cljs", "lumo"],
@@ -702,7 +705,7 @@ end`,
     lsp: { start: "/opt/elixir-ls/language_server.sh" },
     template: `IO.puts("Hello, world!")
 `,
-    skip: ["repl", "runrepl", "scope"],
+    skip: ["repl", "runrepl", "scope", "lsp"],
   },
   elm: {
     name: "Elm",
@@ -723,6 +726,7 @@ Main.x`,
 output : String
 output = "Hello, world!"
 `,
+    skip: ["lsp"],
   },
   elvish: {
     aliases: ["elv"],
@@ -803,6 +807,7 @@ x() -> 123 * 234.
 main() ->
     io:fwrite("Hello, world!\\n").
 `,
+    skip: ["lsp"],
   },
   euphoria: {
     aliases: ["ex", "exw", "exu", "euc", "eui", "eub"],
@@ -879,6 +884,7 @@ USE: io
           print *, "Hello, world!"
        end program hello
 `,
+    skip: ["lsp"],
   },
   fsharp: {
     aliases: ["fsharpi", "fsx", "fs"],
@@ -923,6 +929,7 @@ func main() {
 	fmt.Println("Hello, world!")
 }
 `,
+    skip: ["lsp"],
   },
   golfscript: {
     aliases: ["gs", "golf"],
@@ -995,6 +1002,7 @@ main =
 main :: IO ()
 main = putStrLn "Hello, world!"
 `,
+    skip: ["lsp"],
   },
   haxe: {
     aliases: ["hx"],
@@ -1156,6 +1164,7 @@ PLEASE GIVE UP
     },
     template: `println("Hello, world!")
 `,
+    skip: ["lsp"],
   },
   kalyn: {
     name: "Kalyn",
@@ -1273,6 +1282,7 @@ KTHXBYE
     lsp: { start: "java -cp /usr/lib/EmmyLua-LS.jar com.tang.vscode.MainKt" },
     template: `print("Hello, world!")
 `,
+    skip: ["lsp"],
   },
   malbolge: {
     aliases: ["mb"],
@@ -1423,6 +1433,7 @@ int main() {
   return 0;
 }
 `,
+    skip: ["lsp"],
   },
   ocaml: {
     name: "OCaml",
@@ -1444,6 +1455,7 @@ let x = 123 * 234`,
     template: `;;
 print_string "Hello, world!\\n"
 `,
+    skip: ["lsp"],
   },
   octave: {
     aliases: ["matlab", "m", "mathworks"],
@@ -1547,6 +1559,7 @@ end.
 
 echo "Hello, world!\\n";
 `,
+    skip: ["lsp"],
   },
   pikachu: {
     aliases: [
@@ -1603,7 +1616,7 @@ pipi pikachu
     },
     template: `Write-Host "Hello, world!"
 `,
-    skip: ["repl", "runrepl", "scope"],
+    skip: ["repl", "runrepl", "scope", "lsp"],
   },
   prolog: {
     name: "Prolog",
@@ -1757,6 +1770,7 @@ x`,
     },
     template: `print_string("Hello, world!\\n");
 `,
+    skip: ["lsp"],
   },
   redis: {
     name: "Redis",
@@ -1858,7 +1872,7 @@ binding_irb.run(IRB.conf)
     lsp: { start: "solargraph stdio" },
     template: `puts "Hello, world!"
 `,
-    skip: ["repl", "runrepl", "scope"],
+    skip: ["repl", "runrepl", "scope", "lsp"],
   },
   rust: {
     aliases: ["rs", "rustc"],
@@ -1872,6 +1886,7 @@ binding_irb.run(IRB.conf)
     println!("Hello, world!");
 }
 `,
+    skip: ["lsp"],
   },
   sass: {
     name: "Sass",
@@ -2118,6 +2133,7 @@ END
     lsp: { start: "sourcekit-lsp" },
     template: `print("Hello, world!")
 `,
+    skip: ["lsp"],
   },
   tcl: {
     aliases: ["tclsh", "tclshrc"],
@@ -2170,6 +2186,7 @@ END
     lsp: { start: "digestif", lang: "tex" },
     template: `\\message{Hello, world!}
 `,
+    skip: ["lsp"],
   },
   textile: {
     name: "Textile",
@@ -2256,6 +2273,7 @@ a
     lsp: { start: "vim-language-server --stdio" },
     template: `:echo "Hello, world!"
 `,
+    skip: ["lsp"],
   },
   vimwiki: {
     name: "Vimwiki",
