@@ -128,10 +128,7 @@ wget -nv http://www.golfscript.com/golfscript/golfscript.rb -O /usr/local/bin/go
 chmod +x /usr/local/bin/golfscript
 
 # Haskell
-wget -nv https://get.haskellstack.org/stable/linux-x86_64-static.tar.gz
-tar -xf linux-x86_64-static.tar.gz
-mv stack-*-linux-x86_64-static/stack /usr/local/bin/stack
-rm -rf stack-*-linux-x86_64-static linux-x86_64-static.tar.gz
+curl -sSL https://get.haskellstack.org/ | sh
 
 wget "https://drive.google.com/uc?export=download&id=1MpozlNLmWeUaQuT-5t6gyE3Yv56gUbea" -O /usr/local/bin/brittany
 chmod +x /usr/local/bin/brittany
