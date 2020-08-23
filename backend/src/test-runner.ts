@@ -15,7 +15,7 @@ function parseIntOr(thing: any, def: number) {
   return Number.isNaN(num) ? def : num;
 }
 
-const TIMEOUT_SECS = parseIntOr(process.env.TIMEOUT, 5);
+const TIMEOUT_SECS = parseIntOr(process.env.TIMEOUT_SECS, 5);
 const CONCURRENCY = parseIntOr(process.env.CONCURRENCY, 2);
 
 function findPosition(str: string, idx: number) {
