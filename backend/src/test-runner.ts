@@ -15,8 +15,9 @@ function parseIntOr(thing: any, def: number) {
   return Number.isNaN(num) ? def : num;
 }
 
-const TIMEOUT_SECS = parseIntOr(process.env.TIMEOUT_SECS, 5);
+const TIMEOUT_FACTOR = parseIntOr(process.env.TIMEOUT_FACTOR, 1);
 const CONCURRENCY = parseIntOr(process.env.CONCURRENCY, 2);
+const BASE_TIMEOUT_SECS = 5;
 
 function findPosition(str: string, idx: number) {
   const lines = str.substring(0, idx).split("\n");
@@ -103,7 +104,7 @@ class Test {
       timeout = setTimeout(() => {
         this.timedOut = true;
         this.handleUpdate();
-      }, (this.config.timeout || TIMEOUT_SECS) * 1000);
+      }, (this.config.timeout || BASE_TIMEOUT_SECS) * 1000 * TIMEOUT_FACTOR);
       await session.setup();
       switch (this.type) {
         case "ensure":

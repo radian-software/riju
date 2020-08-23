@@ -63,7 +63,7 @@ additional layers. You can build it as follows:
 Lastly I should mention the tests. There are integration tests for
 every language, and they can be run as follows:
 
-    $ [CONCURRENCY=2] [TIMEOUT=5] yarn test [<filter>...]
+    $ [CONCURRENCY=2] [TIMEOUT_FACTOR=1] yarn test [<filter>...]
 
 Filters can be for language (`python`, `java`) or test type (`hello`,
 `lsp`). You can comma-delimit multiple filters to do a disjunction,
