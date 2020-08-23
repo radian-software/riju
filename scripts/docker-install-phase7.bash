@@ -12,6 +12,27 @@ mkdir -p /opt/cmd/home-template
 mv /home/build/.wine /opt/cmd/home-template/
 chmod -R a=u,go-w /opt/cmd/home-template
 
+# Dylan
+pushd /opt/dylan
+make-dylan-app main
+mv main project-template
+pushd project-template >/dev/null
+cat <<"EOF" > main.dylan
+Module: main
+
+define function main
+    (name :: <string>, arguments :: <vector>)
+  format-out("Hello, world!\n");
+  exit-application(0);
+end function main;
+
+main(application-name(), application-arguments());
+EOF
+dylan-compiler -build main.lid
+rm main.dylan
+popd >/dev/null
+popd >/dev/null
+
 # Elm
 mkdir -p /opt/elm
 mkdir elm-project

@@ -82,6 +82,9 @@ dart
 # Dhall
 dhall
 
+# Dylan
+libunwind-dev
+
 "
 
 apt-get install -y $(grep -v "^#" <<< "$packages")

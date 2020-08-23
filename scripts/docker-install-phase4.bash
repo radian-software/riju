@@ -66,6 +66,14 @@ tar -xf dhall-json-*-x86_64-linux.tar.bz2 -C dhall-json
 mv dhall-json/bin/dhall-to-json dhall-json/bin/json-to-dhall /usr/local/bin/
 rm -rf dhall-json dhall-json-*-x86_64-linux.tar.bz2
 
+# Dylan
+ver="$(latest_release dylan-lang/opendylan)"
+wget -nv "https://github.com/dylan-lang/opendylan/releases/download/${ver}/opendylan-$(grep -Eo '[0-9]+\.[0-9]+' <<< "$ver")-x86_64-linux.tar.bz2"
+tar -xf opendylan-*-x86_64-linux.tar.bz2
+rm opendylan-*-x86_64-linux.tar.bz2
+mv opendylan-* /opt/dylan
+ln -s /opt/dylan/bin/dylan-compiler /opt/dylan/bin/make-dylan-app /usr/local/bin/
+
 # Elixir
 ver="$(latest_release elixir-lsp/elixir-ls)"
 wget -nv "https://github.com/elixir-lsp/elixir-ls/releases/download/${ver}/elixir-ls.zip"

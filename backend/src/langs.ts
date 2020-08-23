@@ -729,6 +729,24 @@ void main()
     template: `Hello, world!
 `,
   },
+  dylan: {
+    aliases: ["opendylan"],
+    name: "Dylan",
+    setup: "cp -R /opt/dylan/project-template/* ./",
+    main: "main.dylan",
+    compile: "dylan-compiler -build main.lid",
+    run: "_build/bin/main",
+    template: `Module: main
+
+define function main
+    (name :: <string>, arguments :: <vector>)
+  format-out("Hello, world!\\n");
+  exit-application(0);
+end function main;
+
+main(application-name(), application-arguments());
+`,
+  },
   elixir: {
     aliases: ["iex", "exs"],
     name: "Elixir",
