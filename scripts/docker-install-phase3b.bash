@@ -64,6 +64,9 @@ default-jdk
 # Julia
 julia
 
+# Koka
+rlwrap
+
 # Ksh
 ksh
 
