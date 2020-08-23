@@ -1169,6 +1169,15 @@ PLEASE GIVE UP
 `,
     timeout: 15,
   },
+  j: {
+    aliases: ["jconsole", "ijconsole"],
+    name: "J",
+    repl: "echo 'ijconsole:' && ijconsole",
+    main: "main.ijs",
+    run: "ijconsole main.ijs",
+    template: `echo 'Hello, world!'
+`,
+  },
   java: {
     aliases: ["javac"],
     name: "Java",

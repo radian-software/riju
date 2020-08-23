@@ -177,6 +177,11 @@ tar -xf ioke-ikj-*.tar.gz -C /opt
 rm ioke-ikj-*.tar.gz
 ln -s /opt/ioke/bin/ioke /usr/local/bin/ioke
 
+# J
+wget -nv "$(curl -sSL https://code.jsoftware.com/wiki/System/Installation/J901/Debian | grep -F '<a' | grep 'amd64\.deb' | grep -Eo 'http://.+?\.deb')"
+dpkg -i j*_amd64.deb
+rm j*_amd64.deb
+
 # Java
 wget -nv https://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz
 mkdir /opt/jdt
