@@ -52,6 +52,14 @@ wget -nv "https://github.com/snoe/clojure-lsp/releases/download/${ver}/clojure-l
 chmod +x clojure-lsp
 mv clojure-lsp /usr/local/bin/clojure-lsp
 
+# Cobra
+wget -nv http://cobra-language.com/downloads/Cobra-0.9.6.tar.gz
+tar -xf Cobra-*.tar.gz
+pushd Cobra-*/Source >/dev/null
+bin/build
+popd >/dev/null
+rm -rf Cobra-*
+
 # D
 wget -nv "$(curl -sSL https://dlang.org/download.html | grep -Eo '"http://[^"]+amd64.deb"' | tr -d '"')"
 dpkg -i dmd_*.deb
