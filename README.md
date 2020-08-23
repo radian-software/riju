@@ -4,7 +4,7 @@ Riju is a very fast online playground for every programming language.
 In less than a second, you can start playing with a Python interpreter
 or compiling INTERCAL code.
 
-Check out the [live application](https://riju-sandbox.herokuapp.com/)!
+Check out the [live application](https://riju.codes/)!
 
 **You should not write any sensitive code on Riju, as NO GUARANTEES
 are made about the security or privacy of your data. (No warranty etc
