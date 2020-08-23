@@ -11,6 +11,7 @@ import tempfile
 import time
 
 subprocess.run(["docker", "pull", "ubuntu:rolling"], check=True)
+subprocess.run(["docker", "system", "prune", "-f"], check=True)
 subprocess.run(["make", "image-prod"], check=True)
 existing_containers = subprocess.run(
     ["docker", "ps", "-q"], check=True, stdout=subprocess.PIPE
@@ -20,6 +21,5 @@ if existing_containers:
     subprocess.run(["docker", "kill", *existing_containers], check=True)
 subprocess.run(["systemctl", "enable", "riju"], check=True)
 subprocess.run(["systemctl", "restart", "riju"], check=True)
-subprocess.run(["docker", "system", "prune", "-f"], check=True)
 
 print("==> Successfully deployed Riju! <==", file=sys.stderr)
