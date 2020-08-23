@@ -110,6 +110,14 @@ tar -xf euphor*.tar -C /opt/euphoria --strip-components=1
 ln -s /opt/euphoria/bin/exu /usr/bin/
 rm euphor*.tar
 
+# Ezhil
+wget -nv https://github.com/raxod502/riju-cdn/releases/download/ezhil-2017.08.19/ezhil.tar.gz
+tar -xf ezhil.tar.gz
+mv ezhil-* /opt/ezhil
+cp /opt/ezhil/ezhili /opt/ezhil/ezhuthi/
+ln -s /opt/ezhil/ezhuthi/ezhili /usr/local/bin/
+rm ezhil.tar.gz
+
 # Factor
 ver="$(curl -sSL https://factorcode.org/ | grep -Eo 'release\?os=linux[^>]+>[^<]+' | sed -E 's/[^>]+>//' | head -n1)"
 wget -nv "https://downloads.factorcode.org/releases/${ver}/factor-linux-x86-64-${ver}.tar.gz"

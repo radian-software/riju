@@ -858,6 +858,16 @@ main() ->
     template: `puts(1, "Hello, world!\\n")
 `,
   },
+  எழில்: {
+    aliases: ["ezhil", "ezhili", "ezhuthi", "tamil"],
+    name: "எழில்",
+    repl: "ezhili",
+    main: "main.n",
+    run: "ezhili main.n; ezhili",
+    hello: "வணக்கம், உலகமே!",
+    template: `பதிப்பி "வணக்கம், உலகமே!"
+`,
+  },
   factor: {
     aliases: ["fact"],
     name: "Factor",
