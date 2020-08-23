@@ -35,6 +35,7 @@ iputils-ping
 ripgrep
 sudo
 tmux
+trash-cli
 tree
 vim
 wget
