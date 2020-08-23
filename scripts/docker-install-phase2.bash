@@ -33,6 +33,7 @@ nano
 ncdu
 iputils-ping
 ripgrep
+strace
 sudo
 tmux
 trash-cli
