@@ -62,6 +62,16 @@ mv src-kalyn/Stdlib src-kalyn/Stdlib.kalyn /opt/kalyn/
 popd >/dev/null
 rm -rf kalyn
 
+# Koka
+git clone https://github.com/koka-lang/koka.git /opt/koka
+pushd /opt/koka >/dev/null
+npm install
+npm install jake
+npx jake compiler
+popd >/dev/null
+ln -s /opt/koka/out/debug/koka-* /usr/local/bin/koka
+rm -rf koka
+
 # LOLCODE
 git clone https://github.com/justinmeza/lci.git
 pushd lci >/dev/null
