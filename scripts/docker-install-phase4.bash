@@ -284,5 +284,9 @@ ln -s /opt/swift/bin/swiftc /usr/local/bin/swiftc
 ln -s /opt/swift/bin/sourcekit-lsp /usr/local/bin/sourcekit-lsp
 rm swift.tar.gz
 
+# Unison
+wget -nv https://github.com/raxod502/riju-cdn/releases/download/unison-M1l-232-519cbeb58704c1b9410c9386e492be59fd5a5334/unison -O /usr/local/bin/unison
+chmod +x /usr/local/bin/unison
+
 popd >/dev/null
 rm "$0"

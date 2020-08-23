@@ -26,8 +26,18 @@ function findPosition(str: string, idx: number) {
   return { line, character };
 }
 
-function forTTY(input: string) {
-  return input.replace(/\n/g, "\r") + "\r";
+async function sendInput(send: (msg: any) => any, input: string) {
+  for (const line of input.split("\n")) {
+    if (line.startsWith("DELAY:")) {
+      const delay = parseFloat(line.replace(/DELAY: */, ""));
+      if (Number.isNaN(delay)) continue;
+      await new Promise((resolve) =>
+        setTimeout(resolve, delay * 1000 * TIMEOUT_FACTOR)
+      );
+    } else {
+      send({ event: "terminalInput", input: line + "\r" });
+    }
+  }
 }
 
 class Test {
@@ -196,24 +206,21 @@ class Test {
     const pattern = this.config.hello || "Hello, world!";
     this.send({ event: "runCode", code: this.config.template });
     if (this.config.helloInput !== undefined) {
-      this.send({
-        event: "terminalInput",
-        input: forTTY(this.config.helloInput),
-      });
+      sendInput(this.send, this.config.helloInput);
     }
     await this.waitForOutput(pattern, this.config.helloMaxLength);
   };
   testRepl = async () => {
     const input = this.config.input || "123 * 234";
     const output = this.config.output || "28782";
-    this.send({ event: "terminalInput", input: forTTY(input) });
+    sendInput(this.send, input);
     await this.waitForOutput(output);
   };
   testRunRepl = async () => {
     const input = this.config.runReplInput || this.config.input || "123 * 234";
     const output = this.config.runReplOutput || this.config.output || "28782";
     this.send({ event: "runCode", code: this.config.template });
-    this.send({ event: "terminalInput", input: forTTY(input) });
+    sendInput(this.send, input);
     await this.waitForOutput(output);
   };
   testScope = async () => {
@@ -231,7 +238,7 @@ class Test {
       allCode = allCode + code + "\n";
     }
     this.send({ event: "runCode", code: allCode });
-    this.send({ event: "terminalInput", input: forTTY(input) });
+    sendInput(this.send, input);
     await this.waitForOutput(output);
   };
   testFormat = async () => {

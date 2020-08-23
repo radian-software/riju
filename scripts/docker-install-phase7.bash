@@ -71,6 +71,13 @@ cat bsconfig.json | jq '.name = "riju-project"' | sponge bsconfig.json
 yarn install
 popd >/dev/null
 
+# Unison
+mkdir -p /opt/unison/project-template
+pushd /opt/unison/project-template >/dev/null
+unison -codebase . init
+LESS="+q" unison -codebase . <<< 'pull https://github.com/unisonweb/base:.trunk .base'
+popd >/dev/null
+
 # Befunge
 tee /usr/local/bin/befunge-repl >/dev/null <<"EOF"
 #!/usr/bin/env -S NODE_PATH=/usr/lib/node_modules node
