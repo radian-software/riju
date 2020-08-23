@@ -10,8 +10,13 @@ import { v4 as getUUID } from "uuid";
 import * as api from "./api";
 import { LangConfig, langs } from "./langs";
 
-const TIMEOUT_SECS = 5;
-const CONCURRENCY = 1;
+function parseIntOr(thing: any, def: number) {
+  const num = parseInt(thing);
+  return Number.isNaN(num) ? def : num;
+}
+
+const TIMEOUT_SECS = parseIntOr(process.env.TIMEOUT, 5);
+const CONCURRENCY = parseIntOr(process.env.CONCURRENCY, 2);
 
 function findPosition(str: string, idx: number) {
   const lines = str.substring(0, idx).split("\n");
