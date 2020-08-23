@@ -251,6 +251,13 @@ mv "$HOME/.cache/coursier" /opt/coursier/cache
 wget -nv https://setl.org/setl/bin/Linux-x86-64bit/setlbin.tgz
 tar -xf setlbin.tgz -C /usr/local/bin
 
+# SQL
+ver="$(latest_release lighttiger2505/sqls)"
+wget -nv "https://github.com/lighttiger2505/sqls/releases/download/${ver}/sqls-${ver}-linux-amd64.tar.gz"
+tar -xf sqls-*-linux-amd64.tar.gz
+mv linux-amd64/sqls /usr/local/bin/
+rm -rf linux-amd64 sqls-*-linux-amd64.tar.gz
+
 # Swift
 wget -nv https://github.com/raxod502/riju-cdn/releases/download/swift-5.2.4-20.04/swift.tar.gz -O swift.tar.gz
 mkdir /opt/swift

@@ -1446,8 +1446,12 @@ KTHXBYE
     input: "SELECT 123 * 234;",
     main: "main.sql",
     run: `rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && (mysql --socket="$PWD/socket" < main.sql; mysql --socket="$PWD/socket")`,
+    lsp: {
+      start: "sqls",
+    },
     template: `SELECT 'Hello, world!';
 `,
+    skip: ["lsp"],
   },
   markdown: {
     aliases: [
@@ -1534,9 +1538,13 @@ message:
     input: "SELECT 123 * 234;",
     main: "main.sql",
     run: `rm -rf data && mysqld -h "$PWD/data" --initialize-insecure && (mysqld -h "$PWD/data" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && (mysql --socket="$PWD/socket" -u root < main.sql; mysql --socket="$PWD/socket" -u root)`,
+    lsp: {
+      start: "sqls",
+    },
     template: `SELECT 'Hello, world!';
 `,
     timeout: 15,
+    skip: ["lsp"],
   },
   nim: {
     name: "Nim",
@@ -1741,9 +1749,13 @@ pipi pikachu
     input: "SELECT 123 * 234;",
     main: "main.sql",
     run: `rm -rf data && /usr/lib/postgresql/*/bin/initdb -D data && (echo "listen_addresses = ''" && echo "unix_socket_directories = '.'") >> data/postgresql.conf && /usr/lib/postgresql/*/bin/pg_ctl -D data -w start && (psql -h "$PWD/data" postgres -f main.sql; psql -h "$PWD/data" postgres)`,
+    lsp: {
+      start: "sqls",
+    },
     template: `SELECT 'Hello, world!';
 `,
     timeout: 15,
+    skip: ["lsp"],
   },
   powershell: {
     aliases: ["pwsh", "ps1"],
@@ -2252,8 +2264,12 @@ END
     input: "SELECT 123 * 234;",
     main: "main.sql",
     run: `sqlite3 -cmd "$(< main.sql)"`,
+    lsp: {
+      start: "sqls",
+    },
     template: `SELECT 'Hello, world!';
 `,
+    skip: ["lsp"],
   },
   standardml: {
     aliases: ["sml", "ml"],
