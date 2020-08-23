@@ -1422,19 +1422,6 @@ PLEASE GIVE UP
 `,
     timeout: 15,
   },
-  koka: {
-    aliases: ["kk"],
-    name: "Koka",
-    repl: "NODE_PATH=/opt/koka/node_modules rlwrap koka -i/opt/koka/lib",
-    main: "main.kk",
-    run:
-      "NODE_PATH=/opt/koka/node_modules rlwrap koka -i/opt/koka/lib main.kk; NODE_PATH=/opt/koka/node_modules rlwrap koka -i/opt/koka/lib",
-    template: `public fun main() : <div,console> ()
-{
-  println("Hello, world!")
-}
-`,
-  },
   kotlin: {
     aliases: ["kts", "kotlinc"],
     name: "Kotlin",
