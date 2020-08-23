@@ -1341,6 +1341,9 @@ PLEASE GIVE UP
     repl: `JAVA_OPTS="-Duser.home=$PWD" kotlinc`,
     main: "main.kts",
     run: `JAVA_OPTS="-Duser.home=$PWD" kotlinc -script main.kts; kotlinc`,
+    lsp: {
+      start: "kotlin-language-server",
+    },
     template: `println("Hello, world!")
 `,
     timeout: 30,

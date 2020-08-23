@@ -174,6 +174,11 @@ ln -s /opt/kotlin/bin/* /usr/local/bin/
 ln -s /opt/kotlin/lib/* /usr/local/lib/
 rm kotlin-*.zip
 
+wget -nv https://github.com/fwcd/kotlin-language-server/releases/download/0.6.0/server.zip
+unzip server.zip
+mv server /opt/kotlin-language-server
+ln -s /opt/kotlin-language-server/bin/kotlin-language-server /usr/local/bin/
+
 # Lua
 ver="$(latest_release EmmyLua/EmmyLua-LanguageServer)"
 wget -nv "https://github.com/EmmyLua/EmmyLua-LanguageServer/releases/download/${ver}/EmmyLua-LS-all.jar"
