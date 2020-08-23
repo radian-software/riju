@@ -1872,6 +1872,9 @@ main = do
     scope: {
       code: `x = 123 * 234`,
     },
+    lsp: {
+      start: `R --slave -e "languageserver::run()"`,
+    },
     template: `print("Hello, world!")
 `,
   },

@@ -66,6 +66,8 @@ python3-pip
 python3-venv
 
 # R
+libcurl4-openssl-dev
+libxml2-dev
 r-base
 
 # Racket

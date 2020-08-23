@@ -89,6 +89,9 @@ npm install -g purescript spago
 # Python
 pip3 install black
 
+# R
+R -e 'install.packages("languageserver")'
+
 # ReasonML
 npm install -g bs-platform
 opam install -y reason
