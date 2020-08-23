@@ -3,10 +3,15 @@
 set -e
 set -o pipefail
 set -x
+pushd /tmp >/dev/null
 
 # Package manager - Julia
 mkdir /opt/julia
 export JULIA_DEPOT_PATH=/opt/julia
+
+# Package manager - Nim
+git clone https://github.com/nim-lang/Nim.git --depth=1 --single-branch --no-tags /opt/nim
+ln -s /opt/nim/nimsuggest /usr/nimsuggest
 
 # Package manager - Node.js
 npm config set unsafe-perm true
@@ -56,6 +61,9 @@ pip3 install hy
 
 # Julia
 julia -e 'using Pkg; Pkg.add("LanguageServer")'
+
+# Nim
+nimble install -y nimlsp
 
 # Less
 npm install -g less
@@ -124,4 +132,5 @@ python3.7 -m pip install mathics
 rm -rf /root/.cache /root/.config /root/.cpan /root/.cpanm /root/.dub /root/.gem /root/.npm /root/.npmrc
 rm -f /tmp/core-js-banners
 
+popd >/dev/null
 rm "$0"
