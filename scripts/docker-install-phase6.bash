@@ -31,6 +31,16 @@ pushd /opt/cat >/dev/null
 npm install
 popd >/dev/null
 
+# Clean
+wget -nv "$(curl -sSL https://clean.cs.ru.nl/Download_Clean | grep linux/clean | grep -F 64.tar.gz | grep -Eo "https://[^>]+\.tar\.gz")"
+mkdir /opt/clean
+tar -xf clean*_64.tar.gz -C /opt/clean --strip-components=1
+pushd /opt/clean >/dev/null
+make
+popd >/dev/null
+ln -s /opt/clean/bin/clm /usr/local/bin/
+rm clean*_64.tar.gz
+
 # Erlang
 git clone https://github.com/erlang-ls/erlang_ls.git
 pushd erlang_ls >/dev/null

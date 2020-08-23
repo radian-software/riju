@@ -530,6 +530,23 @@ Pour contents of the mixing bowl into the baking dish.
 Refrigerate for 1 hour.
 `,
   },
+  clean: {
+    aliases: ["icl", "clm"],
+    name: "Clean",
+    main: "main.icl",
+    compile: "clm main -o main",
+    run: "./main",
+    template: `module main
+
+import StdEnv
+
+Start world
+  #(console, world) = stdio world
+  #console = fwrites "Hello, world!\\n" console
+  #(ok, world) = fclose console world
+  = world
+`,
+  },
   clojure: {
     aliases: ["clj"],
     name: "Clojure",
