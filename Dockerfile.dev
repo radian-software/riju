@@ -5,40 +5,40 @@ ARG UID
 COPY scripts/my_init /usr/bin/my_init
 
 COPY scripts/docker-install-phase0.bash /tmp/
-RUN /tmp/docker-install-phase0.bash
+RUN time /tmp/docker-install-phase0.bash
 
 COPY scripts/docker-install-phase1.bash /tmp/
-RUN /tmp/docker-install-phase1.bash
+RUN time /tmp/docker-install-phase1.bash
 
 COPY scripts/docker-install-phase2.bash /tmp/
-RUN /tmp/docker-install-phase2.bash
+RUN time /tmp/docker-install-phase2.bash
 
 COPY scripts/docker-install-phase3a.bash /tmp/
-RUN /tmp/docker-install-phase3a.bash
+RUN time /tmp/docker-install-phase3a.bash
 
 COPY scripts/docker-install-phase3b.bash /tmp/
-RUN /tmp/docker-install-phase3b.bash
+RUN time /tmp/docker-install-phase3b.bash
 
 COPY scripts/docker-install-phase3c.bash /tmp/
-RUN /tmp/docker-install-phase3c.bash
+RUN time /tmp/docker-install-phase3c.bash
 
 COPY scripts/docker-install-phase3d.bash /tmp/
-RUN /tmp/docker-install-phase3d.bash
+RUN time /tmp/docker-install-phase3d.bash
 
 COPY scripts/docker-install-phase4.bash /tmp/
-RUN /tmp/docker-install-phase4.bash
+RUN time /tmp/docker-install-phase4.bash
 
 COPY scripts/docker-install-phase5.bash /tmp/
-RUN /tmp/docker-install-phase5.bash
+RUN time /tmp/docker-install-phase5.bash
 
 COPY scripts/docker-install-phase6.bash /tmp/
-RUN /tmp/docker-install-phase6.bash
+RUN time /tmp/docker-install-phase6.bash
 
 COPY scripts/docker-install-phase7.bash /tmp/
-RUN /tmp/docker-install-phase7.bash
+RUN time /tmp/docker-install-phase7.bash
 
 COPY scripts/docker-install-phase8.bash /tmp/
-RUN /tmp/docker-install-phase8.bash "$UID"
+RUN time /tmp/docker-install-phase8.bash "$UID"
 
 USER docker
 WORKDIR /home/docker
