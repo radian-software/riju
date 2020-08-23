@@ -39,6 +39,10 @@ bwbasic
 # Bash
 bash
 
+# Battlestar
+golang
+yasm
+
 # BrainF
 beef
 

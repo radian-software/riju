@@ -183,6 +183,18 @@ implement main0 () = ()
     template: `PRINT "Hello, world!"
 `,
   },
+  battlestar: {
+    aliases: ["battlestarc", "bts"],
+    name: "Battlestar",
+    main: "main.bts",
+    run: "bts main.bts",
+    template: `const message = "Hello, world!\n"
+
+fun main
+    syscall(1, 1, message, len(message))
+end
+`,
+  },
   beatnik: {
     name: "Beatnik",
     main: "main.beatnik",

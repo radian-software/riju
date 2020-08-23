@@ -5,6 +5,15 @@ set -o pipefail
 set -x
 pushd /tmp >/dev/null
 
+# Battlestar
+git clone https://github.com/xyproto/battlestar.git
+pushd battlestar >/dev/null
+make
+mv cmd/battlestarc/battlestarc /usr/local/bin/
+mv scripts/bts.sh /usr/local/bin/bts
+popd >/dev/null
+rm -rf battlestar
+
 # Beatnik
 git clone https://github.com/catseye/Beatnik.git
 sed -i 's#env python#env python2#' Beatnik/script/beatnik.py
