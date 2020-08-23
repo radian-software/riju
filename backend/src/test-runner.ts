@@ -637,6 +637,7 @@ async function main() {
     console.error("no tests selected");
     process.exit(1);
   }
+  console.error(`Running ${tests.length} test${tests.length !== 1 ? "s" : ""}`);
   const lintSeen = new Set();
   let lintPassed = new Set();
   let lintFailed = new Map();
