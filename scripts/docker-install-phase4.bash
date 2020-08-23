@@ -39,6 +39,13 @@ wget -nv "ftp://ftp.gnu.org/gnu/apl/${file}"
 dpkg -i apl_*_amd64.deb
 rm apl_*_amd64.deb
 
+# Boo
+wget -nv https://github.com/boo-lang/boo/releases/download/unstable/boo-latest.zip
+unzip boo-latest.zip
+mv boo-latest /usr/local/lib/boo
+chmod +x /usr/local/lib/boo/booc /usr/local/lib/boo/booish
+ln -s /usr/local/lib/boo/booc /usr/local/lib/boo/booish /usr/local/bin/
+
 # Clojure
 ver="$(latest_release snoe/clojure-lsp)"
 wget -nv "https://github.com/snoe/clojure-lsp/releases/download/${ver}/clojure-lsp"

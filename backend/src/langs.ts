@@ -313,6 +313,17 @@ Nude pagoda careens.
 000001110111011011110111001001101100011001000010000100001010
 `,
   },
+  boo: {
+    aliases: ["booc"],
+    name: "Boo",
+    setup: `mkdir -p "$HOME/.local/share" && touch "$HOME/.local/share/booish_history"`,
+    main: "main.boo",
+    repl: "booish",
+    compile: "booc main.boo",
+    run: "mono main.exe; booish",
+    template: `print "Hello, world!"
+`,
+  },
   brainf: {
     aliases: ["brainfuck", "bf"],
     name: "Brainf***",
