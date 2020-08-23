@@ -242,16 +242,19 @@ class Test {
     }
   };
   testLsp = async () => {
-    const insertedCode = this.config.lsp!.code!;
+    const code = this.config.lsp!.code!;
     const after = this.config.lsp!.after;
     const item = this.config.lsp!.item!;
     const idx = after
       ? this.config.template.indexOf(after) + after.length
       : this.config.template.length;
-    const code =
+    const pos = findPosition(this.config.template, idx);
+    const newCode =
       this.config.template.slice(0, idx) +
-      insertedCode +
+      code +
       this.config.template.slice(idx);
+    const newIdx = idx + code.length;
+    const newPos = findPosition(newCode, newIdx);
     const root = await this.wait("lspStarted message", (msg: any) => {
       if (msg.event === "lspStarted") {
         return msg.root;
@@ -484,8 +487,31 @@ class Test {
             languageId:
               this.config.lsp!.lang || this.config.monacoLang || "plaintext",
             version: 1,
-            text: code,
+            text: this.config.template,
           },
+        },
+      },
+    });
+    this.send({
+      event: "lspInput",
+      input: {
+        jsonrpc: "2.0",
+        method: "textDocument/didChange",
+        params: {
+          textDocument: {
+            uri: `file://${root}/${this.config.main}`,
+            version: 3,
+          },
+          contentChanges: [
+            {
+              range: {
+                start: pos,
+                end: pos,
+              },
+              rangeLength: 0,
+              text: code,
+            },
+          ],
         },
       },
     });
@@ -499,7 +525,7 @@ class Test {
           textDocument: {
             uri: `file://${root}/${this.config.main}`,
           },
-          position: findPosition(code, idx + insertedCode.length),
+          position: newPos,
           context: { triggerKind: 1 },
         },
       },
