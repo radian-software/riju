@@ -395,6 +395,56 @@ int main() {
 `,
     skip: ["lsp"],
   },
+  "c++": {
+    aliases: [
+      "cpp",
+      "g++",
+      "clang++",
+      "c++98",
+      "c++03",
+      "c++11",
+      "c++14",
+      "c++17",
+      "c++20",
+      "cpp98",
+      "cpp03",
+      "cpp11",
+      "cpp14",
+      "cpp17",
+      "cpp20",
+      "hpp",
+      "cxx",
+      "hxx",
+    ],
+    name: "C++",
+    monacoLang: "cpp",
+    main: "main.cpp",
+    compile: "clang++ -Wall -Wextra main.cpp -o main",
+    run: "./main",
+    format: {
+      run: "clang-format --assume-filename=format.cpp",
+      input: `#include <iostream>
+
+int main()
+{
+  std::cout << "Hello, world!" << std::endl;
+  return 0;
+}
+`,
+    },
+    lsp: {
+      setup: `echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
+      start: "clangd",
+    },
+    template: `#include <iostream>
+
+int main() {
+  std::cout << "Hello, world!" << std::endl;
+  return 0;
+}
+`,
+    skip: ["lsp"],
+  },
   cat: {
     aliases: ["cat-language"],
     name: "Cat",
@@ -480,6 +530,36 @@ Pour contents of the mixing bowl into the baking dish.
 Refrigerate for 1 hour.
 `,
   },
+  clojure: {
+    aliases: ["clj"],
+    name: "Clojure",
+    monacoLang: "clojure",
+    repl: "clojure",
+    input: "(* 123 234)",
+    main: "main.clj",
+    run: "clojure -i main.clj -r",
+    scope: {
+      code: `(def x (* 123 234))`,
+    },
+    lsp: { start: "clojure-lsp" },
+    template: `(println "Hello, world!")
+`,
+    skip: ["lsp"],
+  },
+  clojurescript: {
+    aliases: ["cljs", "lumo"],
+    name: "ClojureScript",
+    monacoLang: "clojure",
+    repl: "lumo -r",
+    input: "(* 123 234)",
+    main: "main.cljs",
+    run: "lumo -i main.cljs -r",
+    scope: {
+      code: `(def x (* 123 234))`,
+    },
+    template: `(println "Hello, world!")
+`,
+  },
   cmd: {
     aliases: ["bat", "batch", "wine"],
     name: "Cmd",
@@ -496,6 +576,36 @@ Refrigerate for 1 hour.
     template: `echo "Hello, world!"
 `,
     timeout: 15,
+  },
+  cobol: {
+    aliases: ["cbl", "cobc"],
+    name: "COBOL",
+    main: "main.cbl",
+    compile: "cobc -free -x main.cbl -o main",
+    run: "./main",
+    template: `IDENTIFICATION DIVISION.
+PROGRAM-ID. MAIN.
+PROCEDURE DIVISION.
+    DISPLAY "Hello, world!".
+    STOP RUN.
+`,
+  },
+  coffeescript: {
+    aliases: ["coffee"],
+    name: "CoffeeScript",
+    monacoLang: "coffee",
+    repl: "coffee",
+    main: "main.coffee",
+    compile: "coffee -b -c main.coffee",
+    run: `node -e '
+eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
+require("/usr/lib/node_modules/coffeescript/repl").start()
+'`,
+    scope: {
+      code: `x = 123 * 234`,
+    },
+    template: `console.log "Hello, world!"
+`,
   },
   commonlisp: {
     aliases: ["lisp", "sbcl"],
@@ -518,56 +628,6 @@ Refrigerate for 1 hour.
     run: "prettier --no-config main.html",
     template: `Hello, world!
 `,
-  },
-  "c++": {
-    aliases: [
-      "cpp",
-      "g++",
-      "clang++",
-      "c++98",
-      "c++03",
-      "c++11",
-      "c++14",
-      "c++17",
-      "c++20",
-      "cpp98",
-      "cpp03",
-      "cpp11",
-      "cpp14",
-      "cpp17",
-      "cpp20",
-      "hpp",
-      "cxx",
-      "hxx",
-    ],
-    name: "C++",
-    monacoLang: "cpp",
-    main: "main.cpp",
-    compile: "clang++ -Wall -Wextra main.cpp -o main",
-    run: "./main",
-    format: {
-      run: "clang-format --assume-filename=format.cpp",
-      input: `#include <iostream>
-
-int main()
-{
-  std::cout << "Hello, world!" << std::endl;
-  return 0;
-}
-`,
-    },
-    lsp: {
-      setup: `echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
-      start: "clangd",
-    },
-    template: `#include <iostream>
-
-int main() {
-  std::cout << "Hello, world!" << std::endl;
-  return 0;
-}
-`,
-    skip: ["lsp"],
   },
   crystal: {
     aliases: ["cr"],
@@ -601,66 +661,6 @@ int main() {
         System.Console.WriteLine("Hello, world!");
     }
 }
-`,
-  },
-  clojure: {
-    aliases: ["clj"],
-    name: "Clojure",
-    monacoLang: "clojure",
-    repl: "clojure",
-    input: "(* 123 234)",
-    main: "main.clj",
-    run: "clojure -i main.clj -r",
-    scope: {
-      code: `(def x (* 123 234))`,
-    },
-    lsp: { start: "clojure-lsp" },
-    template: `(println "Hello, world!")
-`,
-    skip: ["lsp"],
-  },
-  clojurescript: {
-    aliases: ["cljs", "lumo"],
-    name: "ClojureScript",
-    monacoLang: "clojure",
-    repl: "lumo -r",
-    input: "(* 123 234)",
-    main: "main.cljs",
-    run: "lumo -i main.cljs -r",
-    scope: {
-      code: `(def x (* 123 234))`,
-    },
-    template: `(println "Hello, world!")
-`,
-  },
-  cobol: {
-    aliases: ["cbl", "cobc"],
-    name: "COBOL",
-    main: "main.cbl",
-    compile: "cobc -free -x main.cbl -o main",
-    run: "./main",
-    template: `IDENTIFICATION DIVISION.
-PROGRAM-ID. MAIN.
-PROCEDURE DIVISION.
-    DISPLAY "Hello, world!".
-    STOP RUN.
-`,
-  },
-  coffeescript: {
-    aliases: ["coffee"],
-    name: "CoffeeScript",
-    monacoLang: "coffee",
-    repl: "coffee",
-    main: "main.coffee",
-    compile: "coffee -b -c main.coffee",
-    run: `node -e '
-eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
-require("/usr/lib/node_modules/coffeescript/repl").start()
-'`,
-    scope: {
-      code: `x = 123 * 234`,
-    },
-    template: `console.log "Hello, world!"
 `,
   },
   d: {
