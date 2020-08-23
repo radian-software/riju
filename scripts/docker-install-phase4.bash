@@ -237,16 +237,6 @@ for file in /opt/rust/bin/*; do
     ln -s /opt/rust/wrapper "/usr/local/bin/${file##*/}"
 done
 
-# Scala
-file="$(curl -sSL https://scalameta.org/metals/docs/editors/emacs.html | grep -Eo 'org.scalameta[^ ]+')"
-wget -nv https://git.io/coursier-cli
-chmod +x coursier-cli
-mv coursier-cli /usr/local/bin/coursier
-coursier bootstrap --java-opt -Xss4m --java-opt -Xms100m --java-opt -Dmetals.client=emacs "${file}" -r bintray:scalacenter/releases -r sonatype:snapshots -o /usr/local/bin/metals
-metals -version </dev/null
-mkdir /opt/coursier
-mv "$HOME/.cache/coursier" /opt/coursier/cache
-
 # SETL
 wget -nv https://setl.org/setl/bin/Linux-x86-64bit/setlbin.tgz
 tar -xf setlbin.tgz -C /usr/local/bin
