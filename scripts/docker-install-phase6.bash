@@ -25,6 +25,12 @@ wget -nv https://www.ioccc.org/2012/tromp/tromp.c
 clang tromp.c -Wno-everything -DInt=long -DX=8 -DA=500000 -o /usr/local/bin/tromp
 rm tromp.c
 
+# Cat
+git clone https://github.com/cdiggins/cat-language.git /opt/cat
+pushd /opt/cat >/dev/null
+npm install
+popd >/dev/null
+
 # Erlang
 git clone https://github.com/erlang-ls/erlang_ls.git
 pushd erlang_ls >/dev/null

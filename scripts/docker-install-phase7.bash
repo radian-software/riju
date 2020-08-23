@@ -130,6 +130,29 @@ while True:
 EOF
 chmod +x /usr/local/bin/brainf-repl
 
+# Cat
+tee /opt/cat/repl.js >/dev/null <<"EOF"
+const fs = require("fs");
+const repl = require("repl");
+
+const args = process.argv.slice(2);
+if (args.length > 1) {
+  console.error("usage: repl.js [FILE]");
+  process.exit(1);
+}
+
+const program = args.length === 1 ? fs.readFileSync(args[0], "utf-8") : null;
+
+const cat = require("cat");
+const ce = new cat.CatLanguage.CatEvaluator();
+
+if (program !== null) {
+  ce.eval(program);
+}
+
+repl.start({prompt: "cat> ", eval: (cmd, context, filename, callback) => callback(null, ce.eval(cmd))});
+EOF
+
 # Haskell
 mkdir -p /opt/haskell
 tee /opt/haskell/hie.yaml >/dev/null <<"EOF"

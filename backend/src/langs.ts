@@ -395,6 +395,17 @@ int main() {
 `,
     skip: ["lsp"],
   },
+  cat: {
+    aliases: ["cat-language"],
+    name: "Cat",
+    repl: "NODE_PATH=/opt/cat node /opt/cat/repl.js",
+    input: "123 234 mul",
+    main: "main.cat",
+    run: "NODE_PATH=/opt/cat node /opt/cat/repl.js main.cat",
+    hello: "72,101,108,108,111,44,32,119,111,114,108,100,33,10",
+    template: `72 101 108 108 111 44 32 119 111 114 108 100 33 10
+`,
+  },
   ceylon: {
     name: "Ceylon",
     main: "source/main.ceylon",
