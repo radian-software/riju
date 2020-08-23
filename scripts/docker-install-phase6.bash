@@ -41,6 +41,9 @@ popd >/dev/null
 ln -s /opt/clean/bin/clm /usr/local/bin/
 rm clean*_64.tar.gz
 
+sleep 2
+find /opt/clean -name '*.o' -exec touch '{}' ';'
+
 # Erlang
 git clone https://github.com/erlang-ls/erlang_ls.git
 pushd erlang_ls >/dev/null
