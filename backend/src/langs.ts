@@ -2062,6 +2062,9 @@ binding_irb.run(IRB.conf)
     scope: {
       code: `val x = 123 * 234`,
     },
+    lsp: {
+      start: `mkdir -p .cache; [[ -d .cache/coursier ]] || cp -R /opt/coursier/cache .cache/coursier; JAVA_OPTS="-Duser.home=$PWD" metals`,
+    },
     template: `println("Hello, world!")
 `,
     timeout: 30,
