@@ -68,4 +68,4 @@ RUN sudo cp -a /tmp/riju/* /home/docker/src/ && rm -rf /tmp/riju
 
 WORKDIR /home/docker/src
 RUN sudo deluser docker sudo
-RUN RIJU_PRIVILEGED=1 TIMEOUT_SECS=60 yarn test
+RUN RIJU_PRIVILEGED=1 CONCURRENCY=1 TIMEOUT_SECS=60 yarn test
