@@ -67,8 +67,8 @@ every language, and they can be run as follows:
 
 Filters can be for language (`python`, `java`) or test type (`hello`,
 `lsp`). You can comma-delimit multiple filters to do a disjunction,
-and space-delimit them to do a conjunction (`hello python,java`) for
-the `hello` tests for `python` and `java`.
+and space-delimit them to do a conjunction (`yarn test hello
+python,java` for the `hello` tests for `python` and `java`).
 
 The tests are run automatically when building the production image,
 and fail the build if they fail.
