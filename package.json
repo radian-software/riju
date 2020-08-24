@@ -61,6 +61,6 @@
     "dev": "run-p backend-dev frontend-dev system-dev server-dev",
     "lsp-repl": "node backend/out/lsp-repl.js",
     "sandbox": "node backend/out/sandbox.js",
-    "test": "bash -c 'time node backend/out/test-runner.js \"$@\"' --"
+    "test": "bash -c 'scripts/setup.bash && time node backend/out/test-runner.js \"$@\"' --"
   }
 }
