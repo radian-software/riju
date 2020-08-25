@@ -84,6 +84,11 @@ Here are some explicit *non-requirements*:
   but I've seen some s\*\*\* when adding languages to Riju so it will
   take a lot to surprise me at this point.
 
+If you'd like to request a new language, head to the [language support
+meta-issue](https://github.com/raxod502/riju/issues/24) and add a
+comment. Of course, if you actually want it to be added anytime soon,
+you should submit a pull request :)
+
 ## Project setup
 
 To run the webserver, all you need is Yarn. Just run `yarn install` as
