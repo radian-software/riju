@@ -2505,16 +2505,18 @@ a
     name: "Unison",
     setup: "shopt -s dotglob && cp -R /opt/unison/project-template/* ./",
     repl: "unison -codebase .",
-    input: "find : [a] -> [a]",
+    input: `DELAY: 3
+find : [a] -> [a]`,
     output: "base.List.reverse",
     main: "main.u",
     run: `echo "Type 'run main' to run the code." && unison -codebase .`,
-    helloInput: "run main",
+    helloInput: `DELAY: 3
+run main`,
     scope: {
       code: `x = 123 * 234`,
-      input: `DELAY: 1
+      input: `DELAY: 3
 add x
-DELAY: 0.5
+DELAY: 3
 display x`,
     },
     template: `use io
@@ -2523,6 +2525,7 @@ main : '{IO} ()
 main = 'let
   printLine "Hello, world!"
 `,
+    timeout: 15,
   },
   unlambda: {
     aliases: ["unl"],
