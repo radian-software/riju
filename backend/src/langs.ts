@@ -592,7 +592,7 @@ Start world
     },
     template: `echo "Hello, world!"
 `,
-    timeout: 15,
+    timeout: 30,
   },
   cobol: {
     aliases: ["cbl", "cobc"],

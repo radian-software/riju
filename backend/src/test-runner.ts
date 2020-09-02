@@ -3,6 +3,8 @@ import * as process from "process";
 import { promisify } from "util";
 
 import * as _ from "lodash";
+import { Moment } from "moment";
+import * as moment from "moment";
 import PQueue from "p-queue";
 import * as rimraf from "rimraf";
 import { v4 as getUUID } from "uuid";
@@ -47,6 +49,7 @@ class Test {
   timedOut: boolean = false;
   handledMessages: number = 0;
   handleUpdate: () => void = () => {};
+  startTime: Moment | null = null;
 
   get config() {
     return langs[this.lang];
@@ -54,9 +57,14 @@ class Test {
 
   ws: any = null;
 
+  record = (msg: any) => {
+    const dur = moment.duration(moment().diff(this.startTime!));
+    this.messages.push({ time: dur.asSeconds(), ...msg });
+  };
+
   send = (msg: any) => {
     this.ws.onMessage(JSON.stringify(msg));
-    this.messages.push(msg);
+    this.record(msg);
     this.handledMessages += 1;
   };
 
@@ -76,6 +84,7 @@ class Test {
     if ((this.config.skip || []).includes(this.type)) {
       return "skipped";
     }
+    this.startTime = moment();
     let session = null;
     let timeout = null;
     try {
@@ -103,13 +112,13 @@ class Test {
         },
         messageQueue: [] as any[],
         send: function (data: string) {
-          that.messages.push(JSON.parse(data));
+          that.record(JSON.parse(data));
           that.handleUpdate();
         },
         terminate: function () {},
       };
       session = new api.Session(this.ws, this.lang, (msg: string) => {
-        this.messages.push({ event: "serverLog", message: msg });
+        this.record({ event: "serverLog", message: msg });
       });
       timeout = setTimeout(() => {
         this.timedOut = true;
