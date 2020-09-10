@@ -29,7 +29,7 @@ body {
 
 #formatButton {
   position: absolute;
-  bottom: 25px;
+  bottom: 80px;
   right: calc(50% + 25px);
   visibility: hidden;
 }
@@ -38,8 +38,36 @@ body {
   visibility: visible;
 }
 
+#packagesButton {
+  position: absolute;
+  bottom: 25px;
+  right: calc(50% + 25px);
+  visibility: hidden;
+}
+
+#packagesButton.visible {
+  visibility: visible;
+}
+
 #backButton {
   position: absolute;
   left: 25px;
   bottom: 25px;
+}
+
+#packagesTerminal {
+  height: 250px;
+}
+
+#packagesAdd {
+  float: right;
+}
+
+#packagesSearchContainer {
+  overflow: hidden;
+  padding-right: 15px;
+}
+
+#packagesSearch {
+  width: 100%;
 }

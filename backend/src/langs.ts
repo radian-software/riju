@@ -1,3 +1,4 @@
+// Keep in sync with app.ts
 export interface LangConfig {
   aliases?: string[];
   name: string;

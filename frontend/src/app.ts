@@ -1,3 +1,4 @@
+import * as $ from "jquery";
 import * as monaco from "monaco-editor";
 import {
   createConnection,
@@ -16,16 +17,25 @@ import { Message } from "vscode-jsonrpc/lib/messages";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 
+import "bootstrap";
+
 import "xterm/css/xterm.css";
 
 const DEBUG = window.location.hash === "#debug";
 const config: RijuConfig = (window as any).rijuConfig;
 
+// Keep in sync with langs.ts (this exposes a subset of the keys)
 interface RijuConfig {
   id: string;
   monacoLang?: string;
   main: string;
   format?: any;
+  pkg?: {
+    install: string;
+    uninstall?: string;
+    all?: string;
+    search?: string;
+  };
   lsp?: {
     disableDynamicRegistration?: boolean;
     init?: any;
@@ -126,6 +136,8 @@ async function main() {
 
   fitAddon.fit();
   window.addEventListener("resize", () => fitAddon.fit());
+
+  let packagesTermOpened = false;
 
   await new Promise((resolve) =>
     term.write("Connecting to server...", resolve)
@@ -328,6 +340,23 @@ async function main() {
       sendMessage({ event: "formatCode", code: editor.getValue() });
     });
   }
+  if (config.pkg) {
+    document.getElementById("packagesButton")!.classList.add("visible");
+  }
+  $("#packagesModal").on("shown.bs.modal", () => {
+    if (!packagesTermOpened) {
+      packagesTermOpened = true;
+
+      const packagesTerm = new Terminal();
+      const packagesFitAddon = new FitAddon();
+      packagesTerm.loadAddon(packagesFitAddon);
+
+      packagesTerm.open(document.getElementById("packagesTerminal")!);
+
+      packagesFitAddon.fit();
+      window.addEventListener("resize", () => packagesFitAddon.fit());
+    }
+  });
 }
 
 main().catch(console.error);
