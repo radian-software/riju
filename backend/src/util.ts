@@ -1,8 +1,10 @@
 import { SpawnOptions, spawn, spawnSync } from "child_process";
 import * as os from "os";
 import * as process from "process";
+import * as nodeReadline from "readline";
 
 import * as appRoot from "app-root-path";
+import * as readline from "historic-readline";
 import { quote } from "shell-quote";
 
 import { MIN_UID, MAX_UID } from "./users";
@@ -137,4 +139,94 @@ export function bash(cmdline: string) {
     cmdline = "exec " + cmdline;
   }
   return ["bash", "-c", cmdline];
+}
+
+// https://stackoverflow.com/a/10608048/3538165
+function fixStreamFor(cli: any, streamName: string) {
+  var oldStream = (process as any)[streamName];
+  var newStream = Object.create(oldStream);
+  newStream.write = function () {
+    cli.output.write("\x1b[2K\r");
+    var result = oldStream.write.apply(
+      this,
+      (Array.prototype.slice as any).call(arguments)
+    );
+    cli._refreshLine();
+    return result;
+  };
+  (process as any).__defineGetter__("old" + streamName, () => oldStream);
+  (process as any).__defineGetter__(streamName, () => newStream);
+}
+
+export interface ReplOptions {
+  onLine: (line: any) => void;
+  historyFile: string;
+}
+
+export function startRepl(options: ReplOptions) {
+  readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    path: appRoot.resolve(options.historyFile),
+    next: (cli: nodeReadline.Interface) => {
+      fixStreamFor(cli, "stdout");
+      fixStreamFor(cli, "stderr");
+      cli.setPrompt(">>> ");
+      cli.on("line", (line: string) => {
+        if (line) {
+          options.onLine(line);
+        }
+        cli.prompt();
+      });
+      cli.on("SIGINT", () => {
+        (process as any).oldstderr.write("^C\n");
+        cli.write("", { ctrl: true, name: "u" });
+        cli.prompt();
+      });
+      cli.on("close", () => {
+        (process as any).oldstderr.write("^D\n");
+        process.exit(0);
+      });
+      console.log();
+      cli.prompt();
+    },
+  });
+}
+
+export function mockSocket() {
+  return {
+    on: function (type: string, handler: any) {
+      switch (type) {
+        case "message":
+          this.onMessage = handler;
+          for (const msg of this.messageReceivedQueue) {
+            this.onMessage(msg);
+          }
+          this.messageReceivedQueue = [];
+          break;
+        case "send":
+          this.send = handler;
+          for (const msg of this.messageSentQueue) {
+            this.send(msg);
+          }
+          this.messageSentQueue = [];
+          break;
+        case "close":
+        case "error":
+          // No need to clean up, we'll call teardown() explicitly.
+          break;
+        default:
+          throw new Error(`unexpected websocket handler type: ${type}`);
+      }
+    },
+    onMessage: function (msg: any) {
+      this.messageReceivedQueue.push(msg);
+    },
+    send: function (msg: any) {
+      this.messageSentQueue.push(msg);
+    },
+    messageReceivedQueue: [] as any[],
+    messageSentQueue: [] as any[],
+    terminate: function () {},
+  };
 }

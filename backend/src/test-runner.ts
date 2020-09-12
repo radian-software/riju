@@ -11,6 +11,7 @@ import { v4 as getUUID } from "uuid";
 
 import * as api from "./api";
 import { LangConfig, langs } from "./langs";
+import { mockSocket } from "./util";
 
 function parseIntOr(thing: any, def: number) {
   const num = parseInt(thing);
@@ -88,35 +89,11 @@ class Test {
     let session = null;
     let timeout = null;
     try {
-      const that = this;
-      this.ws = {
-        on: function (type: string, handler: any) {
-          switch (type) {
-            case "message":
-              this.onMessage = handler;
-              for (const msg of this.messageQueue) {
-                this.onMessage(msg);
-              }
-              this.messageQueue = [];
-              break;
-            case "close":
-            case "error":
-              // No need to clean up, we'll call teardown() explicitly.
-              break;
-            default:
-              throw new Error(`unexpected websocket handler type: ${type}`);
-          }
-        },
-        onMessage: function (msg: any) {
-          this.messageQueue.push(msg);
-        },
-        messageQueue: [] as any[],
-        send: function (data: string) {
-          that.record(JSON.parse(data));
-          that.handleUpdate();
-        },
-        terminate: function () {},
-      };
+      this.ws = mockSocket();
+      this.ws.on("send", (data: string) => {
+        this.record(JSON.parse(data));
+        this.handleUpdate();
+      });
       session = new api.Session(this.ws, this.lang, (msg: string) => {
         this.record({ event: "serverLog", message: msg });
       });

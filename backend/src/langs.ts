@@ -32,6 +32,7 @@ export interface LangConfig {
     output?: string;
   };
   pkg?: {
+    index: string | string[];
     install: string;
     uninstall?: string;
     all?: string;
@@ -1928,6 +1929,7 @@ main = do
 `,
     },
     pkg: {
+      index: "https://pypi.org/",
       install: "pip3 install --user NAME",
       uninstall: "pip3 uninstall NAME",
       search: `python3 -c 'import json; from xmlrpc import client; print(json.dumps(client.ServerProxy("https://pypi.org/pypi").search({"name": "NAME"})))' | jq -r 'map(.name) | .[]'`,

@@ -1,6 +1,7 @@
 .git
 *.log
 .log
+.api-repl-history
 .lsp-repl-history
 node_modules
 out

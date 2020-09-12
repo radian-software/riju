@@ -13,6 +13,9 @@ import { borrowUser } from "./users";
 import * as util from "./util";
 import { Context, Options, bash } from "./util";
 
+const PACKAGE_MAX_SEARCH_RESULTS = 100;
+const PACKAGE_NAME_REGEX = /[-_a-zA-Z0-9.+:]/;
+
 const allSessions: Set<Session> = new Set();
 
 export class Session {
@@ -37,6 +40,12 @@ export class Session {
   } | null = null;
   daemon: { proc: ChildProcess } | null = null;
   formatter: {
+    proc: ChildProcess;
+    live: boolean;
+    input: string;
+    output: string;
+  } | null = null;
+  packageSearcher: {
     proc: ChildProcess;
     live: boolean;
     input: string;
@@ -243,6 +252,9 @@ export class Session {
             this.logBadMessage(msg);
             break;
           }
+          if (!this.config.format) {
+            this.log("formatCode ignored because format is null");
+          }
           await this.formatCode(msg.code);
           break;
         case "lspInput":
@@ -258,10 +270,21 @@ export class Session {
           break;
         case "ensure":
           if (!this.config.ensure) {
-            this.log(`ensure ignored because of missing configuration`);
+            this.log(`ensure ignored because ensure is null`);
             break;
           }
           await this.ensure(this.config.ensure);
+          break;
+        case "packageSearch":
+          if (!this.config.pkg || !this.config.pkg.search) {
+            this.log(`packageSearch ignored because pkg.search is null`);
+            break;
+          }
+          if (typeof msg.search !== "string") {
+            this.logBadMessage(msg);
+            break;
+          }
+          await this.packageSearch(msg.search);
           break;
         default:
           this.logBadMessage(msg);
@@ -368,10 +391,6 @@ export class Session {
 
   formatCode = async (code: string) => {
     try {
-      if (!this.config.format) {
-        this.log("formatCode ignored because format is null");
-        return;
-      }
       if (this.formatter) {
         const pid = this.formatter.proc.pid;
         const args = this.privilegedSpawn(
@@ -381,7 +400,7 @@ export class Session {
         this.formatter.live = false;
         this.formatter = null;
       }
-      const args = this.privilegedSpawn(bash(this.config.format.run));
+      const args = this.privilegedSpawn(bash(this.config.format!.run));
       const formatter = {
         proc: spawn(args[0], args.slice(1)),
         live: true,
@@ -438,6 +457,78 @@ export class Session {
       check: false,
     });
     this.send({ event: "ensured", code });
+  };
+
+  packageSearch = async (search: string) => {
+    try {
+      if (this.packageSearcher) {
+        const pid = this.packageSearcher.proc.pid;
+        const args = this.privilegedSpawn(
+          bash(`kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`)
+        );
+        spawn(args[0], args.slice(1));
+        this.packageSearcher.live = false;
+        this.packageSearcher = null;
+      }
+      if (!search) {
+        this.send({
+          event: "packageSearched",
+          results: this.config.pkg!.popular || [],
+          search: "",
+        });
+        return;
+      }
+      const args = this.privilegedSpawn(
+        bash(this.config.pkg!.search!.replace(/NAME/g, search))
+      );
+      const packageSearcher = {
+        proc: spawn(args[0], args.slice(1)),
+        live: true,
+        input: search,
+        output: "",
+      };
+      packageSearcher.proc.stdout!.on("data", (data) => {
+        if (!packageSearcher.live) return;
+        packageSearcher.output += data.toString("utf8");
+      });
+      packageSearcher.proc.stderr!.on("data", (data) => {
+        if (!packageSearcher.live) return;
+        this.send({
+          event: "serviceLog",
+          service: "packageSearch",
+          output: data.toString("utf8"),
+        });
+      });
+      packageSearcher.proc.on("close", (code, signal) => {
+        if (!packageSearcher.live) return;
+        if (code === 0) {
+          this.send({
+            event: "packageSearched",
+            results: packageSearcher.output.split("\n").filter((x) => x),
+            search: packageSearcher.input,
+          });
+        } else {
+          this.send({
+            event: "serviceFailed",
+            service: "packageSearch",
+            error: `Exited with status ${signal || code}`,
+          });
+        }
+      });
+      packageSearcher.proc.on("error", (err) => {
+        if (!packageSearcher.live) return;
+        this.send({
+          event: "serviceFailed",
+          service: "packageSearch",
+          error: `${err}`,
+        });
+      });
+      this.packageSearcher = packageSearcher;
+    } catch (err) {
+      this.log(`Error while running package search`);
+      console.log(err);
+      this.sendError(err);
+    }
   };
 
   teardown = async () => {

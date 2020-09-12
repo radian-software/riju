@@ -1,4 +1,5 @@
 import * as $ from "jquery";
+import * as _ from "lodash";
 import * as monaco from "monaco-editor";
 import {
   createConnection,
@@ -138,6 +139,7 @@ async function main() {
   window.addEventListener("resize", () => fitAddon.fit());
 
   let packagesTermOpened = false;
+  let handlePackageSearchResults: (results: string[]) => void = () => {};
 
   await new Promise((resolve) =>
     term.write("Connecting to server...", resolve)
@@ -284,7 +286,24 @@ async function main() {
           }
           return;
         case "serviceCrashed":
+          if (typeof message.service !== "string") {
+            console.error("Unexpected message from server:", message);
+            return;
+          }
+          if (message.service === "packageSearch") {
+            handlePackageSearchResults([]);
+          }
           return;
+        case "packageSearched":
+          if (
+            !Array.isArray(message.results) ||
+            !message.results.every((x: any) => typeof x === "string")
+          ) {
+            console.error("Unexpected message from server:", message);
+            return;
+          }
+          handlePackageSearchResults(message.results);
+          break;
         default:
           console.error("Unexpected message from server:", message);
           return;
@@ -342,21 +361,34 @@ async function main() {
   }
   if (config.pkg) {
     document.getElementById("packagesButton")!.classList.add("visible");
+    $("#packagesModal").on("shown.bs.modal", () => {
+      if (!packagesTermOpened) {
+        packagesTermOpened = true;
+
+        const packagesTerm = new Terminal();
+        const packagesFitAddon = new FitAddon();
+        packagesTerm.loadAddon(packagesFitAddon);
+
+        packagesTerm.open(document.getElementById("packagesTerminal")!);
+
+        packagesFitAddon.fit();
+        window.addEventListener("resize", () => packagesFitAddon.fit());
+
+        const searchInput = document.getElementById(
+          "packagesSearch"
+        ) as HTMLInputElement;
+        searchInput.addEventListener(
+          "input",
+          _.debounce(() => {
+            sendMessage({ event: "packageSearch", search: searchInput.value });
+          }, 100)
+        );
+        handlePackageSearchResults = (results: string[]) => {
+          console.log("got results:", results);
+        };
+      }
+    });
   }
-  $("#packagesModal").on("shown.bs.modal", () => {
-    if (!packagesTermOpened) {
-      packagesTermOpened = true;
-
-      const packagesTerm = new Terminal();
-      const packagesFitAddon = new FitAddon();
-      packagesTerm.loadAddon(packagesFitAddon);
-
-      packagesTerm.open(document.getElementById("packagesTerminal")!);
-
-      packagesFitAddon.fit();
-      window.addEventListener("resize", () => packagesFitAddon.fit());
-    }
-  });
 }
 
 main().catch(console.error);

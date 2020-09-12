@@ -1,13 +1,12 @@
 import * as child_process from "child_process";
 import * as process from "process";
-import * as nodeReadline from "readline";
 
 import * as appRoot from "app-root-path";
-import * as readline from "historic-readline";
 import { quote } from "shell-quote";
 import * as rpc from "vscode-jsonrpc";
 
 import { langs } from "./langs";
+import { startRepl } from "./util";
 
 const args = process.argv.slice(2);
 
@@ -57,56 +56,17 @@ reader.listen((data) => {
   console.log("<<< " + JSON.stringify(data) + "\n");
 });
 
-// https://stackoverflow.com/a/10608048/3538165
-function fixStdoutFor(cli: any) {
-  var oldStdout = process.stdout;
-  var newStdout = Object.create(oldStdout);
-  newStdout.write = function () {
-    cli.output.write("\x1b[2K\r");
-    var result = oldStdout.write.apply(
-      this,
-      (Array.prototype.slice as any).call(arguments)
-    );
-    cli._refreshLine();
-    return result;
-  };
-  (process as any).__defineGetter__("stdout", function () {
-    return newStdout;
-  });
-}
-
-readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  path: appRoot.resolve(".lsp-repl-history"),
-  next: (cli: nodeReadline.Interface) => {
-    fixStdoutFor(cli);
-    cli.setPrompt(">>> ");
-    cli.on("line", (line: string) => {
-      if (line) {
-        let data;
-        try {
-          data = JSON.parse(line);
-        } catch (err) {
-          console.error(`Invalid JSON: ${err}`);
-          cli.prompt();
-          return;
-        }
-        console.log();
-        writer.write(data);
-      }
-      cli.prompt();
-    });
-    cli.on("SIGINT", () => {
-      console.error("^C");
-      cli.write("", { ctrl: true, name: "u" });
-      cli.prompt();
-    });
-    cli.on("close", () => {
-      console.error();
-      process.exit(0);
-    });
+startRepl({
+  historyFile: ".lsp-repl-history",
+  onLine: (line) => {
+    let data;
+    try {
+      data = JSON.parse(line);
+    } catch (err) {
+      console.error(`Invalid JSON: ${err}`);
+      return;
+    }
     console.log();
-    cli.prompt();
+    writer.write(data);
   },
 });
