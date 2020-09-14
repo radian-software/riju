@@ -56,5 +56,6 @@ module.exports = (_, argv) => ({
     alias: {
       vscode: require.resolve("monaco-languageclient/lib/vscode-compatibility"),
     },
+    extensions: [".js", ".ts"],
   },
 });

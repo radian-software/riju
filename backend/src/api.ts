@@ -473,7 +473,7 @@ export class Session {
       if (!search) {
         this.send({
           event: "packageSearched",
-          results: this.config.pkg!.popular || [],
+          results: [],
           search: "",
         });
         return;

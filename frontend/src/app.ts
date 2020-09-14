@@ -22,6 +22,8 @@ import "bootstrap";
 
 import "xterm/css/xterm.css";
 
+import { autocomplete } from "./util";
+
 const DEBUG = window.location.hash === "#debug";
 const config: RijuConfig = (window as any).rijuConfig;
 
@@ -362,6 +364,10 @@ async function main() {
   if (config.pkg) {
     document.getElementById("packagesButton")!.classList.add("visible");
     $("#packagesModal").on("shown.bs.modal", () => {
+      const searchInput = document.getElementById(
+        "packagesSearch"
+      ) as HTMLInputElement;
+
       if (!packagesTermOpened) {
         packagesTermOpened = true;
 
@@ -374,19 +380,17 @@ async function main() {
         packagesFitAddon.fit();
         window.addEventListener("resize", () => packagesFitAddon.fit());
 
-        const searchInput = document.getElementById(
-          "packagesSearch"
-        ) as HTMLInputElement;
         searchInput.addEventListener(
           "input",
           _.debounce(() => {
             sendMessage({ event: "packageSearch", search: searchInput.value });
           }, 100)
         );
-        handlePackageSearchResults = (results: string[]) => {
-          console.log("got results:", results);
-        };
+        handlePackageSearchResults = autocomplete(searchInput);
       }
+
+      searchInput.value = "";
+      searchInput.focus();
     });
   }
 }

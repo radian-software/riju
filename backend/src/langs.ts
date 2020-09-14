@@ -832,6 +832,7 @@ output = "Hello, world!"
       code: `(defvar x (* 123 234))`,
     },
     pkg: {
+      index: ["https://melpa.org/#/", "https://elpa.gnu.org/"],
       install: `emacs -Q --batch --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (unless (ignore-errors (>= (length (directory-files \"~/.emacs.d/elpa/archives\")) 4)) (package-refresh-contents)) (package-install 'NAME))"`,
       uninstall: `ls ~/.emacs.d/elpa | grep -- - | grep '^NAME-[0-9]' | while read pkg; do emacs -Q --batch --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (unless (ignore-errors (>= (length (directory-files \"~/.emacs.d/elpa/archives\")) 4)) (package-refresh-contents)) (call-interactively 'package-delete))" <<< "$pkg"; done`,
       all: `set -o pipefail; (curl -sS https://elpa.gnu.org/packages/ | grep '<td>' | grep -Eo '[^>]+</a>' | grep -Eo '^[^<]+' && curl -sS https://melpa.org/archive.json | jq -r 'keys | .[]') | sort | uniq`,
@@ -1377,6 +1378,7 @@ PLEASE GIVE UP
 `,
     },
     pkg: {
+      index: "https://www.npmjs.com/",
       install: "yarn add NAME",
       uninstall: "yarn remove NAME",
       search:
@@ -2114,6 +2116,7 @@ binding_irb.run(IRB.conf)
 `,
     },
     pkg: {
+      index: "https://rubygems.org/",
       install: "gem install --user-install NAME",
       uninstall: "gem uninstall --user-install NAME",
       search: `curl -sS 'https://rubygems.org/api/v1/search.json?query=NAME' | jq -r 'map(.name) | .[]'`,
