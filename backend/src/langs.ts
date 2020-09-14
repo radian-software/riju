@@ -87,6 +87,7 @@ export interface LangConfig {
 //
 // (All 28 languages listed are on Riju, except Object Pascal and VBA.)
 
+// TODO: validate that links have not broken
 export const langs: { [key: string]: LangConfig } = {
   "><>": {
     aliases: ["esofish"],
