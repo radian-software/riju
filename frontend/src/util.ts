@@ -55,6 +55,9 @@ export function autocomplete(
         updateActive();
         e.preventDefault();
         break;
+      case "Enter":
+        close();
+        break;
     }
   });
   return (newResults: string[]) => {
@@ -67,7 +70,11 @@ export function autocomplete(
     results.forEach((result, index) => {
       const eltDiv = document.createElement("div");
       eltDiv.innerText = result;
-      eltDiv.addEventListener("click", () => select(index));
+      eltDiv.addEventListener("click", () => {
+        currentIndex = index;
+        updateActive();
+        close();
+      });
       eltsDiv.appendChild(eltDiv);
     });
     input.parentNode!.appendChild(eltsDiv);
