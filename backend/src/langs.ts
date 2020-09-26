@@ -2656,6 +2656,17 @@ main = 'let
     run: "unlambda-repl main.unl",
     template: "`.\n`.!`.d`.l`.r`.o`.w`. `.,`.o`.l`.l`.e`.Hi\n",
   },
+  vala: {
+    aliases: ["valac"],
+    name: "Vala",
+    main: "main.vala",
+    compile: "valac main.vala",
+    run: "./main",
+    template: `void main () {
+    print("Hello, world!\\n");
+}
+`
+  },
   vim: {
     aliases: ["viml", "vimscript"],
     name: "Vimscript",

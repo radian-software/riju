@@ -63,6 +63,9 @@ texlive-binaries
 # Unlambda
 unlambda
 
+# Vala
+valac
+
 # Vimscript
 vim
 
