@@ -18,6 +18,9 @@ scala
 # Scheme
 mit-scheme
 
+# Scilab
+scilab
+
 # Sed
 sed
 

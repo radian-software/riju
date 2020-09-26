@@ -2219,6 +2219,16 @@ binding_irb.run(IRB.conf)
 (newline)
 `,
   },
+  scilab: {
+    aliases: ["sci"],
+    name: "Scilab",
+    repl: "scilab-cli",
+    main: "main.sci",
+    run: "scilab-cli -f main.sci",
+    template: `disp("Hello, world!")
+`,
+    skip: ["repl", "runrepl"],
+  },
   scss: {
     name: "SCSS",
     monacoLang: "scss",
