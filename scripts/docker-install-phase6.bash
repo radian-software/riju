@@ -104,6 +104,13 @@ mv snobol4 /usr/local/bin/snobol4
 popd >/dev/null
 rm -rf snobol4-*
 
+# Subleq
+git clone https://github.com/davidar/subleq.git
+pushd subleq/src >/dev/null
+make sq
+mv sq /usr/local/bin/
+popd >/dev/null
+
 # Tabloid
 mkdir /opt/tabloid
 pushd /opt/tabloid >/dev/null
