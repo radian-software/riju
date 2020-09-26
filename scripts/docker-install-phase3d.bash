@@ -12,6 +12,9 @@ liblua_name="$(grep-aptavail -eF Package "liblua[0-9.]+-dev" -a -XF Version "${l
 
 packages="
 
+# S-Lang
+slsh
+
 # Scala
 scala
 

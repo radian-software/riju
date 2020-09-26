@@ -2225,6 +2225,9 @@ binding_irb.run(IRB.conf)
     repl: "scilab-cli",
     main: "main.sci",
     run: "scilab-cli -f main.sci",
+    scope: {
+      code: `x = 123 * 234`,
+    },
     template: `disp("Hello, world!")
 `,
     skip: ["repl", "runrepl"],
@@ -2382,6 +2385,19 @@ Ophelia:
 [Exeunt]
 `,
     timeout: 15,
+  },
+  slang: {
+    aliases: ["s", "sl"],
+    name: "S-Lang",
+    repl: "slsh",
+    input: "123 * 234;",
+    main: "main.sl",
+    run: "slsh -i main.sl",
+    scope: {
+      code: "x = 123 * 234;",
+    },
+    template: `message("Hello, world!");
+`
   },
   smalltalk: {
     aliases: ["gst", "st"],
