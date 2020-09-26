@@ -104,6 +104,15 @@ mv snobol4 /usr/local/bin/snobol4
 popd >/dev/null
 rm -rf snobol4-*
 
+# Tabloid
+mkdir /opt/tabloid
+pushd /opt/tabloid >/dev/null
+wget -nv https://github.com/thesephist/tabloid/raw/master/static/js/lang.js
+cat <<"EOF" >> lang.js
+module.exports = { tokenize, Parser, Environment };
+EOF
+popd >/dev/null
+
 # Thue
 wget -nv "$(curl -sSL https://catseye.tc/distribution/Thue_distribution | grep -Eo 'https://catseye.tc/distfiles/thue-[^"]+\.zip' | head -n1)"
 unzip thue-*.zip

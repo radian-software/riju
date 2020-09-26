@@ -2385,6 +2385,15 @@ END
 `,
     skip: ["lsp"],
   },
+  tabloid: {
+    name: "Tabloid",
+    main: "main.tabloid",
+    run: "node /opt/tabloid/run.js main.tabloid",
+    hello: "HELLO, WORLD!",
+    template: `YOU WON'T WANT TO MISS "Hello, world"
+PLEASE LIKE AND SUBSCRIBE
+`,
+  },
   tcl: {
     aliases: ["tclsh", "tclshrc"],
     name: "Tcl",

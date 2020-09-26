@@ -216,6 +216,27 @@ if (program !== null) {
 repl.start({prompt: "قلب> ", eval: (cmd, context, filename, callback) => callback(null, Qlb.execute(cmd))});
 EOF
 
+# Tabloid
+tee /opt/tabloid/run.js >/dev/null <<"EOF"
+const fs = require("fs");
+
+const args = process.argv.slice(2);
+if (args.length !== 1) {
+  console.error("usage: run.js FILE");
+  process.exit(1);
+}
+
+const lang = require("./lang");
+
+const program = fs.readFileSync(args[0], "utf-8");
+const tokens = lang.tokenize(program);
+const parser = new lang.Parser(tokens);
+const ast = parser.parse();
+const runtime = { print: (s) => console.log(s.toString().toUpperCase() + "!") };
+const env = new lang.Environment(runtime);
+env.run(ast);
+EOF
+
 # Unlambda
 tee /usr/local/bin/unlambda-repl >/dev/null <<"EOF"
 #!/usr/bin/env python3
