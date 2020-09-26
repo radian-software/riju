@@ -39,6 +39,9 @@ m4
 # SQLite
 sqlite
 
+# Squirrel
+squirrel3
+
 # Standard ML
 rlwrap
 smlnj

@@ -2435,6 +2435,16 @@ END
 `,
     skip: ["lsp"],
   },
+  squirrel: {
+    aliases: ["nut", "cnut"],
+    name: "Squirrel",
+    repl: "squirrel",
+    input: `print(123 * 234)`,
+    main: "main.nut",
+    run: "squirrel main.nut; squirrel",
+    template: `print("Hello, world!\\n")
+`
+  },
   standardml: {
     aliases: ["sml", "ml"],
     name: "Standard ML",
