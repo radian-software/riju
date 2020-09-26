@@ -1126,6 +1126,56 @@ l ; ; o ; * 4
    4 ; * /
 `,
   },
+  hmmm: {
+    name: "HMMM",
+    main: "main.hmmm",
+    run: "hmmm main.hmmm",
+    hello: `72
+101
+108
+108
+111
+44
+32
+119
+111
+114
+108
+100
+33
+10
+`,
+    template: ` 0 setn r1, 72
+ 1 write r1
+ 2 setn r1, 101
+ 3 write r1
+ 4 setn r1, 108
+ 5 write r1
+ 6 setn r1, 108
+ 7 write r1
+ 8 setn r1, 111
+ 9 write r1
+10 setn r1, 44
+11 write r1
+12 setn r1, 32
+13 write r1
+14 setn r1, 119
+15 write r1
+16 setn r1, 111
+17 write r1
+18 setn r1, 114
+19 write r1
+20 setn r1, 108
+21 write r1
+22 setn r1, 100
+23 write r1
+24 setn r1, 33
+25 write r1
+26 setn r1, 10
+27 write r1
+28 halt
+`,
+  },
   hy: {
     name: "Hy",
     repl: "hy",

@@ -182,6 +182,7 @@ class Test {
   };
 
   waitForOutput = async (pattern: string, maxLength?: number) => {
+    pattern = pattern.replace(/\n/g, "\r\n");
     let output = "";
     return await this.wait(`output ${JSON.stringify(pattern)}`, (msg: any) => {
       const prevLength = output.length;

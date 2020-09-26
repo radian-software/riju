@@ -161,6 +161,10 @@ wget -nv "https://github.com/sclevine/yj/releases/download/${ver}/yj-linux"
 chmod +x yj-linux
 mv yj-linux /usr/local/bin/yj
 
+# HMMM
+wget -nv https://www.cs.hmc.edu/~cs5grad/cs5/hmmm/code/hmmm -O /usr/local/bin/hmmm
+chmod +x /usr/local/bin/hmmm
+
 # Ink
 ver="$(latest_release thesephist/ink)"
 wget -nv "https://github.com/thesephist/ink/releases/download/${ver}/ink-linux"
