@@ -11,6 +11,11 @@ ceylon="$(grep-aptavail -F Package ceylon -s Package -n | sort -rV | head -n1)"
 
 packages="
 
+# A+
+aplus-fsf
+aplus-fsf-doc
+rlwrap
+
 # Ada
 gnat
 

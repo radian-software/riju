@@ -62,6 +62,18 @@ export const langs: { [key: string]: LangConfig } = {
            o;!?l<
 `,
   },
+  "a+": {
+    aliases: ["aplus"],
+    name: "A+",
+    repl: "rlwrap a+",
+    input: "2 * 16",
+    output: "65536",
+    main: "main.a+",
+    run: "rlwrap a+ main.a+",
+    template: `'Hello, world!'
+`,
+    skip: ["scope"],
+  },
   ada: {
     aliases: ["adb"],
     name: "Ada",
