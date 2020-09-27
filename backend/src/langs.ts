@@ -141,6 +141,13 @@ println (* 123 234)`,
     template: `print(("Hello, world!",new line))
 `,
   },
+  antecards: {
+    name: "Ante (Cards)",
+    main: "main.ante",
+    run: `RUBYOPT="-W0" ante-cards main.ante`,
+    template: `9♦8♥J♦A♦2♣3♥7♠J♦A♦7♦J♦J♦A♦3♦J♦5♥6♦4♥J♥A♥6♠6♠J♥A♦8♦J♦A♦8♠J♦A♦3♦J♦A♦6♠J♦A♦8♠J♦A♥3♦2♠J♥A♥2♣6♠J♥
+`,
+  },
   apl: {
     name: "APL",
     repl: "apl",

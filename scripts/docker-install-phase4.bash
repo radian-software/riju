@@ -33,6 +33,10 @@ mv linux/ada_language_server /usr/local/bin/ada_language_server
 mv linux/*.so* /usr/lib/x86_64-linux-gnu/
 rm -rf linux linux-latest.tar.gz
 
+# Ante (Cards)
+wget -nv https://github.com/michaeldv/ante/raw/master/ante.rb -O /usr/local/bin/ante-cards
+chmod +x /usr/local/bin/ante-cards
+
 # APL
 file="$(curl -sS ftp://ftp.gnu.org/gnu/apl/ | grep -Eo 'apl_[-0-9.]+_amd64.deb$' | sort -rV | head -n1)"
 wget -nv "ftp://ftp.gnu.org/gnu/apl/${file}"
