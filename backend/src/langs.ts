@@ -226,6 +226,15 @@ int main() {
 }
 `
   },
+  asymptote: {
+    aliases: ["asy"],
+    name: "Asymptote",
+    repl: "asy",
+    main: "main.asy",
+    run: "asy main.asy; asy",
+    template: `write("Hello, world!");
+`,
+  },
   ats: {
     aliases: ["dats"],
     name: "ATS",

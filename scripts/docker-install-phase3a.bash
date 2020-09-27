@@ -42,6 +42,9 @@ aspectc++
 # AspectJ
 aspectj
 
+# Asymptote
+asymptote
+
 # ATS
 ats2-lang
 
