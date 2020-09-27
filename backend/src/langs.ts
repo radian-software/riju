@@ -141,6 +141,15 @@ println (* 123 234)`,
     template: `print(("Hello, world!",new line))
 `,
   },
+  ante: {
+    aliases: ["an"],
+    name: "Ante",
+    main: "main.an",
+    compile: "ante main.an",
+    run: "./main",
+    template: `puts("Hello, world!".cStr)
+`,
+  },
   antecards: {
     name: "Ante (Cards)",
     main: "main.ante",
