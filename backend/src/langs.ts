@@ -213,6 +213,19 @@ int main() {
 }
 `,
   },
+  aspectj: {
+    aliases: ["aj"],
+    name: "AspectJ",
+    main: "Main.aj",
+    compile: "ajc Main.aj",
+    run: "java Main",
+    template: `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+    }
+}
+`
+  },
   ats: {
     aliases: ["dats"],
     name: "ATS",

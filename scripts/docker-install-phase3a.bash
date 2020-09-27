@@ -39,6 +39,9 @@ asciidoc
 # AspectC++
 aspectc++
 
+# AspectJ
+aspectj
+
 # ATS
 ats2-lang
 
