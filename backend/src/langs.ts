@@ -2997,6 +2997,25 @@ message:
 	.string "Hello, world!\\n"
 `,
   },
+  xslt: {
+    aliases: ["xsltproc", "xsl"],
+    name: "XSLT",
+    main: "main.xsl",
+    compile: "xsltproc main.xsl -o main",
+    run: "cat main",
+    template: `<?xml-stylesheet type="text/xml" href="#style"?>
+<main>
+  <xsl:stylesheet xml:id="style"
+                  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                  version="1.0">
+    <xsl:template match="main">
+      <xsl:value-of select="data"/>
+    </xsl:template>
+  </xsl:stylesheet>
+  <data>Hello, world!</data>
+</main>
+`
+  },
   yaml: {
     aliases: ["yml"],
     name: "YAML",

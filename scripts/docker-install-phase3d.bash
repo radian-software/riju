@@ -81,6 +81,9 @@ python3.7
 # x86
 clang
 
+# XSLT
+xsltproc
+
 # YAML
 jq
 
