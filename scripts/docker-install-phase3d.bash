@@ -91,6 +91,9 @@ jq
 rlwrap
 yorick
 
+# Zoem
+zoem
+
 # Zot
 qt5-qmake
 qtscript5-dev

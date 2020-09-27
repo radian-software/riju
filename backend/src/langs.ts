@@ -3045,6 +3045,17 @@ x`,
     template: `write, "Hello, world!"
 `,
   },
+  zoem: {
+    aliases: ["azm"],
+    name: "Zoem",
+    repl: "zoem",
+    input: `\\let{123 * 234}
+.`,
+    main: "main.azm",
+    run: "zoem -I main.azm; zoem",
+    template: `\\inform{Hello, world!}
+`,
+  },
   zot: {
     name: "Zot",
     main: "main.zot",
