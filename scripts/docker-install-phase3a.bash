@@ -19,6 +19,10 @@ rlwrap
 # Ada
 gnat
 
+# Afnix
+afnix
+afnix-doc
+
 # Algol
 algol68g
 

@@ -95,6 +95,17 @@ begin
 end Main;
 `,
   },
+  afnix: {
+    aliases: ["als", "axc", "axi"],
+    name: "Afnix",
+    repl: "LD_LIBRARY_PATH=/usr/lib/afnix axi",
+    input: `DELAY: 1
+println (* 123 234)`,
+    main: "main.als",
+    run: "LD_LIBRARY_PATH=/usr/lib/afnix axi main.als; LD_LIBRARY_PATH=/usr/lib/afnix axi",
+    template: `println "Hello, world!"
+`,
+  },
   algol: {
     aliases: ["alg"],
     name: "ALGOL 68",
