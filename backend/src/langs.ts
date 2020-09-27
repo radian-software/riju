@@ -2230,7 +2230,7 @@ binding_irb.run(IRB.conf)
     },
     template: `disp("Hello, world!")
 `,
-    skip: ["repl", "runrepl"],
+    skip: ["repl", "runrepl", "scope"],
   },
   scss: {
     name: "SCSS",
