@@ -36,6 +36,9 @@ qemu-user-static
 # AsciiDoc
 asciidoc
 
+# AspectC++
+aspectc++
+
 # ATS
 ats2-lang
 

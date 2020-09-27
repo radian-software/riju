@@ -199,6 +199,20 @@ message:
     template: `Hello, world!
 `,
   },
+  "aspectc++":{
+    aliases: ["aspectcpp"],
+    name: "AspectC++",
+    main: "main.cpp",
+    compile: `ag++ main.cpp -o main | (grep -v "TO BE FIXED" || true)`,
+    run: "./main",
+    template: `#include <iostream>
+
+int main() {
+  std::cout << "Hello, world!" << std::endl;
+  return 0;
+}
+`,
+  },
   ats: {
     aliases: ["dats"],
     name: "ATS",
