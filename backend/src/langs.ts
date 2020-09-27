@@ -2892,6 +2892,21 @@ BA   64   CR       1/2   TR  1   CH  1   NT  C           3+1/5   voff=0
 BA   67   CR      7/10   TR  1   CH 16   End of track
 `
   },
+  verilog: {
+    aliases: ["systemverilog", "iverilog", "v"],
+    name: "Verilog",
+    main: "main.v",
+    compile: "iverilog main.v -o main",
+    run: "./main",
+    template: `module main;
+
+initial begin
+  $display("Hello, world!");
+end
+
+endmodule
+`,
+  },
   vim: {
     aliases: ["viml", "vimscript"],
     name: "Vimscript",

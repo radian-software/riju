@@ -66,6 +66,9 @@ unlambda
 # Vala
 valac
 
+# Verilog
+iverilog
+
 # Vimscript
 vim
 
