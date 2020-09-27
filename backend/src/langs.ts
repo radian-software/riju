@@ -106,6 +106,33 @@ println (* 123 234)`,
     template: `println "Hello, world!"
 `,
   },
+  아희: {
+    aliases: [
+      "aheui",
+      "aheuis",
+      "rpaheui",
+      "caheui",
+      "naheui",
+      "goaheui",
+      "jsaheui",
+      "pyaheui",
+      "rsaheui",
+      "as3aheui",
+      "raheui",
+    ],
+    name: "아희",
+    main: "main.aheui",
+    run: "aheui main.aheui",
+    template: `밤밣따빠밣밟따뿌
+빠맣파빨받밤뚜뭏
+돋밬탕빠맣붏두붇
+볻뫃박발뚷투뭏붖
+뫃도뫃희멓뭏뭏붘
+뫃봌토범더벌뿌뚜
+뽑뽀멓멓더벓뻐뚠
+뽀덩벐멓뻐덕더벅
+`,
+  },
   algol: {
     aliases: ["alg"],
     name: "ALGOL 68",

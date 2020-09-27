@@ -5,6 +5,14 @@ set -o pipefail
 set -x
 pushd /tmp >/dev/null
 
+# Aheui
+git clone https://github.com/aheui/caheui.git
+pushd caheui >/dev/null
+make
+mv aheui /usr/local/bin/
+popd >/dev/null
+rm -rf cahuei
+
 # Battlestar
 git clone https://github.com/xyproto/battlestar.git
 pushd battlestar >/dev/null
