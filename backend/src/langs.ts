@@ -791,6 +791,8 @@ main(application-name(), application-arguments());
     aliases: ["iex", "exs"],
     name: "Elixir",
     repl: "iex",
+    input: `DELAY: 1
+123 * 234`,
     main: "main.exs",
     run: "iex main.exs",
     scope: {
@@ -799,12 +801,13 @@ main(application-name(), application-arguments());
     123 * 234
   end
 end`,
-      input: `Scope.x`,
+      input: `DELAY: 1
+Scope.x`,
     },
     lsp: { start: "/opt/elixir-ls/language_server.sh" },
     template: `IO.puts("Hello, world!")
 `,
-    skip: ["repl", "runrepl", "scope", "lsp"],
+    skip: ["lsp"],
   },
   elm: {
     name: "Elm",
@@ -1544,11 +1547,12 @@ PLEASE GIVE UP
     aliases: ["lsc", "ls"],
     name: "LiveScript",
     repl: "lsc",
+    input: `DELAY: 1
+123 * 234`,
     main: "main.ls",
     run: "lsc -r ./main.ls",
     template: `console.log "Hello, world!"
 `,
-    skip: ["repl", "runrepl"],
   },
   llvm: {
     name: "LLVM",
@@ -2096,13 +2100,13 @@ x`,
     monacoLang: "redis",
     repl:
       "rm -f socket; (redis-server --port 0 --unixsocket socket &); until [[ -e socket ]]; do sleep 0.01; done; redis-cli -s socket",
-    input: `EVAL "return 123 * 234" 0`,
+    input: `DELAY: 3
+EVAL "return 123 * 234" 0`,
     main: "main.redis",
     run:
       "rm -f socket; (redis-server --port 0 --unixsocket socket &); until [[ -e socket ]]; do sleep 0.01; done; redis-cli -s socket < main.redis; redis-cli -s socket",
     template: `ECHO "Hello, world!"
 `,
-    skip: ["repl", "runrepl"],
   },
   restructuredtext: {
     aliases: ["rst"],
@@ -2246,14 +2250,17 @@ binding_irb.run(IRB.conf)
     aliases: ["sci"],
     name: "Scilab",
     repl: "scilab-cli",
+    input: `DELAY: 1
+123 * 234`,
     main: "main.sci",
     run: "scilab-cli -f main.sci",
     scope: {
       code: `x = 123 * 234`,
+      input: `DELAY: 1
+x`,
     },
     template: `disp("Hello, world!")
 `,
-    skip: ["repl", "runrepl", "scope"],
   },
   scss: {
     name: "SCSS",
