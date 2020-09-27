@@ -54,10 +54,10 @@ export interface LangConfig {
 
 export const langs: { [key: string]: LangConfig } = {
   "><>": {
-    aliases: ["esofish"],
+    aliases: ["fishlang"],
     name: "><>",
     main: "main.fish",
-    run: "esofish main.fish",
+    run: "fish-lang main.fish",
     template: `"Hello, world!"r\\
            o;!?l<
 `,

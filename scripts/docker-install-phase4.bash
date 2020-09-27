@@ -22,9 +22,9 @@ tar -xf pandoc-*-linux-amd64.tar.gz -C /usr --strip-components=1
 rm pandoc-*-linux-amd64.tar.gz
 
 # ><>
-wget -nv https://gist.githubusercontent.com/anonymous/6392418/raw/fish.py -O /usr/local/bin/esofish
-sed -i 's:^#!.*:#!/usr/bin/env python3:' /usr/local/bin/esofish
-chmod +x /usr/local/bin/esofish
+wget -nv https://gist.githubusercontent.com/anonymous/6392418/raw/fish.py -O /usr/local/bin/fish-lang
+sed -i 's:^#!.*:#!/usr/bin/env python3:' /usr/local/bin/fish-lang
+chmod +x /usr/local/bin/fish-lang
 
 # Ada
 wget -nv https://dl.bintray.com/reznikmm/ada-language-server/linux-latest.tar.gz
