@@ -292,11 +292,6 @@ rm swift.tar.gz
 wget -nv https://github.com/raxod502/riju-cdn/releases/download/unison-M1l-232-519cbeb58704c1b9410c9386e492be59fd5a5334/unison -O /usr/local/bin/unison
 chmod +x /usr/local/bin/unison
 
-# Velato
-wget -nv http://www.archduke.org/midi/asc2mid.c
-clang asc2mid.c -o /usr/local/bin/asc2mid
-rm asc2mid.c
-
 file="$(curl -fsSL http://velato.net/ | grep -Eo 'Velato[0-9_]+.zip')"
 wget -nv "http://velato.net/Content/Velato/${file}"
 unzip -d /opt/velato Velato*.zip

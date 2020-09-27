@@ -138,6 +138,11 @@ mv bin/thue /usr/local/bin/thue
 popd >/dev/null
 rm -rf thue-*
 
+# Velato
+wget -nv http://www.archduke.org/midi/asc2mid.c
+clang asc2mid.c -o /usr/local/bin/asc2mid
+rm asc2mid.c
+
 # Zot
 git clone https://github.com/manyoso/zot.git
 pushd zot >/dev/null
