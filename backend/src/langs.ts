@@ -3031,6 +3031,20 @@ message:
     template: `output: "Hello, world!"
 `,
   },
+  yorick: {
+    name: "Yorick",
+    repl: "rlwrap yorick",
+    main: "main.i",
+    run: `echo "Type '#include \\"main.i\\"' to run the code." && rlwrap yorick`,
+    helloInput: `#include "main.i"`,
+    scope: {
+      code: `x = 123 * 234`,
+      input: `#include "main.i"
+x`,
+    },
+    template: `write, "Hello, world!"
+`,
+  },
   zot: {
     name: "Zot",
     main: "main.zot",

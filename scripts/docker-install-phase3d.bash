@@ -87,6 +87,10 @@ xsltproc
 # YAML
 jq
 
+# Yorick
+rlwrap
+yorick
+
 # Zot
 qt5-qmake
 qtscript5-dev
