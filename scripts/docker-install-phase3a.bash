@@ -64,6 +64,9 @@ yasm
 # bc
 bc
 
+# Beanshell
+bsh
+
 # BrainF
 beef
 

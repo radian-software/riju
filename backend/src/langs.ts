@@ -307,6 +307,21 @@ end
 "
 `,
   },
+  beanshell: {
+    aliases: ["bsh"],
+    name: "Beanshell",
+    repl: `CLASSPATH=/usr/share/java/jline.jar:/usr/share/java/bsh.jar java -Duser.home="$PWD" jline.ConsoleRunner bsh.Interpreter`,
+    input: `print(123 * 234);`,
+    main: ".bshrc",
+    createEmpty: ``,
+    run: `CLASSPATH=/usr/share/java/jline.jar:/usr/share/java/bsh.jar java -Duser.home="$PWD" jline.ConsoleRunner bsh.Interpreter`,
+    scope: {
+      code: `x = 123 * 234;`,
+      input: `print(x);`,
+    },
+    template: `print("Hello, world!");
+`,
+  },
   beatnik: {
     name: "Beatnik",
     main: "main.beatnik",
