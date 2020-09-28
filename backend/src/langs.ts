@@ -144,9 +144,10 @@ println (* 123 234)`,
   ante: {
     aliases: ["an"],
     name: "Ante",
+    repl: "ante",
     main: "main.an",
     compile: "ante main.an",
-    run: "./main",
+    run: "./main; ante",
     template: `puts("Hello, world!".cStr)
 `,
   },
