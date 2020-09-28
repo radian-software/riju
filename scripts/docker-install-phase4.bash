@@ -34,6 +34,7 @@ mv linux/*.so* /usr/lib/x86_64-linux-gnu/
 rm -rf linux linux-latest.tar.gz
 
 # Ante
+mkdir /opt/ante
 wget -nv https://github.com/raxod502/riju-cdn/releases/download/ante-0.8.0-d2c43992e0c7a4c1942d5c097233f4f7638a1ee6/ante -O /opt/ante/ante
 chmod +x /opt/ante/ante
 wget -nv https://github.com/raxod502/riju-cdn/releases/download/ante-0.8.0-d2c43992e0c7a4c1942d5c097233f4f7638a1ee6/libantecommon.so -O /opt/ante/libantecommon.so
