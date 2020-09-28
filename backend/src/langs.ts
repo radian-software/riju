@@ -815,6 +815,19 @@ require("/usr/lib/node_modules/coffeescript/repl").start()
 }
 `,
   },
+  curry: {
+    aliases: ["curry2prolog", "pakcs"],
+    name: "Curry",
+    repl: "pakcs",
+    main: "main.curry",
+    run: "pakcs :load main.curry :eval main",
+    scope: {
+      code: `x = 123 * 234`,
+    },
+    template: `main :: IO ()
+main = putStrLn "Hello, world!"
+`,
+  },
   d: {
     aliases: ["dmd"],
     name: "D",

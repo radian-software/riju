@@ -103,6 +103,9 @@ sbcl
 # Crystal
 crystal
 
+# Curry
+pakcs
+
 # Dart
 dart
 
