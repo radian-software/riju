@@ -61,6 +61,9 @@ bash
 golang
 yasm
 
+# bc
+bc
+
 # BrainF
 beef
 

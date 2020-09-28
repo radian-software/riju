@@ -297,6 +297,15 @@ fun main
 end
 `,
   },
+  bc: {
+    name: "bc",
+    repl: "bc",
+    main: "main.bc",
+    run: "bc main.bc",
+    template: `"Hello, world!
+"
+`,
+  },
   beatnik: {
     name: "Beatnik",
     main: "main.beatnik",
