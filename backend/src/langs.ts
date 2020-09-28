@@ -851,6 +851,17 @@ void main()
 }
 `,
   },
+  dafny: {
+    aliases: ["dfy"],
+    name: "Dafny",
+    main: "main.dfy",
+    compile: "dafny main.dfy",
+    run: "mono main.exe",
+    template: `method Main() {
+  print "Hello, world!\\n";
+}
+`,
+  },
   dart: {
     name: "Dart",
     monacoLang: "dart",

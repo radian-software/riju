@@ -106,6 +106,10 @@ crystal
 # Curry
 pakcs
 
+# Dafny
+dafny
+mono-runtime
+
 # Dart
 dart
 
