@@ -86,6 +86,9 @@ openjdk-8-jdk-headless
 # Clojure
 clojure
 
+# CMake
+cmake
+
 # Cmd
 wine
 wine32

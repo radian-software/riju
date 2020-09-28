@@ -704,6 +704,14 @@ Start world
     template: `(println "Hello, world!")
 `,
   },
+  cmake: {
+    aliases: ["cmakelists"],
+    name: "CMake",
+    main: "main.cmake",
+    run: "cmake -P main.cmake",
+    template: `message("Hello, world!")
+`,
+  },
   cmd: {
     aliases: ["bat", "batch", "wine"],
     name: "Cmd",
