@@ -1707,6 +1707,23 @@ KTHXBYE
 `,
     skip: ["lsp"],
   },
+  make: {
+    aliases: [
+      "gmake",
+      "makefile",
+      "gmakefile",
+      "gnumakefile",
+      "gnumake",
+      "bsdmake",
+    ],
+    name: "Make",
+    main: "Makefile",
+    run: "make",
+    template: `.PHONY: all
+all:
+	@echo "Hello, world!"
+`,
+  },
   malbolge: {
     aliases: ["mb"],
     name: "Malbolge",
