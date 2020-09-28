@@ -113,6 +113,9 @@ mono-runtime
 # Dart
 dart
 
+# dc
+dc
+
 # Dhall
 dhall
 

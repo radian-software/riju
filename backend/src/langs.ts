@@ -879,6 +879,19 @@ void main()
 `,
     skip: ["lsp"],
   },
+  dc: {
+    name: "dc",
+    repl: "echo 'Reading from stdin...' >&2; dc",
+    input: `123 234 * p`,
+    main: "main.dc",
+    run: "echo 'Reading from stdin...' >&2; dc main.dc -",
+    scope: {
+      code: `123 234 *`,
+      input: `p`,
+    },
+    template: `[Hello, world!] p
+`,
+  },
   dogescript: {
     aliases: ["doge", "ds", "wow"],
     name: "Dogescript",
