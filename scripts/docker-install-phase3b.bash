@@ -48,6 +48,9 @@ gforth
 # Gambas
 gambas3-script
 
+# GAP
+gap
+
 # Go
 golang
 

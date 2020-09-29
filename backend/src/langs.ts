@@ -1219,6 +1219,19 @@ int main() {
     template: `Print "Hello, world!"
 `,
   },
+  gap: {
+    name: "GAP",
+    repl: "gap",
+    input: `123 * 234;`,
+    main: "main.gap",
+    run: "gap main.gap",
+    scope: {
+      code: `x := 123 * 234;`,
+      input: `123 * 234;`,
+    },
+    template: `Print("Hello, world!\\n");
+`,
+  },
   go: {
     aliases: ["golang"],
     name: "Go",
