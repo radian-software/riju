@@ -12,6 +12,10 @@ m4
 # MariaDB
 libtinfo5
 
+# Maxima
+maxima
+maxima-doc
+
 # MIPS
 gcc-mips64-linux-gnuabi64
 qemu-user-static
