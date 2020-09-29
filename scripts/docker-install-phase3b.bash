@@ -82,6 +82,9 @@ icont
 # INTERCAL
 intercal
 
+# Jasmin
+jasmin-sable
+
 # Java
 clang-format
 default-jdk

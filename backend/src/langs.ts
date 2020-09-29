@@ -1549,6 +1549,29 @@ PLEASE GIVE UP
     template: `echo 'Hello, world!'
 `,
   },
+  jasmin: {
+    name: "Jasmin",
+    main: "Main.j",
+    compile: "jasmin Main.j",
+    run: "java Main",
+    template: `.class public Main
+.super java/lang/Object
+
+.method public <init>()V
+    aload_0
+    invokenonvirtual java/lang/Object/<init>()V
+    return
+.end method
+
+.method public static main([Ljava/lang/String;)V
+    .limit stack 2
+    getstatic java/lang/System/out Ljava/io/PrintStream;
+    ldc "Hello, world!"
+    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+    return
+.end method
+`,
+  },
   java: {
     aliases: ["javac"],
     name: "Java",
