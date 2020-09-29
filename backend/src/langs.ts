@@ -145,11 +145,13 @@ println (* 123 234)`,
     aliases: ["an"],
     name: "Ante",
     repl: "ante",
+    output: "i32",
     main: "main.an",
     compile: "ante main.an",
     run: "./main; ante",
     template: `puts("Hello, world!".cStr)
 `,
+    timeout: 10,
   },
   antecards: {
     name: "Ante (Cards)",
