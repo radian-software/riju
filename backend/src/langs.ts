@@ -1134,6 +1134,31 @@ USE: io
     template: `echo "Hello, world!"
 `,
   },
+  flex: {
+    aliases: ["lex"],
+    name: "Flex",
+    main: "main.lex",
+    compile: "lex -o main.c main.lex && clang main.c -o main",
+    run: "echo 'Reading from stdin, ctrl+D to end input...' >&2 && ./main",
+    helloInput: "EOF",
+    template: `%{
+#include <stdio.h>
+%}
+
+%%
+%%
+
+int yywrap() {
+  printf("Hello, world!\\n");
+  return 1;
+}
+
+int main() {
+  yylex();
+  return 0;
+}
+`,
+  },
   forth: {
     aliases: ["gforth"],
     name: "Forth",

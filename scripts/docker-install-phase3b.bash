@@ -35,6 +35,10 @@ fsharp
 # Fish
 fish
 
+# Flex
+flex
+flex-doc
+
 # FORTRAN
 flang
 

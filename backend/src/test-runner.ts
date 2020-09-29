@@ -31,7 +31,9 @@ function findPosition(str: string, idx: number) {
 
 async function sendInput(send: (msg: any) => any, input: string) {
   for (const line of input.split("\n")) {
-    if (line.startsWith("DELAY:")) {
+    if (line === "EOF") {
+      send({ event: "terminalInput", input: "\u0004" });
+    } else if (line.startsWith("DELAY:")) {
       const delay = parseFloat(line.replace(/DELAY: */, ""));
       if (Number.isNaN(delay)) continue;
       await new Promise((resolve) =>
