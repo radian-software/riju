@@ -1258,6 +1258,19 @@ int main() {
     template: `print("Hello, world!")
 `,
   },
+  gnuplot: {
+    name: "Gnuplot",
+    repl: "gnuplot",
+    input: `print 123 * 234`,
+    main: "main.gnuplot",
+    run: "gnuplot main.gnuplot -",
+    scope: {
+      code: `x = 123 * 234`,
+      input: `print x`,
+    },
+    template: `print "Hello, world!"
+`,
+  },
   go: {
     aliases: ["golang"],
     name: "Go",

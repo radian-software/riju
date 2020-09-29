@@ -63,6 +63,9 @@ golang
 # Groovy
 groovy
 
+# Gnuplot
+gnuplot
+
 # Hack
 hhvm
 
