@@ -1481,6 +1481,17 @@ l ; ; o ; * 4
     template: `(print "Hello, world!")
 `,
   },
+  icon: {
+    aliases: ["icn", "icont", "iconx"],
+    name: "Icon",
+    main: "main.icn",
+    compile: "icont main.icn",
+    run: "./main",
+    template: `procedure main ()
+    write("Hello, world!")
+end
+`,
+  },
   ink: {
     name: "Ink",
     repl: "ink",

@@ -76,6 +76,9 @@ ghc
 # Haxe
 haxe
 
+# Icon
+icont
+
 # INTERCAL
 intercal
 
