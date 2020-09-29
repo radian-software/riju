@@ -39,6 +39,9 @@ wget -nv https://github.com/raxod502/riju-cdn/releases/download/ante-0.8.0-d2c43
 chmod +x /opt/ante/ante
 wget -nv https://github.com/raxod502/riju-cdn/releases/download/ante-0.8.0-d2c43992e0c7a4c1942d5c097233f4f7638a1ee6/libantecommon.so -O /opt/ante/libantecommon.so
 ln -s /opt/ante/ante /usr/local/bin/
+wget -nv https://github.com/raxod502/riju-cdn/releases/download/ante-0.8.0-d2c43992e0c7a4c1942d5c097233f4f7638a1ee6/stdlib.tar.gz
+tar -xf stdlib.tar.gz -C /opt/ante
+rm stdlib.tar.gz
 
 # Ante (Cards)
 wget -nv https://github.com/michaeldv/ante/raw/master/ante.rb -O /usr/local/bin/ante-cards
