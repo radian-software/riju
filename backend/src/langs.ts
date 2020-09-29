@@ -2157,6 +2157,16 @@ all:
     template: `Hello, world!
 `,
   },
+  minizinc: {
+    aliases: ["mzn"],
+    name: "MiniZinc",
+    main: "main.mzn",
+    run: "minizinc --solver Gecode main.mzn",
+    template: `solve satisfy;
+
+output ["Hello, world!\\n"];
+`,
+  },
   mips: {
     aliases: ["mips64"],
     name: "MIPS",

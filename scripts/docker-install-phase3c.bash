@@ -12,6 +12,9 @@ m4
 # MariaDB
 libtinfo5
 
+# MiniZinc
+minizinc
+
 # MIPS
 gcc-mips64-linux-gnuabi64
 qemu-user-static
