@@ -1980,6 +1980,12 @@ PLEASE GIVE UP
     template: `echo "Hello, world!"
 `,
   },
+  lazyk: {
+    name: "Lazy K",
+    main: "main.lazy",
+    run: "lazyk -u main.lazy",
+    template: "K(S(S(S(S(S(S(SI`S`K(S(S`KS(S`KK(S`KS(S(S`KS(S`K`S(SI`KK)(S`KKK)))`K`K(SI`K0))))\n)`K(S`K`S(S`KS(S`K`SI(S`KK(S`K(S(S(SSS)(SS(SSI(SS0))))S(S`KSK))(SI`K(S`KSK))))))\n(S`KKK)))(SII)`K(SII(SII(S(S`KSK)I))))(S`K`S(S(S(SSS)(SS0))S)(SSSS))(SS(SS0))(S(\nSI(SS0))(SS(SS(SS(SS`S(SSS)(SS0))))))(SS(SS(SS(SSSSSS(SS0))))))`S(S(S(SS(SS0))(S\nS0))S))`K(SS0))`K(SS(SS(S(SSS)(SS(SS0))))))I(SSSSSS(SS0)))I(S(SI(SS0))(SS(SS(SS(\nSS`S(SSS)(SS0))))))(SS(S(S(S(SSS)(SS0))S)(SSSS(SS(SS0)))))(S(SSS)(S(SSS)(SS0)))`\nK0)\n",
+  },
   less: {
     aliases: ["lessc"],
     name: "Less",

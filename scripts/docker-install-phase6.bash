@@ -73,6 +73,14 @@ mv src-kalyn/Stdlib src-kalyn/Stdlib.kalyn /opt/kalyn/
 popd >/dev/null
 rm -rf kalyn
 
+# Lazy K
+git clone https://github.com/irori/lazyk.git
+pushd lazyk >/dev/null
+make
+mv lazyk /usr/local/bin/
+popd >/dev/null
+rm -rf lazyk
+
 # LOLCODE
 git clone https://github.com/justinmeza/lci.git
 pushd lci >/dev/null
