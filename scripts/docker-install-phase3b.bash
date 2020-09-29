@@ -64,6 +64,9 @@ intercal
 clang-format
 default-jdk
 
+# jq
+jq
+
 # Julia
 julia
 

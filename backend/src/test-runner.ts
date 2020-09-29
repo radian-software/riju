@@ -7,6 +7,7 @@ import { Moment } from "moment";
 import * as moment from "moment";
 import PQueue from "p-queue";
 import * as rimraf from "rimraf";
+import stripAnsi = require("strip-ansi");
 import { v4 as getUUID } from "uuid";
 
 import * as api from "./api";
@@ -187,7 +188,9 @@ class Test {
     return await this.wait(`output ${JSON.stringify(pattern)}`, (msg: any) => {
       const prevLength = output.length;
       if (msg.event === "terminalOutput") {
-        output += msg.output;
+        // Applying stripAnsi here is wrong because escape sequences
+        // could be split across multiple messages. Who cares?
+        output += stripAnsi(msg.output);
       }
       if (typeof maxLength === "number") {
         return (

@@ -1631,6 +1631,21 @@ PLEASE GIVE UP
     template: `console.log("Hello, world!");
 `,
   },
+  jq: {
+    name: "jq",
+    repl: "echo 'Reading from stdin...' >&2 && while true; do jq .; done",
+    input: `{"foo":"bar"}`,
+    output: `"foo": "bar"`,
+    main: "main.jq",
+    run: `echo 'Reading from stdin...' >&2 && while true; do jq "$(< main.jq)"; done`,
+    helloInput: `{}`,
+    // This test doesn't actually test anything, because "Hello,
+    // world" is already printed before anything is sent to the repl,
+    // but we can't do any better.
+    runReplOutput: `"Hello, world!"`,
+    template: `"Hello, world!"
+`,
+  },
   julia: {
     aliases: ["jl"],
     name: "Julia",
