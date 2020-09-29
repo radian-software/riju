@@ -165,6 +165,10 @@ rm -rf go
 wget -nv http://www.golfscript.com/golfscript/golfscript.rb -O /usr/local/bin/golfscript
 chmod +x /usr/local/bin/golfscript
 
+# Grass
+wget -nv http://www.blue.sky.or.jp/grass/grass.rb -O /usr/local/bin/grass
+chmod +x /usr/local/bin/grass
+
 # Haskell
 curl -sSL https://get.haskellstack.org/ | sh
 wget -nv https://github.com/raxod502/riju-cdn/releases/download/brittany-0.12.1.1/brittany -O /usr/local/bin/brittany

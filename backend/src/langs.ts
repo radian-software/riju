@@ -1310,6 +1310,14 @@ func main() {
     template: `'Hello, world!'
 `,
   },
+  grass: {
+    name: "Grass",
+    main: "main.grass",
+    run: "grass < main.grass",
+    hello: `w`,
+    template: `wWWwwww
+`,
+  },
   groovy: {
     name: "Groovy",
     repl: `JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" groovysh`,
