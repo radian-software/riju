@@ -45,6 +45,9 @@ flang
 # Forth
 gforth
 
+# Gambas
+gambas3-script
+
 # Go
 golang
 

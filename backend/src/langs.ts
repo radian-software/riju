@@ -1211,6 +1211,14 @@ int main() {
 `,
     timeout: 15,
   },
+  gambas: {
+    aliases: ["gambasscript", "gbs"],
+    name: "Gambas",
+    main: "main.gbs",
+    run: "gbs3 main.gbs",
+    template: `Print "Hello, world!"
+`,
+  },
   go: {
     aliases: ["golang"],
     name: "Go",
