@@ -6,6 +6,9 @@ set -x
 
 packages="
 
+# m4
+m4
+
 # MariaDB
 libtinfo5
 

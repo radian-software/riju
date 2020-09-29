@@ -2071,6 +2071,17 @@ KTHXBYE
 `,
     skip: ["lsp"],
   },
+  m4: {
+    name: "m4",
+    repl: "echo 'Reading from stdin...' >&2; m4",
+    input: `eval(123 * 234)`,
+    main: "main.m4",
+    run: "echo 'Reading from stdin...' >&2; m4 main.m4 -",
+    scope: {
+      code: "define(`x', eval(123 * 234))",
+    },
+    template: "errprint(`Hello, world!')\n",
+  },
   make: {
     aliases: [
       "gmake",
