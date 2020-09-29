@@ -1245,6 +1245,19 @@ int main() {
     template: `p "Hello, world!"
 `,
   },
+  gel: {
+    aliases: ["genius"],
+    name: "GEL",
+    repl: "genius",
+    main: ".geniusinit",
+    createEmpty: ``,
+    run: "genius",
+    scope: {
+      code: `x = 123 * 234`,
+    },
+    template: `print("Hello, world!")
+`,
+  },
   go: {
     aliases: ["golang"],
     name: "Go",

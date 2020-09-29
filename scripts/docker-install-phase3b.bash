@@ -54,6 +54,9 @@ gap
 # GDB
 gdb
 
+# GEL
+genius
+
 # Go
 golang
 
