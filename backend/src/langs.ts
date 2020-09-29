@@ -1113,6 +1113,14 @@ USE: io
 "Hello, world!" print
 `,
   },
+  "false": {
+    aliases: ["falselang"],
+    name: "FALSE",
+    main: "main.false",
+    run: "false-lang main.false",
+    template: `"Hello, world!"
+`,
+  },
   fish: {
     name: "Fish",
     repl: "SHELL=/usr/bin/fish fish",

@@ -148,6 +148,12 @@ mv -T factor /opt/factor
 ln -s /opt/factor/factor /usr/local/bin/factor-lang
 rm factor-linux-x86-64-*.tar.gz
 
+# False
+wget https://github.com/mame/quine-relay/raw/master/vendor/false.rb
+cat <(echo '#!/usr/bin/env ruby') false.rb > /usr/local/bin/false-lang
+chmod +x /usr/local/bin/false-lang
+rm false.rb
+
 # Go
 export GO111MODULE=on
 export GOPATH="$PWD/go"
