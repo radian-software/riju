@@ -98,6 +98,9 @@ julia
 # Ksh
 ksh
 
+# Lisaac
+lisaac
+
 # LLVM
 llvm
 

@@ -2004,6 +2004,21 @@ PLEASE GIVE UP
 }
 `,
   },
+  lisaac: {
+    name: "Lisaac",
+    main: "main.li",
+    compile: "lisaac -gcc -Wno-implicit-function-declaration main.li",
+    run: "./main",
+    template: `Section Header
+  + name := MAIN;
+
+Section Public
+  - main <-
+  (
+    "Hello, world!\\n".print;
+  );
+`,
+  },
   livescript: {
     aliases: ["lsc", "ls"],
     name: "LiveScript",
