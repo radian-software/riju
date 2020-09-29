@@ -12,6 +12,9 @@ lua_name="$(grep-aptavail -XF Provides lua -a -XF Version "${lua_ver}" -s Packag
 
 packages="
 
+# eC
+ecere-dev
+
 # Elixir
 elixir
 

@@ -936,6 +936,21 @@ end function main;
 main(application-name(), application-arguments());
 `,
   },
+  ec: {
+    aliases: ["ecere", "ecp", "ecs", "ecc"],
+    name: "eC",
+    main: "main.ec",
+    compile: "ecp -c main.ec -o main.sym && ecc -c main.ec -o main.c && ecs -console main.sym main.imp -o main.main.ec && ecp -c main.main.ec -o main.main.sym && ecc -c main.main.ec -o main.main.c && clang main.c main.main.c -lecereCOM -o main",
+    run: "./main",
+    template: `class Main : Application
+{
+   void Main()
+   {
+      PrintLn("Hello, world!");
+   }
+}
+`,
+  },
   elixir: {
     aliases: ["iex", "exs"],
     name: "Elixir",
