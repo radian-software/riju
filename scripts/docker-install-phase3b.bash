@@ -51,6 +51,9 @@ gambas3-script
 # GAP
 gap
 
+# GDB
+gdb
+
 # Go
 golang
 

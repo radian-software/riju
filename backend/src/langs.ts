@@ -1232,6 +1232,19 @@ int main() {
     template: `Print("Hello, world!\\n");
 `,
   },
+  gdb: {
+    name: "GDB",
+    repl: "gdb",
+    input: "p 123 * 234",
+    main: "main.gdb",
+    run: "gdb -x main.gdb",
+    scope: {
+      code: `set $x = 123 * 234`,
+      input: `p $x`,
+    },
+    template: `p "Hello, world!"
+`,
+  },
   go: {
     aliases: ["golang"],
     name: "Go",
