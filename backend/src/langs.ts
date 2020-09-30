@@ -659,6 +659,25 @@ Pour contents of the mixing bowl into the baking dish.
 Refrigerate for 1 hour.
 `,
   },
+  cil: {
+    aliases: ["msil", "il", "ilasm"],
+    name: "CIL",
+    main: "main.il",
+    compile: "ilasm main.il",
+    run: "mono main.exe",
+    template: `.assembly main {}
+.class Main
+{
+  .method static void Main() cil managed
+  {
+    .entrypoint
+    ldstr "Hello, world!"
+    call void [mscorlib]System.Console::WriteLine(string)
+    ret
+  }
+}
+`,
+  },
   clean: {
     aliases: ["icl", "clm"],
     name: "Clean",

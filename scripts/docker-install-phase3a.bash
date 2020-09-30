@@ -83,6 +83,9 @@ mono-mcs
 ${ceylon}
 openjdk-8-jdk-headless
 
+# CIL
+mono-devel
+
 # Clojure
 clojure
 
