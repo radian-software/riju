@@ -2244,6 +2244,15 @@ message:
     timeout: 15,
     skip: ["lsp"],
   },
+  neko: {
+    aliases: ["nekoc"],
+    name: "Neko",
+    main: "main.neko",
+    compile: "nekoc main.neko",
+    run: "neko main",
+    template: `$print("Hello, world!\\n");
+`,
+  },
   nim: {
     name: "Nim",
     main: "main.nim",

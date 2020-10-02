@@ -28,6 +28,9 @@ fis-gtm
 # MySQL
 mysql-server
 
+# Neko
+neko
+
 # Nim
 nim
 
