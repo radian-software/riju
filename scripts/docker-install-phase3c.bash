@@ -25,6 +25,9 @@ mongodb
 # MUMPS
 fis-gtm
 
+# Mustache
+ruby-mustache
+
 # MySQL
 mysql-server
 
