@@ -31,6 +31,9 @@ mysql-server
 # Neko
 neko
 
+# Nickle
+nickle
+
 # Nim
 nim
 

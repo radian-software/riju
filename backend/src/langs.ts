@@ -2253,6 +2253,19 @@ message:
     template: `$print("Hello, world!\\n");
 `,
   },
+  nickle: {
+    name: "Nickle",
+    repl: "nickle",
+    main: "main.nickle",
+    run: `nickle main.nickle; echo "Type 'load \\"main.nickle\\"' at the repl prompt to bring variables into scope" >&2; nickle`,
+    scope: {
+      code: `x = 123 * 234;`,
+      input: `load "main.nickle"
+x`,
+    },
+    template: `printf("Hello, world!\\n");
+`,
+  },
   nim: {
     name: "Nim",
     main: "main.nim",
