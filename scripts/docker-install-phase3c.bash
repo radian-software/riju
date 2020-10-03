@@ -4,6 +4,9 @@ set -e
 set -o pipefail
 set -x
 
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+
 pike_name="$(grep-aptavail -eF Package "^pike[0-9.]+$" -s Package -n | sort -Vr | head -n1)"
 
 packages="
@@ -131,8 +134,6 @@ ruby-dev
 
 "
 
-export DEBIAN_FRONTEND=noninteractive
-apt-get update
 apt-get install -y $(grep -v "^#" <<< "$packages")
 rm -rf /var/lib/apt/lists/*
 
