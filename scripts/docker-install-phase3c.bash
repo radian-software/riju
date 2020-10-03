@@ -81,6 +81,10 @@ ${pike_name}-doc
 postgresql
 postgresql-client
 
+# PostScript
+ghostscript
+rlwrap
+
 # Prolog
 swi-prolog
 

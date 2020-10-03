@@ -1322,7 +1322,7 @@ func main() {
     skip: ["lsp"],
   },
   golfscript: {
-    aliases: ["gs", "golf"],
+    aliases: ["golf"],
     name: "GolfScript",
     main: "main.gs",
     run: "golfscript main.gs",
@@ -2535,6 +2535,20 @@ pipi pikachu
     timeout: 15,
     skip: ["lsp"],
   },
+  postscript: {
+    aliases: ["ps", "gs", "ghostscript"],
+    name: "PostScript",
+    repl: "rlwrap gs",
+    input: `123 234 mul =`,
+    main: "main.ps",
+    run: "rlwrap gs main.ps",
+    scope: {
+      code: `123 234 mul`,
+      input: `=`,
+    },
+    template: `(Hello, world!) =
+`,
+  },
   powershell: {
     aliases: ["pwsh", "ps1"],
     name: "PowerShell",
@@ -2582,7 +2596,7 @@ main :-
 `,
   },
   purescript: {
-    aliases: ["purs", "pure", "ps"],
+    aliases: ["purs", "pure"],
     name: "PureScript",
     setup: `shopt -s dotglob; cp -R /opt/purescript/project-template/* "$PWD/"`,
     repl: "spago repl",
