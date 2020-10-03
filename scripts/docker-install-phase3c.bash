@@ -4,6 +4,8 @@ set -e
 set -o pipefail
 set -x
 
+pike_name="$(grep-aptavail -eF Package "^pike[0-9.]+$" -s Package -n | sort -Vr | head -n1)"
+
 packages="
 
 # m4
@@ -70,6 +72,10 @@ perlconsole
 
 # PHP
 php
+
+# Pike
+${pike_name}
+${pike_name}-doc
 
 # PostgreSQL
 postgresql

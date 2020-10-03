@@ -2506,6 +2506,19 @@ ka ka ka ka ka pikachu ka ka ka ka ka ka ka ka pikachu pipi pi pikachu
 pipi pikachu
 `,
   },
+  pike: {
+    name: "Pike",
+    repl: "pike",
+    input: `123 * 234;`,
+    main: "main.pike",
+    run: "pike main.pike; pike",
+    template: `int main()
+{
+  write("Hello, world!\\n");
+  return 0;
+}
+`,
+  },
   postgresql: {
     aliases: ["psql", "postgres", "pgsql", "postgre"],
     name: "PostgreSQL",
