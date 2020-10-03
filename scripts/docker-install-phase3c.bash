@@ -118,6 +118,9 @@ rc
 # Redis
 redis
 
+# REXX
+regina-rexx
+
 # RISC-V
 gcc-riscv64-linux-gnu
 qemu-user-static

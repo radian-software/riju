@@ -2775,6 +2775,14 @@ EVAL "return 123 * 234" 0`,
     template: `Hello, world!
 `,
   },
+  rexx: {
+    aliases: ["regina", "reginarexx"],
+    name: "REXX",
+    main: "main.rexx",
+    run: "rexx main.rexx",
+    template: `say "Hello, world!"
+`,
+  },
   riscv: {
     aliases: ["risc"],
     name: "RISC-V",
