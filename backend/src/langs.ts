@@ -2584,6 +2584,16 @@ main :-
     write("Hello, world!"), nl.
 `,
   },
+  promela: {
+    aliases: ["spin", "pml"],
+    name: "PROMELA",
+    main: "main.pml",
+    run: "spin main.pml",
+    template: `active proctype main() {
+  printf("Hello, world!\\n");
+}
+`,
+  },
   pug: {
     name: "Pug",
     monacoLang: "pug",

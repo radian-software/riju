@@ -88,6 +88,9 @@ rlwrap
 # Prolog
 swi-prolog
 
+# Promela
+spin
+
 # PureScript
 libtinfo5
 
