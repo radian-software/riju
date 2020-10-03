@@ -58,6 +58,9 @@ autoconf
 # PARI/GP
 pari-gp
 
+# Parser3
+parser3-cgi
+
 # Pascal
 fpc
 

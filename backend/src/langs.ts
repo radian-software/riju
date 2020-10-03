@@ -2421,6 +2421,14 @@ rofl lol
     template: `print("Hello, world!")
 `,
   },
+  parser3: {
+    aliases: ["parser", "p"],
+    name: "Parser3",
+    main: "main.p",
+    run: "parser3 main.p",
+    template: `$console:line[Hello, world!]
+`,
+  },
   pascal: {
     aliases: ["pas", "fpc"],
     name: "Pascal",
