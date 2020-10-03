@@ -493,6 +493,14 @@ Nude pagoda careens.
 >++.
 `,
   },
+  bython: {
+    aliases: ["by"],
+    name: "Bython",
+    main: "main.by",
+    run: "bython main.by",
+    template: `print("Hello, world!")
+`,
+  },
   c: {
     aliases: ["gcc", "clang", "h", "cc", "c99", "c11", "c18"],
     name: "C",

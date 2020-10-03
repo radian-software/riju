@@ -27,6 +27,9 @@ npm install -g bash-language-server
 # Befunge
 npm install -g befunge93 prompt-sync
 
+# Bython
+pip3 install bython
+
 # Chef
 cpanm -n Acme::Chef
 
