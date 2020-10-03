@@ -2723,6 +2723,16 @@ x`,
 end
 `,
   },
+  rc: {
+    aliases: ["runcommands"],
+    name: "rc",
+    repl: "rc",
+    input: `expr 123 '*' 234`,
+    main: "main.rc",
+    run: "rc main.rc; rc",
+    template: `echo Hello, world!
+`,
+  },
   reasonml: {
     aliases: ["re", "reason", "bsc", "buckle", "bucklescript"],
     name: "ReasonML",

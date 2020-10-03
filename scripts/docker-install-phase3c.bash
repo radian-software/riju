@@ -112,6 +112,9 @@ clang
 flang
 ratfor
 
+# rc
+rc
+
 # Redis
 redis
 
