@@ -2409,6 +2409,18 @@ rofl lol
     template: `Hello, world!
 `,
   },
+  parigp: {
+    aliases: ["gp"],
+    name: "PARI/GP",
+    repl: "gp",
+    main: "main.gp",
+    run: "gp main.gp",
+    scope: {
+      code: `x = 123 * 234`,
+    },
+    template: `print("Hello, world!")
+`,
+  },
   pascal: {
     aliases: ["pas", "fpc"],
     name: "Pascal",

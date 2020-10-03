@@ -55,6 +55,9 @@ octave
 # Ook
 autoconf
 
+# PARI/GP
+pari-gp
+
 # Pascal
 fpc
 
