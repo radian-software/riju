@@ -93,6 +93,17 @@ git clone https://github.com/bipinu/malbolge.git
 clang malbolge/malbolge.c -o /usr/local/bin/malbolge
 rm -rf malbolge
 
+# Ook
+git clone https://git.code.sf.net/p/esco/code esco
+pushd esco >/dev/null
+autoreconf -fi
+./configure --prefix="$PWD"
+make
+make install
+mv bin/esco /usr/local/bin/
+popd >/dev/null
+rm -rf esco
+
 # Rapira
 git clone https://github.com/freeduke33/rerap2.git
 pushd rerap2 >/dev/null

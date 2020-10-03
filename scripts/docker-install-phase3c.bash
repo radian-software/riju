@@ -52,6 +52,9 @@ opam
 # Octave
 octave
 
+# Ook
+autoconf
+
 # Pascal
 fpc
 
