@@ -2713,6 +2713,16 @@ x`,
     template: `вывод: "Hello, world!"
 `,
   },
+  ratfor: {
+    aliases: ["rationalfortran"],
+    name: "Ratfor",
+    main: "main.r",
+    compile: "ratfor main.r -o main.f && flang main.f -o main",
+    run: "./main",
+    template: `print *, 'Hello, world!'
+end
+`,
+  },
   reasonml: {
     aliases: ["re", "reason", "bsc", "buckle", "bucklescript"],
     name: "ReasonML",

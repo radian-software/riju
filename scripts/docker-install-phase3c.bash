@@ -108,6 +108,10 @@ racket
 # Rapira
 clang
 
+# Ratfor
+flang
+ratfor
+
 # Redis
 redis
 
