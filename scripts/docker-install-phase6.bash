@@ -147,6 +147,16 @@ module.exports = { tokenize, Parser, Environment };
 EOF
 popd >/dev/null
 
+# TECO
+git clone https://github.com/blakemcbride/TECOC.git
+pushd TECOC/src >/dev/null
+make -f makefile.linux
+mv tecoc /usr/local/bin/tecoc
+ln -s /usr/local/bin/tecoc /usr/local/bin/teco
+ln -s /usr/local/bin/tecoc /usr/local/bin/mung
+popd >/dev/null
+rm -rf TECOC
+
 # Thue
 wget -nv "$(curl -sSL https://catseye.tc/distribution/Thue_distribution | grep -Eo 'https://catseye.tc/distfiles/thue-[^"]+\.zip' | head -n1)"
 unzip thue-*.zip

@@ -3240,6 +3240,22 @@ PLEASE LIKE AND SUBSCRIBE
     template: `echo "Hello, world!"
 `,
   },
+  teco: {
+    aliases: ["mung"],
+    name: "TECO",
+    repl: "teco",
+    input: `123*234=\x1b\x1b`,
+    main: "main.txt",
+    compile: "cat main.txt | teco-encode > main.teco",
+    run: "mung main.teco",
+    scope: {
+      code: `123*234UX$$`,
+      input: `QX=\x1b\x1b`,
+    },
+    template: `IHello, world!
+$HT$$
+`,
+  },
   tex: {
     aliases: ["latex", "xetex", "plaintex"],
     name: "TeX",

@@ -237,6 +237,20 @@ const env = new lang.Environment(runtime);
 env.run(ast);
 EOF
 
+# TECO
+tee /usr/local/bin/teco-encode >/dev/null <<"EOF"
+#!/usr/bin/env -S python3 -u
+
+import re
+import sys
+
+for line in sys.stdin:
+    line = re.sub(r"\^(.)", lambda m: chr(ord(m.group(1)) ^ 0b1000000), line)
+    line = line.replace("$", chr(27))
+    print(line, end="")
+EOF
+chmod +x /usr/local/bin/teco-encode
+
 # Unlambda
 tee /usr/local/bin/unlambda-repl >/dev/null <<"EOF"
 #!/usr/bin/env python3
