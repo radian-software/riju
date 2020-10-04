@@ -26,6 +26,19 @@ wget -nv https://gist.githubusercontent.com/anonymous/6392418/raw/fish.py -O /us
 sed -i 's:^#!.*:#!/usr/bin/env python3:' /usr/local/bin/fish-lang
 chmod +x /usr/local/bin/fish-lang
 
+# ABC
+wget -nv https://homepages.cwi.nl/~steven/abc/implementations/abc.tar.gz
+mkdir /opt/abc
+tar -xf abc.tar.gz -C /opt/abc --strip-components=1
+chmod +x /opt/abc/abc /opt/abc/abckeys
+tee /usr/local/bin/abc >/dev/null <<"EOF"
+#!/usr/bin/env bash
+cd /opt/abc
+exec ./abc "$@"
+EOF
+chmod +x /usr/local/bin/abc
+rm abc.tar.gz
+
 # Ada
 wget -nv https://dl.bintray.com/reznikmm/ada-language-server/linux-latest.tar.gz
 tar -xf linux-latest.tar.gz

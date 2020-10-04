@@ -16,6 +16,9 @@ aplus-fsf
 aplus-fsf-doc
 rlwrap
 
+# ABC
+libtinfo5:i386
+
 # Ada
 gnat
 

@@ -74,6 +74,19 @@ export const langs: { [key: string]: LangConfig } = {
 `,
     skip: ["scope"],
   },
+  abc: {
+    name: "ABC",
+    repl: "abc",
+    input: `WRITE 123 * 234`,
+    main: "main.abc",
+    run: `abc "$PWD/main.abc" -`,
+    scope: {
+      code: `PUT 123 * 234 IN x`,
+      input: `WRITE x`,
+    },
+    template: `WRITE "Hello, world!" /
+`,
+  },
   ada: {
     aliases: ["adb"],
     name: "Ada",
