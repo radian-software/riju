@@ -2045,7 +2045,7 @@ PLEASE GIVE UP
 `,
   },
   limbo: {
-    aliases: ["inferno"],
+    aliases: ["inferno", "b"],
     name: "Limbo",
     setup: "ln -s /usr/local/inferno/* ./",
     main: "riju/main.b",
