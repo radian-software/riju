@@ -81,6 +81,17 @@ mv lazyk /usr/local/bin/
 popd >/dev/null
 rm -rf lazyk
 
+# Limbo
+wget -nv "$(curl -sSL http://www.vitanuova.com/inferno/downloads.html | grep -E 'inferno-[0-9]+\.tgz' | grep -Eo 'http://[^"]+')"
+tar -xf inferno-*.tgz -C /usr/local
+pushd /usr/local/inferno >/dev/null
+sed -i 's/gcc/gcc -m32/g' makemk.sh
+./makemk.sh
+PATH="$PWD/Linux/386/bin:$PATH" mk install
+ln -s "$PWD/Linux/386/bin/emu" "$PWD/Linux/386/bin/limbo" /usr/local/bin/
+popd >/dev/null
+rm inferno-*.tgz
+
 # LOLCODE
 git clone https://github.com/justinmeza/lci.git
 pushd lci >/dev/null

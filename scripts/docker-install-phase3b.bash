@@ -98,6 +98,12 @@ julia
 # Ksh
 ksh
 
+# Limbo
+gcc
+libc6-dev-i386
+libx11-dev:i386
+libxext-dev:i386
+
 # Lisaac
 lisaac
 

@@ -2044,6 +2044,29 @@ PLEASE GIVE UP
 }
 `,
   },
+  limbo: {
+    aliases: ["inferno"],
+    name: "Limbo",
+    setup: "ln -s /usr/local/inferno/* ./",
+    main: "riju/main.b",
+    compile: "limbo -o riju/main.dis riju/main.b",
+    run: `emu -r . riju/main.dis`,
+    template: `implement Cmd;
+
+include "sys.m";
+include "draw.m";
+
+Cmd : module {
+    init : fn (ctxt : ref Draw->Context, args : list of string);
+};
+
+init(nil : ref Draw->Context, nil : list of string)
+{
+    sys := load Sys Sys->PATH;
+    sys->print("Hello, world!\\n");
+}
+`,
+  },
   lisaac: {
     name: "Lisaac",
     main: "main.li",
