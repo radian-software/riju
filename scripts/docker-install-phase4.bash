@@ -291,6 +291,11 @@ chmod +x /opt/mspyls/Microsoft.Python.LanguageServer
 ln -s /opt/mspyls/Microsoft.Python.LanguageServer /usr/local/bin/Microsoft.Python.LanguageServer
 rm Python-Language-Server-linux-x64.*.nupkg
 
+# Q
+wget -nv "$(curl -sSL https://kx.com/download-landing-linux/ | grep x86 | grep -Eo 'https://[^"]+linuxx86\.zip')"
+unzip -d /opt linuxx86.zip
+rm linuxx86.zip
+
 # ReasonML
 ver="$(latest_release jaredly/reason-language-server)"
 wget -nv "https://github.com/jaredly/reason-language-server/releases/download/${ver}/rls-linux.zip"

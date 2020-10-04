@@ -2714,6 +2714,19 @@ main = do
 `,
     timeout: 15,
   },
+  q: {
+    aliases: ["kdb", "kdb+"],
+    name: "Q",
+    setup: "cp -R /opt/q ./",
+    repl: "q/l32/q",
+    main: "main.q",
+    run: "q/l32/q main.q",
+    scope: {
+      code: `x:123 * 234;`,
+    },
+    template: `1 "Hello, world!\\n";
+`,
+  },
   قلب: {
     aliases: ["qalb"],
     name: "قلب",
