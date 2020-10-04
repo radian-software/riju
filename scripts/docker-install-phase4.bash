@@ -257,6 +257,12 @@ mv mariadb-*-linux-x86_64/* /opt/mariadb/
 chmod a=rx,u=rwx /opt/mariadb/lib/plugin/auth_pam_tool_dir
 chmod a=rx,u=rwxs /opt/mariadb/lib/plugin/auth_pam_tool_dir/auth_pam_tool
 
+# Nemerle
+file="$(curl -sSL http://nemerle.org/Downloads | grep -Eo 'NemerleBinaries[^"]+' | head -n1)"
+wget -nv "http://nemerle.org/Download/Nightly%20master-NET40-VS2010/build-283/${file}"
+unzip -d /opt/nemerle NemerleBinaries-net-*.zip
+rm NemerleBinaries-net-*.zip
+
 # Omgrofl
 ver="$(latest_release OlegSmelov/omgrofl-interpreter)"
 mkdir /opt/omgrofl

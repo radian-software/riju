@@ -2313,6 +2313,15 @@ message:
     template: `$print("Hello, world!\\n");
 `,
   },
+  nemerle: {
+    aliases: ["ncc", "n"],
+    name: "Nemerle",
+    main: "main.n",
+    compile: "mono /opt/nemerle/ncc.exe main.n",
+    run: "mono main.exe",
+    template: `System.Console.WriteLine("Hello, world!");
+`,
+  },
   nickle: {
     name: "Nickle",
     repl: "nickle",
