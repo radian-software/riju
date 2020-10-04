@@ -16,6 +16,7 @@ ubuntu_ver="$(lsb_release -rs)"
 ubuntu_name="$(lsb_release -cs)"
 
 curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
+curl -sSL https://debian.neo4j.com/neotechnology.gpg.key | apt-key add -
 curl -sSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
 curl -sSL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 curl -sSL https://downloads.ceylon-lang.org/apt/ceylon-debian-repo.gpg.key | apt-key add -
@@ -34,6 +35,7 @@ tee -a /etc/apt/sources.list.d/custom.list >/dev/null <<EOF
 deb [arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main
 deb https://cloud.r-project.org/bin/linux/ubuntu ${ubuntu_name}-${cran}/
 deb https://deb.nodesource.com/${nodesource} ${ubuntu_name} main
+deb https://debian.neo4j.com stable latest
 deb https://dist.crystal-lang.org/apt crystal main
 deb https://dl.hhvm.com/ubuntu ${ubuntu_name} main
 deb https://dl.yarnpkg.com/debian/ stable main

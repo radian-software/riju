@@ -2274,6 +2274,14 @@ message:
     template: `$print("Hello, world!\\n");
 `,
   },
+  neo4j: {
+    name: "Neo4j",
+    setup: `cp -R /etc/neo4j conf && sed -i "s#/var/lib/neo4j/data#$PWD/data#; s#/var/log/neo4j#$PWD/logs#" conf/neo4j.conf`,
+    repl: `NEO4J_CONF="$PWD/conf" neo4j console`,
+    main: "main.cypher",
+    template: `RETURN "Hello, world!"
+`,
+  },
   nickle: {
     name: "Nickle",
     repl: "nickle",

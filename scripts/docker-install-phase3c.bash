@@ -36,6 +36,9 @@ mysql-server
 # Neko
 neko
 
+# Neo4j
+neo4j
+
 # Nickle
 nickle
 
