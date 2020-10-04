@@ -2789,6 +2789,17 @@ end
 `,
     skip: ["lsp"],
   },
+  rebol: {
+    name: "REBOL",
+    repl: "rebol",
+    main: "main.r",
+    run: "rebol main.r; rebol",
+    runReplInput: `DELAY: 1
+123 * 234`,
+    template: `REBOL [Title: "Main"]
+print "Hello, world!"
+`,
+  },
   redis: {
     name: "Redis",
     monacoLang: "redis",
