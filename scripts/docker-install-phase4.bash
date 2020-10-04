@@ -309,7 +309,6 @@ rm -rf rebol-core rebol-core-*.tar.gz
 path="$(curl -sSL https://static.red-lang.org/download.html | grep -Eo '/dl/linux/[^"]+' | head -n1)"
 wget -nv "https://static.red-lang.org/${path}" -O /usr/local/bin/red
 chmod +x /usr/local/bin/red
-rm red-latest.zip
 
 # Rust
 export CARGO_HOME=/opt/rust
