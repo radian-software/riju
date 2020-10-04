@@ -2446,6 +2446,22 @@ rofl lol
     template: `Hello, world!
 `,
   },
+  oz: {
+    aliases: ["mozart", "mozart2"],
+    name: "Oz",
+    main: "main.oz",
+    compile: "ozc -c main.oz",
+    run: "ozengine main.ozf",
+    template: `functor
+import
+    Application
+    System
+define
+    {System.showInfo 'Hello, world!'}
+    {Application.exit 0}
+end
+`,
+  },
   parigp: {
     aliases: ["gp"],
     name: "PARI/GP",

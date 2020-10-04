@@ -262,6 +262,12 @@ ver="$(latest_release OlegSmelov/omgrofl-interpreter)"
 mkdir /opt/omgrofl
 wget -nv "https://github.com/OlegSmelov/omgrofl-interpreter/releases/download/${ver}/Omgrofl.jar" -O /opt/omgrofl/Omgrofl.jar
 
+# Oz
+ver="$(latest_release mozart/mozart2)"
+wget -nv "https://github.com/mozart/mozart2/releases/download/${ver}/mozart2-$(sed 's/^v//' <<< "$ver")-x86_64-linux.deb"
+dpkg -i mozart2-*-x86_64-linux.deb
+rm mozart2-*-x86_64-linux.deb
+
 # PowerShell
 ver="$(latest_release PowerShell/PowerShell)"
 wget -nv "https://github.com/PowerShell/PowerShell/releases/download/${ver}/powershell-$(sed 's/^v//' <<< "$ver")-linux-x64.tar.gz"
