@@ -298,8 +298,8 @@ unzip rls-linux.zip
 mv rls-linux/reason-language-server /usr/local/bin/
 rm rls-linux.zip
 
-# Rebol
-file="$(curl -sSL http://www.rebol.com/downloads.html | sed '0,/x86-64/d' | head -n10 | grep -Eo 'downloads/[^"]+')"
+# REBOL
+file="$(curl -sSL http://www.rebol.com/downloads.html | sed '0,/x86-64/d' | grep -Eo 'downloads/[^"]+' | head -n1)"
 wget -nv "http://www.rebol.com/${file}"
 tar -xf rebol-core-*.tar.gz
 mv rebol-core/rebol /usr/local/bin/
