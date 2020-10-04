@@ -3248,6 +3248,17 @@ Ophelia:
     template: `message("Hello, world!");
 `
   },
+  slick: {
+    name: "Slick",
+    repl: "slick",
+    input: `DELAY: 1
+123 * 234`,
+    main: "main.sl",
+    run: "slick main.sl; slick",
+    template: `def main:
+  print "Hello, world!"
+`,
+  },
   smalltalk: {
     aliases: ["gst", "st"],
     name: "Smalltalk",
