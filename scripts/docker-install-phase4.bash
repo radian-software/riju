@@ -282,6 +282,12 @@ unzip PowerShellEditorServices.zip
 mv PowerShellEditorServices /opt/powershell-editor-services
 rm PowerShellEditorServices.zip
 
+# PSeInt
+wget -nv "$(curl -sSL "http://pseint.sourceforge.net/index.php?page=descargas.php&os=lnx" | grep -Eo 'http://[^"]+l64[^"]+\.tgz\?download')" -O pseint.tgz
+tar -xf pseint.tgz
+mv pseint/bin/pseint /usr/local/bin/
+rm -rf pseint pseint.tgz
+
 # Python
 xml="$(curl -sSL "https://pvsc.blob.core.windows.net/python-language-server-stable?restype=container&comp=list&prefix=Python-Language-Server-linux-x64")"
 nupkg="$(echo "$xml" | grep -Eo 'https://[^<]+\.nupkg' | tail -n1)"

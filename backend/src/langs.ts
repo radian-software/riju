@@ -2699,6 +2699,17 @@ main :-
 }
 `,
   },
+  pseint: {
+    aliases: ["psc"],
+    name: "PSeInt",
+    main: "main.psc",
+    run: "pseint --nouser main.psc",
+    hello: "¡Hola, mundo!",
+    template: `Proceso Main
+    Escribir "¡Hola, mundo!";
+FinProceso
+`,
+  },
   pug: {
     name: "Pug",
     monacoLang: "pug",
