@@ -46,6 +46,10 @@ nim
 nodejs
 yarn
 
+# Oberon
+clang
+make
+
 # Objective-C
 gcc
 gnustep-devel

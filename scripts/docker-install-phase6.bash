@@ -93,6 +93,16 @@ git clone https://github.com/bipinu/malbolge.git
 clang malbolge/malbolge.c -o /usr/local/bin/malbolge
 rm -rf malbolge
 
+# Oberon
+file="$(curl -sSL https://miasap.se/obnc/ | grep -F obnc_ | grep -Eo 'obnc_[^"]+' | grep -v win | head -n1)"
+wget -nv "https://miasap.se/obnc/downloads/${file}"
+tar -xf obnc_*.tar.gz
+pushd obnc-* >/dev/null
+./build
+./install
+popd >/dev/null
+rm -rf obnc_*.tar.gz obnc-*
+
 # Ook
 git clone https://git.code.sf.net/p/esco/code esco
 pushd esco >/dev/null

@@ -2295,6 +2295,22 @@ x`,
     template: `echo "Hello, world!"
 `,
   },
+  oberon: {
+    aliases: ["obn"],
+    name: "Oberon",
+    main: "Main.obn",
+    compile: "obnc Main.obn -o main",
+    run: "./main",
+    template: `MODULE Main;
+
+IMPORT Out;
+
+BEGIN
+  Out.String("Hello, world!");
+  Out.Ln;
+END Main.
+`,
+  },
   objectivec: {
     aliases: ["objc", "gnustep"],
     name: "Objective-C",
