@@ -15,6 +15,9 @@ packages="
 # S-Lang
 slsh
 
+# SageMath
+sagemath
+
 # Scala
 scala
 

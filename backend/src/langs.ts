@@ -2884,6 +2884,20 @@ binding_irb.run(IRB.conf)
 `,
     skip: ["lsp"],
   },
+  sagemath: {
+    aliases: ["sage"],
+    name: "SageMath",
+    repl: "sage",
+    main: ".sage/init.sage",
+    createEmpty: ``,
+    run: "sage",
+    scope: {
+      code: `x = 123 * 234`,
+    },
+    template: `print("Hello, world!")
+`,
+    timeout: 10,
+  },
   sass: {
     name: "Sass",
     main: "main.sass",
