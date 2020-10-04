@@ -5,6 +5,9 @@ set -o pipefail
 set -x
 pushd /tmp >/dev/null
 
+export OPAMROOT=/opt/opam
+export OPAMROOTISOK=1
+
 # Aheui
 git clone https://github.com/aheui/caheui.git
 pushd caheui >/dev/null
@@ -129,6 +132,16 @@ mkdir -p /opt/qalb
 mv public/qlb/*.js /opt/qalb/
 popd >/dev/null
 rm -rf qalb
+
+# Slick
+git clone https://github.com/kwshi/slick.git
+pushd slick >/dev/null
+opam switch create .
+opam pin --switch . containers 2.7 -y
+opam install --switch . $(dune external-lib-deps src --display=quiet | grep -F - | sed 's/- //; s/\..*//') -y
+opam install --switch . menhir -y
+opam exec --switch . dune build
+popd >/dev/null
 
 # Snobol
 file="$(curl -sSL ftp://ftp.snobol4.org/snobol/ | grep -Eo 'snobol4-.*\.tar\.gz' | sort -rV | head -n1)"

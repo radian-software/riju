@@ -109,6 +109,10 @@ npm install -g sass
 # Shakespeare
 pip3 install shakespearelang
 
+# Slick
+opam install -y dune
+ln -s /opt/opam/default/bin/dune /usr/local/bin/dune
+
 # TeX
 luarocks install digestif
 
