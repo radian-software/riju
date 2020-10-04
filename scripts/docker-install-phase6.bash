@@ -63,6 +63,14 @@ rm -rf erlang_ls
 # Hexagony
 git clone https://github.com/m-ender/hexagony.git /opt/hexagony
 
+# Idris
+wget -nv https://www.idris-lang.org/idris2-src/idris2-latest.tgz
+tar -xf idris2-latest.tgz
+make bootstrap-build SCHEME=chezscheme PREFIX=/usr/local
+make install PREFIX=/usr/local
+chmod -R a=u,go-w /usr/local/idris2-*
+rm -rf Idris2-* idris2-latest.tgz
+
 # Kalyn
 git clone https://github.com/raxod502/kalyn.git
 pushd kalyn >/dev/null

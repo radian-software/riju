@@ -79,6 +79,10 @@ haxe
 # Icon
 icont
 
+# Idris
+chezscheme
+gcc
+
 # INTERCAL
 intercal
 

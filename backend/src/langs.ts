@@ -1532,6 +1532,22 @@ l ; ; o ; * 4
 end
 `,
   },
+  idris: {
+    aliases: ["idr", "idris2"],
+    name: "Idris",
+    repl: "rm -f .idris/repl/init; idris2",
+    main: "Main.idr",
+    run: "mkdir -p .idris/repl; echo ':exec main' > .idris/repl/init; idris2 Main.idr -x main; idris2 Main.idr",
+    scope: {
+      code: `x : Int
+x = 123 * 234`,
+    },
+    template: `module Main
+
+main : IO ()
+main = putStrLn "Hello, world!"
+`,
+  },
   ink: {
     name: "Ink",
     repl: "ink",
