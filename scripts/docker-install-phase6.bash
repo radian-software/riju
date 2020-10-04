@@ -125,6 +125,17 @@ mv bin/esco /usr/local/bin/
 popd >/dev/null
 rm -rf esco
 
+# PAWN
+git clone https://github.com/compuphase/pawn.git
+pushd pawn >/dev/null
+cmake .
+make
+mv pawncc pawnrun /usr/local/bin/
+mkdir /opt/pawn
+mv include /opt/pawn/
+popd >/dev/null
+rm -rf pawn
+
 # Rapira
 git clone https://github.com/freeduke33/rerap2.git
 pushd rerap2 >/dev/null

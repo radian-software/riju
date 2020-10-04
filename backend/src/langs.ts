@@ -2518,6 +2518,19 @@ begin
 end.
 `,
   },
+  pawn: {
+    aliases: ["pawncc", "pawnrun"],
+    name: "PAWN",
+    main: "main.pawn",
+    compile: "pawncc main.pawn -i/opt/pawn/include",
+    run: "pawnrun main.amx",
+    template: `#include <core>
+
+main() {
+    print("Hello, world!\\n");
+}
+`,
+  },
   perl: {
     aliases: ["pl", "repl"],
     name: "Perl",
