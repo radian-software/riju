@@ -122,6 +122,9 @@ ratfor
 # rc
 rc
 
+# Red
+libcurl4:i386
+
 # Redis
 redis
 

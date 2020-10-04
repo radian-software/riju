@@ -71,6 +71,11 @@ cat bsconfig.json | jq '.name = "riju-project"' | sponge bsconfig.json
 yarn install
 popd >/dev/null
 
+# Red
+sudo -u build /usr/local/bin/red <<< quit
+mkdir /opt/red
+mv /home/build/.red /opt/red/template
+
 # Unison
 mkdir -p /opt/unison/project-template
 pushd /opt/unison/project-template >/dev/null

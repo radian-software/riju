@@ -2816,6 +2816,19 @@ end
 print "Hello, world!"
 `,
   },
+  red: {
+    name: "Red",
+    setup: "cp -R /opt/red/template .red",
+    repl: "/usr/local/bin/red",
+    input: `DELAY: 1
+123 * 234`,
+    main: "main.red",
+    run: "/usr/local/bin/red main.red; /usr/local/bin/red",
+    template: `Red [Title: "Main"]
+
+print "Hello, world!"
+`,
+  },
   redis: {
     name: "Redis",
     monacoLang: "redis",
