@@ -66,6 +66,12 @@ wget -nv "ftp://ftp.gnu.org/gnu/apl/${file}"
 dpkg -i apl_*_amd64.deb
 rm apl_*_amd64.deb
 
+# AutoIt
+wget -nv https://www.autoitscript.com/cgi-bin/getfile.pl?autoit3/autoit-v3.zip -O autoit.zip
+unzip autoit.zip
+
+rm autoit.zip
+
 # Boo
 wget -nv https://github.com/boo-lang/boo/releases/download/unstable/boo-latest.zip
 unzip boo-latest.zip
