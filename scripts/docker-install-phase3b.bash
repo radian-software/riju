@@ -107,6 +107,7 @@ gcc
 libc6-dev-i386
 libx11-dev:i386
 libxext-dev:i386
+linux-libc-dev:i386
 
 # Lisaac
 lisaac
