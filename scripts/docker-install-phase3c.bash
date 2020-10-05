@@ -68,6 +68,9 @@ octave
 # Ook
 autoconf
 
+# OpenSCAD
+openscad
+
 # PARI/GP
 pari-gp
 

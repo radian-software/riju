@@ -2476,6 +2476,14 @@ lol iz 10
 rofl lol
 `,
   },
+  openscad: {
+    name: "OpenSCAD",
+    main: "main.scad",
+    compile: "openscad main.scad -o main.stl",
+    run: "cat main.stl",
+    template: `echo("Hello, world!");
+`,
+  },
   org: {
     aliases: ["orgmode"],
     name: "Org",
