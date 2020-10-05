@@ -69,9 +69,11 @@ git clone https://github.com/m-ender/hexagony.git /opt/hexagony
 # Idris
 wget -nv https://www.idris-lang.org/idris2-src/idris2-latest.tgz
 tar -xf idris2-latest.tgz
+pushd Idris2-* >/dev/null
 make bootstrap-build SCHEME=chezscheme PREFIX=/usr/local
 make install PREFIX=/usr/local
 chmod -R a=u,go-w /usr/local/idris2-*
+popd >/dev/null
 rm -rf Idris2-* idris2-latest.tgz
 
 # Kalyn
