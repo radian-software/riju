@@ -58,6 +58,11 @@ make
 gcc
 gnustep-devel
 
+Objective-C++
+gcc
+gnustep-devel
+gobjc++
+
 # OCaml
 ocaml
 opam

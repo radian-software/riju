@@ -2385,6 +2385,39 @@ int main() {
 `,
     skip: ["lsp"],
   },
+  "objectivec++": {
+    aliases: ["objc++", "objcpp", "objectivecpp"],
+    name: "Objective-C++",
+    main: "main.mm",
+    compile: "gcc $(gnustep-config --objc-flags) main.mm $(gnustep-config --base-libs) -o main",
+    run: "./main",
+    format: {
+      run: "clang-format --assume-filename=format.m",
+      input: `#import <Foundation/Foundation.h>
+
+int main() {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    NSLog(@"Hello, world!");
+    [pool drain];
+    return 0;
+}
+`,
+    },
+    lsp: {
+      setup: `(gnustep-config --objc-flags && gnustep-config --base-libs) | sed -E 's/\\s+/\\n/g' > compile_flags.txt`,
+      start: "clangd",
+    },
+    template: `#import <Foundation/Foundation.h>
+
+int main() {
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSLog(@"Hello, world!");
+  [pool drain];
+  return 0;
+}
+`,
+    skip: ["lsp"],
+  },
   ocaml: {
     name: "OCaml",
     main: "main.ml",
