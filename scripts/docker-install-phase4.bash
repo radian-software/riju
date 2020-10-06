@@ -9,6 +9,18 @@ latest_release() {
     curl -sSL "https://api.github.com/repos/$1/releases/latest" | jq -r .tag_name
 }
 
+alpine_to_ubuntu() {
+    cat | \
+        sed '/addgroup/s/ -g / --gid /'               | \
+        sed '/addgroup/s/ -S / --system /'            | \
+        sed '/adduser/ s/ -g / --gecos /'              | \
+        sed '/adduser/ s/ -h / --home /'               | \
+        sed '/adduser/ s/ -u / --uid /'                | \
+        sed '/adduser/ s/ -D / --disabled-password /'  | \
+        sed '/adduser/ s/ -G / --ingroup /'            | \
+        sed '/adduser/ s/ -S / --system /'
+}
+
 # Needed for project infrastructure
 ver="$(latest_release watchexec/watchexec)"
 wget -nv "https://github.com/watchexec/watchexec/releases/download/${ver}/watchexec-${ver}-x86_64-unknown-linux-gnu.deb"
@@ -256,6 +268,12 @@ mkdir /opt/mariadb
 mv mariadb-*-linux-x86_64/* /opt/mariadb/
 chmod a=rx,u=rwx /opt/mariadb/lib/plugin/auth_pam_tool_dir
 chmod a=rx,u=rwxs /opt/mariadb/lib/plugin/auth_pam_tool_dir/auth_pam_tool
+
+# Nix
+wget -nv https://github.com/NixOS/docker/raw/master/Dockerfile
+export NIX_VERSION="$(cat Dockerfile | grep "ARG NIX_VERSION" | sed -E 's/[^=]+=//')"
+eval "$(cat Dockerfile | sed -n '/RUN wget/,/^$/p' | sed 's/RUN //' | alpine_to_ubuntu)"
+rm Dockerfile
 
 # Omgrofl
 ver="$(latest_release OlegSmelov/omgrofl-interpreter)"
