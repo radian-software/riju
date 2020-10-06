@@ -149,6 +149,13 @@ mv include /opt/pawn/
 popd >/dev/null
 rm -rf pawn
 
+# POP-11
+wget -nv http://www.cs.bham.ac.uk/research/projects/poplog/V16/getpoplog.sh
+chmod +x getpoplog.sh
+./getpoplog.sh -nopie
+mv poplog_base /opt/poplog
+rm getpoplog.sh latest_poplog_base.tar.bz2 INSTRUCTIONS.txt
+
 # Rapira
 git clone https://github.com/freeduke33/rerap2.git
 pushd rerap2 >/dev/null
