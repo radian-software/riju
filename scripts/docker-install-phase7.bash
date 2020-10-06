@@ -63,6 +63,15 @@ popd >/dev/null
 mkdir /opt/purescript
 mv project-template /opt/purescript/
 
+# Q#
+dotnet new -i Microsoft.Quantum.ProjectTemplates
+dotnet new console -lang Q# -o main
+rm main/Program.qs
+mkdir /opt/qsharp
+mv main /opt/qsharp/project-template
+mv "$HOME/.dotnet" /opt/qsharp/dotnet
+chmod -R a=u,go-w /opt/qsharp/dotnet
+
 # ReasonML
 mkdir -p /opt/reasonml/project-template
 pushd /opt/reasonml/project-template >/dev/null

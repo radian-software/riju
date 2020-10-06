@@ -2818,6 +2818,25 @@ main = do
 `,
     timeout: 15,
   },
+  qsharp: {
+    aliases: ["q", "qs"],
+    name: "Q#",
+    setup: "cp -R /opt/qsharp/dotnet ./.dotnet && cp -R /opt/qsharp/project-template/* ./",
+    main: "Main.qs",
+    run: "dotnet run",
+    template: `namespace main {
+
+    open Microsoft.Quantum.Canon;
+    open Microsoft.Quantum.Intrinsic;
+
+    @EntryPoint()
+    operation Main() : Unit {
+        Message("Hello, world!");
+    }
+}
+`,
+    timeout: 60,
+  },
   قلب: {
     aliases: ["qalb"],
     name: "قلب",
