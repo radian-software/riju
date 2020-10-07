@@ -79,6 +79,12 @@ wget -nv "https://github.com/snoe/clojure-lsp/releases/download/${ver}/clojure-l
 chmod +x clojure-lsp
 mv clojure-lsp /usr/local/bin/clojure-lsp
 
+# Couchbase
+wget -nv https://packages.couchbase.com/releases/6.6.0/couchbase-server-community_6.6.0-ubuntu18.04_amd64.deb
+dpkg -i couchbase-server-community_*-*_amd64.deb
+rm couchbase-server-community_*-*_amd64.deb
+/opt/couchbase/bin/couchbase-server --stop
+
 # D
 wget -nv "$(curl -sSL https://dlang.org/download.html | grep -Eo '"http://[^"]+amd64.deb"' | tr -d '"')"
 dpkg -i dmd_*.deb
