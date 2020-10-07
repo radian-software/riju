@@ -58,7 +58,7 @@ make
 gcc
 gnustep-devel
 
-Objective-C++
+# Objective-C++
 gcc
 gnustep-devel
 gobjc++
