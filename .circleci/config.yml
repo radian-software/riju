@@ -22,7 +22,7 @@ jobs:
       - run: |
           echo "${DOCKER_PASSWORD}" | \
             docker login --username "${DOCKER_USERNAME}" --password-stdin
-      - run: scripts/deploy.bash
+      - run: make deploy
 workflows:
   version: 2
   ci:
