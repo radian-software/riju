@@ -1,16 +1,16 @@
 {
   "variables": {
-    "api_token": "",
+    "digitalocean_api_token": "",
     "admin_password": "",
     "admin_ssh_public_key_file": "",
     "deploy_ssh_public_key_file": "",
     "docker_repo": "raxod502/riju"
   },
-  "sensitive-variables": ["api_token", "admin_password"],
+  "sensitive-variables": ["digitalocean_api_token", "admin_password"],
   "builders": [
     {
       "type": "digitalocean",
-      "api_token": "{{user `api_token`}}",
+      "api_token": "{{user `digitalocean_api_token`}}",
       "image": "ubuntu-20-04-x64",
       "region": "sfo3",
       "size": "s-1vcpu-1gb",

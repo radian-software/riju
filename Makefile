@@ -1,3 +1,6 @@
+-include .env
+export
+
 UID := $(shell id -u)
 
 .PHONY: help

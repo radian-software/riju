@@ -13,14 +13,15 @@ if [[ -z "${DOMAIN}" ]]; then
 fi
 
 if [[ -z "${DEPLOY_SSH_PRIVATE_KEY}" ]]; then
-    if [[ -f "$HOME/.ssh/id_rsa_riju_deploy" ]]; then
-        DEPLOY_SSH_PRIVATE_KEY="$(< "$HOME/.ssh/id_rsa_riju_deploy")"
-    else
-        echo "environment variable not set: DEPLOY_SSH_PRIVATE_KEY"
-    fi
-else
-    DEPLOY_SSH_PRIVATE_KEY="$(printf '%s\n' "${DEPLOY_SSH_PRIVATE_KEY}" | base64 -d)"
+    echo "environment variable not set: DEPLOY_SSH_PRIVATE_KEY" >&2
+    exit 1
 fi
+
+if [[ -f "${DEPLOY_SSH_PRIVATE_KEY}" ]]; then
+    DEPLOY_SSH_PRIVATE_KEY="$(< "${DEPLOY_SSH_PRIVATE_KEY}")"
+fi
+
+DEPLOY_SSH_PRIVATE_KEY="$(printf '%s\n' "${DEPLOY_SSH_PRIVATE_KEY}" | base64 -d)"
 
 tag="$(date +%s%3N)-$(git branch --show-current)-$(git rev-parse @)"
 

@@ -151,6 +151,227 @@ and fail the build if they fail.
 
 See also [riju-cdn](https://github.com/raxod502/riju-cdn).
 
-## Flag
+## Adding a language
 
-[![Flag](flag.png)](https://www.reddit.com/r/Breath_of_the_Wild/comments/947ewf/flag_of_the_gerudo_based_on_the_flag_of_kazakhstan/)
+The workflow for adding a language is more streamlined than you might
+expect, given that building Riju's Docker image takes over an hour.
+This is because there is no need to rebuild the image when a change is
+made. Instead, you can manually apply the changes to a running
+container in parallel with adding those changes to the Dockerfile
+scripts.
+
+### Install
+
+The first step in adding a language is figuring out how to install it.
+There are a number of considerations here:
+
+* If it's available from Ubuntu, that's the best option.
+* Language-specific package managers are a second-best choice.
+* Downloading precompiled binaries is also not the worst. It's best if
+  upstream offers a .deb download, but manual installation is fine
+  too.
+* Compiling from source is the worst option, but sometimes it's the
+  only way.
+
+Typically, I `sudo su` and change directory to `/tmp` in order to test
+out installation. Once I've identified a way to install such that the
+software appears to function, I transcribe the commands from my shell
+back into the relevant Dockerfile script.
+
+#### Dockerfile scripts
+
+These are as follows:
+
+* `docker-install-phase0.bash`: perform initial upgrade of all Ubuntu
+  packages, unminimize system
+* `docker-install-phase1.bash`: configure APT repositories and
+  additional architectures
+* `docker-install-phase2.bash`: install tools that are used for Riju
+  itself (build and development tools)
+* `docker-install-phase3a.bash`: install APT packages for languages
+  A-D
+* `docker-install-phase3b.bash`: install APT packages for languages
+  E-L
+* `docker-install-phase3c.bash`: install APT packages for languages
+  M-R
+* `docker-install-phase3d.bash`: install APT packages for languages
+  S-Z
+* `docker-install-phase4.bash`: install precompiled binaries and
+  tarballs
+* `docker-install-phase5.bash`: set up language-specific package
+  managers and install packages from them
+* `docker-install-phase6.bash`: install things from source
+* `docker-install-phase7.bash`: set up project templates for languages
+  that require you start by running a "create new project" command,
+  and install custom wrapper scripts
+* `docker-install-phase8.bash`: set up access control and do final
+  cleanup
+
+#### Rolling-release policy
+
+You'll notice in these scripts a distinct lack of any version numbers.
+This is because Riju uses rolling-release for everything that can
+conceivably be rolling-released (even things that look like they're
+probably never *going* to get a new release, since the last one was in
+2004).
+
+For APT and language-specific packages, this is typically simple. A
+small number of APT packages include a version number as part of their
+name for some reason, and I work around this using various
+`grep-aptavail` incantations at the top of the `phase-3[ad].bash`
+scripts. I suggest checking those examples and referring to the
+`grep-aptavail` man page to understand what is going on.
+
+For binaries and tarballs in `phase4.bash`, a version number is
+typically encoded in the download URL. For projects available via
+GitHub Releases (preferred), there is a `latest_release` shell
+function to fetch the latest tag. For things hosted elsewhere, I
+resort to using `curl` and `grep` on the download homepage to identify
+the latest version number or download URL. Crafting an appropriate
+pipeline for these cases is as much an art as a science. We simply
+hope that the relevant webpages will not have their layout changed too
+frequently.
+
+#### Conventions
+
+* We do all work from `/tmp` and clean up our files when done. (The
+  current code doesn't always do a great job of this; see
+  [#27](https://github.com/raxod502/riju/issues/27).)
+* When changing directory, we use `pushd` and `popd` in pairs.
+* We prefer putting files where they're supposed to be in the first
+  place, rather than moving (or worse, copying) them. This can be
+  accomplished by means of `wget -O`, `unzip -d`, `tar -C
+  [--strip-components]`, and similar.
+* We like to keep things as minimal as possible in terms of shell
+  scripting, but try to follow the standard installation procedure
+  where reasonable.
+
+### Running
+
+There are three categories of languages: non-interactive, interactive,
+and interactive+scoped. The capabilities are as follows:
+
+* *Non-interactive:* You can run a file.
+* FIXME
+
+## Debugging tools
+
+Add `#debug` to the end of a Riju URL and reload the page to output
+all messages in JSON format in the JavaScript console. You can copy
+the LSP messages as JSON for direct use in the LSP REPL (see below).
+
+To get a sandboxed shell session, the same as is used to run languages
+on Riju, run:
+
+    $ yarn sandbox
+
+To start up a JSON REPL for interacting with LSP servers, run:
+
+    $ yarn lsp-repl (LANGUAGE | CMD...)
+
+## Self-hosting
+
+Riju is hosted on [DigitalOcean](https://www.digitalocean.com/). Sign
+up for an account and obtain a personal access token with read/write
+access.
+
+You will need some credentials. Start by selecting an admin password
+to use for the DigitalOcean instance. Then generate two SSH key-pairs
+(or you can use pre-existing ones). One is for the admin account on
+DigitalOcean, while the other is to deploy from CI.
+
+Install [Packer](https://www.packer.io/). Riju uses Packer to generate
+DigitalOcean AMIs to ensure a consistent setup for the production
+instance. Navigate to the `packer` subdirectory of this repository and
+create a file `secrets.json`, changing the values as appropriate for
+your setup:
+
+```json
+{
+  "digitalocean_api_token": "28114a9f0ed5637c576794138c71bf03d01946288a6922ea083f923ec883c431",
+  "admin_password": "R3iIhqs856N1sT5Mg6QFAsB5VPJrXS",
+  "admin_ssh_public_key_file": "/home/raxod502/.ssh/id_rsa.pub",
+  "deploy_ssh_public_key_file": "/home/raxod502/.ssh/id_rsa_riju_deploy.pub"
+}
+```
+
+We'll start by setting up Riju without TLS. Run:
+
+    $ packer build -var-file secrets.json config.json
+
+This will take about five minutes to generate a DigitalOcean AMI. Log
+in to your DigitalOcean and launch an instance based on that AMI
+(called an "Image" in the interface). The hosted version of Riju uses
+the $10/month instance with 1 vCPU and 2GB memory / 50GB disk.
+
+Root login is disabled on the AMI generated by Packer, but
+DigitalOcean unfortunately doesn't give you any option to leave login
+settings unchanged. I suggest setting the root password to a random
+string. Make a note of the IP address of the droplet and SSH into it
+under the admin user, using the key that you specified in
+`secrets.json`. Now perform the following setup:
+
+    $ sudo passwd -l root
+
+This completes the first DigitalOcean portion of deployment.
+
+Now you'll need an account on [Docker Hub](https://hub.docker.com/),
+which is where built images will be stored before they are pulled down
+to DigitalOcean. Create a repository; the name will be
+`your-docker-id/whatever-you-name-the-repo`. You'll need this below.
+
+You're now ready to deploy. You can do this manually to begin with. In
+the repository root on your local checkout of Riju, create a file
+`.env`, changing the values as appropriate for your setup:
+
+    DOCKER_REPO=raxod502/riju
+    DOMAIN=riju.codes
+    DEPLOY_SSH_PRIVATE_KEY=/home/raxod502/.ssh/id_rsa_riju_deploy
+
+Run:
+
+    $ docker login
+    $ make deploy
+
+Riju should now be available online at your instance's public IP
+address.
+
+Next, let's configure TLS. You'll need to configure DNS for your
+domain with a CNAME to point at your DigitalOcean instance. Once DNS
+has propagated, SSH into your DigitalOcean instance and run:
+
+    $ sudo systemctl stop riju
+    $ sudo certbot certonly --standalone
+    $ sudo systemctl start riju
+
+You'll also want to set up automatic renewal. This can be done by
+installing the two Certbot hook scripts from Riju in the
+`packer/resources` subdirectory. Here is one approach:
+
+    $ sudo wget https://github.com/raxod502/riju/raw/master/packer/resources/certbot-pre.bash
+             -O /etc/letsencrypt/renewal-hooks/pre/riju
+    $ sudo wget https://github.com/raxod502/riju/raw/master/packer/resources/certbot-post.bash
+             -O /etc/letsencrypt/renewal-hooks/post/riju
+    $ sudo chmod +x /etc/letsencrypt/renewal-hooks/pre/riju
+    $ sudo chmod +x /etc/letsencrypt/renewal-hooks/post/riju
+
+At this point you should be able to visit Riju at your custom browser
+with TLS enabled.
+
+We can now set up CI. Sign up at [CircleCI](https://circleci.com/) and
+enable automatic builds for your fork of Riju. You'll need to set the
+following environment variables for the Riju project on CircleCI,
+adjusting as appropriate for your own setup:
+
+    DOCKER_USERNAME=raxod502
+    DOCKER_PASSWORD=MIMvzS1bKPunDDSX4AJu
+    DOCKER_REPO=raxod502/riju
+    DOMAIN=riju.codes
+    DEPLOY_SSH_PRIVATE_KEY=b2Rs......lots more......SFAK
+
+To obtain the base64-encoded deploy key, run:
+
+    $ cat ~/.ssh/id_rsa_riju_deploy | base64 | tr -d '\n'; echo
+
+New pushes to master should trigger deploys, while pushes to other
+branches should trigger just builds.

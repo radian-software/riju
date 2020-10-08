@@ -607,7 +607,7 @@ const testTypes: {
   format: {
     pred: ({ format }) => (format ? true : false),
   },
-  lsp: { pred: ({ lsp }) => (lsp && lsp.code ? true : false) },
+  lsp: { pred: ({ lsp }) => (lsp ? true : false) },
 };
 
 function getTestList() {

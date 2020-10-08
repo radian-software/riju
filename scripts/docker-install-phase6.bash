@@ -32,7 +32,7 @@ mv Beatnik/script/beatnik.py /usr/local/bin/beatnik
 rm -rf Beatnik
 
 # Binary Lambda Calculus
-wget -nv https://www.ioccc.org/2012/tromp/tromp.c
+wget https://www.ioccc.org/2012/tromp/tromp.c
 clang tromp.c -Wno-everything -DInt=long -DX=8 -DA=500000 -o /usr/local/bin/tromp
 rm tromp.c
 
@@ -43,7 +43,7 @@ npm install
 popd >/dev/null
 
 # Clean
-wget -nv "$(curl -sSL https://clean.cs.ru.nl/Download_Clean | grep linux/clean | grep -F 64.tar.gz | grep -Eo "https://[^>]+\.tar\.gz")"
+wget "$(curl -sSL https://clean.cs.ru.nl/Download_Clean | grep linux/clean | grep -F 64.tar.gz | grep -Eo "https://[^>]+\.tar\.gz")"
 mkdir /opt/clean
 tar -xf clean*_64.tar.gz -C /opt/clean --strip-components=1
 pushd /opt/clean >/dev/null
@@ -67,7 +67,7 @@ rm -rf erlang_ls
 git clone https://github.com/m-ender/hexagony.git /opt/hexagony
 
 # Idris
-wget -nv https://www.idris-lang.org/idris2-src/idris2-latest.tgz
+wget https://www.idris-lang.org/idris2-src/idris2-latest.tgz
 tar -xf idris2-latest.tgz
 pushd Idris2-* >/dev/null
 make bootstrap-build SCHEME=chezscheme PREFIX=/usr/local
@@ -95,7 +95,7 @@ popd >/dev/null
 rm -rf lazyk
 
 # Limbo
-wget -nv "$(curl -sSL http://www.vitanuova.com/inferno/downloads.html | grep -E 'inferno-[0-9]+\.tgz' | grep -Eo 'http://[^"]+')"
+wget "$(curl -sSL http://www.vitanuova.com/inferno/downloads.html | grep -E 'inferno-[0-9]+\.tgz' | grep -Eo 'http://[^"]+')"
 tar -xf inferno-*.tgz -C /usr/local
 pushd /usr/local/inferno >/dev/null
 sed -i 's/gcc/gcc -m32/g' makemk.sh
@@ -119,7 +119,7 @@ rm -rf malbolge
 
 # Oberon
 file="$(curl -sSL https://miasap.se/obnc/ | grep -F obnc_ | grep -Eo 'obnc_[^"]+' | grep -v win | head -n1)"
-wget -nv "https://miasap.se/obnc/downloads/${file}"
+wget "https://miasap.se/obnc/downloads/${file}"
 tar -xf obnc_*.tar.gz
 pushd obnc-* >/dev/null
 ./build
@@ -178,7 +178,7 @@ rm -rf slick
 
 # Snobol
 file="$(curl -sSL ftp://ftp.snobol4.org/snobol/ | grep -Eo 'snobol4-.*\.tar\.gz' | sort -rV | head -n1)"
-wget -nv "ftp://ftp.snobol4.org/snobol/${file}"
+wget "ftp://ftp.snobol4.org/snobol/${file}"
 tar -xf snobol4-*.tar.gz
 rm snobol4-*.tar.gz
 pushd snobol4-* >/dev/null
@@ -197,7 +197,7 @@ popd >/dev/null
 # Tabloid
 mkdir /opt/tabloid
 pushd /opt/tabloid >/dev/null
-wget -nv https://github.com/thesephist/tabloid/raw/master/static/js/lang.js
+wget https://github.com/thesephist/tabloid/raw/master/static/js/lang.js
 cat <<"EOF" >> lang.js
 module.exports = { tokenize, Parser, Environment };
 EOF
@@ -214,7 +214,7 @@ popd >/dev/null
 rm -rf TECOC
 
 # Thue
-wget -nv "$(curl -sSL https://catseye.tc/distribution/Thue_distribution | grep -Eo 'https://catseye.tc/distfiles/thue-[^"]+\.zip' | head -n1)"
+wget "$(curl -sSL https://catseye.tc/distribution/Thue_distribution | grep -Eo 'https://catseye.tc/distfiles/thue-[^"]+\.zip' | head -n1)"
 unzip thue-*.zip
 rm thue-*.zip
 pushd thue-* >/dev/null
@@ -224,7 +224,7 @@ popd >/dev/null
 rm -rf thue-*
 
 # Velato
-wget -nv http://www.archduke.org/midi/asc2mid.c
+wget http://www.archduke.org/midi/asc2mid.c
 clang asc2mid.c -o /usr/local/bin/asc2mid
 rm asc2mid.c
 

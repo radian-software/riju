@@ -11,23 +11,23 @@ latest_release() {
 
 # Needed for project infrastructure
 ver="$(latest_release watchexec/watchexec)"
-wget -nv "https://github.com/watchexec/watchexec/releases/download/${ver}/watchexec-${ver}-x86_64-unknown-linux-gnu.deb"
+wget "https://github.com/watchexec/watchexec/releases/download/${ver}/watchexec-${ver}-x86_64-unknown-linux-gnu.deb"
 dpkg -i watchexec-*.deb
 rm watchexec-*.deb
 
 # Shared
 ver="$(latest_release jgm/pandoc)"
-wget -nv "https://github.com/jgm/pandoc/releases/download/${ver}/pandoc-${ver}-linux-amd64.tar.gz"
+wget "https://github.com/jgm/pandoc/releases/download/${ver}/pandoc-${ver}-linux-amd64.tar.gz"
 tar -xf pandoc-*-linux-amd64.tar.gz -C /usr --strip-components=1
 rm pandoc-*-linux-amd64.tar.gz
 
 # ><>
-wget -nv https://gist.githubusercontent.com/anonymous/6392418/raw/fish.py -O /usr/local/bin/fish-lang
+wget https://gist.githubusercontent.com/anonymous/6392418/raw/fish.py -O /usr/local/bin/fish-lang
 sed -i 's:^#!.*:#!/usr/bin/env python3:' /usr/local/bin/fish-lang
 chmod +x /usr/local/bin/fish-lang
 
 # ABC
-wget -nv https://homepages.cwi.nl/~steven/abc/implementations/abc.tar.gz
+wget https://homepages.cwi.nl/~steven/abc/implementations/abc.tar.gz
 mkdir /opt/abc
 tar -xf abc.tar.gz -C /opt/abc --strip-components=1
 chmod +x /opt/abc/abc /opt/abc/abckeys
@@ -40,7 +40,7 @@ chmod +x /usr/local/bin/abc
 rm abc.tar.gz
 
 # Ada
-wget -nv https://dl.bintray.com/reznikmm/ada-language-server/linux-latest.tar.gz
+wget https://dl.bintray.com/reznikmm/ada-language-server/linux-latest.tar.gz
 tar -xf linux-latest.tar.gz
 mv linux/ada_language_server /usr/local/bin/ada_language_server
 mv linux/*.so* /usr/lib/x86_64-linux-gnu/
@@ -48,26 +48,26 @@ rm -rf linux linux-latest.tar.gz
 
 # Ante
 mkdir /opt/ante
-wget -nv https://github.com/raxod502/riju-cdn/releases/download/ante-0.8.0-d2c43992e0c7a4c1942d5c097233f4f7638a1ee6/ante -O /opt/ante/ante
+wget https://github.com/raxod502/riju-cdn/releases/download/ante-0.8.0-d2c43992e0c7a4c1942d5c097233f4f7638a1ee6/ante -O /opt/ante/ante
 chmod +x /opt/ante/ante
-wget -nv https://github.com/raxod502/riju-cdn/releases/download/ante-0.8.0-d2c43992e0c7a4c1942d5c097233f4f7638a1ee6/libantecommon.so -O /opt/ante/libantecommon.so
+wget https://github.com/raxod502/riju-cdn/releases/download/ante-0.8.0-d2c43992e0c7a4c1942d5c097233f4f7638a1ee6/libantecommon.so -O /opt/ante/libantecommon.so
 ln -s /opt/ante/ante /usr/local/bin/
-wget -nv https://github.com/raxod502/riju-cdn/releases/download/ante-0.8.0-d2c43992e0c7a4c1942d5c097233f4f7638a1ee6/stdlib.tar.gz
+wget https://github.com/raxod502/riju-cdn/releases/download/ante-0.8.0-d2c43992e0c7a4c1942d5c097233f4f7638a1ee6/stdlib.tar.gz
 tar -xf stdlib.tar.gz -C /opt/ante
 rm stdlib.tar.gz
 
 # Ante (Cards)
-wget -nv https://github.com/michaeldv/ante/raw/master/ante.rb -O /usr/local/bin/ante-cards
+wget https://github.com/michaeldv/ante/raw/master/ante.rb -O /usr/local/bin/ante-cards
 chmod +x /usr/local/bin/ante-cards
 
 # APL
 file="$(curl -sS ftp://ftp.gnu.org/gnu/apl/ | grep -Eo 'apl_[-0-9.]+_amd64.deb$' | sort -rV | head -n1)"
-wget -nv "ftp://ftp.gnu.org/gnu/apl/${file}"
+wget "ftp://ftp.gnu.org/gnu/apl/${file}"
 dpkg -i apl_*_amd64.deb
 rm apl_*_amd64.deb
 
 # Boo
-wget -nv https://github.com/boo-lang/boo/releases/download/unstable/boo-latest.zip
+wget https://github.com/boo-lang/boo/releases/download/unstable/boo-latest.zip
 unzip boo-latest.zip
 mv boo-latest /usr/local/lib/boo
 chmod +x /usr/local/lib/boo/booc /usr/local/lib/boo/booish
@@ -75,19 +75,19 @@ ln -s /usr/local/lib/boo/booc /usr/local/lib/boo/booish /usr/local/bin/
 
 # Clojure
 ver="$(latest_release snoe/clojure-lsp)"
-wget -nv "https://github.com/snoe/clojure-lsp/releases/download/${ver}/clojure-lsp"
+wget "https://github.com/snoe/clojure-lsp/releases/download/${ver}/clojure-lsp"
 chmod +x clojure-lsp
 mv clojure-lsp /usr/local/bin/clojure-lsp
 
 # D
-wget -nv "$(curl -sSL https://dlang.org/download.html | grep -Eo '"http://[^"]+amd64.deb"' | tr -d '"')"
+wget "$(curl -sSL https://dlang.org/download.html | grep -Eo '"http://[^"]+amd64.deb"' | tr -d '"')"
 dpkg -i dmd_*.deb
 rm dmd_*.deb
 
 # Dhall
 ver="$(latest_release dhall-lang/dhall-haskell)"
 file="$(curl -sSL "https://api.github.com/repos/dhall-lang/dhall-haskell/releases/tags/${ver}" | jq -r '.assets | map(select(.name | (contains("dhall-json") and contains("x86_64-linux.tar.bz2")))) | .[0].name')"
-wget -nv "https://github.com/dhall-lang/dhall-haskell/releases/download/${ver}/${file}"
+wget "https://github.com/dhall-lang/dhall-haskell/releases/download/${ver}/${file}"
 mkdir dhall-json
 tar -xf dhall-json-*-x86_64-linux.tar.bz2 -C dhall-json
 mv dhall-json/bin/dhall-to-json dhall-json/bin/json-to-dhall /usr/local/bin/
@@ -95,7 +95,7 @@ rm -rf dhall-json dhall-json-*-x86_64-linux.tar.bz2
 
 # Dylan
 ver="$(latest_release dylan-lang/opendylan)"
-wget -nv "https://github.com/dylan-lang/opendylan/releases/download/${ver}/opendylan-$(grep -Eo '[0-9]+\.[0-9]+' <<< "$ver")-x86_64-linux.tar.bz2"
+wget "https://github.com/dylan-lang/opendylan/releases/download/${ver}/opendylan-$(grep -Eo '[0-9]+\.[0-9]+' <<< "$ver")-x86_64-linux.tar.bz2"
 tar -xf opendylan-*-x86_64-linux.tar.bz2
 rm opendylan-*-x86_64-linux.tar.bz2
 mv opendylan-* /opt/dylan
@@ -103,21 +103,21 @@ ln -s /opt/dylan/bin/dylan-compiler /opt/dylan/bin/make-dylan-app /usr/local/bin
 
 # Elixir
 ver="$(latest_release elixir-lsp/elixir-ls)"
-wget -nv "https://github.com/elixir-lsp/elixir-ls/releases/download/${ver}/elixir-ls.zip"
+wget "https://github.com/elixir-lsp/elixir-ls/releases/download/${ver}/elixir-ls.zip"
 unzip -d /opt/elixir-ls elixir-ls.zip
 ln -s /opt/elixir-ls/language_server.sh /usr/local/bin/elixir-ls
 rm elixir-ls.zip
 
 # Elm
 ver="$(latest_release elm/compiler)"
-wget -nv "https://github.com/elm/compiler/releases/download/${ver}/binary-for-linux-64-bit.gz"
+wget "https://github.com/elm/compiler/releases/download/${ver}/binary-for-linux-64-bit.gz"
 gunzip binary-for-linux-64-bit.gz
 chmod +x binary-for-linux-64-bit
 mv binary-for-linux-64-bit /usr/local/bin/elm
 
 # Emojicode
 ver="$(latest_release emojicode/emojicode)"
-wget -nv "https://github.com/emojicode/emojicode/releases/download/${ver}/Emojicode-$(sed 's/^v//' <<< "$ver")-Linux-x86_64.tar.gz"
+wget "https://github.com/emojicode/emojicode/releases/download/${ver}/Emojicode-$(sed 's/^v//' <<< "$ver")-Linux-x86_64.tar.gz"
 tar -xf Emojicode-*-Linux-x86_64.tar.gz
 pushd Emojicode-*-Linux-x86_64 >/dev/null
 mv emojicodec /usr/local/bin/
@@ -129,24 +129,24 @@ popd >/dev/null
 rm -rf Emojicode-*-Linux-x86_64 Emojicode-*-Linux-x86_64.tar.gz
 
 # Entropy
-wget -nv http://danieltemkin.com/Content/Entropy/Entropy.zip
+wget http://danieltemkin.com/Content/Entropy/Entropy.zip
 unzip -d /opt/entropy Entropy.zip
 rm Entropy.zip
 
 # Erlang
-wget -nv https://s3.amazonaws.com/rebar3/rebar3
+wget https://s3.amazonaws.com/rebar3/rebar3
 chmod +x rebar3
 mv rebar3 /usr/local/bin/rebar3
 
 # Euphoria
-wget -nv http://www.rapideuphoria.com/31/euphor31.tar
+wget http://www.rapideuphoria.com/31/euphor31.tar
 mkdir /opt/euphoria
 tar -xf euphor*.tar -C /opt/euphoria --strip-components=1
 ln -s /opt/euphoria/bin/exu /usr/bin/
 rm euphor*.tar
 
 # Ezhil
-wget -nv https://github.com/raxod502/riju-cdn/releases/download/ezhil-2017.08.19/ezhil.tar.gz
+wget https://github.com/raxod502/riju-cdn/releases/download/ezhil-2017.08.19/ezhil.tar.gz
 tar -xf ezhil.tar.gz
 mv ezhil-* /opt/ezhil
 cp /opt/ezhil/ezhili /opt/ezhil/ezhuthi/
@@ -155,7 +155,7 @@ rm ezhil.tar.gz
 
 # Factor
 ver="$(curl -sSL https://factorcode.org/ | grep -Eo 'release\?os=linux[^>]+>[^<]+' | sed -E 's/[^>]+>//' | head -n1)"
-wget -nv "https://downloads.factorcode.org/releases/${ver}/factor-linux-x86-64-${ver}.tar.gz"
+wget "https://downloads.factorcode.org/releases/${ver}/factor-linux-x86-64-${ver}.tar.gz"
 tar -xf factor-linux-x86-64-*.tar.gz
 mv -T factor /opt/factor
 ln -s /opt/factor/factor /usr/local/bin/factor-lang
@@ -175,68 +175,68 @@ mv go/bin/gopls /usr/local/bin/gopls
 rm -rf go
 
 # GolfScript
-wget -nv http://www.golfscript.com/golfscript/golfscript.rb -O /usr/local/bin/golfscript
+wget http://www.golfscript.com/golfscript/golfscript.rb -O /usr/local/bin/golfscript
 chmod +x /usr/local/bin/golfscript
 
 # Grass
-wget -nv http://www.blue.sky.or.jp/grass/grass.rb -O /usr/local/bin/grass
+wget http://www.blue.sky.or.jp/grass/grass.rb -O /usr/local/bin/grass
 chmod +x /usr/local/bin/grass
 
 # Haskell
 curl -sSL https://get.haskellstack.org/ | sh
-wget -nv https://github.com/raxod502/riju-cdn/releases/download/brittany-0.12.1.1/brittany -O /usr/local/bin/brittany
+wget https://github.com/raxod502/riju-cdn/releases/download/brittany-0.12.1.1/brittany -O /usr/local/bin/brittany
 chmod +x /usr/local/bin/brittany
 
 mkdir -p /opt/haskell
-wget -nv https://github.com/raxod502/riju-cdn/releases/download/hie-1.4-a9005b2ba2050bdfdd4438f1d471a3f7985492cd-ghc8.6.5/hie -O /usr/local/bin/hie
-wget -nv https://github.com/raxod502/riju-cdn/releases/download/hie-1.4-a9005b2ba2050bdfdd4438f1d471a3f7985492cd-ghc8.6.5/hoogle.hoo -O /opt/haskell/hoogle.hoo
+wget https://github.com/raxod502/riju-cdn/releases/download/hie-1.4-a9005b2ba2050bdfdd4438f1d471a3f7985492cd-ghc8.6.5/hie -O /usr/local/bin/hie
+wget https://github.com/raxod502/riju-cdn/releases/download/hie-1.4-a9005b2ba2050bdfdd4438f1d471a3f7985492cd-ghc8.6.5/hoogle.hoo -O /opt/haskell/hoogle.hoo
 chmod +x /usr/local/bin/hie
 
 # HCL/TOML/YAML
 ver="$(latest_release sclevine/yj)"
-wget -nv "https://github.com/sclevine/yj/releases/download/${ver}/yj-linux"
+wget "https://github.com/sclevine/yj/releases/download/${ver}/yj-linux"
 chmod +x yj-linux
 mv yj-linux /usr/local/bin/yj
 
 # HMMM
-wget -nv https://www.cs.hmc.edu/~cs5grad/cs5/hmmm/code/hmmm -O /usr/local/bin/hmmm
+wget https://www.cs.hmc.edu/~cs5grad/cs5/hmmm/code/hmmm -O /usr/local/bin/hmmm
 chmod +x /usr/local/bin/hmmm
 
 # Ink
 ver="$(latest_release thesephist/ink)"
-wget -nv "https://github.com/thesephist/ink/releases/download/${ver}/ink-linux"
-wget -nv "https://github.com/thesephist/ink/releases/download/${ver}/std.ink"
-wget -nv "https://github.com/thesephist/ink/releases/download/${ver}/str.ink"
+wget "https://github.com/thesephist/ink/releases/download/${ver}/ink-linux"
+wget "https://github.com/thesephist/ink/releases/download/${ver}/std.ink"
+wget "https://github.com/thesephist/ink/releases/download/${ver}/str.ink"
 chmod +x ink-linux
 mv ink-linux /usr/local/bin/ink
 mkdir /opt/ink
 mv std.ink str.ink /opt/ink/
 
 # Ioke
-wget -nv https://ioke.org/dist/ioke-ikj-latest.tar.gz
+wget https://ioke.org/dist/ioke-ikj-latest.tar.gz
 tar -xf ioke-ikj-*.tar.gz -C /opt
 rm ioke-ikj-*.tar.gz
 ln -s /opt/ioke/bin/ioke /usr/local/bin/ioke
 
 # J
-wget -nv "$(curl -sSL https://code.jsoftware.com/wiki/System/Installation/J901/Debian | grep -F '<a' | grep 'amd64\.deb' | grep -Eo 'http://.+?\.deb')"
+wget "$(curl -sSL https://code.jsoftware.com/wiki/System/Installation/J901/Debian | grep -F '<a' | grep 'amd64\.deb' | grep -Eo 'http://.+?\.deb')"
 dpkg -i j*_amd64.deb
 rm j*_amd64.deb
 
 # Java
-wget -nv https://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz
+wget https://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz
 mkdir /opt/jdt
 tar -C /opt/jdt -xf jdt-language-server-latest.tar.gz
 rm jdt-language-server-latest.tar.gz
 
 # Kitten
-wget -nv https://github.com/raxod502/riju-cdn/releases/download/kitten-0.1-bcaffa109c7f93959b3c2e9e7ae74462f840088d.ktn/kitten -O /usr/local/bin/kitten
-wget -nv https://github.com/raxod502/riju-cdn/releases/download/kitten-0.1-bcaffa109c7f93959b3c2e9e7ae74462f840088d.ktn/common.ktn -O /usr/local/bin/common.ktn
+wget https://github.com/raxod502/riju-cdn/releases/download/kitten-0.1-bcaffa109c7f93959b3c2e9e7ae74462f840088d.ktn/kitten -O /usr/local/bin/kitten
+wget https://github.com/raxod502/riju-cdn/releases/download/kitten-0.1-bcaffa109c7f93959b3c2e9e7ae74462f840088d.ktn/common.ktn -O /usr/local/bin/common.ktn
 chmod +x /usr/local/bin/kitten
 
 # Kotlin
 ver="$(latest_release JetBrains/kotlin)"
-wget -nv "https://github.com/JetBrains/kotlin/releases/download/${ver}/kotlin-compiler-$(sed 's/^v//' <<< "$ver").zip"
+wget "https://github.com/JetBrains/kotlin/releases/download/${ver}/kotlin-compiler-$(sed 's/^v//' <<< "$ver").zip"
 unzip kotlin-*.zip
 mv kotlinc /opt/kotlin
 ln -s /opt/kotlin/bin/* /usr/local/bin/
@@ -245,12 +245,12 @@ rm kotlin-*.zip
 
 # Lua
 ver="$(latest_release EmmyLua/EmmyLua-LanguageServer)"
-wget -nv "https://github.com/EmmyLua/EmmyLua-LanguageServer/releases/download/${ver}/EmmyLua-LS-all.jar"
+wget "https://github.com/EmmyLua/EmmyLua-LanguageServer/releases/download/${ver}/EmmyLua-LS-all.jar"
 mv EmmyLua-LS-all.jar /usr/lib/EmmyLua-LS.jar
 
 # MariaDB
 ver="$(curl -sSL https://downloads.mariadb.org/ | grep 'href="/mariadb/[0-9]' | grep -Eo '[0-9][^/]+' | sort -rV | head -n1)"
-wget -nv "https://downloads.mariadb.org/f/mariadb-${ver}/bintar-linux-x86_64/mariadb-${ver}-linux-x86_64.tar.gz/from/http%3A//sfo1.mirrors.digitalocean.com/mariadb/?serve" -O mariadb.tar.gz
+wget "https://downloads.mariadb.org/f/mariadb-${ver}/bintar-linux-x86_64/mariadb-${ver}-linux-x86_64.tar.gz/from/http%3A//sfo1.mirrors.digitalocean.com/mariadb/?serve" -O mariadb.tar.gz
 tar -xf mariadb.tar.gz
 mkdir /opt/mariadb
 mv mariadb-*-linux-x86_64/* /opt/mariadb/
@@ -260,30 +260,30 @@ chmod a=rx,u=rwxs /opt/mariadb/lib/plugin/auth_pam_tool_dir/auth_pam_tool
 # Omgrofl
 ver="$(latest_release OlegSmelov/omgrofl-interpreter)"
 mkdir /opt/omgrofl
-wget -nv "https://github.com/OlegSmelov/omgrofl-interpreter/releases/download/${ver}/Omgrofl.jar" -O /opt/omgrofl/Omgrofl.jar
+wget "https://github.com/OlegSmelov/omgrofl-interpreter/releases/download/${ver}/Omgrofl.jar" -O /opt/omgrofl/Omgrofl.jar
 
 # Oz
 ver="$(latest_release mozart/mozart2)"
-wget -nv "https://github.com/mozart/mozart2/releases/download/${ver}/mozart2-$(sed 's/^v//' <<< "$ver")-x86_64-linux.deb"
+wget "https://github.com/mozart/mozart2/releases/download/${ver}/mozart2-$(sed 's/^v//' <<< "$ver")-x86_64-linux.deb"
 dpkg -i mozart2-*-x86_64-linux.deb
 rm mozart2-*-x86_64-linux.deb
 
 # PowerShell
 ver="$(latest_release PowerShell/PowerShell)"
-wget -nv "https://github.com/PowerShell/PowerShell/releases/download/${ver}/powershell-$(sed 's/^v//' <<< "$ver")-linux-x64.tar.gz"
+wget "https://github.com/PowerShell/PowerShell/releases/download/${ver}/powershell-$(sed 's/^v//' <<< "$ver")-linux-x64.tar.gz"
 mkdir /opt/powershell
 tar -xf powershell-*.tar.gz -C /opt/powershell
 ln -s /opt/powershell/pwsh /usr/local/bin/pwsh
 rm powershell-*.tar.gz
 
 ver="$(latest_release PowerShell/PowerShellEditorServices)"
-wget -nv "https://github.com/PowerShell/PowerShellEditorServices/releases/download/${ver}/PowerShellEditorServices.zip"
+wget "https://github.com/PowerShell/PowerShellEditorServices/releases/download/${ver}/PowerShellEditorServices.zip"
 unzip PowerShellEditorServices.zip
 mv PowerShellEditorServices /opt/powershell-editor-services
 rm PowerShellEditorServices.zip
 
 # PSeInt
-wget -nv "$(curl -sSL "http://pseint.sourceforge.net/index.php?page=descargas.php&os=lnx" | grep -Eo 'http://[^"]+l64[^"]+\.tgz\?download')" -O pseint.tgz
+wget "$(curl -sSL "http://pseint.sourceforge.net/index.php?page=descargas.php&os=lnx" | grep -Eo 'http://[^"]+l64[^"]+\.tgz\?download')" -O pseint.tgz
 tar -xf pseint.tgz
 mv pseint/bin/pseint /usr/local/bin/
 rm -rf pseint pseint.tgz
@@ -291,7 +291,7 @@ rm -rf pseint pseint.tgz
 # Python
 xml="$(curl -sSL "https://pvsc.blob.core.windows.net/python-language-server-stable?restype=container&comp=list&prefix=Python-Language-Server-linux-x64")"
 nupkg="$(echo "$xml" | grep -Eo 'https://[^<]+\.nupkg' | tail -n1)"
-wget -nv "${nupkg}"
+wget "${nupkg}"
 unzip -d /opt/mspyls Python-Language-Server-linux-x64.*.nupkg
 chmod +x /opt/mspyls/Microsoft.Python.LanguageServer
 ln -s /opt/mspyls/Microsoft.Python.LanguageServer /usr/local/bin/Microsoft.Python.LanguageServer
@@ -299,21 +299,21 @@ rm Python-Language-Server-linux-x64.*.nupkg
 
 # ReasonML
 ver="$(latest_release jaredly/reason-language-server)"
-wget -nv "https://github.com/jaredly/reason-language-server/releases/download/${ver}/rls-linux.zip"
+wget "https://github.com/jaredly/reason-language-server/releases/download/${ver}/rls-linux.zip"
 unzip rls-linux.zip
 mv rls-linux/reason-language-server /usr/local/bin/
 rm rls-linux.zip
 
 # REBOL
 file="$(curl -sSL http://www.rebol.com/downloads.html | sed '0,/x86-64/d' | grep -Eo 'downloads/[^"]+' | head -n1)"
-wget -nv "http://www.rebol.com/${file}"
+wget "http://www.rebol.com/${file}"
 tar -xf rebol-core-*.tar.gz
 mv rebol-core/rebol /usr/local/bin/
 rm -rf rebol-core rebol-core-*.tar.gz
 
 # Red
 path="$(curl -sSL https://static.red-lang.org/download.html | grep -Eo '/dl/linux/[^"]+' | head -n1)"
-wget -nv "https://static.red-lang.org/${path}" -O /usr/local/bin/red
+wget "https://static.red-lang.org/${path}" -O /usr/local/bin/red
 chmod +x /usr/local/bin/red
 
 # Rust
@@ -331,18 +331,18 @@ for file in /opt/rust/bin/*; do
 done
 
 # SETL
-wget -nv https://setl.org/setl/bin/Linux-x86-64bit/setlbin.tgz
+wget https://setl.org/setl/bin/Linux-x86-64bit/setlbin.tgz
 tar -xf setlbin.tgz -C /usr/local/bin
 
 # SQL
 ver="$(latest_release lighttiger2505/sqls)"
-wget -nv "https://github.com/lighttiger2505/sqls/releases/download/${ver}/sqls-${ver}-linux-amd64.tar.gz"
+wget "https://github.com/lighttiger2505/sqls/releases/download/${ver}/sqls-${ver}-linux-amd64.tar.gz"
 tar -xf sqls-*-linux-amd64.tar.gz
 mv linux-amd64/sqls /usr/local/bin/
 rm -rf linux-amd64 sqls-*-linux-amd64.tar.gz
 
 # Swift
-wget -nv https://github.com/raxod502/riju-cdn/releases/download/swift-5.2.4-20.04/swift.tar.gz -O swift.tar.gz
+wget https://github.com/raxod502/riju-cdn/releases/download/swift-5.2.4-20.04/swift.tar.gz -O swift.tar.gz
 mkdir /opt/swift
 tar -xf swift.tar.gz -C /opt/swift --strip-components=2
 ln -s /opt/swift/bin/swiftc /usr/local/bin/swiftc
@@ -350,11 +350,11 @@ ln -s /opt/swift/bin/sourcekit-lsp /usr/local/bin/sourcekit-lsp
 rm swift.tar.gz
 
 # Unison
-wget -nv https://github.com/raxod502/riju-cdn/releases/download/unison-M1l-232-519cbeb58704c1b9410c9386e492be59fd5a5334/unison -O /usr/local/bin/unison
+wget https://github.com/raxod502/riju-cdn/releases/download/unison-M1l-232-519cbeb58704c1b9410c9386e492be59fd5a5334/unison -O /usr/local/bin/unison
 chmod +x /usr/local/bin/unison
 
 file="$(curl -fsSL http://velato.net/ | grep -Eo 'Velato[0-9_]+.zip')"
-wget -nv "http://velato.net/Content/Velato/${file}"
+wget "http://velato.net/Content/Velato/${file}"
 unzip -d /opt/velato Velato*.zip
 rm Velato*.zip
 
