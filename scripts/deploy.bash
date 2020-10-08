@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euxo pipefail
+set -euo pipefail
 
 if [[ -z "${DOCKER_REPO}" ]]; then
     echo "environment variable not set: DOCKER_REPO" >&2
