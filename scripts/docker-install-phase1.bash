@@ -9,7 +9,7 @@ dpkg --add-architecture i386
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y apt-transport-https curl gnupg lsb-release software-properties-common wget
+apt-get install -y apt-transport-https curl gnupg libc6 libc6:i386 lsb-release software-properties-common wget
 rm -rf /var/lib/apt/lists/*
 
 ubuntu_ver="$(lsb_release -rs)"

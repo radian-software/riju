@@ -1,5 +1,15 @@
 version: 2
 jobs:
+  build:
+    docker:
+      - image: alpine
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: >-
+          apk add --no-cache --no-progress
+            bash docker make
+      - run: make image-prod
   build_and_deploy:
     docker:
       - image: alpine
@@ -17,6 +27,12 @@ workflows:
   version: 2
   ci:
     jobs:
+      - build:
+          filters:
+            branches:
+              ignore: master
+            tags:
+              ignore: /.*/
       - build_and_deploy:
           filters:
             branches:
