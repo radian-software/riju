@@ -30,12 +30,12 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: master
+              ignore: wip/packer
             tags:
               ignore: /.*/
       - build_and_deploy:
           filters:
             branches:
-              only: master
+              only: wip/packer
             tags:
               ignore: /.*/
