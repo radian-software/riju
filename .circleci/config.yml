@@ -5,7 +5,13 @@ jobs:
       - image: alpine
     steps:
       - checkout
-      - run: apk add --no-cache --no-progress bash openssh
+      - setup_remote_docker
+      - run: >-
+          apk add --no-cache --no-progress
+            bash docker make openssh
+      - run: >-
+          echo "${DOCKER_PASSWORD}" |
+            docker login --username "${DOCKER_USERNAME}" --password-stdin
       - run: scripts/deploy.bash
 workflows:
   version: 2

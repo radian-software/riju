@@ -19,10 +19,10 @@ image-prod: ## Build Docker image for production
 .PHONY: docker
 docker: image-dev docker-nobuild ## Run shell with source code and deps inside Docker
 
-.PHONY: docker
+.PHONY: docker-nobuild
 docker-nobuild: ## Same as 'make docker', but don't rebuild image
 	scripts/docker.bash run -it --rm -v "$(PWD):/home/docker/src" -p 6119:6119 -p 6120:6120 -h riju riju bash
 
 .PHONY: deploy
-deploy: ## Deploy current master from GitHub to production
+deploy: image-prod ## Build, publish, and deploy production image
 	scripts/deploy.bash

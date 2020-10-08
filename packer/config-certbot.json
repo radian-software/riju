@@ -1,0 +1,22 @@
+{
+  "variables": {
+    "api_token": ""
+  },
+  "sensitive-variables": ["api_token"],
+  "builders": [
+    {
+      "type": "digitalocean",
+      "api_token": "{{user `api_token`}}",
+      "image": "ubuntu-20-04-x64",
+      "region": "sfo3",
+      "size": "s-1vcpu-1gb",
+      "ssh_username": "root"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "script": "provision-certbot.bash"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "variables": {
+    "api_token": "",
+    "admin_password": "",
+    "admin_ssh_public_key_file": "",
+    "deploy_ssh_public_key_file": "",
+    "docker_repo": "raxod502/riju"
+  },
+  "sensitive-variables": ["api_token", "admin_password"],
+  "builders": [
+    {
+      "type": "digitalocean",
+      "api_token": "{{user `api_token`}}",
+      "image": "ubuntu-20-04-x64",
+      "region": "sfo3",
+      "size": "s-1vcpu-1gb",
+      "ssh_username": "root"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "{{user `admin_ssh_public_key_file`}}",
+      "destination": "/tmp/id_admin.pub"
+    },
+    {
+      "type": "file",
+      "source": "{{user `deploy_ssh_public_key_file`}}",
+      "destination": "/tmp/id_deploy.pub"
+    },
+    {
+      "type": "file",
+      "source": "resources/riju.bash",
+      "destination": "/tmp/riju.bash"
+    },
+    {
+      "type": "file",
+      "source": "resources/riju.service",
+      "destination": "/tmp/riju.service"
+    },
+    {
+      "type": "file",
+      "source": "resources/rijuctl.bash",
+      "destination": "/tmp/rijuctl.bash"
+    },
+    {
+      "type": "shell",
+      "script": "provision.bash",
+      "environment_vars": [
+        "ADMIN_PASSWORD={{user `admin_password`}}",
+        "DOCKER_REPO={{user `docker_repo`}}"
+      ]
+    }
+  ]
+}

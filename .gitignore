@@ -2,7 +2,9 @@
 *.log
 .log
 .lsp-repl-history
+do_digitalocean.pem
 node_modules
 out
+secrets.json
 tests
 tests-*
