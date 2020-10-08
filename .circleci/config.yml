@@ -6,8 +6,8 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: >-
-          apk add --no-cache --no-progress
+      - run: |
+          apk add --no-cache --no-progress \
             bash docker make
       - run: make image-prod
   build_and_deploy:
@@ -16,11 +16,11 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: >-
-          apk add --no-cache --no-progress
+      - run: |
+          apk add --no-cache --no-progress \
             bash docker make openssh
-      - run: >-
-          echo "${DOCKER_PASSWORD}" |
+      - run: |
+          echo "${DOCKER_PASSWORD}" | \
             docker login --username "${DOCKER_USERNAME}" --password-stdin
       - run: scripts/deploy.bash
 workflows:
