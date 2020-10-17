@@ -5,6 +5,7 @@ import * as process from "process";
 import * as appRoot from "app-root-path";
 import { quote } from "shell-quote";
 
+import { PRIVILEGED } from "./config";
 import { MIN_UID, MAX_UID } from "./users";
 
 export interface Options extends SpawnOptions {
@@ -51,7 +52,7 @@ function getEnv({ uid, uuid }: Context) {
     LANG: process.env.LANG || "",
     LC_ALL: process.env.LC_ALL || "",
     LOGNAME: username,
-    PATH: path.join(":"),
+    PATH: PRIVILEGED ? path.join(":") : process.env.PATH || "",
     PWD: cwd,
     SHELL: "/usr/bin/bash",
     TERM: "xterm-256color",
