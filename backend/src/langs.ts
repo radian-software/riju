@@ -4030,7 +4030,7 @@ x`,
     input: `expr 123 \\* 234`,
     main: ".zshrc",
     createEmpty: ``,
-    run: `SHELL=/usr/bin/zsh ZDOTDIR="$PWD" zsh`,
+    run: `SHELL=/usr/bin/zsh zsh`,
     scope: {
       code: `x="$(expr 123 \\* 234)"`,
       input: `echo "$x"`,
