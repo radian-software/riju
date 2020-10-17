@@ -80,7 +80,7 @@ chmod +x clojure-lsp
 mv clojure-lsp /usr/local/bin/clojure-lsp
 
 # D
-wget "$(curl -sSL https://dlang.org/download.html | grep -Eo '"http://[^"]+amd64.deb"' | tr -d '"')"
+wget "$(curl -sSL https://dlang.org/download.html | grep -Eo '"http://[^"]+amd64.deb"' | grep -v pre-release | tr -d '"')"
 dpkg -i dmd_*.deb
 rm dmd_*.deb
 
