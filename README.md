@@ -91,8 +91,8 @@ you should submit a pull request :)
 
 ## Project setup
 
-To run the webserver, all you need is Yarn. Just run `yarn install` as
-usual to install dependencies. For production, it's:
+To run the webserver, all you need is Yarn and LLVM. Just run `yarn
+install` as usual to install dependencies. For production, it's:
 
     $ yarn backend    |- or run all three with 'yarn build'
     $ yarn frontend   |
@@ -246,13 +246,217 @@ frequently.
   scripting, but try to follow the standard installation procedure
   where reasonable.
 
-### Running
+### Language configuration
 
-There are three categories of languages: non-interactive, interactive,
-and interactive+scoped. The capabilities are as follows:
+After installing the language, you'll need to configure it. This is
+done by adding an entry to
+[`backend/src/langs.ts`](backend/src/langs.ts).
 
-* *Non-interactive:* You can run a file.
-* FIXME
+#### Required keys
+
+Here is an example of a minimal language configuration, with only the
+required keys:
+
+```ts
+  befunge: {
+    name: "Befunge",
+    main: "main.be",
+    run: "befunge-repl main.be",
+    template: `64+"!dlrow ,olleH">:#,_@
+`,
+  },
+```
+
+We have five things here:
+
+* The language ID `befunge`, which appears in the URL
+  (<https://riju.codes/befunge>) and is used internally to track the
+  language. This can contain Unicode characters, but it must be safe
+  for URLs, so for example `+` is fine but `#` is not.
+* The language display name `Befunge`, which is shown on the language
+  homepage and in some UI messages. The homepage is sorted by this
+  key.
+* The name `main.be` of the file where a program is stored to be run.
+  When the user clicks the Run button, whatever is in the code editor
+  will be saved to this filename before the run command is executed.
+  We try to use a file extension that is actually appropriate for the
+  language, but if there's no standard one it's okay to pick something
+  that seems reasonable. The "Hello, world" resources on the [Riju
+  wiki](https://github.com/raxod502/riju/wiki) can be a helpful source
+  of plausible file extensions for obscure languages.
+* The shell command `befunge-repl main.be` (executed in Bash) to run
+  the main file.
+* The code `64+"!dlrow ,olleH">:#,_@` to prepopulate in the code
+  editor on page load. This should print "Hello, world!" exactly with
+  a trailing newline. Some languages are extremely difficult to write
+  in, so for those cases it's okay to copy a "Hello, world" program
+  from online even if it doesn't have the formatting quite right. The
+  `template` key should use a backtick-delimited string literal with a
+  trailing newline.
+
+After you add these four keys, you should be able to test your
+language at <http://localhost:6119/yourlanguage>. You shouldn't have
+to manually restart anything if you're running `yarn dev` already.
+
+#### Interactive languages
+
+Some languages provide an interactive REPL facility. Such languages
+should be configured to expose that functionality on Riju. That's done
+by adding a `repl` key, like so:
+
+```ts
+  python: {
+    name: "Python",
+    repl: "python3 -u",
+    main: "main.py",
+    run: "python3 -u -i main.py",
+    template: `print("Hello, world!")
+`,
+  },
+```
+
+The `repl` key has another shell command to be executed with Bash,
+which should launch a REPL independently of whatever may be in the
+main file (in this case `main.py`). Also, for interactive languages,
+the `run` command is different. It should not only run the code in
+`main.py`, but then subsequently start the REPL. Many languages
+provide a way to do this conveniently; for Python, the `-i` flag
+forces the REPL to launch after `main.py` has finished executing.
+
+One thing you will want to test is whether variables from your code
+are accessible in the REPL. If it's possible to make this happen, do
+it. Some languages require that you use a specific command-line
+argument to get this behavior, while others may not support it at all.
+
+For languages that do not have a convenient `-i` flag like Python, it
+is okay to explicitly launch the REPL after running the code:
+
+```ts
+  kitten: {
+    name: "Kitten",
+    repl: "kitten",
+    main: "main.ktn",
+    run: "kitten main.ktn; kitten",
+    template: `"Hello, world!" say
+`,
+  },
+```
+
+##### Hacking startup files
+
+Many languages *appear* to have no way to start a REPL with your
+code's variables in scope, but nevertheless have a secret backdoor.
+Check to see if the language supports a "startup file" or "profile
+file" or "REPL configuration file" or "rc file" or anything like that.
+If it does, we can often put the user's code in there and it will be
+read in a special way when the REPL starts up. This is especially
+useful for shells:
+
+```ts
+  zsh: {
+    name: "Zsh",
+    repl: "SHELL=/usr/bin/zsh zsh",
+    main: ".zshrc",
+    createEmpty: ``,
+    run: `SHELL=/usr/bin/zsh zsh`,
+    template: `echo "Hello, world!"
+`,
+  },
+```
+
+When this hack is used, the `repl` and `run` commands are often the
+same, with the different behavior of running the user's code or not
+being caused by whether or not the code has been put into the profile
+file (in this case `.zshrc`).
+
+Note the use of the `createEmpty` key here. To make LSP work properly
+(more on that later), the main file (here `.zshrc`) is actually
+created even before the user clicks the Run button. This causes
+problems for languages that use a startup file hack, since when
+executing the `repl` shell command, the "Hello, world" code from the
+template will get executed, which is undesired. To work around this,
+the `createEmpty` key allows you to provide a special value to write
+into the main file (here `.zshrc`) before executing the `repl` shell
+command. Providing the empty string ensures no user code gets executed
+when we just want to launch a REPL.
+
+Check out Beanshell, Elvish, Factor, GEL, Ksh, R, SageMath, Sh, Tcl,
+Tcsh, and Zsh for examples of this hack.
+
+#### Compiled languages
+
+For languages that have a compilation step, it's nice to split out
+that step into a separate shell command under the `compile` key, like
+so:
+
+```ts
+  c: {
+    name: "C",
+    main: "main.c",
+    compile: "clang -Wall -Wextra main.c -o main",
+    run: "./main",
+    template: `#include <stdio.h>
+
+int main() {
+  printf("Hello, world!\\n");
+  return 0;
+}
+`,
+  },
+```
+
+It's not treated any differently by Riju at present than just cramming
+both steps into the `run` key with a `&&`, but we could implement
+optimizations later such as only re-running the compile step if the
+code actually changed.
+
+#### Integration tests
+
+Riju has a suite of over 500 integration tests covering all supported
+languages. This is to ensure that our aggressive rolling-release
+policy does not lead to breakage.
+
+My design philosophy of tests is that if they require any effort to
+write, nobody is going to write them, least of all me. For this
+reason, Riju uses a
+[convention-over-configuration](https://en.wikipedia.org/wiki/Convention_over_configuration)
+scheme to automatically synthesize the majority of the integration
+tests without the need for any code to be written.
+
+There are seven possible tests each language can have, and each
+language has some subset of them:
+
+* `run`: Verify that running the language with the default code causes
+  `Hello, world!` to be printed.
+* `repl`: Verify that typing in an expression at the REPL (by default
+  `123 * 234`) causes a result to be output (by default `28782`).
+* `runrepl`: Same as `repl`, but after the Run button is clicked. This
+  proves that a REPL is being started after the code finishes running.
+* `scope`: Verify that a variable defined in the code is accessible in
+  the REPL after the code is run.
+* `format`: Verify that a code formatter correctly reformats a piece
+  of sample code.
+* `lsp`: Verify that an LSP server produces a particular completion.
+* `ensure`: Run an arbitrary shell command and verify that it exits
+  successfully. This test is currently not used by any language.
+
+The `run`, `repl`, and `runrepl` tests are configured automatically
+with default values for every language. The other test types are not
+configured automatically, because there is no way to pick a reasonable
+default for the behavior they are testing. Use the following list to
+identify which tests you should make sure are configured for your
+language:
+
+* `run`: all languages
+* `repl`, `runrepl`: interactive languages (ones with a `repl` key)
+* `scope`: interactive languages where you can access code variables
+  from the REPL
+* `format`: languages with code formatters (see below)
+* `lsp`: languages with LSP support (see below)
+
+##### Test configuration
+
+FIXME
 
 ## Debugging tools
 
