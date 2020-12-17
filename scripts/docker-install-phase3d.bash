@@ -84,7 +84,8 @@ vim
 mono-vbnc
 
 # Wolfram Language
-python3.7
+python3
+python3-dev
 
 # x86
 clang

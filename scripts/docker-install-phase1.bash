@@ -40,7 +40,5 @@ deb https://dl.yarnpkg.com/debian/ stable main
 deb https://downloads.ceylon-lang.org/apt/ unstable main
 EOF
 
-add-apt-repository -y -n ppa:deadsnakes/ppa
-
 popd >/dev/null
 rm "$0"

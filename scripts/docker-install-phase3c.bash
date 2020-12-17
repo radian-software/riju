@@ -17,10 +17,6 @@ m4
 # MariaDB
 libtinfo5
 
-# Mathics
-python3.7
-python3.7-dev
-
 # MiniZinc
 minizinc
 

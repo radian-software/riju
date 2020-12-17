@@ -126,7 +126,7 @@ npm install -g vim-language-server
 pip3 install whitespace
 
 # Wolfram Language
-python3.7 -m pip install mathics
+pip3 install Mathics3
 
 rm -rf /root/.cache /root/.config /root/.cpan /root/.cpanm /root/.dub /root/.gem /root/.npm /root/.npmrc
 rm -f /tmp/core-js-banners
