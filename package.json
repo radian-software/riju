@@ -1,0 +1,9 @@
+{
+  "name": "riju",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "yaml": "^1.10.0"
+  }
+}

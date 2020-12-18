@@ -1,0 +1,54 @@
+id: python
+aliases:
+  - py
+  - python2
+  - python3
+name: Python
+monacoLang: python
+
+install:
+  apt:
+    - python3
+    - python3-pip
+  pip:
+    - black
+  manual:
+    - |
+      xml="$(curl -sSL "https://pvsc.blob.core.windows.net/python-language-server-stable?restype=container&comp=list&prefix=Python-Language-Server-linux-x64")"
+      nupkg="$(echo "$xml" | grep -Eo 'https://[^<]+\.nupkg' | tail -n1)"
+      wget "${nupkg}"
+      unzip -d /opt/mspyls Python-Language-Server-linux-x64.*.nupkg
+      chmod +x /opt/mspyls/Microsoft.Python.LanguageServer
+      ln -s /opt/mspyls/Microsoft.Python.LanguageServer /usr/local/bin/Microsoft.Python.LanguageServer
+
+repl: >-
+  python3 -u
+main: "main.py"
+template: |
+  print("Hello, world!")
+run: "python3 -u -i main.py"
+scope:
+  code: |
+    x = 123 * 234
+
+format:
+  run: >-
+    black -
+  input: |
+    print('Hello, world!')
+
+pkg:
+  install: "pip3 install --user NAME"
+  uninstall: "pip3 uninstall NAME"
+  search: >-
+    python3 -c 'import json; from xmlrpc import client; print(json.dumps(client.ServerProxy("https://pypi.org/pypi").search({"name": "NAME"})))' | jq -r 'map(.name) | .[]'
+
+lsp:
+  start: "Microsoft.Python.LanguageServer"
+  init:
+    interpreter:
+      properties:
+        InterpreterPath: "/usr/bin/python3"
+    code: |
+      import func
+    item: "functools"
