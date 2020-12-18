@@ -1,2 +1,3 @@
+*.deb
 *.log
 node_modules

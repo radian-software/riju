@@ -14,16 +14,27 @@ const YAML = require("yaml");
 //   to the directory where the package should be built
 // * we are using bash with 'set -euxo pipefail'
 
+tmp.setGracefulCleanup();
+
 // Read the YAML config file for the language with the given string ID
 // and return it as an object.
 async function readLangConfig(lang) {
   return YAML.parse(await fs.readFile(`langs/${lang}.yaml`, "utf-8"));
 }
 
+// Used to log all progress messages. Not sure what this should do
+// quite yet.
+function log(message) {
+  console.error(message ? message.trimEnd() : "");
+}
+
 // Given a shell command as a string, execute it with Bash.
 async function runCommand(cmd) {
+  log(`$ ${cmd}`);
   return new Promise((resolve, reject) => {
-    const proc = child_process.spawn("bash", ["-c", ...cmd]);
+    const proc = child_process.spawn("bash", ["-c", cmd], {
+      stdio: "inherit",
+    });
     proc.on("error", reject);
     proc.on("close", (code) => {
       if (code === 0) {
@@ -46,6 +57,9 @@ async function buildPackage(langConfig, debPath) {
     install: { apt, pip, manual },
   } = langConfig;
   const timestamp = new Date().getTime();
+  const pkgDir = process.env.pkg;
+  log();
+  log(`Building package riju-lang-${id}...`);
   let debianControlData = `\
 Package: riju-lang-${id}
 Version: ${timestamp}
@@ -58,17 +72,31 @@ Description: The ${name} language packaged for Riju
 Depends: ${apt.join(", ")}
 `;
   }
-  await fs.mkdir("DEBIAN");
-  await fs.writeFile("DEBIAN/control", debianControlData);
-  await runCommand([
-    "fakeroot",
-    "dpkg-deb",
-    "--build",
-    process.env.pkg,
-    debPath,
-  ]);
+  log("Writing Debian control file:");
+  log(debianControlData.replaceAll(/^/gm, "  "));
+  await fs.mkdir(`${pkgDir}/DEBIAN`);
+  await fs.writeFile(`${pkgDir}/DEBIAN/control`, debianControlData);
+  await runCommand(`fakeroot dpkg-deb --build ${pkgDir} ${debPath}`);
+  log(`Finished building package riju-lang-${id}.`);
+  log();
 }
 
+// Create a temporary directory and call the given sync or async
+// function with its path as a string. Once the function returns, make
+// sure the directory and its contents are deleted.
+async function withTempDir(cb) {
+  return await tmp.withDir(
+    async (o) => {
+      await cb(o.path);
+    },
+    {
+      unsafeCleanup: true,
+    }
+  );
+}
+
+// Parse command line and run main functionality. This changes the
+// process environment destructively.
 async function main() {
   const args = process.argv.slice(2);
   if (args.length !== 2) {
@@ -76,13 +104,14 @@ async function main() {
     process.exit(1);
   }
   let [lang, debPath] = args;
-  debPath = path.join(process.cwd(), debPath);
+  debPath = path.resolve(process.cwd(), debPath);
   const langConfig = await readLangConfig(lang);
-  await tmp.withDir(async (o) => {
-    const buildDir = o.path;
-    await tmp.withDir(async (o) => {
-      const pkgDir = o.path;
-      process.chdir(buildDir);
+  await withTempDir(async (srcDir) => {
+    await withTempDir(async (pkgDir) => {
+      log(`Source directory: ${srcDir}`);
+      log(`Package directory: ${pkgDir}`);
+      log(`Will write .deb file to: ${debPath}`);
+      process.chdir(srcDir);
       process.env.pkg = pkgDir;
       await buildPackage(langConfig, debPath);
     });
@@ -90,6 +119,7 @@ async function main() {
 }
 
 main().catch((err) => {
+  console.error();
   console.error(err);
   process.exit(1);
 });
