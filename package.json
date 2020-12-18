@@ -4,7 +4,6 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "tmp-promise": "^3.0.2",
     "yaml": "^1.10.0"
   }
 }

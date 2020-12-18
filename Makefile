@@ -2,7 +2,7 @@ export PATH := bin:$(PATH)
 
 .PHONY: debug
 debug:
-	node builder/build.js python riju-lang-python.deb
+	node builder/build.js python
 
 .PHONY: build-image
 build-image:

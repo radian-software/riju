@@ -3,7 +3,6 @@ const fs = require("fs").promises;
 const path = require("path");
 const process = require("process");
 
-const tmp = require("tmp-promise");
 const YAML = require("yaml");
 
 // The build scripts in the language configs assume a specific build
@@ -12,14 +11,20 @@ const YAML = require("yaml");
 // * the working directory starts out empty
 // * the ${pkg} environment variable has been set to an absolute path
 //   to the directory where the package should be built
-// * we are using bash with 'set -euxo pipefail'
-
-tmp.setGracefulCleanup();
+// * we are using bash with 'set -euo pipefail'
 
 // Read the YAML config file for the language with the given string ID
 // and return it as an object.
 async function readLangConfig(lang) {
-  return YAML.parse(await fs.readFile(`langs/${lang}.yaml`, "utf-8"));
+  const langConfig = YAML.parse(
+    await fs.readFile(`langs/${lang}.yaml`, "utf-8")
+  );
+  if (langConfig.id !== lang) {
+    throw new Error(
+      `lang config id ${langConfig.id} doesn't match expected ${lang}`
+    );
+  }
+  return langConfig;
 }
 
 // Used to log all progress messages. Not sure what this should do
@@ -32,9 +37,13 @@ function log(message) {
 async function runCommand(cmd) {
   log(`$ ${cmd}`);
   return new Promise((resolve, reject) => {
-    const proc = child_process.spawn("bash", ["-c", cmd], {
-      stdio: "inherit",
-    });
+    const proc = child_process.spawn(
+      "bash",
+      ["-c", `set -euo pipefail; ${cmd}`],
+      {
+        stdio: "inherit",
+      }
+    );
     proc.on("error", reject);
     proc.on("close", (code) => {
       if (code === 0) {
@@ -57,7 +66,7 @@ async function buildPackage(langConfig, debPath) {
     install: { apt, pip, manual },
   } = langConfig;
   const timestamp = new Date().getTime();
-  const pkgDir = process.env.pkg;
+  const pkgdir = process.env.pkg;
   log();
   log(`Building package riju-lang-${id}...`);
   let debianControlData = `\
@@ -74,9 +83,9 @@ Depends: ${apt.join(", ")}
   }
   log("Writing Debian control file:");
   log(debianControlData.replaceAll(/^/gm, "  "));
-  await fs.mkdir(`${pkgDir}/DEBIAN`);
-  await fs.writeFile(`${pkgDir}/DEBIAN/control`, debianControlData);
-  await runCommand(`fakeroot dpkg-deb --build ${pkgDir} ${debPath}`);
+  await fs.mkdir(`${pkgdir}/DEBIAN`);
+  await fs.writeFile(`${pkgdir}/DEBIAN/control`, debianControlData);
+  await runCommand(`fakeroot dpkg-deb --build ${pkgdir} ${debPath}`);
   log(`Finished building package riju-lang-${id}.`);
   log();
 }
@@ -99,23 +108,28 @@ async function withTempDir(cb) {
 // process environment destructively.
 async function main() {
   const args = process.argv.slice(2);
-  if (args.length !== 2) {
-    console.error("usage: build.js LANG DEB");
+  if (args.length !== 1) {
+    console.error("usage: build.js LANG");
     process.exit(1);
   }
-  let [lang, debPath] = args;
-  debPath = path.resolve(process.cwd(), debPath);
+  const [lang] = args;
+  const cwd = process.cwd();
+  const srcdir = `${cwd}/work/${lang}/src`;
+  const pkgdir = `${cwd}/work/${lang}/pkg`;
+  const debPath = `${cwd}/debs/riju-lang-${lang}.deb`;
   const langConfig = await readLangConfig(lang);
-  await withTempDir(async (srcDir) => {
-    await withTempDir(async (pkgDir) => {
-      log(`Source directory: ${srcDir}`);
-      log(`Package directory: ${pkgDir}`);
-      log(`Will write .deb file to: ${debPath}`);
-      process.chdir(srcDir);
-      process.env.pkg = pkgDir;
-      await buildPackage(langConfig, debPath);
-    });
-  });
+  log(`Source directory: ${srcdir}`);
+  log(`Package directory: ${pkgdir}`);
+  log(`Will write .deb file to: ${debPath}`);
+  await fs.rmdir(srcdir, { recursive: true });
+  await fs.rmdir(pkgdir, { recursive: true });
+  await fs.rm(debPath, { force: true });
+  await fs.mkdir(srcdir, { recursive: true });
+  await fs.mkdir(pkgdir, { recursive: true });
+  await fs.mkdir(path.dirname(debPath), { recursive: true });
+  process.chdir(srcdir);
+  process.env.pkg = pkgdir;
+  await buildPackage(langConfig, debPath);
 }
 
 main().catch((err) => {
