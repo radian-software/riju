@@ -1,5 +1,9 @@
 export PATH := bin:$(PATH)
 
+.PHONY: debug
+debug:
+	node builder/build.js python riju-lang-python.deb
+
 .PHONY: build-image
 build-image:
 	docker build . -f docker/Dockerfile.build -t riju:build
