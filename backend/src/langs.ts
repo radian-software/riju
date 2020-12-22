@@ -1,6 +1,37 @@
+type Category = "assembly" | "config" | "data" | "database" | "editor" | "esoteric" | "general" | "markup" | "pure" | "shell" | "tool"
+type Mode = "compiled" | "interpreted"
+type Platform = "bf" | "clr" | "js" | "jvm" | "python" | "windows"
+type Syntax = "assembly" | "basic" | "c" | "golf" | "haskell" | "lisp" | "pascal" | "python" | "text" | "tokens" | "2d" | "column" | "extensible" | "foreign" | "symbol" | "whitespace"
+type Typing = "static" | "dynamic" | "theorem" | "float" | "integer" | "lambda" | "string" | "weak"
+type Paradigm = "array" | "declarative" | "functional" | "imperative" | "oo" | "stack" | "turing"
+type Usage = "abandoned" | "personal" | "popular"
+
+type Some<T> = T | T[];
+
 export interface LangConfig {
   aliases?: string[];
   name: string;
+  info?: {
+    impl?: string;
+    version?: string;
+    year: number;
+    desc: string;
+    ext: Some<string>;
+    web: {
+      wiki?: string;
+      esolang?: string;
+      home?: string;
+      impl?: string;
+      source: string | null;
+    };
+    category: Some<Category>;
+    mode: Some<Mode>;
+    platform: Some<Platform>;
+    syntax: Some<Syntax>;
+    typing: Some<Typing>;
+    paradigm: Some<Paradigm>;
+    usage: Some<Usage>;
+  }
   monacoLang?: string;
   daemon?: string;
   setup?: string;
@@ -52,10 +83,31 @@ export interface LangConfig {
   skip?: string[];
 }
 
+// Popular languages: https://pypl.github.io/PYPL.html
+//
+// (All 28 languages listed are on Riju, except Object Pascal and VBA.)
+
+// TODO: validate that links have not broken
 export const langs: { [key: string]: LangConfig } = {
   "><>": {
     aliases: ["fishlang"],
     name: "><>",
+    info: {
+      year: 2009,
+      desc: "Stack-based, reflective, two-dimensional esoteric programming language",
+      ext: "fish",
+      web: {
+        esolang: "https://esolangs.org/wiki/Fish",
+        source: "https://gist.github.com/anonymous/6392418",
+      },
+      category: "esoteric",
+      mode: "interpreted",
+      platform: [],
+      syntax: ["golf", "2d"],
+      typing: "float",
+      paradigm: "stack",
+      usage: [],
+    },
     main: "main.fish",
     run: "fish-lang main.fish",
     template: `"Hello, world!"r\\
@@ -88,8 +140,27 @@ export const langs: { [key: string]: LangConfig } = {
 `,
   },
   ada: {
-    aliases: ["adb"],
+    aliases: ["adb", "gnat"],
     name: "Ada",
+    info: {
+      impl: "GNAT",
+      year: 1980,
+      desc: "Structured, statically typed, imperative, and object-oriented high-level programming language, extended from Pascal and other languages",
+      ext: ["adb", "ads"],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Ada_(programming_language)",
+        home: "https://www.adaic.org/",
+        impl: "https://www.gnu.org/software/gnat/",
+        source: "https://gcc.gnu.org/git.html",
+      },
+      category: "general",
+      mode: "compiled",
+      platform: [],
+      syntax: "pascal",
+      typing: "static",
+      paradigm: ["imperative", "oo"],
+      usage: "popular",
+    },
     main: "main.adb",
     compile: "x86_64-linux-gnu-gnatmake-9 main.adb",
     run: "./main",
@@ -147,8 +218,27 @@ println (* 123 234)`,
 `,
   },
   algol: {
-    aliases: ["alg"],
+    aliases: ["alg", "a68g", "genie", "a68genie"],
     name: "ALGOL 68",
+    info: {
+      impl: "ALGOL 68 Genie",
+      version: "ALGOL 68",
+      year: 1958,
+      desc: "Seminal imperative programming language which introduced lexical scope and formal grammar specification",
+      ext: "alg",
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/ALGOL",
+        home: "http://algol68.sourceforge.net/",
+        source: "https://jmvdveer.home.xs4all.nl/en.algol-68-genie.html",
+      },
+      category: "general",
+      mode: ["interpreted", "compiled"],
+      platform: [],
+      syntax: "pascal",
+      typing: "static",
+      paradigm: "imperative",
+      usage: [],
+    },
     main: "main.alg",
     run: "a68g main.alg",
     template: `print(("Hello, world!",new line))
@@ -175,6 +265,24 @@ println (* 123 234)`,
   },
   apl: {
     name: "APL",
+    info: {
+      impl: "GNU APL",
+      year: 1966,
+      desc: "Array-based programming language using large range of special symbols for concision",
+      ext: "apl",
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/APL_(programming_language)",
+        impl: "https://www.gnu.org/software/apl/",
+        source: "https://savannah.gnu.org/svn/?group=apl",
+      },
+      category: ["general"],
+      mode: "interpreted",
+      platform: [],
+      syntax: ["golf", "symbol"],
+      typing: "dynamic",
+      paradigm: ["array", "functional", "imperative"],
+      usage: [],
+    },
     repl: "apl",
     input: "123 × 234",
     main: "main.apl",
@@ -187,6 +295,25 @@ println (* 123 234)`,
   },
   arm: {
     name: "ARM",
+    info: {
+      impl: "GCC",
+      year: 1985,
+      desc: "Popular RISC architecture used in mobile devices",
+      ext: "S",
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/ARM_architecture",
+        home: "https://developer.arm.com/architectures/cpu-architecture",
+        impl: "https://gcc.gnu.org/",
+        source: "https://gcc.gnu.org/git.html",
+      },
+      category: "assembly",
+      mode: "compiled",
+      platform: [],
+      syntax: "assembly",
+      typing: "weak",
+      paradigm: "imperative",
+      usage: [],
+    },
     main: "main.S",
     compile: "arm-linux-gnueabihf-gcc main.S -o main -static",
     run: "qemu-arm-static main",
@@ -209,6 +336,23 @@ message:
   asciidoc: {
     aliases: ["adoc", "asc"],
     name: "AsciiDoc",
+    info: {
+      year: 2002,
+      desc: "Human-readable document format, semantically equivalent to DocBook XML, but using plain-text mark-up conventions",
+      ext: "adoc",
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/AsciiDoc",
+        home: "https://asciidoc.org/",
+        source: "https://github.com/asciidoc/asciidoc",
+      },
+      category: "markup",
+      mode: [],
+      platform: [],
+      syntax: "text",
+      typing: [],
+      paradigm: [],
+      usage: [],
+    },
     main: "main.adoc",
     compile: "asciidoc -s main.adoc",
     run: "prettier --no-config main.html",
@@ -252,8 +396,26 @@ int main() {
 `,
   },
   ats: {
-    aliases: ["dats"],
+    aliases: ["dats", "sats", "cats", "hats"],
     name: "ATS",
+    info: {
+      impl: "ATS2/Postiats",
+      year: 2007,
+      desc: "Programming language designed to unify programming with formal specification",
+      ext: ["sats", "dats", "cats", "hats"],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/ATS_(programming_language)",
+        home: "http://www.ats-lang.org/",
+        source: "https://github.com/githwxi/ATS-Postiats",
+      },
+      category: "general",
+      mode: "compiled",
+      platform: [],
+      syntax: ["c", "haskell"],
+      typing: ["static", "theorem"],
+      paradigm: ["imperative", "declarative"],
+      usage: [],
+    },
     monacoLang: "postiats",
     main: "main.dats",
     compile: "patscc main.dats -o main",
@@ -263,8 +425,26 @@ implement main0 () = ()
 `,
   },
   awk: {
-    aliases: ["gawk", "mawk"],
+    aliases: ["gawk", "mawk", "nawk"],
     name: "Awk",
+    info: {
+      impl: "GNU Awk",
+      year: 1977,
+      desc: "Domain-specific language designed for text processing and typically used as a data extraction and reporting tool",
+      ext: "awk",
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/AWK",
+        impl: "https://www.gnu.org/software/gawk/manual/gawk.html",
+        source: "https://savannah.gnu.org/git/?group=gawk",
+      },
+      category: "tool",
+      mode: "interpreted",
+      platform: [],
+      syntax: "c",
+      typing: "weak",
+      paradigm: "imperative",
+      usage: [],
+    },
     main: "main.awk",
     run: `awk -f main.awk`,
     template: `BEGIN { print "Hello, world!" }
@@ -273,6 +453,24 @@ implement main0 () = ()
   bash: {
     aliases: ["bashrc", "bourneshell"],
     name: "Bash",
+    info: {
+      impl: "GNU Bash",
+      year: 1989,
+      desc: "Unix shell and command language written by Brian Fox for the GNU Project as a free software replacement for the Bourne shell",
+      ext: ["bash", "sh"],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Bash_(Unix_shell)",
+        impl: "https://www.gnu.org/software/bash/",
+        source: "https://savannah.gnu.org/projects/bash/",
+      },
+      category: "shell",
+      mode: "interpreted",
+      platform: [],
+      syntax: "pascal",
+      typing: "weak",
+      paradigm: "imperative",
+      usage: [],
+    },
     monacoLang: "shell",
     repl: "bash --rcfile /dev/null",
     input: `expr 123 \\* 234`,
@@ -290,6 +488,24 @@ implement main0 () = ()
   basic: {
     aliases: ["bas", "qbasic"],
     name: "BASIC",
+    info: {
+      impl: "Bywater BASIC",
+      year: 1964,
+      desc: "General-purpose, high-level programming language whose design philosophy emphasizes ease of use",
+      ext: "bas",
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/BASIC",
+        impl: "https://sourceforge.net/projects/bwbasic/",
+        source: "https://sourceforge.net/projects/bwbasic/files/bwbasic/",
+      },
+      category: "general",
+      mode: "interpreted",
+      platform: [],
+      syntax: ["basic", "column", "whitespace"],
+      typing: "static",
+      paradigm: "imperative",
+      usage: [],
+    },
     repl: "bwbasic",
     input: "PRINT 123 * 234",
     main: "main.bas",
@@ -304,6 +520,21 @@ implement main0 () = ()
   battlestar: {
     aliases: ["battlestarc", "bts"],
     name: "Battlestar",
+    info: {
+      year: 2014,
+      desc: "A different take on assembly, with the goal of creating tiny executables",
+      ext: "bts",
+      web: {
+        source: "https://github.com/xyproto/battlestar",
+      },
+      category: "assembly",
+      mode: "compiled",
+      platform: [],
+      syntax: "assembly",
+      typing: "weak",
+      paradigm: "imperative",
+      usage: "personal",
+    },
     main: "main.bts",
     run: "bts main.bts",
     template: `const message = "Hello, world!\n"
@@ -339,6 +570,25 @@ end
   },
   beatnik: {
     name: "Beatnik",
+    info: {
+      impl: "Cat's Eye Beatnik",
+      year: 2001,
+      desc: "Stack-based esoteric programming language created by Cliff L. Biffle",
+      ext: "beatnik",
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Beatnik_(programming_language)",
+        esolang: "https://esolangs.org/wiki/Beatnik",
+        home: "https://cliffle.com/esoterica/beatnik/",
+        source: "https://github.com/catseye/Beatnik",
+      },
+      category: "esoteric",
+      mode: "interpreted",
+      platform: [],
+      syntax: [],
+      typing: "integer",
+      paradigm: "stack",
+      usage: [],
+    },
     main: "main.beatnik",
     run: "beatnik main.beatnik",
     template: `Soars, larkspurs, rains.
@@ -435,6 +685,26 @@ Nude pagoda careens.
   befunge: {
     aliases: ["be"],
     name: "Befunge",
+    info: {
+      impl: "amicloud Befunge-93",
+      version: "Befunge-93",
+      year: 1993,
+      desc: "Two-dimensional esoteric programming language invented in 1993 by Chris Pressey with the goal of being as difficult to compile as possible",
+      ext: ["be", "bf", "b93", "b98", "befunge"],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Befunge",
+        esolang: "https://esolangs.org/wiki/Befunge",
+        home: "https://catseye.tc/article/Languages.md#befunge-93",
+        source: "https://github.com/amicloud/befunge93",
+      },
+      category: "esoteric",
+      mode: "interpreted",
+      platform: [],
+      syntax: ["golf", "2d"],
+      typing: "integer",
+      paradigm: "stack",
+      usage: [],
+    },
     main: "main.be",
     run: "befunge-repl main.be",
     template: `64+"!dlrow ,olleH">:#,_@
@@ -449,6 +719,25 @@ Nude pagoda careens.
       "lambda",
     ],
     name: "Binary Lambda Calculus",
+    info: {
+      year: 2004,
+      desc: "Minimal, pure functional programming language invented by John Tromp in 2004, based on a binary encoding of the untyped lambda calculus in De Bruijn index notation",
+      ext: "blc",
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Binary_combinatory_logic",
+        esolang: "https://esolangs.org/wiki/Binary_lambda_calculus",
+        home: "https://tromp.github.io/cl/Binary_lambda_calculus.html",
+        impl: "https://www.ioccc.org/2012/tromp/hint.html",
+        source: "https://www.ioccc.org/2012/tromp/tromp.c",
+      },
+      category: "esoteric",
+      mode: "interpreted",
+      platform: [],
+      syntax: [],
+      typing: "lambda",
+      paradigm: "functional",
+      usage: [],
+    },
     main: "main.blc",
     run: "cat main.blc | binary-to-text | tromp",
     template: `001010100100100001100101011011000110110001101111001011000010
@@ -458,6 +747,23 @@ Nude pagoda careens.
   boo: {
     aliases: ["booc"],
     name: "Boo",
+    info: {
+      year: 2003,
+      desc: "Object-oriented, statically typed, general-purpose programming language on Microsoft's Common Language Infrastructure",
+      ext: "boo",
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Boo_(programming_language)",
+        home: "https://boo-language.github.io/",
+        source: "https://github.com/boo-lang/boo",
+      },
+      category: "general",
+      mode: "compiled",
+      platform: "clr",
+      syntax: ["python", "extensible", "whitespace"],
+      typing: ["static", "dynamic"],
+      paradigm: ["imperative", "oo"],
+      usage: [],
+    },
     setup: `mkdir -p "$HOME/.local/share" && touch "$HOME/.local/share/booish_history"`,
     main: "main.boo",
     repl: "booish",
@@ -469,6 +775,25 @@ Nude pagoda careens.
   brainf: {
     aliases: ["brainfuck", "bf"],
     name: "Brainf***",
+    info: {
+      impl: "Beef",
+      year: 1993,
+      desc: "Famous esoteric programming language created in 1993 by Urban Müller",
+      ext: ["b", "bf"],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Brainfuck",
+        esolang: "https://esolangs.org/wiki/Brainfuck",
+        impl: "https://kiyuko.org/software/beef",
+        source: "https://github.com/andreabolognani/beef",
+      },
+      category: "esoteric",
+      mode: "interpreted",
+      platform: "bf",
+      syntax: "golf",
+      typing: "integer",
+      paradigm: "turing",
+      usage: [],
+    },
     repl: "brainf-repl",
     input:
       ">++>+[>++++[-<++++>]<<]> [>>+>+<<<-]>>>[<<<+>>>-]<<+>[<->[>++++++++++<[->-[>+>>]>[+[-<+>]>+>>]<<<<<]>[-]++++++++[<++++++>-]>[<<+>>-]>[<<+>>-]<<]>]<[->>++++++++[<++++++>-]]<[.[-]<]<",
@@ -517,9 +842,28 @@ Nude pagoda careens.
   c: {
     aliases: ["gcc", "clang", "h", "cc", "c99", "c11", "c18"],
     name: "C",
+    info: {
+      impl: "LLVM",
+      version: "C18",
+      year: 1972,
+      desc: "General-purpose, procedural computer programming language supporting structured programming, lexical variable scope, and recursion, with a static type system",
+      ext: ["c", "h"],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/C_(programming_language)",
+        impl: "https://llvm.org/",
+        source: "https://github.com/llvm/llvm-project",
+      },
+      category: "general",
+      mode: "compiled",
+      platform: [],
+      syntax: "c",
+      typing: "static",
+      paradigm: "imperative",
+      usage: "popular",
+    },
     monacoLang: "c",
     main: "main.c",
-    compile: "clang -Wall -Wextra main.c -o main",
+    compile: "clang -std=c17 -pedantic -Wall -Wextra main.c -o main",
     run: "./main",
     format: {
       run: "clang-format --assume-filename=format.c",
@@ -567,9 +911,28 @@ int main() {
       "hxx",
     ],
     name: "C++",
+    info: {
+      impl: "LLVM",
+      version: "C++20",
+      year: 1985,
+      desc: "General-purpose programming language created by Bjarne Stroustrup as an extension of the C programming language",
+      ext: ["C", "cc", "cpp", "cxx", "c++", "h", "hh", "hpp", "hxx", "h++"],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/C%2B%2B",
+        impl: "https://llvm.org/",
+        source: "https://github.com/llvm/llvm-project",
+      },
+      category: "general",
+      mode: "compiled",
+      platform: [],
+      syntax: "c",
+      typing: "static",
+      paradigm: ["functional", "imperative", "oo"],
+      usage: "popular",
+    },
     monacoLang: "cpp",
     main: "main.cpp",
-    compile: "clang++ -Wall -Wextra main.cpp -o main",
+    compile: "clang++ -std=c++17 -pedantic -Wall -Wextra main.cpp -o main",
     run: "./main",
     format: {
       run: "clang-format --assume-filename=format.cpp",
@@ -598,6 +961,21 @@ int main() {
   cat: {
     aliases: ["cat-language"],
     name: "Cat",
+    info: {
+      year: 2006,
+      desc: "Statically typed stack-based programming language in C#",
+      ext: "cat",
+      web: {
+        source: "https://github.com/cdiggins/cat-language",
+      },
+      category: "pure",
+      mode: "interpreted",
+      platform: [],
+      syntax: "tokens",
+      typing: "static",
+      paradigm: "stack",
+      usage: [],
+    },
     repl: "NODE_PATH=/opt/cat node /opt/cat/repl.js",
     input: "123 234 mul",
     main: "main.cat",
@@ -608,6 +986,23 @@ int main() {
   },
   ceylon: {
     name: "Ceylon",
+    info: {
+      year: 2011,
+      desc: "Object-oriented, strongly statically typed programming language with an emphasis on immutability, created by Red Hat",
+      ext: "ceylon",
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Ceylon_(programming_language)",
+        home: "https://ceylon-lang.org/",
+        source: "https://ceylon-lang.org/code/source/",
+      },
+      category: "general",
+      mode: "compiled",
+      platform: "jvm",
+      syntax: "c",
+      typing: "static",
+      paradigm: ["imperative", "oo"],
+      usage: [],
+    },
     main: "source/main.ceylon",
     run: `PATH="/usr/lib/jvm/java-8-openjdk-amd64/bin:$PATH" ceylon run --compile=force default`,
     template: `shared void run() {
@@ -618,6 +1013,24 @@ int main() {
   },
   chef: {
     name: "Chef",
+    info: {
+      impl: "Acme::Chef",
+      year: 2002,
+      desc: "Stack-based language where programs look like cooking recipes",
+      ext: "chef",
+      web: {
+        esolang: "https://esolangs.org/wiki/Chef",
+        home: "https://www.dangermouse.net/esoteric/chef.html",
+        source: "http://search.cpan.org/author/SMUELLER/Acme-Chef/",
+      },
+      category: "esoteric",
+      mode: ["compiled", "interpreted"],
+      platform: [],
+      syntax: "text",
+      typing: "integer",
+      paradigm: "imperative",
+      usage: [],
+    },
     main: "main.chef",
     run: "chef main.chef",
     hello: "Hello world!",
@@ -700,8 +1113,25 @@ Refrigerate for 1 hour.
 `,
   },
   clean: {
-    aliases: ["icl", "clm"],
+    aliases: ["icl", "clm", "dcl"],
     name: "Clean",
+    info: {
+      year: 1987,
+      desc: "General-purpose purely functional computer programming language",
+      ext: ["icl", "dcl", "abc"],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Clean_(programming_language)",
+        home: "https://clean.cs.ru.nl/Clean",
+        source: "https://gitlab.science.ru.nl/clean-compiler-and-rts/compiler",
+      },
+      category: "general",
+      mode: "compiled",
+      platform: [],
+      syntax: "haskell",
+      typing: "static",
+      paradigm: ["declarative", "functional"],
+      usage: [],
+    },
     main: "main.icl",
     compile: "clm main -o main",
     run: "./main",
@@ -719,6 +1149,24 @@ Start world
   clojure: {
     aliases: ["clj"],
     name: "Clojure",
+    info: {
+      impl: "Java Clojure",
+      year: 2007,
+      desc: "Modern, dynamic, and functional dialect of the Lisp programming language on the Java platform",
+      ext: ["clj", "cljc", "edn"],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Clojure",
+        home: "https://clojure.org/",
+        source: "https://github.com/clojure/clojure",
+      },
+      category: "general",
+      mode: "interpreted",
+      platform: "jvm",
+      syntax: ["lisp", "extensible"],
+      typing: "dynamic",
+      paradigm: ["declarative", "functional", "imperative", "oo"],
+      usage: [],
+    },
     monacoLang: "clojure",
     repl: "clojure",
     input: "(* 123 234)",
@@ -735,6 +1183,23 @@ Start world
   clojurescript: {
     aliases: ["cljs", "lumo"],
     name: "ClojureScript",
+    info: {
+      year: 2011,
+      desc: "Compiler for Clojure that targets JavaScript",
+      ext: "cljs",
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Clojure#Platforms",
+        home: "https://clojurescript.org/",
+        source: "https://github.com/clojure/clojurescript",
+      },
+      category: "general",
+      mode: ["compiled", "interpreted"],
+      platform: "js",
+      syntax: ["lisp", "extensible"],
+      typing: ["dynamic", "weak"],
+      paradigm: ["declarative", "functional", "imperative", "oo"],
+      usage: [],
+    },
     monacoLang: "clojure",
     repl: "lumo -r",
     input: "(* 123 234)",
@@ -757,6 +1222,23 @@ Start world
   cmd: {
     aliases: ["bat", "batch", "wine"],
     name: "Cmd",
+    info: {
+      year: 1987,
+      desc: "Obsolete (but still default) command-line interpreter for Microsoft Windows",
+      ext: "bat",
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Cmd.exe",
+        home: "https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/windows-commands",
+        source: null,
+      },
+      category: "shell",
+      mode: "interpreted",
+      platform: "windows",
+      syntax: "basic",
+      typing: "weak",
+      paradigm: "imperative",
+      usage: [],
+    },
     monacoLang: "bat",
     setup: "shopt -s dotglob; cp -R /opt/cmd/home-template/* ./",
     repl: "wine cmd",
@@ -772,8 +1254,27 @@ Start world
     timeout: 30,
   },
   cobol: {
-    aliases: ["cbl", "cobc"],
+    aliases: ["cbl", "cob", "cobc", "cpy"],
     name: "COBOL",
+    info: {
+      impl: "GnuCOBOL",
+      version: "COBOL 2014",
+      year: 1959,
+      desc: "Compiled English-like computer programming language designed for business use",
+      ext: ["cbl", "cob", "cpy"],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/COBOL",
+        impl: "https://sourceforge.net/projects/gnucobol/",
+        source: "https://sourceforge.net/p/gnucobol/_list/svn",
+      },
+      category: "general",
+      mode: "compiled",
+      platform: [],
+      syntax: "basic",
+      typing: "weak",
+      paradigm: ["imperative", "oo"],
+      usage: "popular",
+    },
     main: "main.cbl",
     compile: "cobc -free -x main.cbl -o main",
     run: "./main",
@@ -785,8 +1286,25 @@ PROCEDURE DIVISION.
 `,
   },
   coffeescript: {
-    aliases: ["coffee"],
+    aliases: ["coffee", "litcoffee"],
     name: "CoffeeScript",
+    info: {
+      year: 2009,
+      desc: "Compile-to-JavaScript programming language adding syntactic sugar inspired by Ruby, Python and Haskell in an effort to enhance JavaScript's brevity and readability",
+      ext: ["coffee", "litcoffee"],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/CoffeeScript",
+        home: "https://coffeescript.org/",
+        source: "https://github.com/jashkenas/coffeescript",
+      },
+      category: "general",
+      mode: ["interpreted", "compiled"],
+      platform: "js",
+      syntax: ["c", "haskell"],
+      typing: "weak",
+      paradigm: ["declarative", "functional", "imperative"],
+      usage: [],
+    },
     monacoLang: "coffee",
     repl: "coffee",
     main: "main.coffee",
@@ -804,6 +1322,25 @@ require("/usr/lib/node_modules/coffeescript/repl").start()
   commonlisp: {
     aliases: ["lisp", "sbcl"],
     name: "Common Lisp",
+    info: {
+      impl: "SBCL",
+      year: 1984,
+      desc: "Modern, multi-paradigm, high-performance, compiled, ANSI-standardized, most prominent (along with Scheme) descendant of the Lisp family",
+      ext: ["lisp", "lsp", "l", "cl", "fasl"],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Common_Lisp",
+        home: "https://common-lisp.net/",
+        impl: "http://www.sbcl.org/",
+        source: "https://sourceforge.net/p/sbcl/sbcl/ci/master/tree/",
+      },
+      category: "general",
+      mode: ["compiled", "interpreted"],
+      platform: [],
+      syntax: ["lisp", "extensible"],
+      typing: ["static", "dynamic"],
+      paradigm: ["declarative", "functional", "imperative", "oo"],
+      usage: [],
+    },
     repl: "rlwrap sbcl",
     input: "(* 123 234)",
     main: "main.lisp",
@@ -817,6 +1354,25 @@ require("/usr/lib/node_modules/coffeescript/repl").start()
   confluence: {
     aliases: ["jira", "atlassian"],
     name: "Confluence",
+    info: {
+      impl: "Pandoc",
+      year: 2004,
+      desc: "Markup format for a popular web-based corporate wiki developed by Atlassian",
+      ext: [],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Confluence_(software)",
+        home: "https://confluence.atlassian.com/doc/confluence-wiki-markup-251003035.html",
+        impl: "https://pandoc.org/",
+        source: "https://github.com/jgm/pandoc",
+      },
+      category: "markup",
+      mode: [],
+      platform: [],
+      syntax: "text",
+      typing: [],
+      paradigm: [],
+      usage: [],
+    },
     main: "main.txt",
     compile: "pandoc main.txt -f jira -o main.html",
     run: "prettier --no-config main.html",
@@ -826,6 +1382,23 @@ require("/usr/lib/node_modules/coffeescript/repl").start()
   crystal: {
     aliases: ["cr"],
     name: "Crystal",
+    info: {
+      year: 2014,
+      desc: "General-purpose, object-oriented programming language with syntax inspired by the language Ruby",
+      ext: "cr",
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Crystal_(programming_language)",
+        home: "https://crystal-lang.org/",
+        source: "https://github.com/crystal-lang/crystal",
+      },
+      category: "general",
+      mode: "compiled",
+      platform: [],
+      syntax: "pascal",
+      typing: "static",
+      paradigm: "oo",
+      usage: [],
+    },
     main: "main.cr",
     run: "crystal main.cr",
     template: `puts "Hello, world!"
@@ -835,6 +1408,7 @@ require("/usr/lib/node_modules/coffeescript/repl").start()
   csharp: {
     aliases: ["cs", "mcs"],
     name: "C#",
+    // popular
     monacoLang: "csharp",
     main: "main.cs",
     compile: "mcs main.cs",
@@ -906,6 +1480,7 @@ void main()
   },
   dart: {
     name: "Dart",
+    // popular
     monacoLang: "dart",
     main: "main.dart",
     run: "dart main.dart",
@@ -1316,6 +1891,7 @@ int main() {
   go: {
     aliases: ["golang"],
     name: "Go",
+    // popular
     monacoLang: "go",
     main: "main.go",
     compile: "go build main.go",
@@ -1360,6 +1936,7 @@ func main() {
   },
   groovy: {
     name: "Groovy",
+    // popular
     repl: `JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" groovysh`,
     main: "main.groovy",
     run: `JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" groovysh main.groovy`,
@@ -1394,6 +1971,7 @@ function main(): void {
   haskell: {
     aliases: ["ghc", "ghci", "hs"],
     name: "Haskell",
+    // popular
     repl: "rm -f .ghci && ghci",
     main: "Main.hs",
     run: "(echo ':load Main' && echo 'main') > .ghci && ghci",
@@ -1631,6 +2209,7 @@ PLEASE GIVE UP
   java: {
     aliases: ["javac"],
     name: "Java",
+    // popular
     monacoLang: "java",
     main: "Main.java",
     compile: "javac Main.java",
@@ -1795,6 +2374,7 @@ PLEASE GIVE UP
   javascript: {
     aliases: ["node", "js", "web", "jsx", "v8", "closure", "nodejs"],
     name: "Node.js",
+    // popular
     monacoLang: "javascript",
     repl: "node",
     main: "main.js",
@@ -1973,6 +2553,7 @@ PLEASE GIVE UP
   julia: {
     aliases: ["jl"],
     name: "Julia",
+    // popular
     repl: "julia",
     main: "main.jl",
     run: "julia -L main.jl",
@@ -2012,6 +2593,7 @@ PLEASE GIVE UP
   kotlin: {
     aliases: ["kts", "kotlinc"],
     name: "Kotlin",
+    // popular
     monacoLang: "kotlin",
     repl: `JAVA_OPTS="-Duser.home=$PWD" kotlinc`,
     main: "main.kts",
@@ -2138,6 +2720,7 @@ KTHXBYE
   },
   lua: {
     name: "Lua",
+    // popular
     monacoLang: "lua",
     repl: "lua",
     main: "main.lua",
@@ -2353,6 +2936,7 @@ END Main.
   objectivec: {
     aliases: ["objc", "gnustep"],
     name: "Objective-C",
+    // popular
     monacoLang: "objective-c",
     main: "main.m",
     compile:
@@ -2443,6 +3027,7 @@ print_string "Hello, world!\\n"
   octave: {
     aliases: ["matlab", "m", "mathworks"],
     name: "Octave",
+    // popular
     repl: "octave",
     main: "main.m",
     run: "octave --persist main.m",
@@ -2591,6 +3176,7 @@ main() {
   perl: {
     aliases: ["pl", "repl"],
     name: "Perl",
+    // popular
     monacoLang: "perl",
     repl: "re.pl",
     main: "main.pl",
@@ -2610,6 +3196,7 @@ main() {
   php: {
     aliases: ["phpcli"],
     name: "PHP",
+    // popular
     monacoLang: "php",
     repl: "php -a",
     input: "print 123 * 234;",
@@ -2785,6 +3372,25 @@ main = do
   python: {
     aliases: ["python3", "python2", "py"],
     name: "Python",
+    info: {
+      impl: "CPython",
+      version: "Python 3",
+      year: 1990,
+      desc: "Interpreted, high-level, general-purpose programming language",
+      ext: ["py", "pyi", "pyc", "pyd", "pyo", "pyw", "pyz"],
+      web: {
+        wiki: "https://en.wikipedia.org/wiki/Python_(programming_language)",
+        source: "https://github.com/python/cpython",
+        home: "https://www.python.org/",
+      },
+      category: "general",
+      mode: "interpreted",
+      platform: "python",
+      syntax: ["python", "whitespace"],
+      typing: "dynamic",
+      paradigm: ["functional", "imperative", "oo"],
+      usage: "popular",
+    },
     monacoLang: "python",
     repl: "python3 -u",
     main: "main.py",
@@ -2855,6 +3461,7 @@ main = do
   r: {
     aliases: ["rlang"],
     name: "R",
+    // popular
     monacoLang: "r",
     repl: "R",
     main: ".Rprofile",
@@ -3033,6 +3640,7 @@ Hello, world!
   ruby: {
     aliases: ["irb", "rb"],
     name: "Ruby",
+    // popular
     monacoLang: "ruby",
     repl: "irb",
     main: "main.rb",
@@ -3065,6 +3673,7 @@ binding_irb.run(IRB.conf)
   rust: {
     aliases: ["rs", "rustc"],
     name: "Rust",
+    // popular
     monacoLang: "rust",
     main: "main.rs",
     compile: "rustc main.rs",
@@ -3100,6 +3709,7 @@ binding_irb.run(IRB.conf)
   },
   scala: {
     name: "Scala",
+    // popular
     repl: "scala",
     main: "main.scala",
     run: "scala -i main.scala",
@@ -3407,6 +4017,7 @@ END
   swift: {
     aliases: ["swiftc"],
     name: "Swift",
+    // popular
     monacoLang: "swift",
     main: "main.swift",
     compile: "swiftc main.swift",
@@ -3540,6 +4151,7 @@ a
   typescript: {
     aliases: ["ts", "tsnode", "tsc"],
     name: "TypeScript",
+    // popular
     monacoLang: "typescript",
     repl: "ts-node",
     main: "main.ts",
@@ -3868,8 +4480,9 @@ endmodule
 `,
   },
   visualbasic: {
-    aliases: ["vbasic", "vb", "vbnc"],
+    aliases: ["vbasic", "vb", "vbnc", "vba"],
     name: "Visual Basic",
+    // popular
     monacoLang: "vb",
     main: "main.vb",
     compile: "vbnc main.vb",
