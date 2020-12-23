@@ -20,13 +20,8 @@ provider "aws" {
 
 resource "aws_s3_bucket" "riju_debs" {
   bucket = "riju-debs"
-  acl    = "private"
+  acl    = "public-read"
   tags = {
     Terraform = "Managed by Terraform"
   }
-}
-
-resource "aws_ecr_repository" "riju_app" {
-  name                 = "riju-app"
-  image_tag_mutability = "IMMUTABLE"
 }

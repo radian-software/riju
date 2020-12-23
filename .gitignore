@@ -1,5 +1,6 @@
 *.log
 .env
+.terraform
 debs
 node_modules
 work
