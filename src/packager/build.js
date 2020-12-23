@@ -13,20 +13,6 @@ const YAML = require("yaml");
 //   to the directory where the package should be built
 // * we are using bash with 'set -euo pipefail'
 
-// Read the YAML config file for the language with the given string ID
-// and return it as an object.
-async function readLangConfig(lang) {
-  const langConfig = YAML.parse(
-    await fs.readFile(`langs/${lang}.yaml`, "utf-8")
-  );
-  if (langConfig.id !== lang) {
-    throw new Error(
-      `lang config id ${langConfig.id} doesn't match expected ${lang}`
-    );
-  }
-  return langConfig;
-}
-
 // Used to log all progress messages. Not sure what this should do
 // quite yet.
 function log(message) {

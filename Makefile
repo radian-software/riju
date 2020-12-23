@@ -32,17 +32,23 @@ app-image:
 .PHONY: pkg
 pkg:
 	@: $${L}
-	node src/packager/main.js --lang $(L)
+	mkdir -p build/$(L)
+	node src/packager/make-script $(L) > build/$(L)/build.bash
+	chmod +x build/$(L)/build.bash
+	rm -rf build/$(L)/src build/$(L)/pkg
+	mkdir -p build/$(L)/src build/$(L)/pkg
+	cd build/$(L)/src && pkg="$(PWD)/build/$(L)/pkg" ../build.bash
+	fakeroot dpkg-deb --build build/$(L)/pkg build/$(L)/$(L).deb
 
 ### Run things inside Docker
 
 .PHONY: packaging-shell
 packaging-shell:
-	docker run -it --rm -v $(PWD):/src riju:packaging
+	docker run -it --rm -v $(PWD):/src riju-packaging
 
 .PHONY: runtime-shell
 runtime-shell:
-	docker run -it --rm -v $(PWD):/src riju:runtime
+	docker run -it --rm -v $(PWD):/src riju-runtime
 
 ### Fetch things from registries
 
@@ -64,8 +70,8 @@ fetch-app-image:
 .PHONY: fetch-pkg
 fetch-pkg:
 	@: $${L}
-	mkdir -p debs
-	aws s3 cp s3://$(S3_BUCKET_BASE)-debs/debs/$(L).deb debs/$(L).deb
+	mkdir -p build/$(L)
+	aws s3 cp s3://$(S3_BUCKET_BASE)-debs/debs/$(L).deb build/$(L)/$(L).deb
 
 ### Publish things to registries
 
@@ -87,7 +93,7 @@ publish-app-image:
 .PHONY: publish-pkg
 publish-pkg:
 	@: $${L}
-	aws s3 cp debs/$(L).deb s3://$(S3_BUCKET_BASE)-debs/debs/$(L).deb
+	aws s3 cp build/$(L)/$(L).deb s3://$(S3_BUCKET_BASE)-debs/debs/$(L).deb
 
 ### Miscellaneous
 

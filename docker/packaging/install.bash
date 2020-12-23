@@ -23,8 +23,12 @@ deb https://dl.yarnpkg.com/debian/ stable main
 EOF
 
 apt-get update
-apt-get install -y fakeroot less make man nodejs yarn
+apt-get install -y fakeroot less make man nodejs sudo yarn
 
 rm -rf /var/lib/apt/lists/*
+
+tee /etc/sudoers.d/90-riju >/dev/null <<"EOF"
+%sudo ALL=(ALL:ALL) NOPASSWD: ALL
+EOF
 
 rm "$0"
