@@ -1,9 +1,9 @@
 FROM ubuntu:rolling
 
-COPY docker/scripts/build/install.bash /tmp/
+COPY docker/packaging/install.bash /tmp/
 RUN /tmp/install.bash
 
 WORKDIR /src
-COPY docker/scripts/build/pid1.bash /usr/local/sbin/
+COPY docker/packaging/pid1.bash /usr/local/sbin/
 ENTRYPOINT ["/usr/local/sbin/pid1.bash"]
 CMD ["bash"]
