@@ -3,7 +3,7 @@ import process from "process";
 import { Command } from "commander";
 import YAML from "yaml";
 
-import { readLangConfig } from "../config.js";
+import { readLangConfig } from "./config.js";
 
 // Given a language config object, return the text of a Bash script
 // that will build the (unpacked) riju-lang-foo Debian package into

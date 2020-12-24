@@ -12,11 +12,6 @@ S3_DEBS := s3://$(S3_BUCKET_BASE)-debs
 S3_DEB := $(S3_DEBS)/debs/$(DEB)
 S3_HASH := $(S3_DEBS)/hashes/riju-$(T)-$(L)
 
-SHELL_ARGS :=
-ifeq ($(I),admin)
-SHELL_ARGS := -v $(HOME)/.aws:/var/riju/.aws:ro -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY
-endif
-
 .PHONY: help
 help:
 	@echo "usage:"
@@ -31,13 +26,17 @@ help:
 .PHONY: image
 image:
 	@: $${I}
+ifeq ($(I),composite)
+	node src/build-composite-image.js
+else
 	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) --pull
+endif
 
 .PHONY: script
 script:
 	@: $${L} $${T}
 	mkdir -p $(BUILD)
-	node src/packager/make-script.js --lang $(L) --type $(T) > $(BUILD)/build.bash
+	node src/make-script.js --lang $(L) --type $(T) > $(BUILD)/build.bash
 	chmod +x $(BUILD)/build.bash
 
 .PHONY: pkg
@@ -50,10 +49,16 @@ pkg:
 
 ### Run things inside Docker
 
+VOLUME_MOUNT ?= $(PWD)
+
 .PHONY: shell
 shell:
 	@: $${I}
-	docker run -it --rm -v $(PWD):/src $(SHELL_ARGS) riju:$(I)
+ifeq ($(I),admin)
+	docker run -it --rm -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws:ro -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e VOLUME_MOUNT=$(VOLUME_MOUNT) riju:$(I)
+else
+	docker run -it --rm -v $(VOLUME_MOUNT):/src riju:$(I)
+endif
 
 .PHONY: install
 install:

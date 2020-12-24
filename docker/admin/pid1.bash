@@ -7,5 +7,6 @@ useradd -u "$(stat -c %u "$PWD")" -g "$(stat -c %g "$PWD")" -o -m -N -l -s /usr/
 
 runuser -u riju-admin -- touch /home/riju-admin/.sudo_as_admin_successful
 runuser -u riju-admin -- ln -sT /var/riju/.aws /home/riju-admin/.aws
+runuser -u riju-admin -- yarn install
 
 exec runuser -u riju-admin "$@"

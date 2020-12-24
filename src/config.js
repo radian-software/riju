@@ -1,5 +1,5 @@
-import _fs from "fs";
-const fs = _fs.promises;
+import { promises as fs } from "fs";
+import path from "path";
 
 import YAML from "yaml";
 
@@ -11,6 +11,14 @@ import YAML from "yaml";
 //   to the directory where the package should be built; this
 //   directory also starts out empty
 // * we are using bash with 'set -euxo pipefail'
+
+// Return a list of the IDs of all the configured languages. Each such
+// ID can be passed to readLangConfig.
+export async function getLangs() {
+  return (await fs.readdir("langs"))
+    .filter((lang) => lang.endsWith(".yaml"))
+    .map((lang) => path.parse(lang).name);
+}
 
 // Read the YAML config file for the language with the given string ID
 // and return it as an object.
