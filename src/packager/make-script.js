@@ -1,6 +1,7 @@
 import process from "process";
 
 import { Command } from "commander";
+import YAML from "yaml";
 
 import { readLangConfig } from "../config.js";
 
@@ -15,7 +16,6 @@ function makeLangScript(langConfig) {
     name,
     install: { apt, pip, manual },
   } = langConfig;
-  const timestamp = new Date().getTime();
   let parts = [];
   parts.push(`\
 #!/usr/bin/env bash
@@ -49,7 +49,31 @@ EOF`);
 // encode the language configuration so that Riju can operate on any
 // installed languages without knowing their configuration in advance.
 function makeConfigScript(langConfig) {
-  //
+  const { id, name } = langConfig;
+  let parts = [];
+  parts.push(`\
+#!/usr/bin/env bash
+
+set -euxo pipefail`);
+  let debianControlData = `\
+Package: riju-config-${id}
+Version: \$(date +%s%3N)
+Architecture: all
+Maintainer: Radon Rosborough <radon.neon@gmail.com>
+Description: Riju configuration for the ${name} language
+Depends: riju-lang-${id}`;
+  parts.push(`\
+install -d "\${pkg}/DEBIAN"
+cat <<EOF > "\${pkg}/DEBIAN/control"
+${debianControlData}
+EOF`);
+  parts.push(`\
+install -d "\${pkg}/opt/riju/langs"
+cat <<"EOF" > "\${pkg}/opt/riju/langs/${id}.json"
+${JSON.stringify(langConfig, null, 2)}
+EOF
+`);
+  return parts.join("\n\n");
 }
 
 // Given a language config object, return the text of a Bash script
