@@ -8,7 +8,9 @@ export
 
 BUILD := build/$(T)/$(L)
 DEB := riju-$(T)-$(L).deb
-S3_DEB := s3://$(S3_BUCKET_BASE)-debs/debs/$(T)/$(L)/$(DEB)
+S3_DEBS := s3://$(S3_BUCKET_BASE)-debs
+S3_DEB := $(S3_DEBS)/debs/$(T)/$(L)/$(DEB)
+S3_HASH := $(S3_DEBS)/hashes/$(T)/$(L)/riju-$(T)-$(L).sha1
 
 .PHONY: help
 help:
@@ -20,6 +22,10 @@ help:
 		sed -E 's/[#]## *(.+)/\n    (\1)\n/'
 
 ### Build things locally
+
+.PHONY: admin-image
+admin-image:
+	docker build . -f docker/admin/Dockerfile -t riju-admin --pull
 
 .PHONY: packaging-image
 packaging-image:
@@ -49,6 +55,10 @@ pkg:
 	fakeroot dpkg-deb --build $(BUILD)/pkg $(BUILD)/$(DEB)
 
 ### Run things inside Docker
+
+.PHONY: admin-shell
+admin-shell:
+	docker run -it --rm -v $(PWD):/src -v $(HOME)/.aws:/var/riju/.aws:ro -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY riju-admin
 
 .PHONY: packaging-shell
 packaging-shell:
@@ -107,6 +117,7 @@ publish-app-image:
 .PHONY: publish-pkg
 publish-pkg:
 	@: $${L} $${T} $${S3_BUCKET_BASE}
+	aws s3 cp <(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash) $(S3_HASH)
 	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
 
 ### Miscellaneous
