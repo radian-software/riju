@@ -2,11 +2,11 @@
 
 set -euo pipefail
 
-groupadd -g "$(stat -c %g "$PWD")" -o -p '!' -r riju-admin
-useradd -u "$(stat -c %u "$PWD")" -g "$(stat -c %g "$PWD")" -o -m -N -l -s /usr/bin/bash -G sudo riju-admin
+groupadd -g "$(stat -c %g "$PWD")" -o -p '!' -r riju
+useradd -u "$(stat -c %u "$PWD")" -g "$(stat -c %g "$PWD")" -o -m -N -l -s /usr/bin/bash -G sudo riju
 
-runuser -u riju-admin -- touch /home/riju-admin/.sudo_as_admin_successful
-runuser -u riju-admin -- ln -sT /var/riju/.aws /home/riju-admin/.aws
-runuser -u riju-admin -- yarn install
+runuser -u riju -- touch /home/riju/.sudo_as_admin_successful
+runuser -u riju -- ln -sT /var/riju/.aws /home/riju/.aws
+runuser -u riju -- yarn install
 
-exec runuser -u riju-admin "$@"
+exec runuser -u riju "$@"

@@ -55,9 +55,9 @@ VOLUME_MOUNT ?= $(PWD)
 shell:
 	@: $${I}
 ifeq ($(I),admin)
-	docker run -it --rm --network host -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws:ro -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e VOLUME_MOUNT=$(VOLUME_MOUNT) riju:$(I)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws:ro -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e VOLUME_MOUNT=$(VOLUME_MOUNT) --network host riju:$(I)
 else
-	docker run -it --rm -v $(VOLUME_MOUNT):/src riju:$(I)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src riju:$(I)
 endif
 
 .PHONY: install
