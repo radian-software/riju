@@ -12,6 +12,11 @@ S3_DEBS := s3://$(S3_BUCKET_BASE)-debs
 S3_DEB := $(S3_DEBS)/debs/$(DEB)
 S3_HASH := $(S3_DEBS)/hashes/riju-$(T)-$(L)
 
+SHELL_ARGS :=
+ifeq ($(I),admin)
+SHELL_ARGS := -v $(HOME)/.aws:/var/riju/.aws:ro -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY
+endif
+
 .PHONY: help
 help:
 	@echo "usage:"
@@ -23,21 +28,10 @@ help:
 
 ### Build things locally
 
-.PHONY: admin-image
-admin-image:
-	docker build . -f docker/admin/Dockerfile -t riju-admin --pull
-
-.PHONY: packaging-image
-packaging-image:
-	docker build . -f docker/packaging/Dockerfile -t riju-packaging --pull
-
-.PHONY: runtime-image
-runtime-image:
-	docker build . -f docker/runtime/Dockerfile -t riju-runtime --pull
-
-.PHONY: app-image
-app-image:
-	docker build . -f docker/app/Dockerfile -t riju-app --pull
+.PHONY: image
+image:
+	@: $${I}
+	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) --pull
 
 .PHONY: script
 script:
@@ -56,17 +50,10 @@ pkg:
 
 ### Run things inside Docker
 
-.PHONY: admin-shell
-admin-shell:
-	docker run -it --rm -v $(PWD):/src -v $(HOME)/.aws:/var/riju/.aws:ro -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY riju-admin
-
-.PHONY: packaging-shell
-packaging-shell:
-	docker run -it --rm -v $(PWD):/src riju-packaging
-
-.PHONY: runtime-shell
-runtime-shell:
-	docker run -it --rm -v $(PWD):/src riju-runtime
+.PHONY: shell
+shell:
+	@: $${I}
+	docker run -it --rm -v $(PWD):/src $(SHELL_ARGS) riju:$(I)
 
 .PHONY: install
 install:
@@ -76,52 +63,28 @@ install:
 
 ### Fetch things from registries
 
-.PHONY: fetch-packaging-image
-fetch-packaging-image:
-	@: $${DOCKER_REPO_BASE}
-	docker pull $(DOCKER_REPO_BASE)-packaging
-	docker tag $(DOCKER_REPO_BASE)-packaging riju-packaging
+.PHONY: pull
+pull:
+	@: $${I} $${DOCKER_REPO_BASE}
+	docker pull $(DOCKER_REPO_BASE):$(I)
+	docker tag $(DOCKER_REPO_BASE):$(I) riju:$(I)
 
-.PHONY: fetch-runtime-image
-fetch-runtime-image:
-	@: $${DOCKER_REPO_BASE}
-	docker pull $(DOCKER_REPO_BASE)-runtime
-	docker tag $(DOCKER_REPO_BASE)-runtime riju-runtime
-
-.PHONY: fetch-app-image
-fetch-app-image:
-	@: $${DOCKER_REPO_BASE}
-	docker pull $(DOCKER_REPO_BASE)-app
-	docker tag $(DOCKER_REPO_BASE)-app riju-app
-
-.PHONY: fetch-pkg
-fetch-pkg:
+.PHONY: download
+download:
 	@: $${L} $${T} $${S3_BUCKET_BASE}
 	mkdir -p $(BUILD)
 	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB)
 
 ### Publish things to registries
 
-.PHONY: publish-packaging-image
-publish-packaging-image:
-	@: $${DOCKER_REPO_BASE}
-	docker tag riju-packaging $(DOCKER_REPO_BASE)-packaging
-	docker push $(DOCKER_REPO_BASE)-packaging
+.PHONY: push
+push:
+	@: $${I} $${DOCKER_REPO_BASE}
+	docker tag riju:$(I) $(DOCKER_REPO_BASE):$(I)
+	docker push $(DOCKER_REPO_BASE):$(I)
 
-.PHONY: publish-runtime-image
-publish-runtime-image:
-	@: $${DOCKER_REPO_BASE}
-	docker tag riju-runtime $(DOCKER_REPO_BASE)-runtime
-	docker push $(DOCKER_REPO_BASE)-runtime
-
-.PHONY: publish-app-image
-publish-app-image:
-	@: $${DOCKER_REPO_BASE}
-	docker tag riju-app $(DOCKER_REPO_BASE)-app
-	docker push $(DOCKER_REPO_BASE)-app
-
-.PHONY: publish-pkg
-publish-pkg:
+.PHONY: upload
+upload:
 	@: $${L} $${T} $${S3_BUCKET_BASE}
 	hash=$$(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash); test $${hash}; aws s3 cp - $(S3_HASH)/$${hash} < /dev/null
 	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
