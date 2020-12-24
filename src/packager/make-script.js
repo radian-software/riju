@@ -1,11 +1,15 @@
 import process from "process";
 
+import { Command } from "commander";
+
 import { readLangConfig } from "../config.js";
 
 // Given a language config object, return the text of a Bash script
-// that will build the (unpacked) Debian package into ${pkg} when run in an
-// appropriate environment.
-function makeScript(langConfig) {
+// that will build the (unpacked) riju-lang-foo Debian package into
+// ${pkg} when run in an appropriate environment. This is a package
+// that will install the language interpreter/compiler and associated
+// tools.
+function makeLangScript(langConfig) {
   const {
     id,
     name,
@@ -19,7 +23,7 @@ function makeScript(langConfig) {
 set -euxo pipefail`);
   let debianControlData = `\
 Package: riju-lang-${id}
-Version: ${timestamp}
+Version: \$(date +%s%3N)
 Architecture: amd64
 Maintainer: Radon Rosborough <radon.neon@gmail.com>
 Description: The ${name} language packaged for Riju`;
@@ -29,7 +33,7 @@ Depends: ${apt.join(", ")}`;
   }
   parts.push(`\
 install -d "\${pkg}/DEBIAN"
-cat <<"EOF" > "\${pkg}/DEBIAN/control"
+cat <<EOF > "\${pkg}/DEBIAN/control"
 ${debianControlData}
 EOF`);
   for (const part of manual || []) {
@@ -38,14 +42,45 @@ EOF`);
   return parts.join("\n\n");
 }
 
+// Given a language config object, return the text of a Bash script
+// that will build the (unpacked) riju-config-foo Debian package into
+// ${pkg} when run in an appropriate environment. This is a package
+// that will install configuration files and/or small scripts that
+// encode the language configuration so that Riju can operate on any
+// installed languages without knowing their configuration in advance.
+function makeConfigScript(langConfig) {
+  //
+}
+
+// Given a language config object, return the text of a Bash script
+// that will build the (unpacked) riju-shared-foo Debian package into
+// ${pkg} when run in an appropriate environment. This is a package
+// that installs tools used by multiple languages, and can be declared
+// as a dependency.
+function makeSharedScript(langConfig) {
+  throw new Error("shared script generation not implemented yet");
+}
+
+// Parse command-line arguments, run main functionality, and exit.
 async function main() {
-  const args = process.argv.slice(2);
-  if (args.length !== 1) {
-    console.error("usage: script-maker.js LANG");
+  const program = new Command();
+  program
+    .requiredOption("--lang <id>", "language ID")
+    .requiredOption(
+      "--type <value>",
+      "package category (lang, config, shared)"
+    );
+  program.parse(process.argv);
+  const scriptMaker = {
+    lang: makeLangScript,
+    config: makeConfigScript,
+    shared: makeSharedScript,
+  }[program.type];
+  if (!scriptMaker) {
+    console.error(`make-script.js: unsupported --type ${program.type}`);
     process.exit(1);
   }
-  const [lang] = args;
-  console.log(makeScript(await readLangConfig(lang)));
+  console.log(scriptMaker(await readLangConfig(program.lang)));
   process.exit(0);
 }
 

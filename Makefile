@@ -3,8 +3,12 @@ SHELL := bash
 
 export PATH := bin:$(PATH)
 
-include .env
+-include .env
 export
+
+BUILD := build/$(T)/$(L)
+DEB := riju-$(T)-$(L).deb
+S3_DEB := s3://$(S3_BUCKET_BASE)-debs/debs/$(T)/$(L)/$(DEB)
 
 .PHONY: help
 help:
@@ -29,16 +33,20 @@ runtime-image:
 app-image:
 	docker build . -f docker/app/Dockerfile -t riju-app --pull
 
+.PHONY: script
+script:
+	@: $${L} $${T}
+	mkdir -p $(BUILD)
+	node src/packager/make-script --lang $(L) --type $(T) > $(BUILD)/build.bash
+	chmod +x $(BUILD)/build.bash
+
 .PHONY: pkg
 pkg:
-	@: $${L}
-	mkdir -p build/$(L)
-	node src/packager/make-script $(L) > build/$(L)/build.bash
-	chmod +x build/$(L)/build.bash
-	rm -rf build/$(L)/src build/$(L)/pkg
-	mkdir -p build/$(L)/src build/$(L)/pkg
-	cd build/$(L)/src && pkg="$(PWD)/build/$(L)/pkg" ../build.bash
-	fakeroot dpkg-deb --build build/$(L)/pkg build/$(L)/$(L).deb
+	@: $${L} $${T}
+	rm -rf $(BUILD)/src $(BUILD)/pkg
+	mkdir -p $(BUILD)/src $(BUILD)/pkg
+	cd $(BUILD)/src && pkg="$(PWD)/$(BUILD)/pkg" ../build.bash
+	fakeroot dpkg-deb --build $(BUILD)/pkg $(BUILD)/$(DEB)
 
 ### Run things inside Docker
 
@@ -54,46 +62,52 @@ runtime-shell:
 
 .PHONY: fetch-packaging-image
 fetch-packaging-image:
+	@: $${DOCKER_REPO_BASE}
 	docker pull $(DOCKER_REPO_BASE)-packaging
 	docker tag $(DOCKER_REPO_BASE)-packaging riju-packaging
 
 .PHONY: fetch-runtime-image
 fetch-runtime-image:
+	@: $${DOCKER_REPO_BASE}
 	docker pull $(DOCKER_REPO_BASE)-runtime
 	docker tag $(DOCKER_REPO_BASE)-runtime riju-runtime
 
 .PHONY: fetch-app-image
 fetch-app-image:
+	@: $${DOCKER_REPO_BASE}
 	docker pull $(DOCKER_REPO_BASE)-app
 	docker tag $(DOCKER_REPO_BASE)-app riju-app
 
 .PHONY: fetch-pkg
 fetch-pkg:
-	@: $${L}
-	mkdir -p build/$(L)
-	aws s3 cp s3://$(S3_BUCKET_BASE)-debs/debs/$(L).deb build/$(L)/$(L).deb
+	@: $${L} $${T} $${S3_BUCKET_BASE}
+	mkdir -p $(BUILD)
+	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB)
 
 ### Publish things to registries
 
 .PHONY: publish-packaging-image
 publish-packaging-image:
+	@: $${DOCKER_REPO_BASE}
 	docker tag riju-packaging $(DOCKER_REPO_BASE)-packaging
 	docker push $(DOCKER_REPO_BASE)-packaging
 
 .PHONY: publish-runtime-image
 publish-runtime-image:
+	@: $${DOCKER_REPO_BASE}
 	docker tag riju-runtime $(DOCKER_REPO_BASE)-runtime
 	docker push $(DOCKER_REPO_BASE)-runtime
 
 .PHONY: publish-app-image
 publish-app-image:
+	@: $${DOCKER_REPO_BASE}
 	docker tag riju-app $(DOCKER_REPO_BASE)-app
 	docker push $(DOCKER_REPO_BASE)-app
 
 .PHONY: publish-pkg
 publish-pkg:
-	@: $${L}
-	aws s3 cp build/$(L)/$(L).deb s3://$(S3_BUCKET_BASE)-debs/debs/$(L).deb
+	@: $${L} $${T} $${S3_BUCKET_BASE}
+	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
 
 ### Miscellaneous
 

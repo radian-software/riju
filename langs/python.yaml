@@ -18,7 +18,7 @@ install:
       wget "$(curl -sSL "https://pvsc.blob.core.windows.net/python-language-server-stable?restype=container&comp=list&prefix=Python-Language-Server-linux-x64" | grep -Eo 'https://[^<]+\.nupkg' | tail -n1)"
       unzip -d "${pkg}/opt/mspyls" Python-Language-Server-linux-x64.*.nupkg
       chmod +x "${pkg}/opt/mspyls/Microsoft.Python.LanguageServer"
-      ln -s "${pkg}/opt/mspyls/Microsoft.Python.LanguageServer" "${pkg}/usr/local/bin/Microsoft.Python.LanguageServer"
+      ln -s "/opt/mspyls/Microsoft.Python.LanguageServer" "${pkg}/usr/local/bin/Microsoft.Python.LanguageServer"
 
 repl: >-
   python3 -u

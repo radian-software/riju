@@ -2,7 +2,5 @@
 **/*.log
 **/.env
 **/.terraform
-**/debs
+**/build
 **/node_modules
-**/pkg
-**/work

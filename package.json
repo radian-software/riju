@@ -5,6 +5,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "commander": "^6.2.1",
     "yaml": "^1.10.0"
   }
 }
