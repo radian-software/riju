@@ -61,7 +61,8 @@ Version: \$(date +%s%3N)
 Architecture: all
 Maintainer: Radon Rosborough <radon.neon@gmail.com>
 Description: Riju configuration for the ${name} language
-Depends: riju-lang-${id}`;
+Depends: riju-lang-${id}
+Riju-Script-Hash: \$(sha1sum "$0" | awk '{ print $1 }')`;
   parts.push(`\
 install -d "\${pkg}/DEBIAN"
 cat <<EOF > "\${pkg}/DEBIAN/control"
