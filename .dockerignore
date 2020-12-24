@@ -3,5 +3,4 @@
 **/.env
 **/.terraform
 **/build
-**/composite
 **/node_modules
