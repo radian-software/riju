@@ -28,9 +28,11 @@ Architecture: amd64
 Maintainer: Radon Rosborough <radon.neon@gmail.com>
 Description: The ${name} language packaged for Riju`;
   if (apt.length > 0) {
-    debianControlData += `\
+    debianControlData += `
 Depends: ${apt.join(", ")}`;
   }
+  debianControlData += `
+Riju-Script-Hash: \$(sha1sum "\$0" | awk '{ print \$1 }')`;
   parts.push(`\
 install -d "\${pkg}/DEBIAN"
 cat <<EOF > "\${pkg}/DEBIAN/control"

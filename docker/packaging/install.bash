@@ -23,7 +23,7 @@ deb https://dl.yarnpkg.com/debian/ stable main
 EOF
 
 apt-get update
-apt-get install -y fakeroot less make man nodejs sudo yarn
+apt-get install -y fakeroot less make man nodejs sudo unzip wget yarn
 
 rm -rf /var/lib/apt/lists/*
 

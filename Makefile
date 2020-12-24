@@ -9,8 +9,8 @@ export
 BUILD := build/$(T)/$(L)
 DEB := riju-$(T)-$(L).deb
 S3_DEBS := s3://$(S3_BUCKET_BASE)-debs
-S3_DEB := $(S3_DEBS)/debs/$(T)/$(L)/$(DEB)
-S3_HASH := $(S3_DEBS)/hashes/$(T)/$(L)/riju-$(T)-$(L).sha1
+S3_DEB := $(S3_DEBS)/debs/$(DEB)
+S3_HASH := $(S3_DEBS)/hashes/riju-$(T)-$(L)
 
 .PHONY: help
 help:
@@ -43,7 +43,7 @@ app-image:
 script:
 	@: $${L} $${T}
 	mkdir -p $(BUILD)
-	node src/packager/make-script --lang $(L) --type $(T) > $(BUILD)/build.bash
+	node src/packager/make-script.js --lang $(L) --type $(T) > $(BUILD)/build.bash
 	chmod +x $(BUILD)/build.bash
 
 .PHONY: pkg
@@ -67,6 +67,12 @@ packaging-shell:
 .PHONY: runtime-shell
 runtime-shell:
 	docker run -it --rm -v $(PWD):/src riju-runtime
+
+.PHONY: install
+install:
+	@: $${L} $${T}
+	[[ -z "$$(ls -A /var/lib/apt/lists)" ]] && sudo apt update
+	sudo apt reinstall -y ./$(BUILD)/$(DEB)
 
 ### Fetch things from registries
 
@@ -117,7 +123,7 @@ publish-app-image:
 .PHONY: publish-pkg
 publish-pkg:
 	@: $${L} $${T} $${S3_BUCKET_BASE}
-	aws s3 cp <(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash) $(S3_HASH)
+	hash=$$(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash); test $${hash}; aws s3 cp - $(S3_HASH)/$${hash} < /dev/null
 	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
 
 ### Miscellaneous
