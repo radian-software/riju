@@ -8,6 +8,7 @@ import _ from "lodash";
 
 import * as api from "./api.js";
 import { langs } from "./langs.js";
+import { log } from "./util.js";
 
 const host = process.env.HOST || "localhost";
 const port = parseInt(process.env.PORT || "") || 6119;
@@ -55,25 +56,29 @@ app.use("/js", express.static("frontend/out"));
 function addWebsocket(baseApp, httpsServer) {
   const app = ws(baseApp, httpsServer).app;
   app.ws("/api/v1/ws", (ws, req) => {
-    const lang = req.query.get("lang");
-    if (!lang) {
-      ws.send(
-        JSON.stringify({
-          event: "error",
-          errorMessage: "No language specified",
-        })
-      );
-      ws.close();
-    } else if (!langs[lang]) {
-      ws.send(
-        JSON.stringify({
-          event: "error",
-          errorMessage: `No such language: ${lang}`,
-        })
-      );
-      ws.close();
-    } else {
-      new api.Session(ws, lang, console.log).setup();
+    try {
+      const lang = req.query.get("lang");
+      if (!lang) {
+        ws.send(
+          JSON.stringify({
+            event: "error",
+            errorMessage: "No language specified",
+          })
+        );
+        ws.close();
+      } else if (!langs[lang]) {
+        ws.send(
+          JSON.stringify({
+            event: "error",
+            errorMessage: `No such language: ${lang}`,
+          })
+        );
+        ws.close();
+      } else {
+        new api.Session(ws, lang, console.log).setup();
+      }
+    } catch (err) {
+      log.error("Unexpected error while handling websocket:", err);
     }
   });
   return app;

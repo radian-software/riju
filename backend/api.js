@@ -3,7 +3,8 @@ import path from "path";
 import WebSocket from "ws";
 
 import pty from "node-pty";
-import PQueue from "p-queue";
+import pQueue from "p-queue";
+const PQueue = pQueue.default;
 import rpc from "vscode-jsonrpc";
 import { v4 as getUUID } from "uuid";
 
@@ -187,7 +188,6 @@ export class Session {
         return;
       }
       let msg;
-      n;
       try {
         msg = JSON.parse(event);
       } catch (err) {
