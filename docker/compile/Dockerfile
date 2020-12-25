@@ -4,7 +4,6 @@ COPY docker/runtime/install.bash /tmp/
 RUN /tmp/install.bash
 
 WORKDIR /src
-ENV RIJU_PRIVILEGED=1
 
 COPY package.json yarn.lock ./
 RUN yarn install

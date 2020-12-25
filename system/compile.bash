@@ -18,7 +18,7 @@ for src in system/src/*.c; do
     out="${src/src/out}"
     out="${out/.c}"
     verbosely clang -Wall -Wextra -Werror -std=c11 "${src}" -o "${out}"
-    if [[ "${out}" == *-privileged && -n "${RIJU_PRIVILEGED:-}" ]]; then
+    if [[ "${out}" == *-privileged ]]; then
         sudo chown root:riju "${out}"
         sudo chmod a=,g=rx,u=rwxs "${out}"
     fi

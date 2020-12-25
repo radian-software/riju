@@ -7,25 +7,29 @@
   </head>
   <body>
     <h1>Riju: <i>fast</i> online playground for every programming language</h1>
-    <i>Pick your favorite language to get started:</i>
-    <div class="grid">
-      <% for (const [id, {name}] of Object.entries(langs).sort(
-        ([id1, {name: name1}], [id2, {name: name2}]) => name1.toLowerCase().localeCompare(name2.toLowerCase()))) { %>
-        <a href=<%= "/" + encodeURIComponent(id) %> class="language">
-          <div class="language">
-            <%= name %>
-          </div>
-        </a>
-      <% } %>
-    </div>
-    <p>
-      <i>
-        Created by
-        <a href="https://github.com/raxod502">Radon Rosborough</a>.
-        Check out the project
-        <a href="https://github.com/raxod502/riju">on GitHub</a>.
-      </i>
-    </p>
+    <% if (Object.keys(langs).length > 0) { %>
+      <i>Pick your favorite language to get started:</i>
+      <div class="grid">
+        <% for (const [id, {name}] of Object.entries(langs).sort(
+          ([id1, {name: name1}], [id2, {name: name2}]) => name1.toLowerCase().localeCompare(name2.toLowerCase()))) { %>
+          <a href=<%= "/" + encodeURIComponent(id) %> class="language">
+            <div class="language">
+              <%= name %>
+            </div>
+          </a>
+        <% } %>
+      </div>
+      <p>
+        <i>
+          Created by
+          <a href="https://github.com/raxod502">Radon Rosborough</a>.
+          Check out the project
+          <a href="https://github.com/raxod502/riju">on GitHub</a>.
+        </i>
+      </p>
+    <% } else { %>
+      <i>Riju is loading language configuration...</i>
+    <% } %>
     <% if (analyticsEnabled) { %>
       <script src="https://cdn.usefathom.com/script.js" site="JOBZEHJE" defer></script>
     <% } %>

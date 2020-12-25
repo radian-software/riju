@@ -97,7 +97,7 @@ build: frontend system
 
 .PHONY: dev
 dev:
-	make -j2 frontend-dev system-dev server-dev
+	make -j3 frontend-dev system-dev server-dev
 
 ### Run application code
 

@@ -4,7 +4,6 @@ import process from "process";
 
 import { quote } from "shell-quote";
 
-import { PRIVILEGED } from "./config.js";
 import { MIN_UID, MAX_UID } from "./users.js";
 
 export const rijuSystemPrivileged = "system/out/riju-system-privileged";
@@ -39,7 +38,7 @@ function getEnv({ uid, uuid }) {
     LANG: process.env.LANG || "",
     LC_ALL: process.env.LC_ALL || "",
     LOGNAME: username,
-    PATH: PRIVILEGED ? path.join(":") : process.env.PATH || "",
+    PATH: path.join(":"),
     PWD: cwd,
     SHELL: "/usr/bin/bash",
     TERM: "xterm-256color",
@@ -122,3 +121,11 @@ export function bash(cmdline) {
   }
   return ["bash", "-c", cmdline];
 }
+
+export const log = {
+  trace: console.error,
+  debug: console.error,
+  info: console.error,
+  warn: console.error,
+  error: console.error,
+};

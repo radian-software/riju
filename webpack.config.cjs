@@ -1,9 +1,10 @@
 const path = require("path");
 
 const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
+const webpack = require("webpack");
 
 function isProduction(argv) {
-  return !argv.development;
+  return argv.mode !== "development";
 }
 
 module.exports = (_, argv) => ({
@@ -40,7 +41,13 @@ module.exports = (_, argv) => ({
   performance: {
     hints: false,
   },
-  plugins: [new MonacoWebpackPlugin()],
+  plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ["buffer", "Buffer"],
+      regeneratorRuntime: "regenerator-runtime/runtime",
+    }),
+    new MonacoWebpackPlugin(),
+  ],
   resolve: {
     alias: {
       vscode: require.resolve("monaco-languageclient/lib/vscode-compatibility"),

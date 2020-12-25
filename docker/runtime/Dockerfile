@@ -9,3 +9,4 @@ ENTRYPOINT ["/usr/local/sbin/my_init", "/usr/local/sbin/pid1.bash"]
 CMD ["bash"]
 EXPOSE 6119
 EXPOSE 6120
+ENV HOST=0.0.0.0

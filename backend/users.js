@@ -6,7 +6,6 @@ import AsyncLock from "async-lock";
 import _ from "lodash";
 import parsePasswd from "parse-passwd";
 
-import { PRIVILEGED } from "./config.js";
 import { privilegedUseradd, run } from "./util.js";
 
 // Keep in sync with system/src/riju-system-privileged.c
@@ -70,27 +69,23 @@ export async function ignoreUsers(uids, log) {
 }
 
 export async function borrowUser(log) {
-  if (!PRIVILEGED) {
-    return { uid: CUR_UID, returnUID: async () => {} };
-  } else {
-    return await lock.acquire("key", async () => {
-      if (availIds === null || nextId === null) {
-        await readExistingUsers(log);
-      }
-      let uid;
-      if (availIds.length > 0) {
-        uid = availIds.pop();
-      } else {
-        uid = await createUser(log);
-      }
-      return {
-        uid,
-        returnUID: async () => {
-          await lock.acquire("key", () => {
-            availIds.push(uid);
-          });
-        },
-      };
-    });
-  }
+  return await lock.acquire("key", async () => {
+    if (availIds === null || nextId === null) {
+      await readExistingUsers(log);
+    }
+    let uid;
+    if (availIds.length > 0) {
+      uid = availIds.pop();
+    } else {
+      uid = await createUser(log);
+    }
+    return {
+      uid,
+      returnUID: async () => {
+        await lock.acquire("key", () => {
+          availIds.push(uid);
+        });
+      },
+    };
+  });
 }
