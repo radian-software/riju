@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title><%= config.name %> - Riju</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="editor" class="column"></div>
+      <div id="terminal" class="column"></div>
+      <button type="button" class="btn btn-success" id="runButton">Run</button>
+      <button type="button" class="btn btn-info" id="formatButton">Prettify</button>
+      <a href="/" class="btn btn-secondary" id="backButton">Switch to a different language</a>
+    </div>
+    <script>
+     window.rijuConfig = <%- JSON.stringify(config) %>;
+    </script>
+    <script src="/js/app.js"></script>
+    <% if (analyticsEnabled) { %>
+      <script src="https://cdn.usefathom.com/script.js" site="JOBZEHJE" defer></script>
+    <% } %>
+  </body>
+</html>

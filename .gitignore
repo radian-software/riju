@@ -3,3 +3,4 @@
 .terraform
 build
 node_modules
+out

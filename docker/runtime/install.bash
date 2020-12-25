@@ -2,6 +2,12 @@
 
 set -euxo pipefail
 
+latest_release() {
+    curl -sSL "https://api.github.com/repos/$1/releases/latest" | jq -r .tag_name
+}
+
+pushd /tmp
+
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get update
@@ -28,12 +34,19 @@ apt-get install -y dctrl-tools
 libicu="$(grep-aptavail -wF Package 'libicu[0-9]+' -s Package -n | head -n1)"
 
 apt-get update
-apt-get install -y less "${libicu}" make man nodejs sudo yarn
+apt-get install -y less clang jq "${libicu}" make man nodejs sudo tmux wget yarn
+
+ver="$(latest_release watchexec/watchexec)"
+wget "https://github.com/watchexec/watchexec/releases/download/${ver}/watchexec-${ver}-x86_64-unknown-linux-gnu.deb"
+apt-get install -y ./watchexec-*.deb
+rm watchexec-*.deb
 
 rm -rf /var/lib/apt/lists/*
 
 tee /etc/sudoers.d/90-riju >/dev/null <<"EOF"
 %sudo ALL=(ALL:ALL) NOPASSWD: ALL
 EOF
+
+popd
 
 rm "$0"

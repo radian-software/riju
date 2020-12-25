@@ -21,13 +21,13 @@ help:
 		sed -E 's/[.]PHONY: */  make /' | \
 		sed -E 's/[#]## *(.+)/\n    (\1)\n/'
 
-### Build things locally
+### Build artifacts locally
 
 .PHONY: image
 image:
 	@: $${I}
 ifeq ($(I),composite)
-	node src/build-composite-image.js
+	node tools/build-composite-image.js
 else
 	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) --pull
 endif
@@ -47,7 +47,7 @@ pkg:
 	cd $(BUILD)/src && pkg="$(PWD)/$(BUILD)/pkg" ../build.bash
 	fakeroot dpkg-deb --build $(BUILD)/pkg $(BUILD)/$(DEB)
 
-### Run things inside Docker
+### Manipulate artifacts inside Docker
 
 VOLUME_MOUNT ?= $(PWD)
 
@@ -57,7 +57,7 @@ shell:
 ifeq ($(I),admin)
 	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws:ro -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e VOLUME_MOUNT=$(VOLUME_MOUNT) --network host riju:$(I)
 else
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src riju:$(I)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -p 127.0.0.1:6119:6119 -p 127.0.0.1:6120:6120 riju:$(I)
 endif
 
 .PHONY: install
@@ -66,7 +66,42 @@ install:
 	[[ -z "$$(ls -A /var/lib/apt/lists)" ]] && sudo apt update
 	sudo apt reinstall -y ./$(BUILD)/$(DEB)
 
-### Fetch things from registries
+### Build and run application code
+
+.PHONY: frontend
+frontend:
+	npx webpack --mode=production
+
+.PHONY: frontend-dev
+frontend-dev:
+	npx webpack --mode=development --watch
+
+.PHONY: system
+system:
+	./system/compile.bash
+
+.PHONY: system-dev
+system-dev:
+	watchexec -w system/src -n ./system/compile.bash
+
+.PHONY: server
+server:
+	node backend/server.js
+
+.PHONY: server-dev
+server-dev:
+	watchexec -w backend -r -n node backend/server.js
+
+.PHONY: build
+build: frontend system
+
+.PHONY: dev
+dev:
+	make -j2 frontend-dev system-dev server-dev
+
+### Run application code
+
+### Fetch artifacts from registries
 
 .PHONY: pull
 pull:
@@ -80,7 +115,7 @@ download:
 	mkdir -p $(BUILD)
 	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB)
 
-### Publish things to registries
+### Publish artifacts to registries
 
 .PHONY: push
 push:
