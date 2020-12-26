@@ -37,6 +37,7 @@ make
 man
 nodejs
 packer
+ssh
 sudo
 tmux
 terraform
