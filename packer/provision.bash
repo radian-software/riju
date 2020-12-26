@@ -20,8 +20,6 @@ EOF
 sudo -E apt-get update
 sudo -E apt-get install -y docker-ce docker-ce-cli containerd.io whois
 
-sudo sed -i "s#DOCKER_REPO_BASE_REPLACED_BY_PACKER#${DOCKER_REPO_BASE}#" /tmp/riju-deploy
-
 sudo chown root:root /tmp/riju /tmp/riju-deploy /tmp/riju.service
 sudo mv /tmp/riju /tmp/riju-deploy /usr/local/bin/
 sudo mv /tmp/riju.service /etc/systemd/system/
@@ -51,7 +49,7 @@ for user in admin deploy; do
     sudo chmod -R go-rwx "/home/${user}/.ssh"
 done
 
-sudo runuser -u deploy -- sed -i 's/^/command="sudo riju-deploy",restrict/' /home/deploy/.ssh/authorized_keys
+sudo runuser -u deploy -- sed -i 's/^/command="sudo riju-deploy ${SSH_ORIGINAL_COMMAND}",restrict /' /home/deploy/.ssh/authorized_keys
 
 sudo tee /etc/sudoers.d/riju >/dev/null <<"EOF"
 deploy ALL=(root) NOPASSWD: /usr/local/bin/riju-deploy

@@ -1,6 +1,5 @@
 {
   "variables": {
-    "docker_repo_base": "{{env `DOCKER_REPO_BASE`}}",
     "admin_password": "{{env `ADMIN_PASSWORD`}}",
     "admin_ssh_public_key_file": "{{env `ADMIN_SSH_PUBLIC_KEY_FILE`}}",
     "deploy_ssh_public_key_file": "{{env `DEPLOY_SSH_PUBLIC_KEY_FILE`}}"
@@ -27,7 +26,6 @@
       "type": "shell",
       "script": "validate.bash",
       "environment_vars": [
-        "DOCKER_REPO_BASE={{user `docker_repo_base`}}",
         "ADMIN_PASSWORD={{user `admin_password`}}",
         "ADMIN_SSH_PUBLIC_KEY_FILE={{user `admin_ssh_public_key_file`}}",
         "DEPLOY_SSH_PUBLIC_KEY_FILE={{user `deploy_ssh_public_key_file`}}"
@@ -61,10 +59,7 @@
     {
       "type": "shell",
       "script": "provision.bash",
-      "environment_vars": [
-        "DOCKER_REPO_BASE={{user `docker_repo_base`}}",
-        "ADMIN_PASSWORD={{user `admin_password`}}"
-      ]
+      "environment_vars": ["ADMIN_PASSWORD={{user `admin_password`}}"]
     }
   ]
 }

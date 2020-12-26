@@ -2,21 +2,12 @@
 
 set -euo pipefail
 
-DOCKER_REPO_BASE="${DOCKER_REPO_BASE:-DOCKER_REPO_BASE_REPLACED_BY_PACKER}"
-
 if (( $# != 1 )); then
-    echo "usage: ssh deploy@riju COMMIT-SHA" >&2
+    echo "usage: ssh deploy@riju IMAGE" >&2
     exit 1
 fi
 
-commit="$1"
-
-if [[ "$(echo -n "${commit}" | wc -c)" != 40 ]]; then
-    echo "riju-deploy: invalid commit SHA: ${commit}" >&2
-    exit 1
-fi
-
-image="${DOCKER_REPO_BASE}:app-${commit}"
+image="$1"
 
 echo "Pull image to be deployed..."
 docker pull "${image}"
@@ -26,7 +17,7 @@ CONTAINER_NAME=riju-test IMAGE_NAME="${image}" DETACH=1 \
               PORT_MAPPING="-p 127.0.0.1:6119:6119" riju
 
 echo "Wait for web server to come up..." >&2
-sleep 10
+sleep 5
 
 echo "Test web server health..." >&2
 curl -fsSL http://localhost:6119 | head -n15
