@@ -28,6 +28,8 @@ image:
 	@: $${I}
 ifeq ($(I),composite)
 	node tools/build-composite-image.js
+else ifeq ($(I),app)
+	docker build . -f docker/$(I)/Dockerfile -t riju:$(I)
 else
 	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) --pull
 endif
@@ -51,13 +53,24 @@ pkg:
 
 VOLUME_MOUNT ?= $(PWD)
 
+P1 ?= 6119
+P2 ?= 6120
+
+ifneq (,$(E))
+SHELL_PORTS := -p 127.0.0.1:$(P1):6119 -p 127.0.0.1:$(P2):6120
+else
+SHELL_PORTS :=
+endif
+
 .PHONY: shell
 shell:
 	@: $${I}
 ifeq ($(I),admin)
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws:ro -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e VOLUME_MOUNT=$(VOLUME_MOUNT) --network host riju:$(I)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) --network host riju:$(I)
+else ifeq ($(I),compile)
+	docker run -it --rm --hostname $(I) $(SHELL_PORTS) riju:$(I)
 else
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -p 127.0.0.1:6119:6119 -p 127.0.0.1:6120:6120 riju:$(I)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) riju:$(I)
 endif
 
 .PHONY: install
@@ -98,8 +111,6 @@ build: frontend system
 .PHONY: dev
 dev:
 	make -j3 frontend-dev system-dev server-dev
-
-### Run application code
 
 ### Fetch artifacts from registries
 

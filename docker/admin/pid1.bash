@@ -7,6 +7,8 @@ useradd -u "$(stat -c %u "$PWD")" -g "$(stat -c %g "$PWD")" -o -p '!' -m -N -l -
 
 runuser -u riju -- touch /home/riju/.sudo_as_admin_successful
 runuser -u riju -- ln -sT /var/riju/.aws /home/riju/.aws
+runuser -u riju -- ln -sT /var/riju/.docker /home/riju/.docker
+runuser -u riju -- ln -sT /var/riju/.terraform.d /home/riju/.terraform.d
 runuser -u riju -- yarn install
 
 exec runuser -u riju "$@"

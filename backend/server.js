@@ -47,7 +47,7 @@ app.get("/:lang", (req, res) => {
       analyticsEnabled,
     });
   } else {
-    res.send(`No such language: ${lang}`);
+    res.send(404, `No such language: ${lang}\n`);
   }
 });
 app.use("/css", express.static("frontend/styles"));
