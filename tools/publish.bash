@@ -86,6 +86,8 @@ else
     make pull I=composite
 fi
 
+make shell I=composite CMD="make test PATIENCE=4"
+
 make pull image push I=compile
 make pull image push I=app
 
