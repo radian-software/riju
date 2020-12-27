@@ -39,7 +39,7 @@ cat <<EOF > "\${pkg}/DEBIAN/control"
 ${debianControlData}
 EOF`);
   for (const part of manual || []) {
-    parts.push(part.trim());
+    parts.push(part);
   }
   return parts.join("\n\n");
 }

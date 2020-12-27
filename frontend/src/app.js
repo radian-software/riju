@@ -289,7 +289,7 @@ async function main() {
     scrollbar: { verticalScrollbarSize: 0 },
   });
   window.addEventListener("resize", () => editor.layout());
-  editor.getModel().setValue(config.template);
+  editor.getModel().setValue(config.template + "\n");
   monaco.editor.setModelLanguage(
     editor.getModel(),
     config.monacoLang || "plaintext"

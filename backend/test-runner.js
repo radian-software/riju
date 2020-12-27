@@ -214,7 +214,7 @@ class Test {
   };
   testRun = async () => {
     const pattern = this.config.hello || "Hello, world!";
-    this.send({ event: "runCode", code: this.config.template });
+    this.send({ event: "runCode", code: this.config.template + "\n" });
     if (this.config.helloInput !== undefined) {
       sendInput(this.send, this.config.helloInput);
     }
@@ -229,7 +229,7 @@ class Test {
   testRunRepl = async () => {
     const input = this.config.runReplInput || this.config.input || "123 * 234";
     const output = this.config.runReplOutput || this.config.output || "28782";
-    this.send({ event: "runCode", code: this.config.template });
+    this.send({ event: "runCode", code: this.config.template + "\n" });
     sendInput(this.send, input);
     await this.waitForOutput(output);
   };
@@ -238,10 +238,7 @@ class Test {
     const after = this.config.scope.after;
     const input = this.config.scope.input || "x";
     const output = this.config.scope.output || "28782";
-    let allCode = this.config.template;
-    if (!allCode.endsWith("\n")) {
-      allCode += "\n";
-    }
+    let allCode = this.config.template + "\n";
     if (after) {
       allCode = allCode.replace(after + "\n", after + "\n" + code + "\n");
     } else {
@@ -253,7 +250,7 @@ class Test {
   };
   testFormat = async () => {
     const input = this.config.format.input;
-    const output = this.config.format.output || this.config.template;
+    const output = (this.config.format.output || this.config.template) + "\n";
     this.send({ event: "formatCode", code: input });
     const result = await this.wait("formatter response", (msg) => {
       if (msg.event === "formattedCode") {
@@ -265,16 +262,14 @@ class Test {
     }
   };
   testLsp = async () => {
+    const template = this.config.template + "\n";
     const insertedCode = this.config.lsp.code;
     const after = this.config.lsp.after;
     const item = this.config.lsp.item;
     const idx = after
-      ? this.config.template.indexOf(after) + after.length
-      : this.config.template.length;
-    const code =
-      this.config.template.slice(0, idx) +
-      insertedCode +
-      this.config.template.slice(idx);
+      ? template.indexOf(after) + after.length
+      : template.length;
+    const code = template.slice(0, idx) + insertedCode + template.slice(idx);
     const root = await this.wait("lspStarted message", (msg) => {
       if (msg.event === "lspStarted") {
         return msg.root;
@@ -538,7 +533,7 @@ class Test {
                 jsonrpc: "2.0",
                 id: msg.output.id,
                 result: Array(msg.output.params.items.length).fill(
-                  this.config.lsp.config == undefined
+                  this.config.lsp.config !== undefined
                     ? this.config.lsp.config
                     : {}
                 ),
@@ -560,11 +555,6 @@ class Test {
 
 function lint(lang) {
   const config = langs[lang];
-  if (!config.template.endsWith("\n")) {
-    throw new Error("template is missing a trailing newline");
-  }
-  // These can be removed when the types are adjusted to make these
-  // situations impossible.
   if (
     config.format &&
     !config.format.input &&

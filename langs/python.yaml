@@ -20,7 +20,7 @@ install:
       chmod +x "${pkg}/opt/mspyls/Microsoft.Python.LanguageServer"
       ln -s "/opt/mspyls/Microsoft.Python.LanguageServer" "${pkg}/usr/local/bin/Microsoft.Python.LanguageServer"
 
-repl: >-
+repl: |
   python3 -u
 main: "main.py"
 template: |
@@ -31,7 +31,7 @@ scope:
     x = 123 * 234
 
 format:
-  run: >-
+  run: |
     black -
   input: |
     print('Hello, world!')
@@ -39,7 +39,7 @@ format:
 pkg:
   install: "pip3 install --user NAME"
   uninstall: "pip3 uninstall NAME"
-  search: >-
+  search: |
     python3 -c 'import json; from xmlrpc import client; print(json.dumps(client.ServerProxy("https://pypi.org/pypi").search({"name": "NAME"})))' | jq -r 'map(.name) | .[]'
 
 lsp:

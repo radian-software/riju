@@ -304,7 +304,7 @@ export class Session {
         cmdline = `echo '${name} has no REPL, press Run to see it in action'`;
       }
       if (code === undefined) {
-        code = createEmpty !== undefined ? createEmpty : template;
+        code = createEmpty !== undefined ? createEmpty : template + "\n";
       }
       if (code && suffix) {
         code += suffix;
