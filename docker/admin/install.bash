@@ -31,6 +31,7 @@ EOF
 packages="
 
 docker-ce-cli
+g++
 git
 jq
 less

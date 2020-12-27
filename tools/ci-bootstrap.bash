@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euxo pipefail
+set -euo pipefail
 
 : ${AWS_ACCESS_KEY_ID}
 : ${AWS_SECRET_ACCESS_KEY}
