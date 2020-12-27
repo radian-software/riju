@@ -1,0 +1,17 @@
+version: 2
+workflows:
+  ci:
+    jobs:
+      - build_and_deploy:
+          filters:
+            branches:
+              only: debian
+            tags:
+              ignore: /.*/
+jobs:
+  build_and_deploy:
+    machine:
+      image: ubuntu-2004:202010-01
+    steps:
+      - checkout
+      - run: tools/ci-bootstrap.bash

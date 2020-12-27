@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
+: ${AWS_ACCESS_KEY_ID}
+: ${AWS_SECRET_ACCESS_KEY}
+: ${DEPLOY_SSH_PRIVATE_KEY}
+: ${DOCKER_PASSWORD}
+: ${DOCKER_REPO}
+: ${DOCKER_USERNAME}
+: ${DOMAIN}
+: ${S3_BUCKET}
+
+make pull image shell I=admin CMD="tools/ci-run.bash"

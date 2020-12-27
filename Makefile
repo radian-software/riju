@@ -8,7 +8,7 @@ export
 
 BUILD := build/$(T)/$(L)
 DEB := riju-$(T)-$(L).deb
-S3_DEBS := s3://$(S3_BUCKET_BASE)-debs
+S3_DEBS := s3://$(S3_BUCKET)-debs
 S3_DEB := $(S3_DEBS)/debs/$(DEB)
 S3_HASH := $(S3_DEBS)/hashes/riju-$(T)-$(L)
 
@@ -38,7 +38,7 @@ endif
 script:
 	@: $${L} $${T}
 	mkdir -p $(BUILD)
-	node src/make-script.js --lang $(L) --type $(T) > $(BUILD)/build.bash
+	node tools/generate-build-script.js --lang $(L) --type $(T) > $(BUILD)/build.bash
 	chmod +x $(BUILD)/build.bash
 
 .PHONY: pkg
@@ -66,11 +66,11 @@ endif
 shell:
 	@: $${I}
 ifeq ($(I),admin)
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.ssh:/var/riju/.ssh -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) --network host riju:$(I)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.ssh:/var/riju/.ssh -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) --network host riju:$(I) $(CMD)
 else ifeq ($(I),compile)
-	docker run -it --rm --hostname $(I) $(SHELL_PORTS) riju:$(I)
+	docker run -it --rm --hostname $(I) $(SHELL_PORTS) riju:$(I) $(CMD)
 else
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) riju:$(I)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) riju:$(I) $(CMD)
 endif
 
 .PHONY: install
@@ -116,13 +116,13 @@ dev:
 
 .PHONY: pull
 pull:
-	@: $${I} $${DOCKER_REPO_BASE}
-	docker pull $(DOCKER_REPO_BASE):$(I)
-	docker tag $(DOCKER_REPO_BASE):$(I) riju:$(I)
+	@: $${I} $${DOCKER_REPO}
+	docker pull $(DOCKER_REPO):$(I)
+	docker tag $(DOCKER_REPO):$(I) riju:$(I)
 
 .PHONY: download
 download:
-	@: $${L} $${T} $${S3_BUCKET_BASE}
+	@: $${L} $${T} $${S3_BUCKET}
 	mkdir -p $(BUILD)
 	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB)
 
@@ -130,15 +130,20 @@ download:
 
 .PHONY: push
 push:
-	@: $${I} $${DOCKER_REPO_BASE}
-	docker tag riju:$(I) $(DOCKER_REPO_BASE):$(I)
-	docker push $(DOCKER_REPO_BASE):$(I)
+	@: $${I} $${DOCKER_REPO}
+	docker tag riju:$(I) $(DOCKER_REPO):$(I)
+	docker push $(DOCKER_REPO):$(I)
 
 .PHONY: upload
 upload:
-	@: $${L} $${T} $${S3_BUCKET_BASE}
+	@: $${L} $${T} $${S3_BUCKET}
+	aws s3 rm --recursive $(S3_HASH)
 	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
-	hash=$$(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash); test $${hash}; aws s3 cp - $(S3_HASH)/$${hash} < /dev/null
+	hash=$$(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash); test $${hash}; echo $${hash}; aws s3 cp - $(S3_HASH)/$${hash} < /dev/null
+
+.PHONY: publish
+publish:
+	tools/publish.bash
 
 ### Miscellaneous
 

@@ -1,23 +1,45 @@
 import child_process from "child_process";
+import process from "process";
 
-// Given a shell command as a string, execute it with Bash.
-export async function runCommand(cmd) {
+// Given a shell command as a string, execute it with Bash. Options:
+//
+// getStdout: if given and truthy, return stdout as a string instead
+//   of streaming it to the standard location
+// getStderr: same but for stderr
+//
+// Return value is an object with required property code and, optional
+// properties stdout, stderr.
+export async function runCommand(cmd, options) {
+  const { getStdout, getStderr } = options || {};
   console.error(`$ ${cmd}`);
-  return new Promise((resolve, reject) => {
+  const rv = await new Promise((resolve, reject) => {
+    const rv = { stdout: "", stderr: "" };
     const proc = child_process.spawn(
       "bash",
       ["-c", `set -euo pipefail; ${cmd}`],
       {
-        stdio: "inherit",
+        stdio: [
+          process.stdin,
+          getStdout ? "pipe" : process.stdout,
+          getStderr ? "pipe" : process.stderr,
+        ],
       }
     );
+    if (getStdout) {
+      proc.stdout.on("data", (data) => {
+        rv.stdout += data.toString();
+      });
+    }
+    if (getStderr) {
+      proc.stderr.on("data", (data) => {
+        rv.stderr += data.toString();
+      });
+    }
     proc.on("error", reject);
-    proc.on("close", (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`command exited with code ${code}`));
-      }
-    });
+    proc.on("close", (code) => resolve({ code, ...rv }));
   });
+  if (rv.code !== 0) {
+    throw new Error(`command exited with code ${code}`);
+  }
+  return rv;
 }

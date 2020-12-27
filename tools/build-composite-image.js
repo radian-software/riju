@@ -6,6 +6,9 @@ import express from "express";
 import { getLangs } from "./config.js";
 import { runCommand } from "./util.js";
 
+// Get a Node.js http server object that will serve information and
+// files for packages that should be installed into the composite
+// Docker image.
 function getServer(langs) {
   const app = express();
   app.get("/langs", (req, res) => {
