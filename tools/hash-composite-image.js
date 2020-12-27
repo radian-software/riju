@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { promises as fs } from "fs";
 import process from "process";
 
 import { getLangs } from "./config.js";
@@ -8,13 +9,24 @@ import { runCommand } from "./util.js";
 async function main() {
   const args = process.argv.slice(2);
   if (args.length !== 1) {
-    console.error("usage: node hash-composite-image.js (local | remote)");
+    console.error(
+      "usage: node hash-composite-image.js (scripts | debs | remote)"
+    );
     process.exit(1);
   }
   const mode = args[0];
   let getHash;
   switch (mode) {
-    case "local":
+    case "scripts":
+      getHash = async (lang, type) => {
+        const text = await fs.readFile(
+          `build/${type}/${lang}/build.bash`,
+          "utf-8"
+        );
+        return crypto.createHash("sha1").update(text).digest("hex");
+      };
+      break;
+    case "debs":
       getHash = async (lang, type) => {
         return (
           await runCommand(
@@ -24,7 +36,7 @@ async function main() {
         ).stdout.trim();
       };
       break;
-    case "remote":
+    case "s3":
       const remoteHashes = Object.fromEntries(
         (
           await runCommand("tools/list-s3-hashes.bash", { getStdout: true })

@@ -39,7 +39,7 @@ export async function runCommand(cmd, options) {
     proc.on("close", (code) => resolve({ code, ...rv }));
   });
   if (rv.code !== 0) {
-    throw new Error(`command exited with code ${code}`);
+    throw new Error(`command exited with code ${rv.code}`);
   }
   return rv;
 }

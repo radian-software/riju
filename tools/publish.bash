@@ -66,8 +66,19 @@ for lang in "${langs[@]}"; do
     done
 done
 
-composite_local_hash="$(node tools/hash-composite-image.js local)"
-composite_remote_hash="$(node tools/hash-composite-image.js remote)"
+for lang in "${langs[@]}"; do
+    for type in lang config; do
+        pkg="riju-${type}-${lang}"
+        hash="${local_hashes["${pkg}"]}"
+        published_hash="${published_hashes["${pkg}"]:-}"
+        if [[ "${published_hash}" != "${hash}" ]]; then
+            make download L="${lang}" T="${type}"
+        fi
+    done
+done
+
+composite_local_hash="$(node tools/hash-composite-image.js scripts)"
+composite_remote_hash="$(node tools/hash-composite-image.js s3)"
 
 if [[ "${composite_local_hash}" != "${composite_remote_hash}" ]]; then
     make image push I=composite

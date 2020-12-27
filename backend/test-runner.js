@@ -5,13 +5,14 @@ import { promisify } from "util";
 import _ from "lodash";
 import { Moment } from "moment";
 import moment from "moment";
-import PQueue from "p-queue";
+import pQueue from "p-queue";
+const PQueue = pQueue.default;
 import rimraf from "rimraf";
 import stripAnsi from "strip-ansi";
 import { v4 as getUUID } from "uuid";
 
 import api from "./api";
-import { LangConfig, langs } from "./langs";
+import { langs } from "./langs";
 
 function parseIntOr(thing, def) {
   const num = parseInt(thing);
