@@ -6,7 +6,7 @@ set -euo pipefail
 : ${DOMAIN}
 : ${S3_BUCKET}
 
-if [[ -z "${DEPLOY_SSH_PRIVATE_KEY}" ]]; then
+if [[ -z "${DEPLOY_SSH_PRIVATE_KEY:-}" ]]; then
     DEPLOY_SSH_PRIVATE_KEY="$(base64 < "${DEPLOY_SSH_PUBLIC_KEY_FILE%.pub}")"
 fi
 
