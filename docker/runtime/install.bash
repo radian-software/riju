@@ -47,6 +47,9 @@ tee /etc/sudoers.d/90-riju >/dev/null <<"EOF"
 %sudo ALL=(ALL:ALL) NOPASSWD: ALL
 EOF
 
+mkdir -p /opt/riju/langs
+touch /opt/riju/langs/.keep
+
 popd
 
 rm "$0"
