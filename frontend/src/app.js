@@ -1,4 +1,4 @@
-import monaco from "monaco-editor";
+import * as monaco from "monaco-editor";
 import {
   createConnection,
   MonacoLanguageClient,
@@ -22,7 +22,7 @@ const DEBUG = window.location.hash === "#debug";
 const config = window.rijuConfig;
 
 class RijuMessageReader extends AbstractMessageReader {
-  constructor(socketSocket) {
+  constructor(socket) {
     super();
     this.state = "initial";
     this.callback = null;

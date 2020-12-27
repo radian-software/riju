@@ -76,7 +76,7 @@ endif
 .PHONY: install
 install:
 	@: $${L} $${T}
-	[[ -z "$$(ls -A /var/lib/apt/lists)" ]] && sudo apt update
+	if [[ -z "$$(ls -A /var/lib/apt/lists)" ]]; then sudo apt update; fi
 	sudo apt reinstall -y ./$(BUILD)/$(DEB)
 
 ### Build and run application code
@@ -87,7 +87,7 @@ frontend:
 
 .PHONY: frontend-dev
 frontend-dev:
-	npx webpack --mode=development --watch
+	watchexec -w webpack.config.cjs -w node_modules -r --no-environment -- "echo 'Running webpack...' >&2; npx webpack --mode=development --watch"
 
 .PHONY: system
 system:
@@ -95,7 +95,7 @@ system:
 
 .PHONY: system-dev
 system-dev:
-	watchexec -w system/src -n ./system/compile.bash
+	watchexec -w system/src -n -- ./system/compile.bash
 
 .PHONY: server
 server:
@@ -103,7 +103,7 @@ server:
 
 .PHONY: server-dev
 server-dev:
-	watchexec -w backend -r -n node backend/server.js
+	watchexec -w backend -r -n -- node backend/server.js
 
 .PHONY: build
 build: frontend system
@@ -111,6 +111,10 @@ build: frontend system
 .PHONY: dev
 dev:
 	make -j3 frontend-dev system-dev server-dev
+
+.PHONY: test
+test:
+	node backend/test-runner.js $(F)
 
 ### Fetch artifacts from registries
 

@@ -1,27 +1,25 @@
-import fs from "fs";
+import { promises as fs } from "fs";
 import process from "process";
-import { promisify } from "util";
 
 import _ from "lodash";
-import { Moment } from "moment";
-import moment from "moment";
 import pQueue from "p-queue";
 const PQueue = pQueue.default;
-import rimraf from "rimraf";
 import stripAnsi from "strip-ansi";
 import { v4 as getUUID } from "uuid";
 
-import api from "./api";
-import { langs } from "./langs";
+import * as api from "./api.js";
+import { langsPromise } from "./langs.js";
+
+let langs = {};
 
 function parseIntOr(thing, def) {
   const num = parseInt(thing);
   return Number.isNaN(num) ? def : num;
 }
 
-const TIMEOUT_FACTOR = parseIntOr(process.env.TIMEOUT_FACTOR, 1);
-const CONCURRENCY = parseIntOr(process.env.CONCURRENCY, 2);
-const BASE_TIMEOUT_SECS = 5;
+const TIMEOUT = parseIntOr(process.env.TEST_TIMEOUT_SECS, 15);
+const PATIENCE = parseIntOr(process.env.TEST_PATIENCE, 1);
+const CONCURRENCY = parseIntOr(process.env.TEST_CONCURRENCY, 2);
 
 function findPosition(str, idx) {
   const lines = str.substring(0, idx).split("\n");
@@ -38,7 +36,7 @@ async function sendInput(send, input) {
       const delay = parseFloat(line.replace(/DELAY: */, ""));
       if (Number.isNaN(delay)) continue;
       await new Promise((resolve) =>
-        setTimeout(resolve, delay * 1000 * TIMEOUT_FACTOR)
+        setTimeout(resolve, delay * 1000 * PATIENCE)
       );
     } else {
       send({ event: "terminalInput", input: line + "\r" });
@@ -52,8 +50,8 @@ class Test {
   }
 
   record = (msg) => {
-    const dur = moment.duration(moment().diff(this.startTime));
-    this.messages.push({ time: dur.asSeconds(), ...msg });
+    const dur = (new Date().getTime() - this.startTime) / 1000;
+    this.messages.push({ time: dur, ...msg });
   };
 
   send = (msg) => {
@@ -84,7 +82,7 @@ class Test {
     if ((this.config.skip || []).includes(this.type)) {
       return "skipped";
     }
-    this.startTime = moment();
+    this.startTime = new Date().getTime();
     let session = null;
     let timeout = null;
     try {
@@ -123,7 +121,7 @@ class Test {
       timeout = setTimeout(() => {
         this.timedOut = true;
         this.handleUpdate();
-      }, (this.config.timeout || BASE_TIMEOUT_SECS) * 1000 * TIMEOUT_FACTOR);
+      }, TIMEOUT * 1000 * PATIENCE);
       await session.setup();
       switch (this.type) {
         case "ensure":
@@ -547,7 +545,9 @@ class Test {
               },
             });
           } else if (msg.output.id === "ecdb8a55-f755-4553-ae8e-91d6ebbc2045") {
-            return msg.output.result.items || msg.output.result;
+            if (msg.output && msg.output.result) {
+              return msg.output.result.items || msg.output.result;
+            }
           }
         }
       }
@@ -615,21 +615,22 @@ function getTestList() {
 
 async function writeLog(lang, type, result, log) {
   log = `${result.toUpperCase()}: ${lang}/${type}\n` + log;
-  await promisify(fs.mkdir)(`tests/${lang}`, { recursive: true });
-  await promisify(fs.writeFile)(`tests/${lang}/${type}.log`, log);
-  await promisify(fs.mkdir)(`tests-run/${lang}`, { recursive: true });
-  await promisify(fs.symlink)(
+  await fs.mkdir(`tests/${lang}`, { recursive: true });
+  await fs.writeFile(`tests/${lang}/${type}.log`, log);
+  await fs.mkdir(`tests-run/${lang}`, { recursive: true });
+  await fs.symlink(
     `../../tests/${lang}/${type}.log`,
     `tests-run/${lang}/${type}.log`
   );
-  await promisify(fs.mkdir)(`tests-${result}/${lang}`, { recursive: true });
-  await promisify(fs.symlink)(
+  await fs.mkdir(`tests-${result}/${lang}`, { recursive: true });
+  await fs.symlink(
     `../../tests/${lang}/${type}.log`,
     `tests-${result}/${lang}/${type}.log`
   );
 }
 
 async function main() {
+  langs = await langsPromise;
   let tests = getTestList();
   const args = process.argv.slice(2);
   for (const arg of args) {
@@ -672,10 +673,10 @@ async function main() {
     );
     process.exit(1);
   }
-  await promisify(rimraf)("tests-run");
-  await promisify(rimraf)("tests-passed");
-  await promisify(rimraf)("tests-skipped");
-  await promisify(rimraf)("tests-failed");
+  await fs.rm("tests-run", { recursive: true, force: true });
+  await fs.rm("tests-passed", { recursive: true, force: true });
+  await fs.rm("tests-skipped", { recursive: true, force: true });
+  await fs.rm("tests-failed", { recursive: true, force: true });
   const queue = new PQueue({ concurrency: CONCURRENCY });
   let passed = new Set();
   let skipped = new Set();

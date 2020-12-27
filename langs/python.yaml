@@ -48,6 +48,6 @@ lsp:
     interpreter:
       properties:
         InterpreterPath: "/usr/bin/python3"
-    code: |
-      import func
-    item: "functools"
+  code: |
+    import func
+  item: "functools"

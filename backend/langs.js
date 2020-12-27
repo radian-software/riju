@@ -43,5 +43,6 @@ async function readLangsFromDisk() {
   }
 }
 
-readLangsFromDisk();
+export const langsPromise = readLangsFromDisk().then(() => langs);
+
 fsOrig.watch("/opt/riju/langs", debounce(readLangsFromDisk, 200));

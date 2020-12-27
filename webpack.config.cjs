@@ -33,6 +33,9 @@ module.exports = (_, argv) => ({
       },
     ],
   },
+  node: {
+    net: "mock",
+  },
   output: {
     path: path.resolve(__dirname, "frontend/out"),
     publicPath: "/js/",
@@ -43,7 +46,6 @@ module.exports = (_, argv) => ({
   },
   plugins: [
     new webpack.ProvidePlugin({
-      Buffer: ["buffer", "Buffer"],
       regeneratorRuntime: "regenerator-runtime/runtime",
     }),
     new MonacoWebpackPlugin(),
@@ -51,12 +53,6 @@ module.exports = (_, argv) => ({
   resolve: {
     alias: {
       vscode: require.resolve("monaco-languageclient/lib/vscode-compatibility"),
-    },
-    fallback: {
-      crypto: false,
-      net: false,
-      os: false,
-      path: false,
     },
   },
 });

@@ -22,10 +22,17 @@ app.set("query parser", (qs) => new URLSearchParams(qs));
 app.set("view engine", "ejs");
 
 app.get("/", (_, res) => {
-  res.render(path.resolve("frontend/pages/index"), {
-    langs,
-    analyticsEnabled,
-  });
+  if (Object.keys(langs).length > 0) {
+    res.render(path.resolve("frontend/pages/index"), {
+      langs,
+      analyticsEnabled,
+    });
+  } else {
+    res.send(
+      503,
+      "Still loading languages, or encountered error while doing so\n"
+    );
+  }
 });
 for (const [lang, { aliases }] of Object.entries(langs)) {
   if (aliases) {
