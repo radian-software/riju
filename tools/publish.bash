@@ -49,7 +49,7 @@ for lang in "${langs[@]}"; do
     done
 done
 
-if [[ -t 1 ]]; then
+if [[ -n "${CONFIRM:-}" ]]; then
     echo "Press enter to continue, or ctrl-C to abort..."
     read
 fi
