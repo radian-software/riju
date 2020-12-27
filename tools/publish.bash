@@ -86,6 +86,7 @@ else
     make pull I=composite
 fi
 
+make pull image push I=compile
 make pull image push I=app
 
 sha="$(git describe --match=always-omit-tag --always --abbrev=40 --dirty)"
