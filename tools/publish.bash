@@ -71,7 +71,7 @@ for lang in "${langs[@]}"; do
         pkg="riju-${type}-${lang}"
         hash="${local_hashes["${pkg}"]}"
         published_hash="${published_hashes["${pkg}"]:-}"
-        if [[ "${published_hash}" != "${hash}" ]]; then
+        if [[ "${published_hash}" == "${hash}" ]]; then
             make download L="${lang}" T="${type}"
         fi
     done

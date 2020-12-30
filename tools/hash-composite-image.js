@@ -72,7 +72,7 @@ export async function hashCompositeImage(mode) {
       }
       return (
         await runCommand(
-          `skopeo inspect docker://raxod502/riju:composite | jq -r '.Labels["riju-composite-hash"]'`,
+          `skopeo inspect docker://\${DOCKER_REPO}:composite | jq -r '.Labels["riju-composite-hash"]'`,
           { getStdout: true }
         )
       ).stdout.trim();
