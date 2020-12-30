@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+export PATH="$(sed -E 's/:bin:/:/; s/(^|:)bin(:|$)//' <<< "${PATH}")"
+
 if [[ "${OSTYPE:-}" != darwin* ]] && [[ "${EUID}" != 0 ]]; then
     exec sudo -E skopeo "$@"
 else
