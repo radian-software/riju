@@ -10,7 +10,7 @@ if [[ -z "${DEPLOY_SSH_PRIVATE_KEY:-}" ]]; then
     DEPLOY_SSH_PRIVATE_KEY="$(base64 < "${DEPLOY_SSH_PUBLIC_KEY_FILE%.pub}")"
 fi
 
-make push I=admin
+make image push I=admin
 make pull image push I=packaging
 
 declare -A published_hashes
@@ -77,10 +77,10 @@ for lang in "${langs[@]}"; do
     done
 done
 
-composite_local_hash="$(node tools/hash-composite-image.js scripts)"
-composite_remote_hash="$(node tools/hash-composite-image.js composite)"
+composite_scripts_hash="$(node tools/hash-composite-image.js scripts)"
+composite_registry_hash="$(node tools/hash-composite-image.js registry)"
 
-if [[ "${composite_local_hash}" != "${composite_remote_hash}" ]]; then
+if [[ "${composite_scripts_hash}" != "${composite_registry_hash}" ]]; then
     make image push I=composite
 else
     make pull I=composite
