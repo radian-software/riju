@@ -4,6 +4,7 @@ import http from "http";
 import express from "express";
 
 import { getLangs } from "./config.js";
+import { hashCompositeImage } from "./hash-composite-image.js";
 import { runCommand } from "./util.js";
 
 // Get a Node.js http server object that will serve information and
@@ -23,8 +24,10 @@ async function main() {
   const server = getServer(await getLangs());
   await new Promise((resolve) => server.listen(8487, "localhost", resolve));
   try {
+    const hash = await hashCompositeImage("debs");
     await runCommand(
-      "docker build . -f docker/composite/Dockerfile -t riju:composite --network host --no-cache"
+      `docker build . -f docker/composite/Dockerfile -t riju:composite` +
+        ` --network host --no-cache --label riju-composite-hash=${hash}`
     );
   } finally {
     await server.close();

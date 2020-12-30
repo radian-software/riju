@@ -78,7 +78,7 @@ for lang in "${langs[@]}"; do
 done
 
 composite_local_hash="$(node tools/hash-composite-image.js scripts)"
-composite_remote_hash="$(node tools/hash-composite-image.js s3)"
+composite_remote_hash="$(node tools/hash-composite-image.js composite)"
 
 if [[ "${composite_local_hash}" != "${composite_remote_hash}" ]]; then
     make image push I=composite

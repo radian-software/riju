@@ -39,6 +39,7 @@ make
 man
 nodejs
 packer
+skopeo
 ssh
 sudo
 tmux
