@@ -28,10 +28,8 @@ image:
 	@: $${I}
 ifeq ($(I),composite)
 	node tools/build-composite-image.js
-else ifeq ($(I),app)
-	docker build . -f docker/$(I)/Dockerfile -t riju:$(I)
 else
-	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) --pull
+	docker build . -f docker/$(I)/Dockerfile -t riju:$(I)
 endif
 
 .PHONY: script
@@ -117,6 +115,10 @@ test:
 	node backend/test-runner.js $(F)
 
 ### Fetch artifacts from registries
+
+.PHONY: pull-base
+pull-base:
+	docker pull ubuntu:rolling
 
 .PHONY: pull
 pull:

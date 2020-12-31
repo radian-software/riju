@@ -814,6 +814,11 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
+"@balena/dockerignore@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@balena/dockerignore/-/dockerignore-1.0.2.tgz#9ffe4726915251e8eb69f44ef3547e0da2c03e0d"
+  integrity sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==
+
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.2.tgz#8f03a22a04de437254e8ce8cc84ba39689288752"
@@ -1793,6 +1798,11 @@ diffie-hellman@^5.0.0:
     bn.js "^4.1.0"
     miller-rabin "^4.0.0"
     randombytes "^2.0.0"
+
+docker-file-parser@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/docker-file-parser/-/docker-file-parser-1.0.5.tgz#0081cf34d0cda620f0a539f8f8595da36e8bbb84"
+  integrity sha512-/pwpZWCVEonetpoEdvHUCH9KtfL/N96X0VVWjvKu/tQGqSE4RgR82kFcTG89xxp1J2LILzJy4ilyUfHpt2FBEQ==
 
 domain-browser@^1.1.1:
   version "1.2.0"
