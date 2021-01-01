@@ -137,22 +137,22 @@ async function main() {
   program.option("--publish", "deploy newly built artifacts");
   program.option("--all", "show also unchanged artifacts");
   program.parse(process.argv);
-  const plan = await computePlan();
+  let plan = await computePlan();
   const filteredPlan = plan.filter(
     ({ desired, local, remote }) => desired !== local || desired !== remote
   );
   console.log();
   if (filteredPlan.length === 0) {
     console.log(`*** NO CHANGES REQUIRED TO ${plan.length} ARTIFACTS ***`);
-    if (!program.all) {
-      plan = filteredPlan;
-    }
   } else {
     console.log(
       `*** CHANGES REQUIRED TO ${filteredPlan.length} of ${plan.length} ARTIFACTS ***`
     );
   }
   console.log();
+  if (!program.all) {
+    plan = filteredPlan;
+  }
   if (plan.length === 0) {
     process.exit(0);
   }
