@@ -97,7 +97,9 @@ async function planDebianPackages(opts) {
             await runCommand(`make download L=${lang} T=${type}`);
           },
           build: async () => {
-            await runCommand(`make pkg L=${lang} T=${type}`);
+            await runCommand(
+              `make shell I=packaging CMD="make pkg L=${lang} T=${type}"`
+            );
           },
           upload: async () => {
             await runCommand(`make upload L=${lang} T=${type}`);
