@@ -39,6 +39,10 @@ script:
 	node tools/generate-build-script.js --lang $(L) --type $(T) > $(BUILD)/build.bash
 	chmod +x $(BUILD)/build.bash
 
+.PHONY: script-all
+script-all:
+	node tools/make-foreach.js script
+
 .PHONY: pkg
 pkg:
 	@: $${L} $${T}
@@ -133,6 +137,10 @@ download:
 	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB)
 
 ### Publish artifacts to registries
+
+.PHONY: plan
+plan:
+	node tools/plan-publish.js
 
 .PHONY: push
 push:

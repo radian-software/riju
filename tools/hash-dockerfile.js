@@ -70,15 +70,19 @@ async function listFiles(path) {
 // change in this object, and when irrelevant things change, this
 // object does not change.
 //
-// Options:
+// dependentHashes should be an object which contains as keys all base
+// images used in the Dockerfile. The value for each base image is
+// included into the encoding of the Dockerfile, so that its hash will
+// change when one of the base images changes.
 //
-// * remote: fetch Riju image digests from registry instead of local
-//     index
-async function encodeDockerfile(name, opts) {
-  const { remote } = opts || {};
+// opts is an optional config object. Keys:
+// * salt: additional arbitrary object which will be included verbatim
+//     into the returned encoding object
+async function encodeDockerfile(name, dependentHashes, opts) {
+  const { salt } = opts || {};
   const dockerfile = await parseDockerfile(name);
   const ignore = await parseDockerignore();
-  return await Promise.all(
+  const steps = await Promise.all(
     dockerfile.map(async ({ name, args, error }) => {
       if (error) {
         throw error;
@@ -124,79 +128,35 @@ async function encodeDockerfile(name, opts) {
             throw new Error("got unexpected non-string for FROM args");
           }
           let image = args.split(" ")[0];
-          let [repo, tag] = image.split(":");
-          if (repo === "riju" && remote) {
-            repo = process.env.DOCKER_REPO;
-            if (!repo) {
-              throw new Error("$DOCKER_REPO not set");
-            }
-          }
-          image = `${repo}:${tag}`;
-          if (remote) {
-            const tags = (
-              await runCommand(
-                `skopeo list-tags "docker://${repo}" | jq -r '.Tags[]'`,
-                { getStdout: true }
-              )
-            ).stdout
-              .trim()
-              .split("\n");
-            if (tags.includes(tag)) {
-              step.digest = (
-                await runCommand(
-                  `skopeo inspect docker://${image} | jq -r .Digest`,
-                  { getStdout: true }
-                )
-              ).stdout.trim();
-            } else {
-              step.digest = "none";
-            }
-          } else {
-            step.digest =
-              (
-                await runCommand(
-                  `docker images --no-trunc --quiet "${image}"`,
-                  { getStdout: true }
-                )
-              ).stdout.trim() || "none";
+          step.hash = dependentHashes[image];
+          if (!step.hash) {
+            throw new Error(`no hash given for base image: ${image}`);
           }
           break;
       }
       return step;
     })
   );
+  if (salt) {
+    steps.push({ name: "SALT", args: salt });
+  }
+  return steps;
 }
 
-// Parse command-line arguments, run main functionality, and exit.
-async function main() {
-  const program = new Command();
-  program
-    .arguments("<name>")
-    .storeOptionsAsProperties(false)
-    .option("--debug", "output Dockerfile internal representation, unhashed")
-    .option("--remote", "fetch image digests from remote registry");
-  program.parse(process.argv);
-  if (program.args.length !== 1) {
-    program.help();
-  }
-  const [name] = program.args;
-  const { debug, remote } = program.opts();
-  const encoding = await encodeDockerfile(name, { remote });
-  if (debug) {
-    console.log(JSON.stringify(encoding, null, 2));
-  } else {
-    const hash = crypto
-      .createHash("sha1")
-      .update(JSON.stringify(encoding))
-      .digest("hex");
-    console.log(hash);
-  }
-  process.exit(0);
-}
-
-if (process.argv[1] === url.fileURLToPath(import.meta.url)) {
-  main().catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+// Given the name of a Dockerfile like "app", compute its hash. This
+// is a string that will change whenever the Dockerfile or any of its
+// build contexts changes meaningfully. dependentHashes should be an
+// object containing hashes for any base images used in the
+// Dockerfile (keys are base image names, values are strings).
+//
+// opts is an optional config object. Keys:
+// * salt: additional arbitrary object which will factor into the
+//     generated hash, so the hash will change whenever the salt
+//     changes
+export async function hashDockerfile(name, dependentHashes, opts) {
+  const encoding = await encodeDockerfile(name, dependentHashes, opts);
+  return crypto
+    .createHash("sha1")
+    .update(JSON.stringify(encoding))
+    .digest("hex");
 }
