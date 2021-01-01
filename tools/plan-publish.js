@@ -249,7 +249,7 @@ async function main() {
         _.every(
           tableData,
           (otherDatum) =>
-            otherDatum.pruned || !otherDatum.deps.includes(datum.id)
+            otherDatum.couldPrune || !otherDatum.deps.includes(datum.id)
         )
       ) {
         datum.pruned = true;
