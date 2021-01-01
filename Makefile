@@ -43,7 +43,7 @@ script:
 
 .PHONY: scripts
 scripts:
-	node tools/make-foreach.js script
+	node tools/make-foreach.js --pkgs script
 
 .PHONY: pkg
 pkg:
@@ -90,6 +90,11 @@ install:
 	@: $${L} $${T}
 	if [[ -z "$$(ls -A /var/lib/apt/lists)" ]]; then sudo apt update; fi
 	sudo apt reinstall -y ./$(BUILD)/$(DEB)
+
+.PHONY: installs
+installs:
+	@: $${L}
+	node tools/make-foreach.js --types install L=$(L)
 
 ### Build and run application code
 

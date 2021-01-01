@@ -6,13 +6,26 @@ import { runCommand } from "./util.js";
 
 // Parse command-line arguments, run main functionality, and exit.
 async function main() {
-  const targets = process.argv.slice(2);
-  if (targets.length === 0) {
-    console.error("usage: make-foreach.js TARGET...");
+  const args = process.argv.slice(2);
+  if (args.length < 2) {
+    console.error("usage: make-foreach.js (--pkgs | --types) TARGET...");
     process.exit(1);
   }
-  for (const { lang, type } of await getPackages()) {
-    await runCommand(`make ${targets} L=${lang} T=${type}`);
+  const [selector, ...targets] = args;
+  switch (selector) {
+    case "--pkgs":
+      for (const { lang, type } of await getPackages()) {
+        await runCommand(`make ${targets.join(" ")} L=${lang} T=${type}`);
+      }
+      break;
+    case "--types":
+      for (const type of ["lang", "config"]) {
+        await runCommand(`make ${targets.join(" ")} T=${type}`);
+      }
+      break;
+    default:
+      console.error(`make-foreach.js: unknown selector: ${selector}`);
+      process.exit(1);
   }
   process.exit(0);
 }

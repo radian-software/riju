@@ -50,6 +50,9 @@ async function planDockerImage(name, dependentHashes, opts) {
       await runCommand(`make image I=${name}`);
     },
     upload: async () => {
+      if (name === "composite") {
+        await runCommand(`make shell I=composite CMD="make test"`);
+      }
       await runCommand(`make push I=${name}`);
     },
   };
@@ -70,51 +73,63 @@ async function planDebianPackages(opts) {
       return [remoteName, remoteHash];
     })
   );
+  const packages = await getPackages();
+  const langUUIDs = Object.fromEntries(
+    packages
+      .filter(({ type }) => type === "lang")
+      .map(({ lang }) => ["lang", getUUID()])
+  );
   return await Promise.all(
-    (await getPackages()).map(
-      async ({ lang, type, name, buildScriptPath, debPath }) => {
-        const desired = crypto
-          .createHash("sha1")
-          .update(await fs.readFile(buildScriptPath, "utf-8"))
-          .digest("hex");
-        let debExists = true;
-        try {
-          await fs.access(debPath);
-        } catch (err) {
-          debExists = false;
-        }
-        let local = null;
-        if (debExists) {
-          local =
-            (
-              await runCommand(`dpkg-deb -f ${debPath} Riju-Script-Hash`, {
-                getStdout: true,
-              })
-            ).stdout.trim() || null;
-        }
-        const remote = remoteHashes[name] || null;
-        return {
-          id: getUUID(),
-          deps: deps || [],
-          artifact: "Debian package",
-          name,
-          desired,
-          local,
-          remote,
-          download: async () => {
-            await runCommand(`make download L=${lang} T=${type}`);
-          },
-          build: async () => {
-            await runCommand(
-              `make shell I=packaging CMD="make pkg L=${lang} T=${type}"`
-            );
-          },
-          upload: async () => {
-            await runCommand(`make upload L=${lang} T=${type}`);
-          },
-        };
+    packages.map(async ({ lang, type, name, buildScriptPath, debPath }) => {
+      const desired = crypto
+        .createHash("sha1")
+        .update(await fs.readFile(buildScriptPath, "utf-8"))
+        .digest("hex");
+      let debExists = true;
+      try {
+        await fs.access(debPath);
+      } catch (err) {
+        debExists = false;
       }
-    )
+      let local = null;
+      if (debExists) {
+        local =
+          (
+            await runCommand(`dpkg-deb -f ${debPath} Riju-Script-Hash`, {
+              getStdout: true,
+            })
+          ).stdout.trim() || null;
+      }
+      const remote = remoteHashes[name] || null;
+      return {
+        id: getUUID(),
+        deps: [
+          ...(deps || []),
+          type === "config" ? langUUIDs[lang] : getUUID(),
+        ],
+        artifact: "Debian package",
+        name,
+        desired,
+        local,
+        remote,
+        download: async () => {
+          await runCommand(`make download L=${lang} T=${type}`);
+        },
+        build: async () => {
+          await runCommand(
+            `make shell I=packaging CMD="make pkg L=${lang} T=${type}"`
+          );
+        },
+        upload: async () => {
+          if (type === "config") {
+            await runCommand(
+              `make shell I=runtime CMD="make installs test L=${lang}"`
+            );
+          }
+          await runCommand(`make upload L=${lang} T=${type}`);
+        },
+      };
+    })
   );
 }
 
@@ -124,7 +139,9 @@ async function computePlan() {
   };
   const packaging = await planDockerImage("packaging", dependentHashes);
   const runtime = await planDockerImage("runtime", dependentHashes);
-  const packages = await planDebianPackages({ deps: [packaging.id] });
+  const packages = await planDebianPackages({
+    deps: [packaging.id, runtime.id],
+  });
   const composite = await planDockerImage("composite", dependentHashes, {
     deps: [runtime.id, ...packages.map(({ id }) => id)],
     hashOpts: {
