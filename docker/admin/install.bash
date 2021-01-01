@@ -54,7 +54,7 @@ yarn
 apt-get update
 apt-get install -y $(sed 's/#.*//' <<< "${packages}")
 
-wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -O awscli.zip
+wget -nv https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -O awscli.zip
 unzip -q awscli.zip
 ./aws/install
 rm -rf aws awscli.zip
