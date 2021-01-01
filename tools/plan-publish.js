@@ -36,9 +36,17 @@ async function planDockerImage(name, dependentHashes, opts) {
     local,
     remote,
     download: async () => {
+      if (name === "app") {
+        // Magic string parsed by publish.bash
+        console.log("[for publish script: plan-publish is tagging app image]");
+      }
       await runCommand(`make pull I=${name}`);
     },
     build: async () => {
+      if (name === "app") {
+        // Magic string parsed by publish.bash
+        console.log("[for publish script: plan-publish is tagging app image]");
+      }
       await runCommand(`make image I=${name}`);
     },
     upload: async () => {
