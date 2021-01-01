@@ -4,7 +4,7 @@ import http from "http";
 import express from "express";
 
 import { getLangs, getPackages } from "./config.js";
-import { getLocalImageDigest } from "./docker-util.js";
+import { getLocalImageLabel } from "./docker-util.js";
 import { hashDockerfile } from "./hash-dockerfile.js";
 import { runCommand } from "./util.js";
 
@@ -25,19 +25,24 @@ async function main() {
   const hash = await hashDockerfile(
     "composite",
     {
-      "riju:runtime": await getLocalImageDigest("riju:runtime"),
+      "riju:runtime": await getLocalImageLabel(
+        "riju:runtime",
+        "riju.image-hash"
+      ),
     },
     {
       salt: {
-        packageHashes: await Promise.all(
-          (await getPackages()).map(async ({ debPath }) => {
-            return (
-              await runCommand(`dpkg-deb -f ${debPath} Riju-Script-Hash`, {
-                getStdout: true,
-              })
-            ).stdout.trim();
-          })
-        ),
+        packageHashes: (
+          await Promise.all(
+            (await getPackages()).map(async ({ debPath }) => {
+              return (
+                await runCommand(`dpkg-deb -f ${debPath} Riju-Script-Hash`, {
+                  getStdout: true,
+                })
+              ).stdout.trim();
+            })
+          )
+        ).sort(),
       },
     }
   );
