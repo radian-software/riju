@@ -9,7 +9,7 @@ import dockerfileParser from "docker-file-parser";
 import dockerignore from "@balena/dockerignore";
 import _ from "lodash";
 
-import { getLocalImageLabel } from "./docker-util.js";
+import { getLocalImageDigest, getLocalImageLabel } from "./docker-util.js";
 import { runCommand } from "./util.js";
 
 // Given a string like "runtime" that identifies the relevant
@@ -135,7 +135,9 @@ async function encodeDockerfile(name, dependentHashes, opts) {
           step.hash = dependentHashes[image];
           if (!step.hash) {
             if (hashLocalImages) {
-              step.hash = await getLocalImageLabel(image, "riju.image-hash");
+              step.hash = image.startsWith("riju:")
+                ? await getLocalImageLabel(image, "riju.image-hash")
+                : await getLocalImageDigest(image);
             } else {
               throw new Error(`no hash given for base image: ${image}`);
             }
@@ -174,16 +176,29 @@ export async function hashDockerfile(name, dependentHashes, opts) {
 
 // Parse command-line arguments, run main functionality, and exit.
 async function main() {
-  const args = process.argv.slice(2);
-  if (args.length !== 1) {
-    console.error("usage: hash-dockerfile.js NAME");
-    process.exit(1);
+  const program = new Command();
+  program
+    .arguments("<name>")
+    .storeOptionsAsProperties(false)
+    .option("--debug", "output Dockerfile internal representation, unhashed");
+  program.parse(process.argv);
+  if (program.args.length !== 1) {
+    program.help();
   }
-  const [name] = args;
+  const [name] = program.args;
+  const { debug } = program.opts();
   if (name === "composite") {
     throw new Error("use build-composite-image.js instead for this");
   }
-  console.log(await hashDockerfile(name, {}, { hashLocalImages: true }));
+  if (debug) {
+    console.log(
+      JSON.stringify(
+        await encodeDockerfile(name, {}, { hashLocalImages: true })
+      )
+    );
+  } else {
+    console.log(await hashDockerfile(name, {}, { hashLocalImages: true }));
+  }
   process.exit(0);
 }
 
