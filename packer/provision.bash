@@ -18,10 +18,10 @@ deb [arch=amd64] https://download.docker.com/linux/ubuntu ${ubuntu_name} stable
 EOF
 
 sudo -E apt-get update
-sudo -E apt-get install -y docker-ce docker-ce-cli containerd.io whois
+sudo -E apt-get install -y certbot docker-ce docker-ce-cli containerd.io whois
 
 sudo chown root:root /tmp/riju /tmp/riju-deploy /tmp/riju.service
-sudo mv /tmp/riju /tmp/riju-deploy /usr/local/bin/
+sudo mv /tmp/riju /tmp/riju-deploy /tmp/riju-install-certbot-hooks /usr/local/bin/
 sudo mv /tmp/riju.service /etc/systemd/system/
 
 for user in admin deploy; do
@@ -54,5 +54,9 @@ sudo runuser -u deploy -- sed -i 's/^/command="sudo riju-deploy ${SSH_ORIGINAL_C
 sudo tee /etc/sudoers.d/riju >/dev/null <<"EOF"
 deploy ALL=(root) NOPASSWD: /usr/local/bin/riju-deploy
 EOF
+
+sudo tee /etc/hostname >/dev/null <<< riju
+
+sudo systemctl enable riju
 
 sudo passwd -l ubuntu

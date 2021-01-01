@@ -43,6 +43,11 @@
     },
     {
       "type": "file",
+      "source": "riju-install-certbot-hooks",
+      "destination": "/tmp/riju-install-certbot-hooks"
+    },
+    {
+      "type": "file",
       "source": "riju.service",
       "destination": "/tmp/riju.service"
     },
