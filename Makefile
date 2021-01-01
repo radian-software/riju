@@ -53,6 +53,12 @@ pkg:
 	cd $(BUILD)/src && pkg="$(PWD)/$(BUILD)/pkg" ../build.bash
 	fakeroot dpkg-deb --build $(BUILD)/pkg $(BUILD)/$(DEB)
 
+.PHONY: repkg
+repkg:
+	@: $${L} $${T}
+	make shell I=packaging CMD="make pkg L=$(L) T=$(T)"
+	ctr="$$(docker container ls -f label="riju-install-target=yes" -l -q)"; test "$${ctr}" || (echo "no valid container is live"; exit 1); docker exec "$${ctr}" make install L=$(L) T=$(T)
+
 ### Manipulate artifacts inside Docker
 
 VOLUME_MOUNT ?= $(PWD)
@@ -73,6 +79,8 @@ ifneq (,$(filter $(I),admin ci))
 	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.ssh:/var/riju/.ssh -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) --network host riju:$(I) $(CMD)
 else ifneq (,$(filter $(I),compile app))
 	docker run -it --rm --hostname $(I) $(SHELL_PORTS) riju:$(I) $(CMD)
+else ifneq (,$(filter $(I),runtime composite))
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src --label riju-install-target=yes $(SHELL_PORTS) riju:$(I) $(CMD)
 else
 	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) riju:$(I) $(CMD)
 endif
@@ -155,7 +163,7 @@ upload:
 	@: $${L} $${T} $${S3_BUCKET}
 	aws s3 rm --recursive $(S3_HASH)
 	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
-	hash=aws s3 cp - $(S3_HASH)/$(shell dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash) < /dev/null
+	aws s3 cp - $(S3_HASH)/$(shell dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash) < /dev/null
 
 .PHONY: publish
 publish:
