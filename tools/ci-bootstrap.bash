@@ -11,4 +11,4 @@ set -euo pipefail
 : ${DOMAIN}
 : ${S3_BUCKET}
 
-make image shell I=admin CMD="tools/ci-run.bash"
+make image shell I=ci CMD="tools/ci-run.bash"

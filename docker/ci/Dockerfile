@@ -1,6 +1,6 @@
 FROM ubuntu:rolling
 
-COPY docker/admin/install.bash /tmp/
+COPY docker/ci/install.bash /tmp/
 RUN /tmp/install.bash
 
 WORKDIR /src
