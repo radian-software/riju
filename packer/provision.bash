@@ -55,7 +55,7 @@ sudo tee /etc/sudoers.d/riju >/dev/null <<"EOF"
 deploy ALL=(root) NOPASSWD: /usr/local/bin/riju-deploy
 EOF
 
-sudo tee /etc/hostname >/dev/null <<< riju
+sudo hostnamectl set-hostname riju
 
 sudo systemctl enable riju
 
