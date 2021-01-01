@@ -12,7 +12,7 @@ fi
 
 make pull-base scripts
 
-node tools/plan-publish.js --publish --omit-unneeded-downloads
+node tools/plan-publish.js --publish --show-all --omit-unneeded-downloads
 
 sha="$(git describe --match=always-omit-tag --always --abbrev=40 --dirty)"
 

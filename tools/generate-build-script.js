@@ -74,8 +74,7 @@ EOF`);
 install -d "\${pkg}/opt/riju/langs"
 cat <<"EOF" > "\${pkg}/opt/riju/langs/${id}.json"
 ${JSON.stringify(langConfig, null, 2)}
-EOF
-`);
+EOF`);
   return parts.join("\n\n");
 }
 

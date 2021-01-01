@@ -149,32 +149,14 @@ function printTable(data, headers) {
 async function main() {
   const program = new Command();
   program.option("--publish", "deploy newly built artifacts");
-  program.option("--all", "show also unchanged artifacts");
+  program.option("--show-all", "show also unchanged artifacts");
   program.option(
     "--omit-unneeded-downloads",
     "don't download artifacts unless needed for dependent builds"
   );
   program.parse(process.argv);
   let plan = await computePlan();
-  const filteredPlan = plan.filter(
-    ({ desired, local, remote }) => desired !== local || desired !== remote
-  );
-  console.log();
-  if (filteredPlan.length === 0) {
-    console.log(`*** NO CHANGES REQUIRED TO ${plan.length} ARTIFACTS ***`);
-  } else {
-    console.log(
-      `*** CHANGES REQUIRED TO ${filteredPlan.length} of ${plan.length} ARTIFACTS ***`
-    );
-  }
-  console.log();
-  if (!program.all) {
-    plan = filteredPlan;
-  }
-  if (plan.length === 0) {
-    process.exit(0);
-  }
-  const tableData = plan.map(
+  let tableData = plan.map(
     ({
       id,
       deps,
@@ -187,22 +169,25 @@ async function main() {
       build,
       upload,
     }) => {
-      let action, details, func, couldPrune;
+      let action, details, func, couldPrune, noop;
       if (remote === desired && local === desired) {
         action = "(no action)";
         details = desired;
         func = () => {};
         couldPrune = true;
+        noop = true;
       } else if (remote === desired && local !== desired) {
         action = "download remote";
         details = `${local} => ${desired}`;
         func = download;
         couldPrune = true;
+        noop = false;
       } else if (local === desired && remote !== desired) {
         action = "publish local";
         details = `${remote} => ${desired}`;
         func = upload;
         couldPrune = false;
+        noop = false;
       } else {
         action = "rebuild and publish";
         if (local === remote) {
@@ -215,33 +200,62 @@ async function main() {
           await upload();
         };
         couldPrune = false;
+        noop = false;
       }
-      return { id, deps, couldPrune, artifact, name, action, details, func };
+      return {
+        id,
+        deps,
+        couldPrune,
+        artifact,
+        name,
+        action,
+        details,
+        func,
+        noop,
+      };
     }
   );
   if (program.omitUnneededDownloads) {
-    // Recall that JavaScript object keys are sorted by insertion
-    // order.
-    const index = Object.fromEntries(
-      tableData.map((datum) => [datum.id, datum]).reverse()
-    );
-    for (const [id, datum] of Object.entries(index)) {
-      // See if we can prune this step.
-      if (datum.couldPrune && _.every(datum.deps, index[dep].pruned)) {
+    for (const datum of [...tableData].reverse()) {
+      if (
+        datum.couldPrune &&
+        _.every(
+          tableData,
+          (otherDatum) =>
+            otherDatum.pruned || !otherDatum.deps.includes(datum.id)
+        )
+      ) {
         datum.pruned = true;
-        if (!datum.details.startsWith("(")) {
-          datum.details += " [skipping]";
+        if (!datum.noop) {
+          datum.action += " [skipping]";
+          datum.noop = true;
         }
       }
     }
   }
-  printTable(tableData, [
-    { key: "artifact", title: "Type" },
-    { key: "name", title: "Name" },
-    { key: "action", title: "Action" },
-    { key: "details", title: "Details" },
-  ]);
   console.log();
+  const filteredTableData = tableData.filter(({ noop }) => !noop);
+  if (filteredTableData.length === 0) {
+    console.log(`*** NO ACTION REQUIRED FOR ${plan.length} ARTIFACTS ***`);
+  } else {
+    console.log(
+      `*** ACTION REQUIRED FOR ${filteredTableData.length} of ${plan.length} ARTIFACTS ***`
+    );
+  }
+  console.log();
+  if (!program.showAll) {
+    tableData = filteredTableData;
+  }
+  if (tableData.length > 0) {
+    printTable(tableData, [
+      { key: "artifact", title: "Type" },
+      { key: "name", title: "Name" },
+      { key: "action", title: "Action" },
+      { key: "details", title: "Details" },
+    ]);
+    console.log();
+  }
+  tableData = filteredTableData;
   if (program.publish) {
     for (const { func } of tableData) {
       await func();
