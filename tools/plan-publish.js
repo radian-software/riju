@@ -23,7 +23,7 @@ async function planDockerImage(name, dependentHashes, opts) {
     `${DOCKER_REPO}:${name}`,
     "riju.image-hash"
   );
-  dependentHashes[`${DOCKER_REPO}:${name}`] = desired;
+  dependentHashes[`riju:${name}`] = desired;
   return {
     artifact: "Docker image",
     name,
@@ -73,7 +73,9 @@ async function planDebianPackages() {
         if (debExists) {
           local =
             (
-              await runCommand(`dpkg-deb -f ${debPath} Riju-Script-Hash`)
+              await runCommand(`dpkg-deb -f ${debPath} Riju-Script-Hash`, {
+                getStdout: true,
+              })
             ).stdout.trim() || null;
         }
         const remote = remoteHashes[name] || null;
@@ -99,7 +101,9 @@ async function planDebianPackages() {
 }
 
 async function computePlan() {
-  const dependentHashes = {};
+  const dependentHashes = {
+    "ubuntu:rolling": await getLocalImageDigest("ubuntu:rolling"),
+  };
   const packaging = await planDockerImage("packaging", dependentHashes);
   const runtime = await planDockerImage("runtime", dependentHashes);
   const packages = await planDebianPackages();
@@ -134,7 +138,9 @@ async function main() {
   program.option("--all", "show also unchanged artifacts");
   program.parse(process.argv);
   const plan = await computePlan();
-  const filteredPlan = plan.filter(({ desired, remote }) => desired !== remote);
+  const filteredPlan = plan.filter(
+    ({ desired, local, remote }) => desired !== local || desired !== remote
+  );
   console.log();
   if (filteredPlan.length === 0) {
     console.log(`*** NO CHANGES REQUIRED TO ${plan.length} ARTIFACTS ***`);
@@ -159,16 +165,16 @@ async function main() {
         func = () => {};
       } else if (remote === desired && local !== desired) {
         action = "download remote";
-        details = `${local} (local) => ${desired}`;
+        details = `${local} => ${desired}`;
         func = download;
       } else if (local === desired && remote !== desired) {
         action = "publish local";
-        details = `${remote} (remote) => ${desired}`;
+        details = `${remote} => ${desired}`;
         func = upload;
       } else {
         action = "rebuild and publish";
         if (local === remote) {
-          details = `${local} (local) => ${desired}`;
+          details = `${local} => ${desired}`;
         } else {
           details = `${local} (local), ${remote} (remote) => ${desired}`;
         }
@@ -188,7 +194,7 @@ async function main() {
   ]);
   console.log();
   if (program.publish) {
-    for ({ func } of tableData) {
+    for (const { func } of tableData) {
       await func();
     }
   }

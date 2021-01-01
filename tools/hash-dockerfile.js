@@ -9,6 +9,7 @@ import dockerfileParser from "docker-file-parser";
 import dockerignore from "@balena/dockerignore";
 import _ from "lodash";
 
+import { getLocalImageLabel } from "./docker-util.js";
 import { runCommand } from "./util.js";
 
 // Given a string like "runtime" that identifies the relevant
@@ -78,8 +79,11 @@ async function listFiles(path) {
 // opts is an optional config object. Keys:
 // * salt: additional arbitrary object which will be included verbatim
 //     into the returned encoding object
+// * hashLocalImages: truthy means that if a base image is not
+//     specified in dependentHashes then its hash will automatically
+//     be extracted from the labels of the local image by that name
 async function encodeDockerfile(name, dependentHashes, opts) {
-  const { salt } = opts || {};
+  const { salt, hashLocalImages } = opts || {};
   const dockerfile = await parseDockerfile(name);
   const ignore = await parseDockerignore();
   const steps = await Promise.all(
@@ -130,7 +134,11 @@ async function encodeDockerfile(name, dependentHashes, opts) {
           let image = args.split(" ")[0];
           step.hash = dependentHashes[image];
           if (!step.hash) {
-            throw new Error(`no hash given for base image: ${image}`);
+            if (hashLocalImages) {
+              step.hash = await getLocalImageLabel(image, "riju.image-hash");
+            } else {
+              throw new Error(`no hash given for base image: ${image}`);
+            }
           }
           break;
       }
@@ -153,10 +161,35 @@ async function encodeDockerfile(name, dependentHashes, opts) {
 // * salt: additional arbitrary object which will factor into the
 //     generated hash, so the hash will change whenever the salt
 //     changes
+// * hashLocalImages: truthy means that if a base image is not
+//     specified in dependentHashes then its hash will automatically
+//     be extracted from the labels of the local image by that name
 export async function hashDockerfile(name, dependentHashes, opts) {
   const encoding = await encodeDockerfile(name, dependentHashes, opts);
   return crypto
     .createHash("sha1")
     .update(JSON.stringify(encoding))
     .digest("hex");
+}
+
+// Parse command-line arguments, run main functionality, and exit.
+async function main() {
+  const args = process.argv.slice(2);
+  if (args.length !== 1) {
+    console.error("usage: hash-dockerfile.js NAME");
+    process.exit(1);
+  }
+  const [name] = args;
+  if (name === "composite") {
+    throw new Error("use build-composite-image.js instead for this");
+  }
+  console.log(await hashDockerfile(name, {}, { hashLocalImages: true }));
+  process.exit(0);
+}
+
+if (process.argv[1] === url.fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 }

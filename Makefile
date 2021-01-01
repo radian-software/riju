@@ -28,8 +28,10 @@ image:
 	@: $${I}
 ifeq ($(I),composite)
 	node tools/build-composite-image.js
-else
+else ifeq ($(I),admin)
 	docker build . -f docker/$(I)/Dockerfile -t riju:$(I)
+else
+	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) --label riju.image-hash=$(shell node tools/hash-dockerfile.js $(I))
 endif
 
 .PHONY: script
@@ -39,8 +41,8 @@ script:
 	node tools/generate-build-script.js --lang $(L) --type $(T) > $(BUILD)/build.bash
 	chmod +x $(BUILD)/build.bash
 
-.PHONY: script-all
-script-all:
+.PHONY: scripts
+scripts:
 	node tools/make-foreach.js script
 
 .PHONY: pkg
@@ -153,7 +155,7 @@ upload:
 	@: $${L} $${T} $${S3_BUCKET}
 	aws s3 rm --recursive $(S3_HASH)
 	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
-	hash=$$(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash); test $${hash}; echo $${hash}; aws s3 cp - $(S3_HASH)/$${hash} < /dev/null
+	hash=aws s3 cp - $(S3_HASH)/$(shell dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash) < /dev/null
 
 .PHONY: publish
 publish:

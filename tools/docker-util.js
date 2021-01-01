@@ -37,8 +37,8 @@ export async function getLocalImageLabel(image, label) {
       return null;
     }
   }
-  const labels = JSON.stringify(output)[0].Config.Labels;
-  return labels[label] || null;
+  const labels = JSON.parse(output)[0].Config.Labels;
+  return (labels && labels[label]) || null;
 }
 
 // Return the value of a label on a Docker image that is on a remote
@@ -47,11 +47,13 @@ export async function getRemoteImageLabel(image, label) {
   const [repo, tag] = image.split(":");
   let output;
   try {
-    output = await runCommand(`skopeo inspect docker://${image}`, {
-      getStdout: true,
-    });
+    output = (
+      await runCommand(`skopeo inspect docker://${image}`, {
+        getStdout: true,
+      })
+    ).stdout;
   } catch (err) {
-    const tags = JSON.stringify(
+    const tags = JSON.parse(
       (
         await runCommand(`skopeo list-tags "docker://${repo}"`, {
           getStdout: true,
@@ -69,7 +71,7 @@ export async function getRemoteImageLabel(image, label) {
     }
   }
   const labels = JSON.parse(output).Labels;
-  return labels[label] || null;
+  return (labels && labels[label]) || null;
 }
 
 // Return the value of $DOCKER_REPO, throwing an error if it's not set
