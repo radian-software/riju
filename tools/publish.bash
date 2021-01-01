@@ -20,7 +20,7 @@ trap cleanup EXIT
 
 make pull-base scripts
 
-node tools/plan-publish.js --publish --show-all --omit-unneeded-downloads \
+node tools/plan-publish.js --execute --publish --show-all --omit-unneeded-downloads \
     | tee "${tmpdir}/plan-publish.out"
 
 if ! grep -F "plan-publish is tagging app image" "${tmpdir}/plan-publish.out"; then

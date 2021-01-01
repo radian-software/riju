@@ -151,11 +151,15 @@ download:
 	mkdir -p $(BUILD)
 	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB)
 
-### Publish artifacts to registries
-
 .PHONY: plan
 plan:
 	node tools/plan-publish.js
+
+.PHONY: sync
+sync:
+	node tools/plan-publish.js --execute
+
+### Publish artifacts to registries
 
 .PHONY: push
 push:

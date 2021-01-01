@@ -175,7 +175,11 @@ function printTable(data, headers) {
 // Parse command-line arguments, run main functionality, and exit.
 async function main() {
   const program = new Command();
-  program.option("--publish", "deploy newly built artifacts");
+  program.option("--execute", "pull and build artifacts locally");
+  program.option(
+    "--publish",
+    "with --execute, also deploy newly built artifacts"
+  );
   program.option("--show-all", "show also unchanged artifacts");
   program.option(
     "--omit-unneeded-downloads",
@@ -212,7 +216,11 @@ async function main() {
       } else if (local === desired && remote !== desired) {
         action = "publish local";
         details = `${remote} => ${desired}`;
-        func = upload;
+        func = async () => {
+          if (program.publish) {
+            await upload();
+          }
+        };
         couldPrune = false;
         noop = false;
       } else {
@@ -224,7 +232,9 @@ async function main() {
         }
         func = async () => {
           await build();
-          await upload();
+          if (program.publish) {
+            await upload();
+          }
         };
         couldPrune = false;
         noop = false;
@@ -283,7 +293,7 @@ async function main() {
     console.log();
   }
   tableData = filteredTableData;
-  if (program.publish) {
+  if (program.execute) {
     for (const { func } of tableData) {
       await func();
     }
