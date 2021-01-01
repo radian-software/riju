@@ -4,6 +4,8 @@ import process from "process";
 import url from "url";
 
 import { Command } from "commander";
+import _ from "lodash";
+import { v4 as getUUID } from "uuid";
 
 import { getPackages } from "./config.js";
 import {
@@ -16,8 +18,9 @@ import { hashDockerfile } from "./hash-dockerfile.js";
 import { runCommand } from "./util.js";
 
 async function planDockerImage(name, dependentHashes, opts) {
+  const { deps, hashOpts } = opts || {};
   const DOCKER_REPO = getDockerRepo();
-  const desired = await hashDockerfile(name, dependentHashes, opts);
+  const desired = await hashDockerfile(name, dependentHashes, hashOpts);
   const local = await getLocalImageLabel(`riju:${name}`, "riju.image-hash");
   const remote = await getRemoteImageLabel(
     `${DOCKER_REPO}:${name}`,
@@ -25,6 +28,8 @@ async function planDockerImage(name, dependentHashes, opts) {
   );
   dependentHashes[`riju:${name}`] = desired;
   return {
+    id: getUUID(),
+    deps: deps || [],
     artifact: "Docker image",
     name,
     desired,
@@ -42,7 +47,8 @@ async function planDockerImage(name, dependentHashes, opts) {
   };
 }
 
-async function planDebianPackages() {
+async function planDebianPackages(opts) {
+  const { deps } = opts || {};
   const remoteHashes = Object.fromEntries(
     JSON.parse(
       (
@@ -80,6 +86,8 @@ async function planDebianPackages() {
         }
         const remote = remoteHashes[name] || null;
         return {
+          id: getUUID(),
+          deps: deps || [],
           artifact: "Debian package",
           name,
           desired,
@@ -106,13 +114,19 @@ async function computePlan() {
   };
   const packaging = await planDockerImage("packaging", dependentHashes);
   const runtime = await planDockerImage("runtime", dependentHashes);
-  const packages = await planDebianPackages();
-  const packageHashes = packages.map(({ desired }) => desired).sort();
+  const packages = await planDebianPackages({ deps: [packaging.id] });
   const composite = await planDockerImage("composite", dependentHashes, {
-    salt: { packageHashes },
+    deps: [runtime.id, ...packages.map(({ id }) => id)],
+    hashOpts: {
+      salt: {
+        packageHashes: packages.map(({ desired }) => desired).sort(),
+      },
+    },
   });
   const compile = await planDockerImage("compile", dependentHashes);
-  const app = await planDockerImage("app", dependentHashes);
+  const app = await planDockerImage("app", dependentHashes, {
+    deps: [composite.id, compile.id],
+  });
   return [packaging, runtime, ...packages, composite, compile, app];
 }
 
@@ -136,6 +150,10 @@ async function main() {
   const program = new Command();
   program.option("--publish", "deploy newly built artifacts");
   program.option("--all", "show also unchanged artifacts");
+  program.option(
+    "--omit-unneeded-downloads",
+    "don't download artifacts unless needed for dependent builds"
+  );
   program.parse(process.argv);
   let plan = await computePlan();
   const filteredPlan = plan.filter(
@@ -157,20 +175,34 @@ async function main() {
     process.exit(0);
   }
   const tableData = plan.map(
-    ({ artifact, name, desired, local, remote, download, build, upload }) => {
-      let action, details, func;
+    ({
+      id,
+      deps,
+      artifact,
+      name,
+      desired,
+      local,
+      remote,
+      download,
+      build,
+      upload,
+    }) => {
+      let action, details, func, couldPrune;
       if (remote === desired && local === desired) {
         action = "(no action)";
         details = desired;
         func = () => {};
+        couldPrune = true;
       } else if (remote === desired && local !== desired) {
         action = "download remote";
         details = `${local} => ${desired}`;
         func = download;
+        couldPrune = true;
       } else if (local === desired && remote !== desired) {
         action = "publish local";
         details = `${remote} => ${desired}`;
         func = upload;
+        couldPrune = false;
       } else {
         action = "rebuild and publish";
         if (local === remote) {
@@ -182,10 +214,27 @@ async function main() {
           await build();
           await upload();
         };
+        couldPrune = false;
       }
-      return { artifact, name, action, details, func };
+      return { id, deps, couldPrune, artifact, name, action, details, func };
     }
   );
+  if (program.omitUnneededDownloads) {
+    // Recall that JavaScript object keys are sorted by insertion
+    // order.
+    const index = Object.fromEntries(
+      tableData.map((datum) => [datum.id, datum]).reverse()
+    );
+    for (const [id, datum] of Object.entries(index)) {
+      // See if we can prune this step.
+      if (datum.couldPrune && _.every(datum.deps, index[dep].pruned)) {
+        datum.pruned = true;
+        if (!datum.details.startsWith("(")) {
+          datum.details += " [skipping]";
+        }
+      }
+    }
+  }
   printTable(tableData, [
     { key: "artifact", title: "Type" },
     { key: "name", title: "Name" },
