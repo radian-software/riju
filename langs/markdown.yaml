@@ -26,4 +26,3 @@ format:
     prettier --no-config --stdin-filepath=format.md
   input: |
     Hello, world!
-
