@@ -25,4 +25,8 @@ format:
   run: |
     prettier --no-config --stdin-filepath=format.md
   input: |
-    Hello, world!
+    1. First
+    3. Second
+  output: |
+    1. First
+    2. Second
