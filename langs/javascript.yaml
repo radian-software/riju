@@ -7,7 +7,7 @@ aliases:
   - "v8"
   - "closure"
   - "nodejs"
-name: "Node.js"
+name: "JavaScript"
 monacoLang: javascript
 
 repl: |
