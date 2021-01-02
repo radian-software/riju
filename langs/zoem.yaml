@@ -3,6 +3,10 @@ aliases:
   - "azm"
 name: "Zoem"
 
+install:
+  apt:
+    - zoem
+
 repl: |
   zoem
 input: |

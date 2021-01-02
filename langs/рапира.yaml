@@ -6,6 +6,11 @@ aliases:
   - "rapira"
 name: "Рапира"
 
+install:
+  build:
+    apt:
+      - clang
+
 main: "main.rap"
 template: |
   вывод: "Hello, world!"

@@ -1,6 +1,10 @@
 id: "gnuplot"
 name: "Gnuplot"
 
+install:
+  apt:
+    - gnuplot
+
 repl: |
   gnuplot
 input: |

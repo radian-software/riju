@@ -3,6 +3,11 @@ aliases:
   - "rationalfortran"
 name: "Ratfor"
 
+install:
+  apt:
+    - ratfor
+    - flang
+
 main: "main.r"
 template: |
   print *, 'Hello, world!'

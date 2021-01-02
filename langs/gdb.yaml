@@ -1,6 +1,10 @@
 id: "gdb"
 name: "GDB"
 
+install:
+  apt:
+    - gdb
+
 repl: |
   gdb
 input: |

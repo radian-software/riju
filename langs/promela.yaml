@@ -4,6 +4,10 @@ aliases:
   - "pml"
 name: "PROMELA"
 
+install:
+  apt:
+    - spin
+
 main: "main.pml"
 template: |
   active proctype main() {

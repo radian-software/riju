@@ -6,6 +6,10 @@ aliases:
   - "ecc"
 name: "eC"
 
+install:
+  apt:
+    - ecere-dev
+
 main: "main.ec"
 template: |
   class Main : Application

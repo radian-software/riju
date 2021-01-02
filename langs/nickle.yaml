@@ -1,6 +1,10 @@
 id: "nickle"
 name: "Nickle"
 
+install:
+  apt:
+    - nickle
+
 repl: |
   nickle
 

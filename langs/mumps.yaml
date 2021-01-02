@@ -5,6 +5,10 @@ aliases:
   - "fisgtm"
 name: "MUMPS"
 
+install:
+  apt:
+    - fis-gtm
+
 main: "main.m"
 template: |
   main()

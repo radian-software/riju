@@ -52,6 +52,12 @@ info:
     - oo
   usage: popular
 
+install:
+  apt:
+    - clang
+    - clang-format
+    - clangd
+
 main: "main.cpp"
 template: |
   #include <iostream>

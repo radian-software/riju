@@ -24,6 +24,10 @@ info:
   paradigm: imperative
   usage: []
 
+install:
+  apt:
+    - bwbasic
+
 repl: |
   bwbasic
 input: |

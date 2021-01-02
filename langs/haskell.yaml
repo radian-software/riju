@@ -5,6 +5,13 @@ aliases:
   - "hs"
 name: "Haskell"
 
+install:
+  build:
+    apt:
+      - cabal-install
+  apt:
+    - ghc
+
 repl: |
   rm -f .ghci && ghci
 

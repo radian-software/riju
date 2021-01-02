@@ -1,6 +1,11 @@
 id: "yorick"
 name: "Yorick"
 
+install:
+  apt:
+    - yorick
+    - rlwrap
+
 repl: |
   rlwrap yorick
 

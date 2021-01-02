@@ -7,6 +7,10 @@ aliases:
   - "ielm"
 name: "Emacs Lisp"
 
+install:
+  apt:
+    - emacs-nox
+
 repl: |
   emacs --eval "(progn (require 'package) (push '("melpa" . "https://melpa.org/packages/") package-archives) (package-initialize) (ielm))"
 input: |
@@ -25,10 +29,10 @@ scope:
 
 pkg:
   install: |
-    emacs -Q --batch --eval "(progn (require 'package) (push '("melpa" . "https://melpa.org/packages/") package-archives) (package-initialize) (unless (ignore-errors (>= (length (directory-files "~/.emacs.d/elpa/archives")) 4)) (package-refresh-contents)) (package-install 'NAME))"
+    emacs -Q --batch --eval "(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (unless (ignore-errors (>= (length (directory-files \"~/.emacs.d/elpa/archives\")) 4)) (package-refresh-contents)) (package-install 'NAME))"
 
   uninstall: |
-    ls ~/.emacs.d/elpa | grep -- - | grep '^NAME-[0-9]' | while read pkg; do emacs -Q --batch --eval "(progn (require 'package) (push '("melpa" . "https://melpa.org/packages/") package-archives) (package-initialize) (unless (ignore-errors (>= (length (directory-files "~/.emacs.d/elpa/archives")) 4)) (package-refresh-contents)) (call-interactively 'package-delete))" <<< "$pkg"; done
+    ls ~/.emacs.d/elpa | grep -- - | grep '^NAME-[0-9]' | while read pkg; do emacs -Q --batch --eval "(progn (require 'package) (push '(\"melpa" . "https://melpa.org/packages/\") package-archives) (package-initialize) (unless (ignore-errors (>= (length (directory-files \"~/.emacs.d/elpa/archives\")) 4)) (package-refresh-contents)) (call-interactively 'package-delete))" <<< "$pkg"; done
 
   all: |
     set -o pipefail; (curl -sS https://elpa.gnu.org/packages/ | grep '<td>' | grep -Eo '[^>]+</a>' | grep -Eo '^[^<]+' && curl -sS https://melpa.org/archive.json | jq -r 'keys | .[]') | sort | uniq

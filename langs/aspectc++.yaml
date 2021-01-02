@@ -3,6 +3,10 @@ aliases:
   - "aspectcpp"
 name: "AspectC++"
 
+install:
+  apt:
+    - aspectc++
+
 main: "main.cpp"
 template: |
   #include <iostream>

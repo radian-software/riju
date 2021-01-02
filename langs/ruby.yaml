@@ -5,6 +5,10 @@ aliases:
 name: "Ruby"
 monacoLang: ruby
 
+install:
+  apt:
+    - ruby
+
 repl: |
   irb
 

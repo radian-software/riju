@@ -5,6 +5,10 @@ aliases:
   - "ilasm"
 name: "CIL"
 
+install:
+  apt:
+    - mono-devel
+
 main: "main.il"
 template: |
   .assembly main {}

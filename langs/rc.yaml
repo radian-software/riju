@@ -3,6 +3,10 @@ aliases:
   - "runcommands"
 name: "rc"
 
+install:
+  apt:
+    - rc
+
 repl: |
   rc
 input: |

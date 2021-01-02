@@ -3,6 +3,10 @@ aliases:
   - "gp"
 name: "PARI/GP"
 
+install:
+  apt:
+    - pari-gp
+
 repl: |
   gp
 

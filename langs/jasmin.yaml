@@ -1,6 +1,10 @@
 id: "jasmin"
 name: "Jasmin"
 
+install:
+  apt:
+    - jasmin-sable
+
 main: "Main.j"
 template: |
   .class public Main

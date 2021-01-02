@@ -6,6 +6,10 @@ aliases:
 name: "F#"
 monacoLang: fsharp
 
+install:
+  apt:
+    - fsharp
+
 repl: |
   fsharpi
 input: |

@@ -26,6 +26,10 @@ info:
     - oo
   usage: popular
 
+install:
+  apt:
+    - gnat
+
 main: "main.adb"
 template: |
   with Ada.Text_IO;

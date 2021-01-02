@@ -3,6 +3,10 @@ aliases:
   - "rkt"
 name: "Racket"
 
+install:
+  apt:
+    - racket
+
 repl: |
   racket
 input: |

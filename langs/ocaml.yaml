@@ -1,6 +1,13 @@
 id: "ocaml"
 name: "OCaml"
 
+install:
+  build:
+    apt:
+      - opam
+  apt:
+    - ocaml
+
 repl: |
   ocaml
 input: |

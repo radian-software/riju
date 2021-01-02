@@ -4,6 +4,10 @@ aliases:
   - "gbs"
 name: "Gambas"
 
+install:
+  apt:
+    - gambas3-script
+
 main: "main.gbs"
 template: |
   Print "Hello, world!"

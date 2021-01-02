@@ -5,6 +5,11 @@ aliases:
   - "ghostscript"
 name: "PostScript"
 
+install:
+  apt:
+    - ghostscript
+    - rlwrap
+
 repl: |
   rlwrap gs
 input: |

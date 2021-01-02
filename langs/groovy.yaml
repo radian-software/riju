@@ -1,6 +1,10 @@
 id: "groovy"
 name: "Groovy"
 
+install:
+  apt:
+    - groovy
+
 repl: |
   JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" groovysh
 

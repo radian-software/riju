@@ -5,6 +5,10 @@ aliases:
   - "v"
 name: "Verilog"
 
+install:
+  apt:
+    - iverilog
+
 main: "main.v"
 template: |
   module main;

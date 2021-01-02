@@ -4,6 +4,10 @@ aliases:
   - "st"
 name: "Smalltalk"
 
+install:
+  apt:
+    - gnu-smalltalk
+
 repl: |
   gst
 

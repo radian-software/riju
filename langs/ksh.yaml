@@ -4,6 +4,10 @@ aliases:
 name: "Ksh"
 monacoLang: shell
 
+install:
+  apt:
+    - ksh
+
 repl: |
   SHELL=/usr/bin/ksh HOME="$PWD" ksh
 input: |

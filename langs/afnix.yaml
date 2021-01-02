@@ -5,6 +5,11 @@ aliases:
   - "axi"
 name: "Afnix"
 
+install:
+  apt:
+    - afnix
+    - afnix-doc
+
 repl: |
   LD_LIBRARY_PATH=/usr/lib/afnix axi
 input: |

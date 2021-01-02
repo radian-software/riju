@@ -18,6 +18,13 @@ info:
   paradigm: imperative
   usage: personal
 
+install:
+  build:
+    apt:
+      - golang
+  apt:
+    - yasm
+
 main: "main.bts"
 template: |
   const message = "Hello, world!

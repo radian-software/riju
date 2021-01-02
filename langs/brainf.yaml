@@ -24,6 +24,10 @@ info:
   paradigm: turing
   usage: []
 
+install:
+  apt:
+    - beef
+
 repl: |
   brainf-repl
 input: |

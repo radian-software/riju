@@ -4,6 +4,11 @@ aliases:
   - "lci"
 name: "LOLCODE"
 
+install:
+  build:
+    apt:
+      - cmake
+
 main: "main.lol"
 template: |
   HAI 1.2

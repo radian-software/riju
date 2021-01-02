@@ -5,6 +5,10 @@ aliases:
 name: "Tcl"
 monacoLang: tcl
 
+install:
+  apt:
+    - tcl
+
 repl: |
   tclsh
 input: |

@@ -37,6 +37,11 @@ info:
     - oo
   usage: []
 
+install:
+  apt:
+    - sbcl
+    - rlwrap
+
 repl: |
   rlwrap sbcl
 input: |

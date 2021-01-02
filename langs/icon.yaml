@@ -5,6 +5,10 @@ aliases:
   - "iconx"
 name: "Icon"
 
+install:
+  apt:
+    - icont
+
 main: "main.icn"
 template: |
   procedure main ()

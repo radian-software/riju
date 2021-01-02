@@ -3,6 +3,10 @@ aliases:
   - "bsh"
 name: "Beanshell"
 
+install:
+  apt:
+    - bsh
+
 repl: |
   CLASSPATH=/usr/share/java/jline.jar:/usr/share/java/bsh.jar java -Duser.home="$PWD" jline.ConsoleRunner bsh.Interpreter
 input: |

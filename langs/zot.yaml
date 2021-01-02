@@ -1,6 +1,12 @@
 id: "zot"
 name: "Zot"
 
+install:
+  build:
+    apt:
+      - qt5-qmake
+      - qtscript5-dev
+
 main: "main.zot"
 template: |
   111101010100111010101001001101010010010011101010100111010101

@@ -1,6 +1,10 @@
 id: "bc"
 name: "bc"
 
+install:
+  apt:
+    - bc
+
 repl: |
   bc
 

@@ -19,6 +19,11 @@ info:
     - oo
   usage: []
 
+install:
+  apt:
+    - $(grep-aptavail -F Package ceylon -s Package -n | sort -rV | head -n1)
+    - openjdk-8-jdk-headless
+
 main: "source/main.ceylon"
 template: |
   shared void run() {

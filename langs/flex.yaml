@@ -3,6 +3,11 @@ aliases:
   - "lex"
 name: "Flex"
 
+install:
+  apt:
+    - flex
+    - flex-doc
+
 main: "main.lex"
 template: |
   %{

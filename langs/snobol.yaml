@@ -5,6 +5,11 @@ aliases:
   - "sno"
 name: "SNOBOL"
 
+install:
+  build:
+    apt:
+      - m4
+
 repl: |
   snobol4
 input: |2

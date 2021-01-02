@@ -19,6 +19,11 @@ info:
   paradigm: imperative
   usage: []
 
+install:
+  apt:
+    - gcc-arm-linux-gnueabihf
+    - qemu-user-static
+
 main: "main.S"
 template: |2
   	.text

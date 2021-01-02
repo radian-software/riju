@@ -4,6 +4,10 @@ aliases:
   - "cnut"
 name: "Squirrel"
 
+install:
+  apt:
+    - squirrel3
+
 repl: |
   squirrel
 input: |

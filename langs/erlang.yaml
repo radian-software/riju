@@ -3,6 +3,12 @@ aliases:
   - "erl"
 name: "Erlang"
 
+install:
+  apt:
+    - erlang
+    - libodbc1  # workaround bug in APT
+    - rebar
+
 repl: |
   erl
 input: |

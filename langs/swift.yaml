@@ -4,6 +4,10 @@ aliases:
 name: "Swift"
 monacoLang: swift
 
+install:
+  apt:
+    - libpython2.7
+
 main: "main.swift"
 template: |
   print("Hello, world!")

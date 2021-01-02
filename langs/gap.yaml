@@ -1,6 +1,10 @@
 id: "gap"
 name: "GAP"
 
+install:
+  apt:
+    - gap
+
 repl: |
   gap
 input: |

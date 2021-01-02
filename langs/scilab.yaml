@@ -3,6 +3,10 @@ aliases:
   - "sci"
 name: "Scilab"
 
+install:
+  apt:
+    - scilab
+
 repl: |
   scilab-cli
 input: |

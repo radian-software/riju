@@ -3,6 +3,10 @@ aliases:
   - "hx"
 name: "Haxe"
 
+install:
+  apt:
+    - haxe
+
 main: "Main.hx"
 template: |
   class Main {

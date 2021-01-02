@@ -4,6 +4,10 @@ aliases:
   - "pakcs"
 name: "Curry"
 
+install:
+  apt:
+    - pakcs
+
 repl: |
   pakcs
 

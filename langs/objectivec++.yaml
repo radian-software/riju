@@ -5,6 +5,12 @@ aliases:
   - "objectivecpp"
 name: "Objective-C++"
 
+install:
+  apt:
+    - gcc
+    - gnustep-devel
+    - gobjc++
+
 main: "main.mm"
 template: |
   #import <Foundation/Foundation.h>

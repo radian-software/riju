@@ -22,6 +22,10 @@ info:
   paradigm: imperative
   usage: []
 
+install:
+  apt:
+    - mawk
+
 main: "main.awk"
 template: |
   BEGIN { print "Hello, world!" }

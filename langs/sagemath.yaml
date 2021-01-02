@@ -3,6 +3,10 @@ aliases:
   - "sage"
 name: "SageMath"
 
+install:
+  apt:
+    - sagemath
+
 repl: |
   sage
 

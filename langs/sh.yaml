@@ -9,6 +9,10 @@ aliases:
 name: "Sh"
 monacoLang: shell
 
+install:
+  apt:
+    - posh
+
 repl: |
   SHELL=/usr/bin/sh HOME="$PWD" posh -l
 input: |

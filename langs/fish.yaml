@@ -1,6 +1,10 @@
 id: "fish"
 name: "Fish"
 
+install:
+  apt:
+    - fish
+
 repl: |
   SHELL=/usr/bin/fish fish
 input: |

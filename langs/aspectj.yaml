@@ -3,6 +3,10 @@ aliases:
   - "aj"
 name: "AspectJ"
 
+install:
+  apt:
+    - aspectj
+
 main: "Main.aj"
 template: |
   public class Main {

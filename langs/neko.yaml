@@ -3,6 +3,10 @@ aliases:
   - "nekoc"
 name: "Neko"
 
+install:
+  apt:
+    - neko
+
 main: "main.neko"
 template: |
   $print("Hello, world!\n");

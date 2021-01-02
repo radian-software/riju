@@ -4,6 +4,10 @@ aliases:
   - "vimscript"
 name: "Vimscript"
 
+install:
+  apt:
+    - vim
+
 repl: |
   vim
 input: |

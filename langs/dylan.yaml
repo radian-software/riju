@@ -3,6 +3,10 @@ aliases:
   - "opendylan"
 name: "Dylan"
 
+install:
+  apt:
+    - libunwind-dev
+
 setup: |
   cp -R /opt/dylan/project-template/* ./
 

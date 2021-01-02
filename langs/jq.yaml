@@ -1,6 +1,10 @@
 id: "jq"
 name: "jq"
 
+install:
+  apt:
+    - jq
+
 repl: |
   echo 'Reading from stdin...' >&2 && while true; do jq .; done
 input: |

@@ -3,6 +3,11 @@ aliases:
   - "dfy"
 name: "Dafny"
 
+install:
+  apt:
+    - dafny
+    - mono-runtime
+
 main: "main.dfy"
 template: |
   method Main() {

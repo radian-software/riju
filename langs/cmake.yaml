@@ -3,6 +3,10 @@ aliases:
   - "cmakelists"
 name: "CMake"
 
+install:
+  apt:
+    - cmake
+
 main: "main.cmake"
 template: |
   message("Hello, world!")

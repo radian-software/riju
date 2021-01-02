@@ -20,6 +20,10 @@ info:
   paradigm: []
   usage: []
 
+install:
+  apt:
+    - asciidoc
+
 main: "main.adoc"
 template: |
   Hello, world!

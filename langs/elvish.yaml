@@ -3,6 +3,10 @@ aliases:
   - "elv"
 name: "Elvish"
 
+install:
+  apt:
+    - elvish
+
 repl: |
   SHELL=/usr/bin/elvish HOME="$PWD" elvish
 input: |

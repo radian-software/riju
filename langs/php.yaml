@@ -4,6 +4,10 @@ aliases:
 name: "PHP"
 monacoLang: php
 
+install:
+  apt:
+    - php
+
 repl: |
   php -a
 input: |

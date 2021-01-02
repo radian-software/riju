@@ -1,6 +1,10 @@
 id: "prolog"
 name: "Prolog"
 
+install:
+  apt:
+    - swi-prolog
+
 repl: |
   prolog
 input: |

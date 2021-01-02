@@ -3,6 +3,10 @@ aliases:
   - "valac"
 name: "Vala"
 
+install:
+  apt:
+    - valac
+
 main: "main.vala"
 template: |
   void main () {

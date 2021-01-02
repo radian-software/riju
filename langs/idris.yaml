@@ -4,6 +4,12 @@ aliases:
   - "idris2"
 name: "Idris"
 
+install:
+  build:
+    apt:
+      - chezscheme
+      - gcc
+
 repl: |
   rm -f .idris/repl/init; idris2
 

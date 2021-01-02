@@ -4,6 +4,10 @@ aliases:
 name: "Go"
 monacoLang: go
 
+install:
+  apt:
+    - golang
+
 main: "main.go"
 template: |
   package main

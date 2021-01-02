@@ -3,6 +3,11 @@ aliases:
   - "risc"
 name: "RISC-V"
 
+install:
+  apt:
+    - gcc-riscv64-linux-gnu
+    - qemu-user-static
+
 main: "main.S"
 template: |2
   	.text

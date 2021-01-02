@@ -1,6 +1,11 @@
 id: "ook"
 name: "Ook"
 
+install:
+  build:
+    apt:
+      - autoconf
+
 main: "main.ook"
 template: |
   Ook. Ook? Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.

@@ -5,6 +5,11 @@ aliases:
 name: "Objective-C"
 monacoLang: objective-c
 
+install:
+  apt:
+    - gcc
+    - gnustep-devel
+
 main: "main.m"
 template: |
   #import <Foundation/Foundation.h>

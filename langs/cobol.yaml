@@ -29,6 +29,10 @@ info:
     - oo
   usage: popular
 
+install:
+  apt:
+    - gnucobol
+
 main: "main.cbl"
 template: |
   IDENTIFICATION DIVISION.

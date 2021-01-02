@@ -3,6 +3,10 @@ aliases:
   - "hhvm"
 name: "Hack"
 
+install:
+  apt:
+    - hhvm
+
 repl: |
   hhvm -a
 input: |

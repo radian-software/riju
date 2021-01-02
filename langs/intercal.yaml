@@ -4,6 +4,10 @@ aliases:
   - "ick"
 name: "INTERCAL"
 
+install:
+  apt:
+    - intercal
+
 main: "main.i"
 template: |
   DO ,1 <- #14

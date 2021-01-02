@@ -1,6 +1,10 @@
 id: "red"
 name: "Red"
 
+install:
+  apt:
+    - libcurl5:i386
+
 setup: |
   cp -R /opt/red/template .red
 

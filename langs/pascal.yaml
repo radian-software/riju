@@ -5,6 +5,10 @@ aliases:
 name: "Pascal"
 monacoLang: pascal
 
+install:
+  apt:
+    - fpc
+
 main: "main.pas"
 template: |
   program Main;

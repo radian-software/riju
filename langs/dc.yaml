@@ -1,6 +1,10 @@
 id: "dc"
 name: "dc"
 
+install:
+  apt:
+    - dc
+
 repl: |
   echo 'Reading from stdin...' >&2; dc
 input: |

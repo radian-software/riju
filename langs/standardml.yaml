@@ -4,6 +4,11 @@ aliases:
   - "ml"
 name: "Standard ML"
 
+install:
+  apt:
+    - smlnj
+    - rlwrap
+
 repl: |
   rlwrap sml
 input: |

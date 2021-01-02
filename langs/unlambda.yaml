@@ -3,6 +3,10 @@ aliases:
   - "unl"
 name: "Unlambda"
 
+install:
+  apt:
+    - unlambda
+
 repl: |
   unlambda-repl
 input: |

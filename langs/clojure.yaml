@@ -30,6 +30,10 @@ info:
     - oo
   usage: []
 
+install:
+  apt:
+    - clojure
+
 repl: |
   clojure
 input: |

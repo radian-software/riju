@@ -1,6 +1,10 @@
 id: "scala"
 name: "Scala"
 
+install:
+  apt:
+    - scala
+
 repl: |
   scala
 

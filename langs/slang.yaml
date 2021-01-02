@@ -4,6 +4,10 @@ aliases:
   - "sl"
 name: "S-Lang"
 
+install:
+  apt:
+    - slsh
+
 repl: |
   slsh
 input: |

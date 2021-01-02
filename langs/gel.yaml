@@ -3,6 +3,10 @@ aliases:
   - "genius"
 name: "GEL"
 
+install:
+  apt:
+    - genius
+
 repl: |
   genius
 

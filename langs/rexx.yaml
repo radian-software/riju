@@ -4,6 +4,10 @@ aliases:
   - "reginarexx"
 name: "REXX"
 
+install:
+  apt:
+    - regina-rexx
+
 main: "main.rexx"
 template: |
   say "Hello, world!"

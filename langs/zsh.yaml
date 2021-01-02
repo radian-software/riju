@@ -5,6 +5,10 @@ aliases:
 name: "Zsh"
 monacoLang: shell
 
+install:
+  apt:
+    - zsh
+
 repl: |
   SHELL=/usr/bin/zsh zsh
 input: |

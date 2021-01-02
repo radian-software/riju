@@ -24,6 +24,10 @@ info:
     - imperative
   usage: []
 
+install:
+  apt:
+    - libtinfo5
+
 repl: |
   apl
 input: |

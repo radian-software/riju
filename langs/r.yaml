@@ -4,6 +4,10 @@ aliases:
 name: "R"
 monacoLang: r
 
+install:
+  apt:
+    - r-base
+
 repl: |
   R
 

@@ -3,6 +3,10 @@ aliases:
   - "gforth"
 name: "Forth"
 
+install:
+  apt:
+    - gforth
+
 repl: |
   gforth
 input: |

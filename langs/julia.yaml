@@ -3,6 +3,10 @@ aliases:
   - "jl"
 name: "Julia"
 
+install:
+  apt:
+    - julia
+
 repl: |
   julia
 

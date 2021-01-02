@@ -22,6 +22,11 @@ info:
   paradigm: imperative
   usage: []
 
+install:
+  apt:
+    - wine
+    - wine32
+
 setup: |
   shopt -s dotglob; cp -R /opt/cmd/home-template/* ./
 

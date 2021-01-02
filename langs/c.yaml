@@ -30,6 +30,12 @@ info:
   paradigm: imperative
   usage: popular
 
+install:
+  apt:
+    - clang
+    - clang-format
+    - clangd
+
 main: "main.c"
 template: |
   #include <stdio.h>

@@ -7,6 +7,11 @@ aliases:
 name: "PostgreSQL"
 monacoLang: pgsql
 
+install:
+  apt:
+    - postgresql
+    - postgresql-client
+
 repl: |
   rm -rf data && /usr/lib/postgresql/*/bin/initdb -D data && (echo "listen_addresses = ''" && echo "unix_socket_directories = '.'") >> data/postgresql.conf && /usr/lib/postgresql/*/bin/pg_ctl -D data -w start && psql -h "$PWD/data" postgres
 input: |

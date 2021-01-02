@@ -3,6 +3,12 @@ aliases:
   - "aplus"
 name: "A+"
 
+install:
+  apt:
+    - aplus-fsf
+    - aplus-fsf-doc
+    - rlwrap
+
 repl: |
   rlwrap a+
 input: |

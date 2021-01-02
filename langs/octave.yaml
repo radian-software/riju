@@ -5,6 +5,10 @@ aliases:
   - "mathworks"
 name: "Octave"
 
+install:
+  apt:
+    - octave
+
 repl: |
   octave
 

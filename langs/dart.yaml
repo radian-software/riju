@@ -2,6 +2,10 @@ id: "dart"
 name: "Dart"
 monacoLang: dart
 
+install:
+  apt:
+    - dart
+
 main: "main.dart"
 template: |
   void main() {

@@ -2,6 +2,10 @@ id: "llvm"
 name: "LLVM"
 monacoLang: shell
 
+install:
+  apt:
+    - llvm
+
 main: "main.ll"
 template: |
   @.str = private unnamed_addr constant [13 x i8] c"Hello, world!"

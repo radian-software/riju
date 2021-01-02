@@ -9,6 +9,12 @@ aliases:
   - "symja"
 name: "Wolfram Language"
 
+install:
+  build:
+    apt:
+      - python3
+      - python3-dev
+
 repl: |
   mathics
 

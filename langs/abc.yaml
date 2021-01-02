@@ -1,6 +1,10 @@
 id: "abc"
 name: "ABC"
 
+install:
+  apt:
+    - libtinfo5:i386
+
 repl: |
   abc
 input: |

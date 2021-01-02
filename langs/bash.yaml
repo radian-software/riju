@@ -24,6 +24,10 @@ info:
   paradigm: imperative
   usage: []
 
+install:
+  apt:
+    - bash
+
 repl: |
   bash --rcfile /dev/null
 input: |

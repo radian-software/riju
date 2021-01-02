@@ -4,6 +4,10 @@ aliases:
   - "pure"
 name: "PureScript"
 
+install:
+  apt:
+    - libtinfo5
+
 setup: |
   shopt -s dotglob; cp -R /opt/purescript/project-template/* "$PWD/"
 

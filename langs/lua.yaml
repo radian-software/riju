@@ -2,6 +2,10 @@ id: "lua"
 name: "Lua"
 monacoLang: lua
 
+install:
+  apt:
+    - $(grep-aptavail -XF Provides lua -a -XF Version "$(grep-aptavail -XF Provides lua -s Version -n | sort -Vr | head -n1)" -s Package -n | head -n1)
+
 repl: |
   lua
 

@@ -4,6 +4,10 @@ aliases:
   - "exs"
 name: "Elixir"
 
+install:
+  apt:
+    - elixir
+
 repl: |
   iex
 input: |

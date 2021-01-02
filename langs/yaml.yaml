@@ -4,6 +4,10 @@ aliases:
 name: "YAML"
 monacoLang: yaml
 
+install:
+  apt:
+    - jq
+
 main: "main.yaml"
 template: |
   output: "Hello, world!"

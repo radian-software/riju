@@ -9,6 +9,10 @@ aliases:
   - "fortran2008"
 name: "FORTRAN"
 
+install:
+  apt:
+    - flang
+
 main: "main.f"
 template: |2
          program hello

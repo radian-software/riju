@@ -4,6 +4,10 @@ aliases:
   - "p"
 name: "Parser3"
 
+install:
+  apt:
+    - parser3-cgi
+
 main: "main.p"
 template: |
   $console:line[Hello, world!]

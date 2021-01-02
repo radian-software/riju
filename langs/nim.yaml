@@ -1,6 +1,10 @@
 id: "nim"
 name: "Nim"
 
+install:
+  apt:
+    - nim
+
 main: "main.nim"
 template: |
   echo "Hello, world!"

@@ -34,6 +34,10 @@ info:
     - declarative
   usage: []
 
+install:
+  apt:
+    - ats2-lang
+
 main: "main.dats"
 template: |
   val _ = print ("Hello, world!\n")

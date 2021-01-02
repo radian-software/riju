@@ -6,6 +6,10 @@ aliases:
 name: "Tcsh"
 monacoLang: shell
 
+install:
+  apt:
+    - tcsh
+
 repl: |
   SHELL=/usr/bin/tcsh HOME="$PWD" tcsh
 input: |

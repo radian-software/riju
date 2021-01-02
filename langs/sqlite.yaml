@@ -6,6 +6,10 @@ aliases:
 name: "SQLite"
 monacoLang: sql
 
+install:
+  apt:
+    - sqlite
+
 repl: |
   sqlite3
 input: |

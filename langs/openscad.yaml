@@ -1,6 +1,10 @@
 id: "openscad"
 name: "OpenSCAD"
 
+install:
+  apt:
+    - openscad
+
 main: "main.scad"
 template: |
   echo("Hello, world!");

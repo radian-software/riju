@@ -4,6 +4,11 @@ aliases:
 name: "Java"
 monacoLang: java
 
+install:
+  apt:
+    - default-jdk
+    - clang-format
+
 main: "Main.java"
 template: |
   public class Main {

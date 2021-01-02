@@ -4,6 +4,10 @@ aliases:
   - "xsl"
 name: "XSLT"
 
+install:
+  apt:
+    - xsltproc
+
 main: "main.xsl"
 template: |
   <?xml-stylesheet type="text/xml" href="#style"?>

@@ -3,6 +3,11 @@ aliases:
   - "obn"
 name: "Oberon"
 
+install:
+  build:
+    apt:
+      - clang
+
 main: "Main.obn"
 template: |
   MODULE Main;

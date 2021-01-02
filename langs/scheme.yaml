@@ -5,6 +5,10 @@ aliases:
 name: "Scheme"
 monacoLang: scheme
 
+install:
+  apt:
+    - mit-scheme
+
 repl: |
   mit-scheme
 input: |

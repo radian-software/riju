@@ -5,6 +5,11 @@ aliases:
 name: "C#"
 monacoLang: csharp
 
+install:
+  apt:
+    - mono-mcs
+    - clang-format
+
 main: "main.cs"
 template: |
   class main {

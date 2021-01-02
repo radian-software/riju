@@ -26,6 +26,10 @@ info:
   paradigm: imperative
   usage: []
 
+install:
+  apt:
+    - algol68g
+
 main: "main.alg"
 template: |
   print(("Hello, world!",new line))

@@ -2,6 +2,10 @@ id: "redis"
 name: "Redis"
 monacoLang: redis
 
+install:
+  apt:
+    - redis
+
 repl: |
   rm -f socket; (redis-server --port 0 --unixsocket socket &); until [[ -e socket ]]; do sleep 0.01; done; redis-cli -s socket
 input: |

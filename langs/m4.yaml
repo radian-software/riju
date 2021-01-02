@@ -1,6 +1,10 @@
 id: "m4"
 name: "m4"
 
+install:
+  apt:
+    - m4
+
 repl: |
   echo 'Reading from stdin...' >&2; m4
 input: |

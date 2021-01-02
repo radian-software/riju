@@ -1,6 +1,10 @@
 id: "dhall"
 name: "Dhall"
 
+install:
+  apt:
+    - dhall
+
 main: "main.dhall"
 template: |
   { output = "Hello, world!" }

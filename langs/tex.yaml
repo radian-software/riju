@@ -5,6 +5,14 @@ aliases:
   - "plaintex"
 name: "TeX"
 
+install:
+  build:
+    apt:
+      - luarocks
+      - $(grep-aptavail -eF Package "liblua[0-9.]+-dev" -a -XF Version "$(grep-aptavail -XF Provides lua -s Version -n | sort -Vr | head -n1)" -s Package -n | head -n1)
+  apt:
+    - texlive-binaries
+
 repl: |
   tex
 input: |

@@ -19,6 +19,10 @@ info:
   paradigm: oo
   usage: []
 
+install:
+  apt:
+    - crystal
+
 main: "main.cr"
 template: |
   puts "Hello, world!"

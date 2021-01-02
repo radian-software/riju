@@ -4,6 +4,10 @@ aliases:
   - "qs"
 name: "Q#"
 
+install:
+  apt:
+    - $(grep-aptavail -eF Package "^dotnet-sdk-[0-9.]+$" -s Package -n | sort -Vr | head -n1)
+
 setup: |
   cp -R /opt/qsharp/dotnet ./.dotnet && cp -R /opt/qsharp/project-template/* ./
 

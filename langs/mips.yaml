@@ -4,6 +4,11 @@ aliases:
 name: "MIPS"
 monacoLang: mips
 
+install:
+  apt:
+    - gcc-mips64-linux-gnuabi64
+    - qemu-user-static
+
 main: "main.S"
 template: |2
   	.text
