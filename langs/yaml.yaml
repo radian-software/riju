@@ -7,6 +7,8 @@ monacoLang: yaml
 install:
   apt:
     - jq
+  riju:
+    - prettier
 
 main: "main.yaml"
 template: |

@@ -20,6 +20,9 @@ info:
   paradigm: imperative
   usage: []
 
+install:
+  cpan: Acme::Chef
+
 main: "main.chef"
 template: |
   Hello World Cake with Chocolate Sauce.

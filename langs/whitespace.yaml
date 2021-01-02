@@ -3,6 +3,10 @@ aliases:
   - "ws"
 name: "Whitespace"
 
+install:
+  pip:
+    - whitespace
+
 main: "main.ws"
 template: "Hello, world  \t  \t   \n\t\n     \t\t  \t \t\n\t\n     \t\t \t\t  \n\t\n     \t\t \t\t  \n\t\n     \t\t \t\t\t\t\n\t\n     \t \t\t  \n\t\n     \t     \n\t\n     \t\t\t \t\t\t\n\t\n     \t\t \t\t\t\t\n\t\n     \t\t\t  \t \n\t\n     \t\t \t\t  \n\t\n     \t\t  \t  \n\t\n  \n\n\n"
 

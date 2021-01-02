@@ -1,6 +1,10 @@
 id: "hy"
 name: "Hy"
 
+install:
+  pip:
+    - hy
+
 repl: |
   hy
 input: |

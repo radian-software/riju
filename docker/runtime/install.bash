@@ -10,22 +10,61 @@ pushd /tmp
 
 export DEBIAN_FRONTEND=noninteractive
 
+dpkg --add-architecture i386
+
 apt-get update
 (yes || true) | unminimize
 
 apt-get install -y curl gnupg lsb-release
 
-curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
-curl -sSL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+# Ceylon
+curl -fsSL https://downloads.ceylon-lang.org/apt/ceylon-debian-repo.gpg.key | apt-key add -
+
+# Crystal
+curl -fsSL https://keybase.io/crystal/pgp_keys.asc | apt-key add -
+
+# Dart
+curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+
+# Hack
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B4112585D386EB94
+
+# Node.js
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
+
+# R
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+
+# Yarn
+curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 
 ubuntu_ver="$(lsb_release -rs)"
 ubuntu_name="$(lsb_release -cs)"
 
-node_repo="$(curl -sS https://deb.nodesource.com/setup_current.x | grep NODEREPO= | grep -Eo 'node_[0-9]+\.x' | head -n1)"
+cran_repo="$(curl -fsSL https://cran.r-project.org/bin/linux/ubuntu/ | grep '<tr>' | grep "${ubuntu_name}" | grep -Eo 'cran[0-9]+' | head -n1)"
+node_repo="$(curl -fsSL https://deb.nodesource.com/setup_current.x | grep NODEREPO= | grep -Eo 'node_[0-9]+\.x' | head -n1)"
 
 tee -a /etc/apt/sources.list.d/custom.list >/dev/null <<EOF
-deb https://deb.nodesource.com/${node_repo} ${ubuntu_name} main
-deb https://dl.yarnpkg.com/debian/ stable main
+# Ceylon
+deb [arch=amd64] https://downloads.ceylon-lang.org/apt/ unstable main
+
+# Crystal
+deb [arch=amd64] https://dist.crystal-lang.org/apt crystal main
+
+# Dart
+deb [arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main
+
+# Hack
+deb [arch=amd64] https://dl.hhvm.com/ubuntu ${ubuntu_name} main
+
+# Node.js
+deb [arch=amd64] https://deb.nodesource.com/${node_repo} ${ubuntu_name} main
+
+# R
+deb [arch=amd64] https://cloud.r-project.org/bin/linux/ubuntu ${ubuntu_name}-${cran_repo} main
+
+# Yarn
+deb [arch=amd64] https://dl.yarnpkg.com/debian/ stable main
 EOF
 
 apt-get update

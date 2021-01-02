@@ -4,6 +4,10 @@ aliases:
   - "ls"
 name: "LiveScript"
 
+install:
+  npm:
+    - livescript
+
 repl: |
   lsc
 input: |

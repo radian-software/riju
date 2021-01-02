@@ -2,11 +2,11 @@ id: "ocaml"
 name: "OCaml"
 
 install:
-  build:
-    apt:
-      - opam
   apt:
     - ocaml
+  opam:
+    - ocamlformat
+    - ocaml-lsp-server: "https://github.com/ocaml/ocaml-lsp.git"
 
 repl: |
   ocaml

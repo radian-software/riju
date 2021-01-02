@@ -4,6 +4,12 @@ aliases:
 name: "Less"
 monacoLang: less
 
+install:
+  riju:
+    - prettier
+  npm:
+    - less
+
 main: "main.less"
 template: |
   body:before {

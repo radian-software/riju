@@ -7,6 +7,9 @@ name: "PureScript"
 install:
   apt:
     - libtinfo5
+  npm:
+    - purescript
+    - spago
 
 setup: |
   shopt -s dotglob; cp -R /opt/purescript/project-template/* "$PWD/"

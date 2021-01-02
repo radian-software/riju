@@ -3,6 +3,10 @@ aliases:
   - "by"
 name: "Bython"
 
+install:
+  pip:
+    - bython
+
 main: "main.by"
 template: |
   print("Hello, world!")

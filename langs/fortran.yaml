@@ -12,6 +12,8 @@ name: "FORTRAN"
 install:
   apt:
     - flang
+  pip:
+    - fortran-language-server
 
 main: "main.f"
 template: |2

@@ -1,6 +1,12 @@
 id: "textile"
 name: "Textile"
 
+install:
+  apt:
+    - pandoc
+  riju:
+    - prettier
+
 main: "main.textile"
 template: |
   Hello, world!

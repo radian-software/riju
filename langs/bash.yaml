@@ -27,6 +27,8 @@ info:
 install:
   apt:
     - bash
+  npm:
+    - bash-language-server
 
 repl: |
   bash --rcfile /dev/null

@@ -23,6 +23,8 @@ info:
 install:
   apt:
     - asciidoc
+  riju:
+    - prettier
 
 main: "main.adoc"
 template: |

@@ -6,6 +6,13 @@ aliases:
 name: "TypeScript"
 monacoLang: typescript
 
+install:
+  riju:
+    - prettier
+  npm:
+    - typescript
+    - ts-node
+
 repl: |
   ts-node
 

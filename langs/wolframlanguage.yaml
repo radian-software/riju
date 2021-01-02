@@ -10,10 +10,8 @@ aliases:
 name: "Wolfram Language"
 
 install:
-  build:
-    apt:
-      - python3
-      - python3-dev
+  pip:
+    - Mathics3
 
 repl: |
   mathics

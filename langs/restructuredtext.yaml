@@ -4,6 +4,12 @@ aliases:
 name: "reStructuredText"
 monacoLang: restructuredtext
 
+install:
+  apt:
+    - pandoc
+  riju:
+    - prettier
+
 main: "main.rst"
 template: |
   Hello, world!

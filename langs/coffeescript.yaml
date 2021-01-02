@@ -30,6 +30,10 @@ info:
     - imperative
   usage: []
 
+install:
+  npm:
+    - coffeescript
+
 repl: |
   coffee
 

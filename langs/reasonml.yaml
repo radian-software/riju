@@ -7,6 +7,12 @@ aliases:
   - "bucklescript"
 name: "ReasonML"
 
+install:
+  npm:
+    - bs-platform
+  opam:
+    - reason
+
 main: "main.re"
 template: |
   print_string("Hello, world!\n");

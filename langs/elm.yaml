@@ -1,6 +1,11 @@
 id: "elm"
 name: "Elm"
 
+install:
+  npm:
+    - "@kachkaev/run-elm"
+    - "@elm-tooling/elm-language-server"
+
 repl: |
   elm repl
 

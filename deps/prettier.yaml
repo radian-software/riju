@@ -1,0 +1,5 @@
+id: "prettier"
+
+install:
+  npm:
+    - prettier

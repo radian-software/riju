@@ -8,6 +8,9 @@ monacoLang: ruby
 install:
   apt:
     - ruby
+  gem:
+    - rufo
+    - solargraph
 
 repl: |
   irb
@@ -16,13 +19,11 @@ main: "main.rb"
 template: |
   puts "Hello, world!"
 suffix: |
-
   require 'irb'
   IRB.setup(ARGV[0], argv: [])
   workspace = IRB::WorkSpace.new(binding)
   binding_irb = IRB::Irb.new(workspace)
   binding_irb.run(IRB.conf)
-
 
 run: |
   ruby main.rb

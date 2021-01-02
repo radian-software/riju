@@ -1,6 +1,10 @@
 id: "slick"
 name: "Slick"
 
+install:
+  opam:
+    - dune
+
 repl: |
   slick
 input: |

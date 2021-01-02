@@ -3,6 +3,12 @@ aliases:
   - "tiki"
 name: "Tiki Wiki"
 
+install:
+  apt:
+    - pandoc
+  riju:
+    - prettier
+
 main: "main.txt"
 template: |
   Hello, world!

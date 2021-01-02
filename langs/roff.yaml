@@ -16,6 +16,12 @@ aliases:
   - "manual"
 name: "roff"
 
+install:
+  apt:
+    - pandoc
+  riju:
+    - prettier
+
 main: "main.roff"
 template: |
   .PP

@@ -14,6 +14,8 @@ install:
   apt:
     - nodejs
     - yarn
+  riju:
+    - prettier
 
 repl: |
   node

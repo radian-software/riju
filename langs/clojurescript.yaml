@@ -31,6 +31,10 @@ info:
     - oo
   usage: []
 
+install:
+  npm:
+    - lumo-cljs
+
 repl: |
   lumo -r
 input: |

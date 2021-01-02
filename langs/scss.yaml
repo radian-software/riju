@@ -2,6 +2,11 @@ id: "scss"
 name: "SCSS"
 monacoLang: scss
 
+install:
+  riju:
+    - sass
+    - prettier
+
 main: "main.scss"
 template: |
   body:before {

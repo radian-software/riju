@@ -8,6 +8,9 @@ monacoLang: perl
 install:
   apt:
     - perl
+  cpan:
+    - Devel::REPL
+    - Perl::Tidy
 
 repl: |
   re.pl

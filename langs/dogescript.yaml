@@ -5,6 +5,10 @@ aliases:
   - "wow"
 name: "Dogescript"
 
+install:
+  npm:
+    - dogescript
+
 repl: |
   dogescript
 

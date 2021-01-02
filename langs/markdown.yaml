@@ -12,6 +12,12 @@ aliases:
 name: "Markdown"
 monacoLang: markdown
 
+install:
+  apt:
+    - pandoc
+  riju:
+    - prettier
+
 main: "main.md"
 template: |
   Hello, world!

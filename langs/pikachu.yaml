@@ -12,6 +12,10 @@ aliases:
   - "pokeball"
 name: "Pikachu"
 
+install:
+  pip:
+    - pikalang
+
 main: "main.pokeball"
 template: |
   pi pi pi pi pi pi pi pi pi pi pika pipi pi pi pi pi pi pi pi pipi pi pi

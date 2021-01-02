@@ -2,6 +2,12 @@ id: "pug"
 name: "Pug"
 monacoLang: pug
 
+install:
+  riju:
+    - prettier
+  npm:
+    - pug-cli
+
 main: "main.pug"
 template: |
   html

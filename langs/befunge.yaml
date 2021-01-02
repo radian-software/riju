@@ -3,6 +3,11 @@ aliases:
   - "be"
 name: "Befunge"
 
+install:
+  npm:
+    - befunge93
+    - prompt-sync
+
 info:
   impl: "amicloud Befunge-93"
   version: "Befunge-93"

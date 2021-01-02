@@ -31,7 +31,7 @@ ifeq ($(I),composite)
 else ifneq (,$(filter $(I),admin ci))
 	docker build . -f docker/$(I)/Dockerfile -t riju:$(I)
 else
-	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) --label riju.image-hash=$(shell node tools/hash-dockerfile.js $(I))
+	hash="$$(node tools/hash-dockerfile.js $(I) | grep .)"; docker build . -f docker/$(I)/Dockerfile -t riju:$(I) --label riju.image-hash="$${hash}"
 endif
 
 .PHONY: script
@@ -43,6 +43,10 @@ script:
 
 .PHONY: scripts
 scripts:
+	@: $${L}
+	node tools/make-foreach.js --types script L=$(L)
+
+.PHONY: all-scripts
 	node tools/make-foreach.js --pkgs script
 
 .PHONY: pkg
@@ -53,11 +57,22 @@ pkg:
 	cd $(BUILD)/src && pkg="$(PWD)/$(BUILD)/pkg" ../build.bash
 	fakeroot dpkg-deb --build $(BUILD)/pkg $(BUILD)/$(DEB)
 
+.PHONY: pkgs
+pkgs:
+	@: $${L}
+	node tools/make-foreach.js --types pkg L=$(L)
+
 .PHONY: repkg
 repkg:
 	@: $${L} $${T}
+	make script L=$(L) T=$(T)
 	make shell I=packaging CMD="make pkg L=$(L) T=$(T)"
 	ctr="$$(docker container ls -f label="riju-install-target=yes" -l -q)"; test "$${ctr}" || (echo "no valid container is live"; exit 1); docker exec "$${ctr}" make install L=$(L) T=$(T)
+
+.PHONY: repkgs
+repkgs:
+	@: $${L}
+	node tools/make-foreach.js --types repkg L=$(L)
 
 ### Manipulate artifacts inside Docker
 
@@ -172,7 +187,7 @@ upload:
 	@: $${L} $${T} $${S3_BUCKET}
 	aws s3 rm --recursive $(S3_HASH)
 	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
-	aws s3 cp - $(S3_HASH)/$(shell dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash) < /dev/null
+	hash="$$(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash | grep .)"; aws s3 cp - "$(S3_HASH)/$${hash}" < /dev/null
 
 .PHONY: publish
 publish:
