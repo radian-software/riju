@@ -307,7 +307,7 @@ export class Session {
         code = createEmpty !== undefined ? createEmpty : template + "\n";
       }
       if (code && suffix) {
-        code += suffix;
+        code += suffix + "\n";
       }
       await this.writeCode(code);
       const termArgs = this.privilegedSpawn(bash(cmdline));

@@ -1,0 +1,11 @@
+id: "cmake"
+aliases:
+  - "cmakelists"
+name: "CMake"
+
+main: "main.cmake"
+template: |
+  message("Hello, world!")
+
+run: |
+  cmake -P main.cmake

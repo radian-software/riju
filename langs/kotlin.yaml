@@ -1,0 +1,16 @@
+id: "kotlin"
+aliases:
+  - "kts"
+  - "kotlinc"
+name: "Kotlin"
+monacoLang: kotlin
+
+repl: |
+  JAVA_OPTS="-Duser.home=$PWD" kotlinc
+
+main: "main.kts"
+template: |
+  println("Hello, world!")
+
+run: |
+  JAVA_OPTS="-Duser.home=$PWD" kotlinc -script main.kts; kotlinc

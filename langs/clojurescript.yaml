@@ -1,0 +1,48 @@
+id: "clojurescript"
+aliases:
+  - "cljs"
+  - "lumo"
+name: "ClojureScript"
+monacoLang: clojure
+
+info:
+  year: 2011
+  desc: "Compiler for Clojure that targets JavaScript"
+  ext: cljs
+  web:
+    wiki: "https://en.wikipedia.org/wiki/Clojure#Platforms"
+    home: "https://clojurescript.org/"
+    source: "https://github.com/clojure/clojurescript"
+  category: general
+  mode:
+    - compiled
+    - interpreted
+  platform: js
+  syntax:
+    - lisp
+    - extensible
+  typing:
+    - dynamic
+    - weak
+  paradigm:
+    - declarative
+    - functional
+    - imperative
+    - oo
+  usage: []
+
+repl: |
+  lumo -r
+input: |
+  (* 123 234)
+
+main: "main.cljs"
+template: |
+  (println "Hello, world!")
+
+run: |
+  lumo -i main.cljs -r
+
+scope:
+  code: |
+    (def x (* 123 234))

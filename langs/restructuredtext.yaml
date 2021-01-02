@@ -1,0 +1,14 @@
+id: "restructuredtext"
+aliases:
+  - "rst"
+name: "reStructuredText"
+monacoLang: restructuredtext
+
+main: "main.rst"
+template: |
+  Hello, world!
+
+compile: |
+  pandoc main.rst -o main.html
+run: |
+  prettier --no-config main.html

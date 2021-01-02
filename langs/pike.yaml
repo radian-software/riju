@@ -1,0 +1,18 @@
+id: "pike"
+name: "Pike"
+
+repl: |
+  pike
+input: |
+  123 * 234;
+
+main: "main.pike"
+template: |
+  int main()
+  {
+    write("Hello, world!\n");
+    return 0;
+  }
+
+run: |
+  pike main.pike; pike

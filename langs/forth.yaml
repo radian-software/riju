@@ -1,0 +1,23 @@
+id: "forth"
+aliases:
+  - "gforth"
+name: "Forth"
+
+repl: |
+  gforth
+input: |
+  123 234 * .
+
+main: "main.fs"
+template: |
+  ." Hello, world!" CR
+
+run: |
+  gforth main.fs
+
+scope:
+  code: |
+    VARIABLE X
+    123 234 * X !
+  input: |
+    X @ .

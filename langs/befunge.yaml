@@ -1,0 +1,37 @@
+id: "befunge"
+aliases:
+  - "be"
+name: "Befunge"
+
+info:
+  impl: "amicloud Befunge-93"
+  version: "Befunge-93"
+  year: 1993
+  desc: "Two-dimensional esoteric programming language invented in 1993 by Chris Pressey with the goal of being as difficult to compile as possible"
+  ext:
+    - be
+    - bf
+    - b93
+    - b98
+    - befunge
+  web:
+    wiki: "https://en.wikipedia.org/wiki/Befunge"
+    esolang: "https://esolangs.org/wiki/Befunge"
+    home: "https://catseye.tc/article/Languages.md#befunge-93"
+    source: "https://github.com/amicloud/befunge93"
+  category: esoteric
+  mode: interpreted
+  platform: []
+  syntax:
+    - golf
+    - 2d
+  typing: integer
+  paradigm: stack
+  usage: []
+
+main: "main.be"
+template: |
+  64+"!dlrow ,olleH">:#,_@
+
+run: |
+  befunge-repl main.be

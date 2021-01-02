@@ -1,0 +1,20 @@
+id: "oberon"
+aliases:
+  - "obn"
+name: "Oberon"
+
+main: "Main.obn"
+template: |
+  MODULE Main;
+
+  IMPORT Out;
+
+  BEGIN
+    Out.String("Hello, world!");
+    Out.Ln;
+  END Main.
+
+compile: |
+  obnc Main.obn -o main
+run: |
+  ./main

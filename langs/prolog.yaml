@@ -1,0 +1,23 @@
+id: "prolog"
+name: "Prolog"
+
+repl: |
+  prolog
+input: |
+  X is 123 * 234.
+
+main: "main.pl"
+template: |
+  :- initialization main.
+
+  main :-
+      write("Hello, world!"), nl.
+
+run: |
+  prolog main.pl
+
+scope:
+  code: |
+    x(X) :- X is 123 * 234.
+  input: |
+    x(X).

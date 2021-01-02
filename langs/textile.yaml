@@ -1,0 +1,11 @@
+id: "textile"
+name: "Textile"
+
+main: "main.textile"
+template: |
+  Hello, world!
+
+compile: |
+  pandoc main.textile -o main.html
+run: |
+  prettier --no-config main.html

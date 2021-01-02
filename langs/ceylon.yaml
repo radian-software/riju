@@ -1,0 +1,29 @@
+id: "ceylon"
+name: "Ceylon"
+
+info:
+  year: 2011
+  desc: "Object-oriented, strongly statically typed programming language with an emphasis on immutability, created by Red Hat"
+  ext: ceylon
+  web:
+    wiki: "https://en.wikipedia.org/wiki/Ceylon_(programming_language)"
+    home: "https://ceylon-lang.org/"
+    source: "https://ceylon-lang.org/code/source/"
+  category: general
+  mode: compiled
+  platform: jvm
+  syntax: c
+  typing: static
+  paradigm:
+    - imperative
+    - oo
+  usage: []
+
+main: "source/main.ceylon"
+template: |
+  shared void run() {
+      print("Hello, world!");
+  }
+
+run: |
+  PATH="/usr/lib/jvm/java-8-openjdk-amd64/bin:$PATH" ceylon run --compile=force default

@@ -1,0 +1,26 @@
+id: "sqlite"
+aliases:
+  - "sql"
+  - "db"
+  - "sqlite3"
+name: "SQLite"
+monacoLang: sql
+
+repl: |
+  sqlite3
+input: |
+  SELECT 123 * 234;
+
+main: "main.sql"
+template: |
+  SELECT 'Hello, world!';
+
+run: |
+  sqlite3 -cmd "$(< main.sql)"
+
+lsp:
+  start: |
+    sqls
+
+skip:
+  - lsp

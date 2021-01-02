@@ -1,0 +1,10 @@
+id: "sass"
+name: "Sass"
+
+main: "main.sass"
+template: |
+  body:before
+    content: "Hello, world!"
+
+run: |
+  sass main.sass

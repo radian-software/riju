@@ -1,0 +1,23 @@
+id: "mariadb"
+aliases:
+  - "maria"
+name: "MariaDB"
+
+repl: |
+  rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && mysql --socket="$PWD/socket"
+input: |
+  SELECT 123 * 234;
+
+main: "main.sql"
+template: |
+  SELECT 'Hello, world!';
+
+run: |
+  rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && (mysql --socket="$PWD/socket" < main.sql; mysql --socket="$PWD/socket")
+
+lsp:
+  start: |
+    sqls
+
+skip:
+  - lsp

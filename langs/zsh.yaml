@@ -1,0 +1,25 @@
+id: "zsh"
+aliases:
+  - "zshell"
+  - "zshrc"
+name: "Zsh"
+monacoLang: shell
+
+repl: |
+  SHELL=/usr/bin/zsh zsh
+input: |
+  expr 123 \* 234
+
+main: ".zshrc"
+template: |
+  echo "Hello, world!"
+createEmpty: ""
+
+run: |
+  SHELL=/usr/bin/zsh zsh
+
+scope:
+  code: |
+    x="$(expr 123 \* 234)"
+  input: |
+    echo "$x"

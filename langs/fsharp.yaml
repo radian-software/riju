@@ -1,0 +1,25 @@
+id: "fsharp"
+aliases:
+  - "fsharpi"
+  - "fsx"
+  - "fs"
+name: "F#"
+monacoLang: fsharp
+
+repl: |
+  fsharpi
+input: |
+  123 * 234 ;;
+
+main: "main.fsx"
+template: |
+  printfn "Hello, world!"
+
+run: |
+  fsharpi --use:main.fsx
+
+scope:
+  code: |
+    let x = 123 * 234
+  input: |
+    x ;;

@@ -1,0 +1,12 @@
+id: "tabloid"
+name: "Tabloid"
+
+main: "main.tabloid"
+template: |
+  YOU WON'T WANT TO MISS "Hello, world"
+  PLEASE LIKE AND SUBSCRIBE
+
+run: |
+  node /opt/tabloid/run.js main.tabloid
+hello: |
+  HELLO, WORLD!

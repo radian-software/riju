@@ -1,0 +1,18 @@
+id: "hexagony"
+aliases:
+  - "hxg"
+  - "hex"
+name: "Hexagony"
+
+main: "main.hxg"
+template: |2
+     H ; e ;
+    l ; d ; *
+   ; r ; o ; w
+  l ; ; o ; * 4
+   3 3 ; @ . >
+    ; 2 3 < \
+     4 ; * /
+
+run: |
+  /opt/hexagony/interpreter.rb main.hxg

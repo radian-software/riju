@@ -1,0 +1,68 @@
+id: "brainf"
+aliases:
+  - "brainfuck"
+  - "bf"
+name: "Brainf***"
+
+info:
+  impl: "Beef"
+  year: 1993
+  desc: "Famous esoteric programming language created in 1993 by Urban Müller"
+  ext:
+    - b
+    - bf
+  web:
+    wiki: "https://en.wikipedia.org/wiki/Brainfuck"
+    esolang: "https://esolangs.org/wiki/Brainfuck"
+    impl: "https://kiyuko.org/software/beef"
+    source: "https://github.com/andreabolognani/beef"
+  category: esoteric
+  mode: interpreted
+  platform: bf
+  syntax: golf
+  typing: integer
+  paradigm: turing
+  usage: []
+
+repl: |
+  brainf-repl
+input: |
+  >++>+[>++++[-<++++>]<<]> [>>+>+<<<-]>>>[<<<+>>>-]<<+>[<->[>++++++++++<[->-[>+>>]>[+[-<+>]>+>>]<<<<<]>[-]++++++++[<++++++>-]>[<<+>>-]>[<<+>>-]<<]>]<[->>++++++++[<++++++>-]]<[.[-]<]<
+output: |
+  86
+
+main: "main.bf"
+template: |
+  ++++++++
+  [
+      >++++
+      [
+          >++
+          >+++
+          >+++
+          >+
+          <<<<-
+      ]
+      >+
+      >+
+      >-
+      >>+
+      [<]
+
+      <-
+  ]
+
+  >>.
+  >---.
+  +++++++..+++.
+  >>.
+  <-.
+  <.
+  +++.------.--------.
+  >>+.
+  >++.
+
+run: |
+  brainf-repl main.bf
+hello: |
+  Hello World

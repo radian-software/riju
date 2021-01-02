@@ -1,0 +1,11 @@
+id: "false"
+aliases:
+  - "falselang"
+name: "FALSE"
+
+main: "main.false"
+template: |
+  "Hello, world!"
+
+run: |
+  false-lang main.false

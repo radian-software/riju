@@ -1,0 +1,13 @@
+id: "org"
+aliases:
+  - "orgmode"
+name: "Org"
+
+main: "main.org"
+template: |
+  Hello, world!
+
+compile: |
+  pandoc main.org -o main.html
+run: |
+  prettier --no-config main.html

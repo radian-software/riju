@@ -1,0 +1,20 @@
+id: "scss"
+name: "SCSS"
+monacoLang: scss
+
+main: "main.scss"
+template: |
+  body:before {
+    content: "Hello, world!";
+  }
+
+run: |
+  sass main.scss
+
+format:
+  run: |
+    prettier --no-config --stdin-filepath=format.scss
+  input: |
+    body:before {
+        content: "Hello, world!";
+    }

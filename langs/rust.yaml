@@ -1,0 +1,24 @@
+id: "rust"
+aliases:
+  - "rs"
+  - "rustc"
+name: "Rust"
+monacoLang: rust
+
+main: "main.rs"
+template: |
+  fn main() {
+      println!("Hello, world!");
+  }
+
+compile: |
+  rustc main.rs
+run: |
+  ./main
+
+lsp:
+  start: |
+    rls
+
+skip:
+  - lsp

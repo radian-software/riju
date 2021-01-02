@@ -1,0 +1,44 @@
+id: "clean"
+aliases:
+  - "icl"
+  - "clm"
+  - "dcl"
+name: "Clean"
+
+info:
+  year: 1987
+  desc: "General-purpose purely functional computer programming language"
+  ext:
+    - icl
+    - dcl
+    - abc
+  web:
+    wiki: "https://en.wikipedia.org/wiki/Clean_(programming_language)"
+    home: "https://clean.cs.ru.nl/Clean"
+    source: "https://gitlab.science.ru.nl/clean-compiler-and-rts/compiler"
+  category: general
+  mode: compiled
+  platform: []
+  syntax: haskell
+  typing: static
+  paradigm:
+    - declarative
+    - functional
+  usage: []
+
+main: "main.icl"
+template: |
+  module main
+
+  import StdEnv
+
+  Start world
+    #(console, world) = stdio world
+    #console = fwrites "Hello, world!\n" console
+    #(ok, world) = fclose console world
+    = world
+
+compile: |
+  clm main -o main
+run: |
+  ./main

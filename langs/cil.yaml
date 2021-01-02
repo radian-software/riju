@@ -1,0 +1,25 @@
+id: "cil"
+aliases:
+  - "msil"
+  - "il"
+  - "ilasm"
+name: "CIL"
+
+main: "main.il"
+template: |
+  .assembly main {}
+  .class Main
+  {
+    .method static void Main() cil managed
+    {
+      .entrypoint
+      ldstr "Hello, world!"
+      call void [mscorlib]System.Console::WriteLine(string)
+      ret
+    }
+  }
+
+compile: |
+  ilasm main.il
+run: |
+  mono main.exe

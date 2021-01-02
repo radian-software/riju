@@ -1,0 +1,34 @@
+id: "algol"
+aliases:
+  - "alg"
+  - "a68g"
+  - "genie"
+  - "a68genie"
+name: "ALGOL 68"
+
+info:
+  impl: "ALGOL 68 Genie"
+  version: "ALGOL 68"
+  year: 1958
+  desc: "Seminal imperative programming language which introduced lexical scope and formal grammar specification"
+  ext: alg
+  web:
+    wiki: "https://en.wikipedia.org/wiki/ALGOL"
+    home: "http://algol68.sourceforge.net/"
+    source: "https://jmvdveer.home.xs4all.nl/en.algol-68-genie.html"
+  category: general
+  mode:
+    - interpreted
+    - compiled
+  platform: []
+  syntax: pascal
+  typing: static
+  paradigm: imperative
+  usage: []
+
+main: "main.alg"
+template: |
+  print(("Hello, world!",new line))
+
+run: |
+  a68g main.alg

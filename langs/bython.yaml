@@ -1,0 +1,11 @@
+id: "bython"
+aliases:
+  - "by"
+name: "Bython"
+
+main: "main.by"
+template: |
+  print("Hello, world!")
+
+run: |
+  bython main.by

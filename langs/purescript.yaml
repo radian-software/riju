@@ -1,0 +1,27 @@
+id: "purescript"
+aliases:
+  - "purs"
+  - "pure"
+name: "PureScript"
+
+setup: |
+  shopt -s dotglob; cp -R /opt/purescript/project-template/* "$PWD/"
+
+repl: |
+  spago repl
+
+main: "src/Main.purs"
+template: |
+  module Main where
+
+  import Prelude
+
+  import Effect (Effect)
+  import Effect.Console (log)
+
+  main :: Effect Unit
+  main = do
+    log "Hello, world!"
+
+run: |
+  if spago build -n; then spago run -n; (echo 'import Prelude'; echo 'import Main') > .purs-repl; spago repl; else echo 'import Prelude' > .purs-repl; spago repl -d; fi

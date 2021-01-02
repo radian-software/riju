@@ -1,0 +1,16 @@
+id: "dogescript"
+aliases:
+  - "doge"
+  - "ds"
+  - "wow"
+name: "Dogescript"
+
+repl: |
+  dogescript
+
+main: "main.djs"
+template: |
+  plz console.loge with "Hello, world!"
+
+run: |
+  dogescript main.djs | node; dogescript

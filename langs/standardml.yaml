@@ -1,0 +1,23 @@
+id: "standardml"
+aliases:
+  - "sml"
+  - "ml"
+name: "Standard ML"
+
+repl: |
+  rlwrap sml
+input: |
+  123 * 234;
+
+main: "main.sml"
+template: |
+  print "Hello, world!\n";
+
+run: |
+  rlwrap sml main.sml
+
+scope:
+  code: |
+    val x = 123 * 234;
+  input: |
+    x;

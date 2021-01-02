@@ -1,0 +1,14 @@
+id: "asymptote"
+aliases:
+  - "asy"
+name: "Asymptote"
+
+repl: |
+  asy
+
+main: "main.asy"
+template: |
+  write("Hello, world!");
+
+run: |
+  asy main.asy; asy

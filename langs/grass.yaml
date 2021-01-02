@@ -1,0 +1,11 @@
+id: "grass"
+name: "Grass"
+
+main: "main.grass"
+template: |
+  wWWwwww
+
+run: |
+  grass < main.grass
+hello: |
+  w

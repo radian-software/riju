@@ -1,0 +1,29 @@
+id: "><>"
+aliases:
+  - "fishlang"
+name: "><>"
+
+info:
+  year: 2009
+  desc: "Stack-based, reflective, two-dimensional esoteric programming language"
+  ext: fish
+  web:
+    esolang: "https://esolangs.org/wiki/Fish"
+    source: "https://gist.github.com/anonymous/6392418"
+  category: esoteric
+  mode: interpreted
+  platform: []
+  syntax:
+    - golf
+    - 2d
+  typing: float
+  paradigm: stack
+  usage: []
+
+main: "main.fish"
+template: |
+  "Hello, world!"r\
+             o;!?l<
+
+run: |
+  fish-lang main.fish

@@ -1,0 +1,54 @@
+id: "commonlisp"
+aliases:
+  - "lisp"
+  - "sbcl"
+name: "Common Lisp"
+
+info:
+  impl: "SBCL"
+  year: 1984
+  desc: "Modern, multi-paradigm, high-performance, compiled, ANSI-standardized, most prominent (along with Scheme) descendant of the Lisp family"
+  ext:
+    - lisp
+    - lsp
+    - l
+    - cl
+    - fasl
+  web:
+    wiki: "https://en.wikipedia.org/wiki/Common_Lisp"
+    home: "https://common-lisp.net/"
+    impl: "http://www.sbcl.org/"
+    source: "https://sourceforge.net/p/sbcl/sbcl/ci/master/tree/"
+  category: general
+  mode:
+    - compiled
+    - interpreted
+  platform: []
+  syntax:
+    - lisp
+    - extensible
+  typing:
+    - static
+    - dynamic
+  paradigm:
+    - declarative
+    - functional
+    - imperative
+    - oo
+  usage: []
+
+repl: |
+  rlwrap sbcl
+input: |
+  (* 123 234)
+
+main: "main.lisp"
+template: |
+  (format t "Hello, world!")
+
+run: |
+  rlwrap sbcl --userinit main.lisp
+
+scope:
+  code: |
+    (defvar x (* 123 234))

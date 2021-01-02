@@ -1,0 +1,16 @@
+id: "euphoria"
+aliases:
+  - "ex"
+  - "exw"
+  - "exu"
+  - "euc"
+  - "eui"
+  - "eub"
+name: "Euphoria"
+
+main: "main.exu"
+template: |
+  puts(1, "Hello, world!\n")
+
+run: |
+  exu main.exu

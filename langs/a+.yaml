@@ -1,0 +1,21 @@
+id: "a+"
+aliases:
+  - "aplus"
+name: "A+"
+
+repl: |
+  rlwrap a+
+input: |
+  2 * 16
+output: |
+  65536
+
+main: "main.a+"
+template: |
+  'Hello, world!'
+
+run: |
+  rlwrap a+ main.a+
+
+skip:
+  - scope

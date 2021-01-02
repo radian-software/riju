@@ -1,0 +1,30 @@
+id: "vim"
+aliases:
+  - "viml"
+  - "vimscript"
+name: "Vimscript"
+
+repl: |
+  vim
+input: |
+  :echo 123 * 234
+
+main: "main.vim"
+template: |
+  :echo "Hello, world!"
+
+run: |
+  vim -c "$(< main.vim)"
+
+scope:
+  code: |
+    :let x = 123 * 234
+  input: |
+    :echo x
+
+lsp:
+  start: |
+    vim-language-server --stdio
+
+skip:
+  - lsp

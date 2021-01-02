@@ -1,0 +1,28 @@
+id: "perl"
+aliases:
+  - "pl"
+  - "repl"
+name: "Perl"
+monacoLang: perl
+
+repl: |
+  re.pl
+
+main: "main.pl"
+template: |
+  print("Hello, world!\n");
+
+run: |
+  re.pl --rcfile ./main.pl
+
+scope:
+  code: |
+    my $x = 123 * 234;
+  input: |
+    $x
+
+format:
+  run: |
+    perltidy
+  input: |
+    print ("Hello, world!\n");

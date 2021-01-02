@@ -1,0 +1,21 @@
+id: "swift"
+aliases:
+  - "swiftc"
+name: "Swift"
+monacoLang: swift
+
+main: "main.swift"
+template: |
+  print("Hello, world!")
+
+compile: |
+  swiftc main.swift
+run: |
+  ./main
+
+lsp:
+  start: |
+    sourcekit-lsp
+
+skip:
+  - lsp

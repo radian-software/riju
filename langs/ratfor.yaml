@@ -1,0 +1,14 @@
+id: "ratfor"
+aliases:
+  - "rationalfortran"
+name: "Ratfor"
+
+main: "main.r"
+template: |
+  print *, 'Hello, world!'
+  end
+
+compile: |
+  ratfor main.r -o main.f && flang main.f -o main
+run: |
+  ./main

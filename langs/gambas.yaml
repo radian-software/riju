@@ -1,0 +1,12 @@
+id: "gambas"
+aliases:
+  - "gambasscript"
+  - "gbs"
+name: "Gambas"
+
+main: "main.gbs"
+template: |
+  Print "Hello, world!"
+
+run: |
+  gbs3 main.gbs

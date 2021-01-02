@@ -1,0 +1,19 @@
+id: "afnix"
+aliases:
+  - "als"
+  - "axc"
+  - "axi"
+name: "Afnix"
+
+repl: |
+  LD_LIBRARY_PATH=/usr/lib/afnix axi
+input: |
+  DELAY: 1
+  println (* 123 234)
+
+main: "main.als"
+template: |
+  println "Hello, world!"
+
+run: |
+  LD_LIBRARY_PATH=/usr/lib/afnix axi main.als; LD_LIBRARY_PATH=/usr/lib/afnix axi

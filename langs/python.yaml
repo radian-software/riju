@@ -1,31 +1,51 @@
-id: python
+id: "python"
 aliases:
-  - py
-  - python2
-  - python3
-name: Python
+  - "python3"
+  - "python2"
+  - "py"
+name: "Python"
 monacoLang: python
 
-install:
-  apt:
-    - python3
-    - python3-pip
-    - black
-  manual:
-    - |
-      install -d "${pkg}/opt/mspyls"
-      install -d "${pkg}/usr/local/bin"
-      wget "$(curl -fsSL "https://pvsc.blob.core.windows.net/python-language-server-stable?restype=container&comp=list&prefix=Python-Language-Server-linux-x64" | grep -Eo 'https://[^<]+\.nupkg' | tail -n1)"
-      unzip -d "${pkg}/opt/mspyls" Python-Language-Server-linux-x64.*.nupkg
-      chmod +x "${pkg}/opt/mspyls/Microsoft.Python.LanguageServer"
-      ln -s "/opt/mspyls/Microsoft.Python.LanguageServer" "${pkg}/usr/local/bin/Microsoft.Python.LanguageServer"
+info:
+  impl: "CPython"
+  version: "Python 3"
+  year: 1990
+  desc: "Interpreted, high-level, general-purpose programming language"
+  ext:
+    - py
+    - pyi
+    - pyc
+    - pyd
+    - pyo
+    - pyw
+    - pyz
+  web:
+    wiki: "https://en.wikipedia.org/wiki/Python_(programming_language)"
+    home: "https://www.python.org/"
+    source: "https://github.com/python/cpython"
+  category: general
+  mode: interpreted
+  platform: python
+  syntax:
+    - python
+    - whitespace
+  typing: dynamic
+  paradigm:
+    - functional
+    - imperative
+    - oo
+  usage: popular
 
 repl: |
   python3 -u
+
 main: "main.py"
 template: |
   print("Hello, world!")
-run: "python3 -u -i main.py"
+
+run: |
+  python3 -u -i main.py
+
 scope:
   code: |
     x = 123 * 234
@@ -37,17 +57,21 @@ format:
     print('Hello, world!')
 
 pkg:
-  install: "pip3 install --user NAME"
-  uninstall: "pip3 uninstall NAME"
+  install: |
+    pip3 install --user NAME
+
+  uninstall: |
+    pip3 uninstall NAME
+
   search: |
     python3 -c 'import json; from xmlrpc import client; print(json.dumps(client.ServerProxy("https://pypi.org/pypi").search({"name": "NAME"})))' | jq -r 'map(.name) | .[]'
 
 lsp:
-  start: "Microsoft.Python.LanguageServer"
+  start: |
+    Microsoft.Python.LanguageServer
   init:
     interpreter:
       properties:
-        InterpreterPath: "/usr/bin/python3"
-  code: |
-    import func
+        InterpreterPath: /usr/bin/python3
+  code: "import func"
   item: "functools"

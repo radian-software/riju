@@ -1,0 +1,16 @@
+id: "rebol"
+name: "REBOL"
+
+repl: |
+  rebol
+
+main: "main.r"
+template: |
+  REBOL [Title: "Main"]
+  print "Hello, world!"
+
+run: |
+  rebol main.r; rebol
+runReplInput: |
+  DELAY: 1
+  123 * 234

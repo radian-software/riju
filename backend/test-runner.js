@@ -249,7 +249,7 @@ class Test {
     await this.waitForOutput(output);
   };
   testFormat = async () => {
-    const input = this.config.format.input;
+    const input = this.config.format.input + "\n";
     const output = (this.config.format.output || this.config.template) + "\n";
     this.send({ event: "formatCode", code: input });
     const result = await this.wait("formatter response", (msg) => {

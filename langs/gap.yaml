@@ -1,0 +1,20 @@
+id: "gap"
+name: "GAP"
+
+repl: |
+  gap
+input: |
+  123 * 234;
+
+main: "main.gap"
+template: |
+  Print("Hello, world!\n");
+
+run: |
+  gap main.gap
+
+scope:
+  code: |
+    x := 123 * 234;
+  input: |
+    123 * 234;

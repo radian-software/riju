@@ -1,0 +1,30 @@
+id: "awk"
+aliases:
+  - "gawk"
+  - "mawk"
+  - "nawk"
+name: "Awk"
+
+info:
+  impl: "GNU Awk"
+  year: 1977
+  desc: "Domain-specific language designed for text processing and typically used as a data extraction and reporting tool"
+  ext: awk
+  web:
+    wiki: "https://en.wikipedia.org/wiki/AWK"
+    impl: "https://www.gnu.org/software/gawk/manual/gawk.html"
+    source: "https://savannah.gnu.org/git/?group=gawk"
+  category: tool
+  mode: interpreted
+  platform: []
+  syntax: c
+  typing: weak
+  paradigm: imperative
+  usage: []
+
+main: "main.awk"
+template: |
+  BEGIN { print "Hello, world!" }
+
+run: |
+  awk -f main.awk

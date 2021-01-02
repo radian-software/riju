@@ -1,0 +1,15 @@
+id: "vala"
+aliases:
+  - "valac"
+name: "Vala"
+
+main: "main.vala"
+template: |
+  void main () {
+      print("Hello, world!\n");
+  }
+
+compile: |
+  valac main.vala
+run: |
+  ./main

@@ -1,0 +1,14 @@
+id: "promela"
+aliases:
+  - "spin"
+  - "pml"
+name: "PROMELA"
+
+main: "main.pml"
+template: |
+  active proctype main() {
+    printf("Hello, world!\n");
+  }
+
+run: |
+  spin main.pml

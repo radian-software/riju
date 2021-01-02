@@ -1,0 +1,18 @@
+id: "ante"
+aliases:
+  - "an"
+name: "Ante"
+
+repl: |
+  ante
+output: |
+  i32
+
+main: "main.an"
+template: |
+  puts("Hello, world!".cStr)
+
+compile: |
+  ante main.an
+run: |
+  ./main; ante

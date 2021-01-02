@@ -1,0 +1,13 @@
+id: "minizinc"
+aliases:
+  - "mzn"
+name: "MiniZinc"
+
+main: "main.mzn"
+template: |
+  solve satisfy;
+
+  output ["Hello, world!\n"];
+
+run: |
+  minizinc --solver Gecode main.mzn

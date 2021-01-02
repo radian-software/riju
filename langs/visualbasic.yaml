@@ -1,0 +1,21 @@
+id: "visualbasic"
+aliases:
+  - "vbasic"
+  - "vb"
+  - "vbnc"
+  - "vba"
+name: "Visual Basic"
+monacoLang: vb
+
+main: "main.vb"
+template: |
+  Module Main
+      Sub Main(args As String())
+          Console.WriteLine("Hello, world!")
+      End Sub
+  End Module
+
+compile: |
+  vbnc main.vb
+run: |
+  mono main.exe

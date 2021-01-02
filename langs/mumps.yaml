@@ -1,0 +1,15 @@
+id: "mumps"
+aliases:
+  - "mlang"
+  - "gtm"
+  - "fisgtm"
+name: "MUMPS"
+
+main: "main.m"
+template: |
+  main()
+    write "Hello, world!",!
+    quit
+
+run: |
+  gtm_dist=/usr/lib/x86_64-linux-gnu/fis-gtm/V6.3-007_x86_64 /usr/lib/x86_64-linux-gnu/fis-gtm/V6.3-007_x86_64/utf8/mumps -r main main.m

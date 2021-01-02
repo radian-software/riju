@@ -1,0 +1,18 @@
+id: "parigp"
+aliases:
+  - "gp"
+name: "PARI/GP"
+
+repl: |
+  gp
+
+main: "main.gp"
+template: |
+  print("Hello, world!")
+
+run: |
+  gp main.gp
+
+scope:
+  code: |
+    x = 123 * 234

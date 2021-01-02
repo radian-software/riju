@@ -1,0 +1,34 @@
+id: "powershell"
+aliases:
+  - "pwsh"
+  - "ps1"
+name: "PowerShell"
+monacoLang: powershell
+
+repl: |
+  SHELL=/usr/bin/pwsh pwsh
+input: |
+  expr 123 "*" 234
+
+main: "main.ps1"
+template: |
+  Write-Host "Hello, world!"
+
+run: |
+  SHELL=/usr/bin/pwsh pwsh -NoExit main.ps1
+
+scope:
+  code: |
+    Set-Variable x "$(expr 123 "*" 234)"
+  input: |
+    echo $x
+
+lsp:
+  start: |
+    pwsh -NoLogo -NoProfile -Command "/opt/powershell-editor-services/PowerShellEditorServices/Start-EditorServices.ps1 -BundledModulesPath /opt/powershell-editor-services -LogPath '$PWD/.powershell-editor-services/lsp.log' -SessionDetailsPath '$PWD/.powershell-editor-services/session.json' -FeatureFlags @() -AdditionalModules @() -HostName Riju -HostProfileId 'riju' -HostVersion 0.0 -Stdio -LogLevel Normal"
+
+skip:
+  - repl
+  - runrepl
+  - scope
+  - lsp

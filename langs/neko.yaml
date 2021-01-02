@@ -1,0 +1,13 @@
+id: "neko"
+aliases:
+  - "nekoc"
+name: "Neko"
+
+main: "main.neko"
+template: |
+  $print("Hello, world!\n");
+
+compile: |
+  nekoc main.neko
+run: |
+  neko main

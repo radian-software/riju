@@ -1,0 +1,13 @@
+id: "mediawiki"
+aliases:
+  - "media"
+name: "MediaWiki"
+
+main: "main.txt"
+template: |
+  Hello, world!
+
+compile: |
+  pandoc main.txt -f mediawiki -o main.html
+run: |
+  prettier --no-config main.html

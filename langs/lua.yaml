@@ -1,0 +1,24 @@
+id: "lua"
+name: "Lua"
+monacoLang: lua
+
+repl: |
+  lua
+
+main: "main.lua"
+template: |
+  print("Hello, world!")
+
+run: |
+  lua -i main.lua
+
+scope:
+  code: |
+    x = 123 * 234
+
+lsp:
+  start: |
+    java -cp /usr/lib/EmmyLua-LS.jar com.tang.vscode.MainKt
+
+skip:
+  - lsp

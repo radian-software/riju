@@ -1,0 +1,15 @@
+id: "dafny"
+aliases:
+  - "dfy"
+name: "Dafny"
+
+main: "main.dfy"
+template: |
+  method Main() {
+    print "Hello, world!\n";
+  }
+
+compile: |
+  dafny main.dfy
+run: |
+  mono main.exe

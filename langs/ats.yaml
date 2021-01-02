@@ -1,0 +1,45 @@
+id: "ats"
+aliases:
+  - "dats"
+  - "sats"
+  - "cats"
+  - "hats"
+name: "ATS"
+monacoLang: postiats
+
+info:
+  impl: "ATS2/Postiats"
+  year: 2007
+  desc: "Programming language designed to unify programming with formal specification"
+  ext:
+    - sats
+    - dats
+    - cats
+    - hats
+  web:
+    wiki: "https://en.wikipedia.org/wiki/ATS_(programming_language)"
+    home: "http://www.ats-lang.org/"
+    source: "https://github.com/githwxi/ATS-Postiats"
+  category: general
+  mode: compiled
+  platform: []
+  syntax:
+    - c
+    - haskell
+  typing:
+    - static
+    - theorem
+  paradigm:
+    - imperative
+    - declarative
+  usage: []
+
+main: "main.dats"
+template: |
+  val _ = print ("Hello, world!\n")
+  implement main0 () = ()
+
+compile: |
+  patscc main.dats -o main
+run: |
+  ./main

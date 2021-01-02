@@ -1,0 +1,14 @@
+id: "kalyn"
+name: "Kalyn"
+
+main: "src-kalyn/Main.kalyn"
+template: |
+  (import "/opt/kalyn/Stdlib.kalyn")
+
+  (public def main (IO Empty)
+    (print "Hello, world!\n"))
+
+compile: |
+  kalyn
+run: |
+  out-kalyn/Main

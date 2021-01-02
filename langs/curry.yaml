@@ -1,0 +1,20 @@
+id: "curry"
+aliases:
+  - "curry2prolog"
+  - "pakcs"
+name: "Curry"
+
+repl: |
+  pakcs
+
+main: "main.curry"
+template: |
+  main :: IO ()
+  main = putStrLn "Hello, world!"
+
+run: |
+  pakcs :load main.curry :eval main
+
+scope:
+  code: |
+    x = 123 * 234

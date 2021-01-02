@@ -1,0 +1,13 @@
+id: "tikiwiki"
+aliases:
+  - "tiki"
+name: "Tiki Wiki"
+
+main: "main.txt"
+template: |
+  Hello, world!
+
+compile: |
+  pandoc main.txt -f tikiwiki -o main.html
+run: |
+  prettier --no-config main.html

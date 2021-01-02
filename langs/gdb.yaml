@@ -1,0 +1,20 @@
+id: "gdb"
+name: "GDB"
+
+repl: |
+  gdb
+input: |
+  p 123 * 234
+
+main: "main.gdb"
+template: |
+  p "Hello, world!"
+
+run: |
+  gdb -x main.gdb
+
+scope:
+  code: |
+    set $x = 123 * 234
+  input: |
+    p $x

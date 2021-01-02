@@ -1,0 +1,26 @@
+id: "tcsh"
+aliases:
+  - "tcshell"
+  - "tcshrc"
+  - "csh"
+name: "Tcsh"
+monacoLang: shell
+
+repl: |
+  SHELL=/usr/bin/tcsh HOME="$PWD" tcsh
+input: |
+  expr 123 \* 234
+
+main: ".tcshrc"
+template: |
+  echo "Hello, world!"
+createEmpty: ""
+
+run: |
+  SHELL=/usr/bin/tcsh HOME="$PWD" tcsh
+
+scope:
+  code: |
+    set x=`expr 123 \* 234`
+  input: |
+    echo "$x"

@@ -1,0 +1,38 @@
+id: "unison"
+aliases:
+  - "ucm"
+name: "Unison"
+
+setup: |
+  shopt -s dotglob && cp -R /opt/unison/project-template/* ./
+
+repl: |
+  unison -codebase .
+input: |
+  DELAY: 3
+  find : [a] -> [a]
+output: |
+  base.List.reverse
+
+main: "main.u"
+template: |
+  use io
+
+  main : '{IO} ()
+  main = 'let
+    printLine "Hello, world!"
+
+run: |
+  echo "Type 'run main' to run the code." && unison -codebase .
+helloInput: |
+  DELAY: 3
+  run main
+
+scope:
+  code: |
+    x = 123 * 234
+  input: |
+    DELAY: 3
+    add x
+    DELAY: 3
+    display x

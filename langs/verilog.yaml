@@ -1,0 +1,21 @@
+id: "verilog"
+aliases:
+  - "systemverilog"
+  - "iverilog"
+  - "v"
+name: "Verilog"
+
+main: "main.v"
+template: |
+  module main;
+
+  initial begin
+    $display("Hello, world!");
+  end
+
+  endmodule
+
+compile: |
+  iverilog main.v -o main
+run: |
+  ./main

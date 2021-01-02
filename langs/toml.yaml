@@ -1,0 +1,13 @@
+id: "toml"
+aliases:
+  - "tom"
+name: "TOML"
+
+main: "main.toml"
+template: |
+  output = "Hello, world!"
+
+compile: |
+  cat main.toml | yj -tj > main.json
+run: |
+  cat main.json | jq .

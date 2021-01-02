@@ -1,0 +1,14 @@
+id: "lolcode"
+aliases:
+  - "lol"
+  - "lci"
+name: "LOLCODE"
+
+main: "main.lol"
+template: |
+  HAI 1.2
+    VISIBLE "Hello, world!"
+  KTHXBYE
+
+run: |
+  lci main.lol

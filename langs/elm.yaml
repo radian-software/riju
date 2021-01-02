@@ -1,0 +1,31 @@
+id: "elm"
+name: "Elm"
+
+repl: |
+  elm repl
+
+main: "Main.elm"
+template: |
+  module Main exposing (..)
+
+  output : String
+  output = "Hello, world!"
+
+run: |
+  cp /opt/elm/elm.json elm.json && run-elm Main.elm; elm repl
+
+scope:
+  code: |
+    x = 123 * 234
+  input: |
+    import Main
+    Main.x
+
+lsp:
+  setup: |
+    cp /opt/elm/elm.json elm.json
+  start: |
+    elm-language-server --stdio
+
+skip:
+  - lsp

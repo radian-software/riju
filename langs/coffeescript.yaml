@@ -1,0 +1,50 @@
+id: "coffeescript"
+aliases:
+  - "coffee"
+  - "litcoffee"
+name: "CoffeeScript"
+monacoLang: coffee
+
+info:
+  year: 2009
+  desc: "Compile-to-JavaScript programming language adding syntactic sugar inspired by Ruby, Python and Haskell in an effort to enhance JavaScript's brevity and readability"
+  ext:
+    - coffee
+    - litcoffee
+  web:
+    wiki: "https://en.wikipedia.org/wiki/CoffeeScript"
+    home: "https://coffeescript.org/"
+    source: "https://github.com/jashkenas/coffeescript"
+  category: general
+  mode:
+    - interpreted
+    - compiled
+  platform: js
+  syntax:
+    - c
+    - haskell
+  typing: weak
+  paradigm:
+    - declarative
+    - functional
+    - imperative
+  usage: []
+
+repl: |
+  coffee
+
+main: "main.coffee"
+template: |
+  console.log "Hello, world!"
+
+compile: |
+  coffee -b -c main.coffee
+run: |
+  node -e '
+  eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
+  require("/usr/lib/node_modules/coffeescript/repl").start()
+  '
+
+scope:
+  code: |
+    x = 123 * 234

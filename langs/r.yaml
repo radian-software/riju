@@ -1,0 +1,19 @@
+id: "r"
+aliases:
+  - "rlang"
+name: "R"
+monacoLang: r
+
+repl: |
+  R
+
+main: ".Rprofile"
+template: |
+  print("Hello, world!")
+
+run: |
+  R --no-save
+
+scope:
+  code: |
+    x = 123 * 234

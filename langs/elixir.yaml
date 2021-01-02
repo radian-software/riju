@@ -1,0 +1,36 @@
+id: "elixir"
+aliases:
+  - "iex"
+  - "exs"
+name: "Elixir"
+
+repl: |
+  iex
+input: |
+  DELAY: 1
+  123 * 234
+
+main: "main.exs"
+template: |
+  IO.puts("Hello, world!")
+
+run: |
+  iex main.exs
+
+scope:
+  code: |
+    defmodule Scope do
+      def x do
+        123 * 234
+      end
+    end
+  input: |
+    DELAY: 1
+    Scope.x
+
+lsp:
+  start: |
+    /opt/elixir-ls/language_server.sh
+
+skip:
+  - lsp

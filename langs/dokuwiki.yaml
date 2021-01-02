@@ -1,0 +1,13 @@
+id: "dokuwiki"
+aliases:
+  - "doku"
+name: "DokuWiki"
+
+main: "main.txt"
+template: |
+  Hello, world!
+
+compile: |
+  pandoc main.txt -f dokuwiki -o main.html
+run: |
+  prettier --no-config main.html

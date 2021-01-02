@@ -1,0 +1,20 @@
+id: "yaml"
+aliases:
+  - "yml"
+name: "YAML"
+monacoLang: yaml
+
+main: "main.yaml"
+template: |
+  output: "Hello, world!"
+
+compile: |
+  cat main.yaml | yj -yj > main.json
+run: |
+  cat main.json | jq .
+
+format:
+  run: |
+    prettier --no-config --stdin-filepath=format.yaml
+  input: |
+    output: 'Hello, world!'

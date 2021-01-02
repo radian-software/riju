@@ -1,0 +1,12 @@
+id: "rexx"
+aliases:
+  - "regina"
+  - "reginarexx"
+name: "REXX"
+
+main: "main.rexx"
+template: |
+  say "Hello, world!"
+
+run: |
+  rexx main.rexx

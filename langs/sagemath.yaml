@@ -1,0 +1,19 @@
+id: "sagemath"
+aliases:
+  - "sage"
+name: "SageMath"
+
+repl: |
+  sage
+
+main: ".sage/init.sage"
+template: |
+  print("Hello, world!")
+createEmpty: ""
+
+run: |
+  sage
+
+scope:
+  code: |
+    x = 123 * 234

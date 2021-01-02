@@ -1,0 +1,20 @@
+id: "gnuplot"
+name: "Gnuplot"
+
+repl: |
+  gnuplot
+input: |
+  print 123 * 234
+
+main: "main.gnuplot"
+template: |
+  print "Hello, world!"
+
+run: |
+  gnuplot main.gnuplot -
+
+scope:
+  code: |
+    x = 123 * 234
+  input: |
+    print x

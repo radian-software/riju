@@ -1,0 +1,32 @@
+id: "php"
+aliases:
+  - "phpcli"
+name: "PHP"
+monacoLang: php
+
+repl: |
+  php -a
+input: |
+  print 123 * 234;
+
+main: "main.php"
+template: |
+  <?php
+
+  echo "Hello, world!\n";
+
+run: |
+  php -d auto_prepend_file=main.php -a
+
+scope:
+  code: |
+    $x = 123 * 234;
+  input: |
+    echo $x;
+
+lsp:
+  start: |
+    intelephense --stdio
+
+skip:
+  - lsp

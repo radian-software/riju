@@ -1,0 +1,28 @@
+id: "d"
+aliases:
+  - "dmd"
+name: "D"
+
+main: "main.d"
+template: |
+  import std.stdio;
+
+  void main()
+  {
+      writeln("Hello, world!");
+  }
+
+compile: |
+  dmd main.d
+run: |
+  ./main
+
+format:
+  run: |
+    dfmt
+  input: |
+    import std.stdio;
+
+    void main() {
+        writeln("Hello, world!");
+    }

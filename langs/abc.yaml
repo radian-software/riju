@@ -1,0 +1,20 @@
+id: "abc"
+name: "ABC"
+
+repl: |
+  abc
+input: |
+  WRITE 123 * 234
+
+main: "main.abc"
+template: |
+  WRITE "Hello, world!" /
+
+run: |
+  abc "$PWD/main.abc" -
+
+scope:
+  code: |
+    PUT 123 * 234 IN x
+  input: |
+    WRITE x

@@ -1,0 +1,31 @@
+id: "battlestar"
+aliases:
+  - "battlestarc"
+  - "bts"
+name: "Battlestar"
+
+info:
+  year: 2014
+  desc: "A different take on assembly, with the goal of creating tiny executables"
+  ext: bts
+  web:
+    source: "https://github.com/xyproto/battlestar"
+  category: assembly
+  mode: compiled
+  platform: []
+  syntax: assembly
+  typing: weak
+  paradigm: imperative
+  usage: personal
+
+main: "main.bts"
+template: |
+  const message = "Hello, world!
+  "
+
+  fun main
+      syscall(1, 1, message, len(message))
+  end
+
+run: |
+  bts main.bts

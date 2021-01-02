@@ -1,0 +1,29 @@
+id: "markdown"
+aliases:
+  - "mdown"
+  - "mkdn"
+  - "md"
+  - "mkd"
+  - "mdwn"
+  - "mdtxt"
+  - "mdtext"
+  - "text"
+  - "rmd"
+name: "Markdown"
+monacoLang: markdown
+
+main: "main.md"
+template: |
+  Hello, world!
+
+compile: |
+  pandoc main.md -o main.html
+run: |
+  prettier --no-config main.html
+
+format:
+  run: |
+    prettier --no-config --stdin-filepath=format.md
+  input: |
+    Hello, world!
+

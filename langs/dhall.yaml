@@ -1,0 +1,11 @@
+id: "dhall"
+name: "Dhall"
+
+main: "main.dhall"
+template: |
+  { output = "Hello, world!" }
+
+compile: |
+  cat main.dhall | dhall-to-json > main.json
+run: |
+  cat main.json | jq .

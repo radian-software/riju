@@ -1,0 +1,13 @@
+id: "bc"
+name: "bc"
+
+repl: |
+  bc
+
+main: "main.bc"
+template: |
+  "Hello, world!
+  "
+
+run: |
+  bc main.bc

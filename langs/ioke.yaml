@@ -1,0 +1,14 @@
+id: "ioke"
+aliases:
+  - "ik"
+name: "Ioke"
+
+repl: |
+  JAVA_OPTS="-Duser.home=$PWD" ioke
+
+main: "main.ik"
+template: |
+  "Hello, world!" println
+
+run: |
+  JAVA_OPTS="-Duser.home=$PWD" ioke main.ik; JAVA_OPTS="-Duser.home=$PWD" ioke

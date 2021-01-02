@@ -1,0 +1,17 @@
+id: "aspectj"
+aliases:
+  - "aj"
+name: "AspectJ"
+
+main: "Main.aj"
+template: |
+  public class Main {
+      public static void main(String[] args) {
+          System.out.println("Hello, world!");
+      }
+  }
+
+compile: |
+  ajc Main.aj
+run: |
+  java Main

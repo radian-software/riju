@@ -1,0 +1,32 @@
+id: "reasonml"
+aliases:
+  - "re"
+  - "reason"
+  - "bsc"
+  - "buckle"
+  - "bucklescript"
+name: "ReasonML"
+
+main: "main.re"
+template: |
+  print_string("Hello, world!\n");
+
+compile: |
+  bsc main.re > main.js
+run: |
+  NODE_PATH=/usr/lib/node_modules node main.js
+
+format:
+  run: |
+    refmt
+  input: |
+    print_string("Hello, world!\n")
+
+lsp:
+  setup: |
+    cp -a /opt/reasonml/project-template/* ./
+  start: |
+    reason-language-server
+
+skip:
+  - lsp

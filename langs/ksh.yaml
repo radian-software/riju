@@ -1,0 +1,24 @@
+id: "ksh"
+aliases:
+  - "kshell"
+name: "Ksh"
+monacoLang: shell
+
+repl: |
+  SHELL=/usr/bin/ksh HOME="$PWD" ksh
+input: |
+  expr 123 * 234
+
+main: ".kshrc"
+template: |
+  echo "Hello, world!"
+createEmpty: ""
+
+run: |
+  SHELL=/usr/bin/ksh HOME="$PWD" ksh
+
+scope:
+  code: |
+    x="$(expr 123 * 234)"
+  input: |
+    echo "$x"

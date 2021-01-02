@@ -1,0 +1,43 @@
+id: "basic"
+aliases:
+  - "bas"
+  - "qbasic"
+name: "BASIC"
+
+info:
+  impl: "Bywater BASIC"
+  year: 1964
+  desc: "General-purpose, high-level programming language whose design philosophy emphasizes ease of use"
+  ext: bas
+  web:
+    wiki: "https://en.wikipedia.org/wiki/BASIC"
+    impl: "https://sourceforge.net/projects/bwbasic/"
+    source: "https://sourceforge.net/projects/bwbasic/files/bwbasic/"
+  category: general
+  mode: interpreted
+  platform: []
+  syntax:
+    - basic
+    - column
+    - whitespace
+  typing: static
+  paradigm: imperative
+  usage: []
+
+repl: |
+  bwbasic
+input: |
+  PRINT 123 * 234
+
+main: "main.bas"
+template: |
+  PRINT "Hello, world!"
+
+run: |
+  bwbasic main.bas
+
+scope:
+  code: |
+    x = 123 * 234
+  input: |
+    PRINT x

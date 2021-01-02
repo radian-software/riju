@@ -1,0 +1,15 @@
+id: "pseint"
+aliases:
+  - "psc"
+name: "PSeInt"
+
+main: "main.psc"
+template: |
+  Proceso Main
+      Escribir "¡Hola, mundo!";
+  FinProceso
+
+run: |
+  pseint --nouser main.psc
+hello: |
+  ¡Hola, mundo!

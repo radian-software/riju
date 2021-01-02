@@ -1,0 +1,18 @@
+id: "pawn"
+aliases:
+  - "pawncc"
+  - "pawnrun"
+name: "PAWN"
+
+main: "main.pawn"
+template: |
+  #include <core>
+
+  main() {
+      print("Hello, world!\n");
+  }
+
+compile: |
+  pawncc main.pawn -i/opt/pawn/include
+run: |
+  pawnrun main.amx

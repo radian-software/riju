@@ -1,0 +1,37 @@
+id: "tex"
+aliases:
+  - "latex"
+  - "xetex"
+  - "plaintex"
+name: "TeX"
+
+repl: |
+  tex
+input: |
+  \newcount\x
+  \advance\x by 123
+  \multiply\x by 234
+  \message{\the\x}
+
+main: "main.tex"
+template: |
+  \message{Hello, world!}
+
+run: |
+  tex main.tex
+
+scope:
+  code: |
+    \newcount\x
+    \advance\x by 123
+    \multiply\x by 234
+  input: |
+    \message{\the\x}
+
+lsp:
+  start: |
+    digestif
+  lang: "tex"
+
+skip:
+  - lsp

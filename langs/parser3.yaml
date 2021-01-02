@@ -1,0 +1,12 @@
+id: "parser3"
+aliases:
+  - "parser"
+  - "p"
+name: "Parser3"
+
+main: "main.p"
+template: |
+  $console:line[Hello, world!]
+
+run: |
+  parser3 main.p

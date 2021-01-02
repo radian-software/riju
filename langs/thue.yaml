@@ -1,0 +1,11 @@
+id: "thue"
+name: "Thue"
+
+main: "main.thue"
+template: |
+  a::=~Hello, world!
+  ::=
+  a
+
+run: |
+  thue main.thue

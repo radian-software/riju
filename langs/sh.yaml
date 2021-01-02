@@ -1,0 +1,29 @@
+id: "sh"
+aliases:
+  - "shell"
+  - "posix"
+  - "posixsh"
+  - "ash"
+  - "dash"
+  - "posh"
+name: "Sh"
+monacoLang: shell
+
+repl: |
+  SHELL=/usr/bin/sh HOME="$PWD" posh -l
+input: |
+  expr 123 \* 234
+
+main: ".profile"
+template: |
+  echo "Hello, world!"
+createEmpty: ""
+
+run: |
+  SHELL=/usr/bin/sh HOME="$PWD" posh -l
+
+scope:
+  code: |
+    x="$(expr 123 \* 234)"
+  input: |
+    echo "$x"

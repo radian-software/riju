@@ -1,0 +1,11 @@
+id: "nim"
+name: "Nim"
+
+main: "main.nim"
+template: |
+  echo "Hello, world!"
+
+compile: |
+  nim compile main.nim
+run: |
+  ./main

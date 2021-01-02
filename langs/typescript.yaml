@@ -1,0 +1,27 @@
+id: "typescript"
+aliases:
+  - "ts"
+  - "tsnode"
+  - "tsc"
+name: "TypeScript"
+monacoLang: typescript
+
+repl: |
+  ts-node
+
+main: "main.ts"
+template: |
+  console.log("Hello, world!");
+
+run: |
+  ts-node -i -e "$(< main.ts)"
+
+scope:
+  code: |
+    let x = 123 * 234;
+
+format:
+  run: |
+    prettier --no-config --stdin-filepath=format.ts
+  input: |
+    console.log('Hello, world!');

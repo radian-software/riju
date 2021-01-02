@@ -1,0 +1,66 @@
+id: "c"
+aliases:
+  - "gcc"
+  - "clang"
+  - "h"
+  - "cc"
+  - "c99"
+  - "c11"
+  - "c18"
+name: "C"
+monacoLang: c
+
+info:
+  impl: "LLVM"
+  version: "C18"
+  year: 1972
+  desc: "General-purpose, procedural computer programming language supporting structured programming, lexical variable scope, and recursion, with a static type system"
+  ext:
+    - c
+    - h
+  web:
+    wiki: "https://en.wikipedia.org/wiki/C_(programming_language)"
+    impl: "https://llvm.org/"
+    source: "https://github.com/llvm/llvm-project"
+  category: general
+  mode: compiled
+  platform: []
+  syntax: c
+  typing: static
+  paradigm: imperative
+  usage: popular
+
+main: "main.c"
+template: |
+  #include <stdio.h>
+
+  int main() {
+    printf("Hello, world!\n");
+    return 0;
+  }
+
+compile: |
+  clang -std=c17 -pedantic -Wall -Wextra main.c -o main
+run: |
+  ./main
+
+format:
+  run: |
+    clang-format --assume-filename=format.c
+  input: |
+    #include <stdio.h>
+
+    int main()
+    {
+      printf("Hello, world!\n");
+      return 0;
+    }
+
+lsp:
+  setup: |
+    echo '-Wall -Wextra' | sed -E 's/\s+/\n/g' > compile_flags.txt
+  start: |
+    clangd
+
+skip:
+  - lsp

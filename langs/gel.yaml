@@ -1,0 +1,19 @@
+id: "gel"
+aliases:
+  - "genius"
+name: "GEL"
+
+repl: |
+  genius
+
+main: ".geniusinit"
+template: |
+  print("Hello, world!")
+createEmpty: ""
+
+run: |
+  genius
+
+scope:
+  code: |
+    x = 123 * 234

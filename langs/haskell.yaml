@@ -1,0 +1,44 @@
+id: "haskell"
+aliases:
+  - "ghc"
+  - "ghci"
+  - "hs"
+name: "Haskell"
+
+repl: |
+  rm -f .ghci && ghci
+
+main: "Main.hs"
+template: |
+  module Main where
+
+  main :: IO ()
+  main = putStrLn "Hello, world!"
+
+run: |
+  (echo ':load Main' && echo 'main') > .ghci && ghci
+
+scope:
+  code: |
+    x = 123 * 234
+
+format:
+  run: |
+    brittany
+  input: |
+    module Main where
+
+    main :: IO ()
+    main =
+      putStrLn "Hello, world!"
+
+lsp:
+  setup: |
+    cp /opt/haskell/hie.yaml hie.yaml
+  start: |
+    HIE_HOOGLE_DATABASE=/opt/haskell/hoogle.hoo hie --lsp
+  init:
+    languageServerHaskell: {}
+
+skip:
+  - lsp

@@ -1,0 +1,20 @@
+id: "snobol"
+aliases:
+  - "snobol4"
+  - "spitbol"
+  - "sno"
+name: "SNOBOL"
+
+repl: |
+  snobol4
+input: |2
+   OUTPUT = 123 * 234
+  END
+
+main: "main.sno"
+template: |2
+   OUTPUT = "Hello, world!"
+  END
+
+run: |
+  snobol4 main.sno; snobol4

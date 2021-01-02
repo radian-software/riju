@@ -1,0 +1,44 @@
+id: "cmd"
+aliases:
+  - "bat"
+  - "batch"
+  - "wine"
+name: "Cmd"
+monacoLang: bat
+
+info:
+  year: 1987
+  desc: "Obsolete (but still default) command-line interpreter for Microsoft Windows"
+  ext: bat
+  web:
+    wiki: "https://en.wikipedia.org/wiki/Cmd.exe"
+    home: "https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/windows-commands"
+    source: null
+  category: shell
+  mode: interpreted
+  platform: windows
+  syntax: basic
+  typing: weak
+  paradigm: imperative
+  usage: []
+
+setup: |
+  shopt -s dotglob; cp -R /opt/cmd/home-template/* ./
+
+repl: |
+  wine cmd
+input: |
+  set /a 123 * 234
+
+main: "main.bat"
+template: |
+  echo "Hello, world!"
+
+run: |
+  wine cmd /k main.bat
+
+scope:
+  code: |
+    set /a x = 123 * 234
+  input: |
+    echo %x%

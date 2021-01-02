@@ -1,0 +1,17 @@
+id: "emojicode"
+aliases:
+  - "emoji"
+  - "emojic"
+  - "emojicodec"
+name: "Emojicode"
+
+main: "main.emojic"
+template: |
+  🏁 🍇
+    😀 🔤Hello, world!🔤❗️
+  🍉
+
+compile: |
+  emojicodec main.emojic
+run: |
+  ./main

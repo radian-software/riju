@@ -1,0 +1,16 @@
+id: "kitten"
+aliases:
+  - "ktn"
+name: "Kitten"
+
+repl: |
+  kitten
+input: |
+  (123 * 234) say
+
+main: "main.ktn"
+template: |
+  "Hello, world!" say
+
+run: |
+  kitten main.ktn; kitten

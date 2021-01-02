@@ -1,0 +1,16 @@
+id: "groovy"
+name: "Groovy"
+
+repl: |
+  JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" groovysh
+
+main: "main.groovy"
+template: |
+  print "Hello, world!";
+
+run: |
+  JAVA_OPTS="-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs" groovysh main.groovy
+
+scope:
+  code: |
+    x = 123 * 234;

@@ -1,0 +1,43 @@
+id: "cobol"
+aliases:
+  - "cbl"
+  - "cob"
+  - "cobc"
+  - "cpy"
+name: "COBOL"
+
+info:
+  impl: "GnuCOBOL"
+  version: "COBOL 2014"
+  year: 1959
+  desc: "Compiled English-like computer programming language designed for business use"
+  ext:
+    - cbl
+    - cob
+    - cpy
+  web:
+    wiki: "https://en.wikipedia.org/wiki/COBOL"
+    impl: "https://sourceforge.net/projects/gnucobol/"
+    source: "https://sourceforge.net/p/gnucobol/_list/svn"
+  category: general
+  mode: compiled
+  platform: []
+  syntax: basic
+  typing: weak
+  paradigm:
+    - imperative
+    - oo
+  usage: popular
+
+main: "main.cbl"
+template: |
+  IDENTIFICATION DIVISION.
+  PROGRAM-ID. MAIN.
+  PROCEDURE DIVISION.
+      DISPLAY "Hello, world!".
+      STOP RUN.
+
+compile: |
+  cobc -free -x main.cbl -o main
+run: |
+  ./main

@@ -1,0 +1,11 @@
+id: "twiki"
+name: "TWiki"
+
+main: "main.txt"
+template: |
+  Hello, world!
+
+compile: |
+  pandoc main.txt -f twiki -o main.html
+run: |
+  prettier --no-config main.html

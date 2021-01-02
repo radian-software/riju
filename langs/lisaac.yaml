@@ -1,0 +1,18 @@
+id: "lisaac"
+name: "Lisaac"
+
+main: "main.li"
+template: |
+  Section Header
+    + name := MAIN;
+
+  Section Public
+    - main <-
+    (
+      "Hello, world!\n".print;
+    );
+
+compile: |
+  lisaac -gcc -Wno-implicit-function-declaration main.li
+run: |
+  ./main

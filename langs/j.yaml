@@ -1,0 +1,15 @@
+id: "j"
+aliases:
+  - "jconsole"
+  - "ijconsole"
+name: "J"
+
+repl: |
+  echo 'ijconsole:' && ijconsole
+
+main: "main.ijs"
+template: |
+  echo 'Hello, world!'
+
+run: |
+  ijconsole main.ijs

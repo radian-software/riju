@@ -1,0 +1,25 @@
+id: "tcl"
+aliases:
+  - "tclsh"
+  - "tclshrc"
+name: "Tcl"
+monacoLang: tcl
+
+repl: |
+  tclsh
+input: |
+  expr 123 * 234
+
+main: ".tclshrc"
+template: |
+  puts {Hello, world!}
+createEmpty: ""
+
+run: |
+  HOME="$PWD" tclsh
+
+scope:
+  code: |
+    set x [expr 123 * 234]
+  input: |
+    echo $x

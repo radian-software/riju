@@ -1,0 +1,11 @@
+id: "golfscript"
+aliases:
+  - "golf"
+name: "GolfScript"
+
+main: "main.gs"
+template: |
+  'Hello, world!'
+
+run: |
+  golfscript main.gs

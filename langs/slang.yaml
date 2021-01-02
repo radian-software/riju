@@ -1,0 +1,21 @@
+id: "slang"
+aliases:
+  - "s"
+  - "sl"
+name: "S-Lang"
+
+repl: |
+  slsh
+input: |
+  123 * 234;
+
+main: "main.sl"
+template: |
+  message("Hello, world!");
+
+run: |
+  slsh -i main.sl
+
+scope:
+  code: |
+    x = 123 * 234;

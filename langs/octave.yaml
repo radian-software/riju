@@ -1,0 +1,20 @@
+id: "octave"
+aliases:
+  - "matlab"
+  - "m"
+  - "mathworks"
+name: "Octave"
+
+repl: |
+  octave
+
+main: "main.m"
+template: |
+  disp("Hello, world!")
+
+run: |
+  octave --persist main.m
+
+scope:
+  code: |
+    x = 123 * 234

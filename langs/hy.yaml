@@ -1,0 +1,18 @@
+id: "hy"
+name: "Hy"
+
+repl: |
+  hy
+input: |
+  (* 123 234)
+
+main: "main.hy"
+template: |
+  (print "Hello, world!")
+
+run: |
+  hy -i main.hy
+
+scope:
+  code: |
+    (setv x (* 123 234))

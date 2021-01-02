@@ -1,0 +1,39 @@
+id: "go"
+aliases:
+  - "golang"
+name: "Go"
+monacoLang: go
+
+main: "main.go"
+template: |
+  package main
+
+  import "fmt"
+
+  func main() {
+  	fmt.Println("Hello, world!")
+  }
+
+compile: |
+  go build main.go
+run: |
+  ./main
+
+format:
+  run: |
+    gofmt
+  input: |
+    package main
+
+    import "fmt"
+
+    func main() {
+    	fmt.Println("Hello, world!");
+    }
+
+lsp:
+  start: |
+    gopls
+
+skip:
+  - lsp

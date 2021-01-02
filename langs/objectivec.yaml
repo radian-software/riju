@@ -1,0 +1,44 @@
+id: "objectivec"
+aliases:
+  - "objc"
+  - "gnustep"
+name: "Objective-C"
+monacoLang: objective-c
+
+main: "main.m"
+template: |
+  #import <Foundation/Foundation.h>
+
+  int main() {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    NSLog(@"Hello, world!");
+    [pool drain];
+    return 0;
+  }
+
+compile: |
+  gcc $(gnustep-config --objc-flags) main.m $(gnustep-config --base-libs) -o main
+run: |
+  ./main
+
+format:
+  run: |
+    clang-format --assume-filename=format.m
+  input: |
+    #import <Foundation/Foundation.h>
+
+    int main() {
+        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        NSLog(@"Hello, world!");
+        [pool drain];
+        return 0;
+    }
+
+lsp:
+  setup: |
+    (gnustep-config --objc-flags && gnustep-config --base-libs) | sed -E 's/\s+/\n/g' > compile_flags.txt
+  start: |
+    clangd
+
+skip:
+  - lsp

@@ -1,0 +1,17 @@
+id: "ink"
+name: "Ink"
+
+repl: |
+  ink
+
+main: "main.ink"
+template: |
+  std := load('../../../opt/ink/std')
+  str := load('../../../opt/ink/str')
+
+  log := std.log
+
+  log('Hello, world!')
+
+run: |
+  ink main.ink; ink

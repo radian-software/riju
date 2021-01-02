@@ -1,0 +1,13 @@
+id: "sed"
+aliases:
+  - "gsed"
+name: "Sed"
+
+main: "main.sed"
+template: |
+  s/.*/Hello, world!/
+
+run: |
+  echo 'Reading from stdin...' >&2; sed -f main.sed
+helloInput: |
+

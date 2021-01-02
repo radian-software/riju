@@ -1,0 +1,36 @@
+id: "ocaml"
+name: "OCaml"
+
+repl: |
+  ocaml
+input: |
+  123 * 234 ;;
+
+main: "main.ml"
+template: |
+  ;;
+  print_string "Hello, world!\n"
+
+run: |
+  ocaml -init main.ml
+
+scope:
+  code: |
+    ;;
+    let x = 123 * 234
+  input: |
+    x ;;
+
+format:
+  run: |
+    touch .ocamlformat; ocamlformat --name=format.ml -
+  input: |
+    print_string "Hello, world!\n";;
+
+lsp:
+  start: |
+    ocamllsp
+  lang: "ocaml"
+
+skip:
+  - lsp

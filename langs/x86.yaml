@@ -1,0 +1,29 @@
+id: "x86"
+aliases:
+  - "s"
+  - "asm"
+  - "assembly"
+  - "x86-64"
+name: "x86"
+
+main: "main.S"
+template: |2
+  	.text
+  	.globl main
+  main:
+  	movq $1, %rax
+  	movq $1, %rdi
+  	leaq message(%rip), %rsi
+  	movq $14, %rdx
+  	syscall
+  	movq $60, %rax
+  	movq $0, %rdi
+  	syscall
+  	.data
+  message:
+  	.string "Hello, world!\n"
+
+compile: |
+  clang main.S -o main
+run: |
+  ./main

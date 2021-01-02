@@ -1,0 +1,16 @@
+id: "hcl"
+aliases:
+  - "tf"
+  - "terraform"
+  - "hashicorp"
+  - "hc"
+name: "HCL"
+
+main: "main.hcl"
+template: |
+  output = "Hello, world!"
+
+compile: |
+  cat main.hcl | yj -cj > main.json
+run: |
+  cat main.json | jq .

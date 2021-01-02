@@ -1,0 +1,19 @@
+id: "எழில்"
+aliases:
+  - "ezhil"
+  - "ezhili"
+  - "ezhuthi"
+  - "tamil"
+name: "எழில்"
+
+repl: |
+  ezhili
+
+main: "main.n"
+template: |
+  பதிப்பி "வணக்கம், உலகமே!"
+
+run: |
+  ezhili main.n; ezhili
+hello: |
+  வணக்கம், உலகமே!

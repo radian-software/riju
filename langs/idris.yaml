@@ -1,0 +1,23 @@
+id: "idris"
+aliases:
+  - "idr"
+  - "idris2"
+name: "Idris"
+
+repl: |
+  rm -f .idris/repl/init; idris2
+
+main: "Main.idr"
+template: |
+  module Main
+
+  main : IO ()
+  main = putStrLn "Hello, world!"
+
+run: |
+  mkdir -p .idris/repl; echo ':exec main' > .idris/repl/init; idris2 Main.idr -x main; idris2 Main.idr
+
+scope:
+  code: |
+    x : Int
+    x = 123 * 234

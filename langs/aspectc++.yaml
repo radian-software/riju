@@ -1,0 +1,18 @@
+id: "aspectc++"
+aliases:
+  - "aspectcpp"
+name: "AspectC++"
+
+main: "main.cpp"
+template: |
+  #include <iostream>
+
+  int main() {
+    std::cout << "Hello, world!" << std::endl;
+    return 0;
+  }
+
+compile: |
+  ag++ main.cpp -o main | (grep -v "TO BE FIXED" || true)
+run: |
+  ./main

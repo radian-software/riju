@@ -1,0 +1,18 @@
+id: "make"
+aliases:
+  - "gmake"
+  - "makefile"
+  - "gmakefile"
+  - "gnumakefile"
+  - "gnumake"
+  - "bsdmake"
+name: "Make"
+
+main: "Makefile"
+template: |
+  .PHONY: all
+  all:
+  	@echo "Hello, world!"
+
+run: |
+  make

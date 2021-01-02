@@ -1,0 +1,22 @@
+id: "less"
+aliases:
+  - "lessc"
+name: "Less"
+monacoLang: less
+
+main: "main.less"
+template: |
+  body:before {
+    content: "Hello, world!";
+  }
+
+run: |
+  lessc main.less
+
+format:
+  run: |
+    prettier --no-config --stdin-filepath=format.less
+  input: |
+    body:before {
+        content: "Hello, world!";
+    }

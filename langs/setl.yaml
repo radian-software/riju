@@ -1,0 +1,9 @@
+id: "setl"
+name: "SETL"
+
+main: "main.setl"
+template: |
+  print("Hello, world!");
+
+run: |
+  setl main.setl

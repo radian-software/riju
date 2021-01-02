@@ -1,0 +1,24 @@
+id: "racket"
+aliases:
+  - "rkt"
+name: "Racket"
+
+repl: |
+  racket
+input: |
+  (* 123 234)
+
+main: "main.rkt"
+template: |
+  #lang racket/base
+  (display "Hello, world!\n")
+
+run: |
+  racket -i -e '(enter! "main.rkt") (display "[ type (enter! \"main.rkt\") to access local variables ]\n")'
+
+scope:
+  code: |
+    (define x (* 123 234))
+  input: |
+    (enter! "main.rkt")
+    x

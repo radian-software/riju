@@ -1,0 +1,20 @@
+id: "fish"
+name: "Fish"
+
+repl: |
+  SHELL=/usr/bin/fish fish
+input: |
+  expr 123 \* 234
+
+main: "main.fish"
+template: |
+  echo "Hello, world!"
+
+run: |
+  SHELL=/usr/bin/fish fish -C "$(< main.fish)"
+
+scope:
+  code: |
+    set x (expr 123 \* 234)
+  input: |
+    echo $x

@@ -1,0 +1,18 @@
+id: "pascal"
+aliases:
+  - "pas"
+  - "fpc"
+name: "Pascal"
+monacoLang: pascal
+
+main: "main.pas"
+template: |
+  program Main;
+  begin
+     writeln('Hello, world!');
+  end.
+
+compile: |
+  fpc main.pas
+run: |
+  ./main

@@ -1,0 +1,17 @@
+id: "icon"
+aliases:
+  - "icn"
+  - "icont"
+  - "iconx"
+name: "Icon"
+
+main: "main.icn"
+template: |
+  procedure main ()
+      write("Hello, world!")
+  end
+
+compile: |
+  icont main.icn
+run: |
+  ./main

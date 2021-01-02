@@ -1,0 +1,17 @@
+id: "unlambda"
+aliases:
+  - "unl"
+name: "Unlambda"
+
+repl: |
+  unlambda-repl
+input: |
+  `.2`.8`.7`.8`.2i
+
+main: "main.unl"
+template: |
+  `.
+  `.!`.d`.l`.r`.o`.w`. `.,`.o`.l`.l`.e`.Hi
+
+run: |
+  unlambda-repl main.unl

@@ -1,0 +1,28 @@
+id: "factor"
+aliases:
+  - "fact"
+name: "Factor"
+
+repl: |
+  factor-lang
+input: |
+  123 234 *
+
+main: ".factor-rc"
+template: |
+  IN: main
+  USE: io
+
+  "Hello, world!" print
+createEmpty: ""
+
+run: |
+  factor-lang
+
+scope:
+  code: |
+    USE: math
+    : x ( -- x ) 123 234 * ;
+  input: |
+    USE: main
+    x

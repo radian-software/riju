@@ -19,6 +19,9 @@ function fixupLangConfig(langConfig) {
     return langConfig.trim();
   } else if (typeof langConfig === "object") {
     for (const key in langConfig) {
+      if (langConfig.id === "whitespace" && key === "template") {
+        continue;
+      }
       langConfig[key] = fixupLangConfig(langConfig[key]);
     }
   }

@@ -1,0 +1,14 @@
+id: "рапира"
+aliases:
+  - "rap"
+  - "rerap"
+  - "rerap2"
+  - "rapira"
+name: "Рапира"
+
+main: "main.rap"
+template: |
+  вывод: "Hello, world!"
+
+run: |
+  rapira main.rap

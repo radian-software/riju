@@ -1,0 +1,146 @@
+id: "java"
+aliases:
+  - "javac"
+name: "Java"
+monacoLang: java
+
+main: "Main.java"
+template: |
+  public class Main {
+      public static void main(String[] args) {
+          System.out.println("Hello, world!");
+      }
+  }
+
+compile: |
+  javac Main.java
+run: |
+  java Main
+
+format:
+  run: |
+    clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" --assume-filename=Format.java
+  input: |
+    public class Main
+    {
+        public static void main(String[] args)
+        {
+            System.out.println("Hello, world!");
+        }
+    }
+
+lsp:
+  setup: |
+    rm -rf jdt && cp -RT /opt/jdt/config_linux jdt
+  start: |
+    java -Declipse.application=org.eclipse.jdt.ls.core.id1 -Dosgi.bundles.defaultStartLevel=4 -Declipse.product=org.eclipse.jdt.ls.core.product -Dlog.level=ALL -noverify -Xmx1G -jar /opt/jdt/plugins/org.eclipse.equinox.launcher_*.jar -configuration "$PWD/jdt" -data "$PWD" --add-modules=ALL-SYSTEM --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED
+  init:
+    bundles:
+      - /opt/jdt/bundles/com.microsoft.java.test.plugin-0.19.0.jar
+      - /opt/jdt/bundles/com.microsoft.jdtls.ext.core-0.5.1.jar
+      - /opt/jdt/bundles/dg.jdt.ls.decompiler.cfr-0.0.2-201802221740.jar
+      - /opt/jdt/bundles/dg.jdt.ls.decompiler.common-0.0.2-201802221740.jar
+      - /opt/jdt/bundles/dg.jdt.ls.decompiler.fernflower-0.0.2-201802221740.jar
+      - /opt/jdt/bundles/dg.jdt.ls.decompiler.procyon-0.0.2-201802221740.jar
+      - /opt/jdt/bundles/io.projectreactor.reactor-core.jar
+      - /opt/jdt/bundles/java.debug.plugin.jar
+      - /opt/jdt/bundles/jdt-ls-commons.jar
+      - /opt/jdt/bundles/jdt-ls-extension.jar
+      - /opt/jdt/bundles/org.reactivestreams.reactive-streams.jar
+    extendedClientCapabilities:
+      advancedExtractRefactoringSupport: true
+      advancedGenerateAccessorsSupport: true
+      advancedOrganizeImportsSupport: true
+      classFileContentsSupport: true
+      generateConstructorsPromptSupport: true
+      generateToStringPromptSupport: true
+      hashCodeEqualsPromptSupport: true
+      moveRefactoringSupport: true
+      overrideMethodsPromptSupport: true
+      progressReportProvider: true
+    settings:
+      java:
+        autobuild:
+          enabled: true
+        codeGeneration:
+          generateComments: false
+          hashCodeEquals:
+            useInstanceof: false
+            useJava7Objects: false
+          toString:
+            codeStyle: STRING_CONCATENATION
+            limitElements: 0
+            listArrayContents: true
+            skipNullValues: false
+            template: ${object.className} [${member.name()}=${member.value}, ${otherMembers}]
+          useBlocks: false
+        completion:
+          enabled: true
+          favoriteStaticMembers:
+            - org.junit.Assert.*
+            - org.junit.Assume.*
+            - org.junit.jupiter.api.Assertions.*
+            - org.junit.jupiter.api.Assumptions.*
+            - org.junit.jupiter.api.DynamicContainer.*
+            - org.junit.jupiter.api.DynamicTest.*
+            - org.mockito.Mockito.*
+            - org.mockito.ArgumentMatchers.*
+            - org.mockito.Answers.*
+          filteredTypes:
+            - java.awt.*
+            - com.sun.*
+          guessMethodArguments: true
+          importOrder:
+            - java
+            - javax
+            - com
+            - org
+          overwrite: true
+        configuration:
+          checkProjectSettingsExclusions: true
+          updateBuildConfiguration: automatic
+        dependency:
+          packagePresentation: flat
+        errors:
+          incompleteClasspath:
+            severity: warning
+        foldingRange:
+          enabled: true
+        format:
+          comments:
+            enabled: true
+          enabled: true
+          onType:
+            enabled: true
+        implementationsCodeLens:
+          enabled: false
+        import:
+          exclusions:
+            - '**/node_modules/**'
+            - '**/.metadata/**'
+            - '**/archetype-resources/**'
+            - '**/META-INF/maven/**'
+          gradle:
+            enabled: true
+            wrapper:
+              enabled: true
+          maven:
+            enabled: true
+        maven:
+          downloadSources: false
+        maxConcurrentBuilds: 1
+        progressReports:
+          enabled: true
+        referencesCodeLens:
+          enabled: false
+        saveActions:
+          organizeImports: false
+        selection:
+          enabled: true
+        signatureHelp:
+          enabled: true
+        trace:
+          server: "off"
+
+skip:
+  - lsp

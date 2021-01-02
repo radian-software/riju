@@ -1,0 +1,21 @@
+id: "dart"
+name: "Dart"
+monacoLang: dart
+
+main: "main.dart"
+template: |
+  void main() {
+    print('Hello, world!');
+  }
+
+run: |
+  dart main.dart
+
+lsp:
+  start: |
+    dart /usr/lib/dart/bin/snapshots/analysis_server.dart.snapshot --lsp
+  disableDynamicRegistration: true
+  lang: "dart"
+
+skip:
+  - lsp

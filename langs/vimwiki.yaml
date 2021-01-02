@@ -1,0 +1,11 @@
+id: "vimwiki"
+name: "Vimwiki"
+
+main: "main.txt"
+template: |
+  Hello, world!
+
+compile: |
+  pandoc main.txt -f vimwiki -o main.html
+run: |
+  prettier --no-config main.html

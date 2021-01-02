@@ -1,0 +1,54 @@
+id: "clojure"
+aliases:
+  - "clj"
+name: "Clojure"
+monacoLang: clojure
+
+info:
+  impl: "Java Clojure"
+  year: 2007
+  desc: "Modern, dynamic, and functional dialect of the Lisp programming language on the Java platform"
+  ext:
+    - clj
+    - cljc
+    - edn
+  web:
+    wiki: "https://en.wikipedia.org/wiki/Clojure"
+    home: "https://clojure.org/"
+    source: "https://github.com/clojure/clojure"
+  category: general
+  mode: interpreted
+  platform: jvm
+  syntax:
+    - lisp
+    - extensible
+  typing: dynamic
+  paradigm:
+    - declarative
+    - functional
+    - imperative
+    - oo
+  usage: []
+
+repl: |
+  clojure
+input: |
+  (* 123 234)
+
+main: "main.clj"
+template: |
+  (println "Hello, world!")
+
+run: |
+  clojure -i main.clj -r
+
+scope:
+  code: |
+    (def x (* 123 234))
+
+lsp:
+  start: |
+    clojure-lsp
+
+skip:
+  - lsp

@@ -1,0 +1,38 @@
+id: "erlang"
+aliases:
+  - "erl"
+name: "Erlang"
+
+repl: |
+  erl
+input: |
+  123 * 234.
+
+main: "main.erl"
+template: |
+  -module(main).
+  -export([main/0]).
+
+  main() ->
+      io:fwrite("Hello, world!\n").
+
+compile: |
+  erl -compile main
+run: |
+  erl -s main main
+
+scope:
+  code: |
+    -export([x/0]).
+    x() -> 123 * 234.
+
+  after: "-export([main/0])."
+  input: |
+    main:x().
+
+lsp:
+  start: |
+    erlang_ls
+
+skip:
+  - lsp

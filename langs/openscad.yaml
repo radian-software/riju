@@ -1,0 +1,11 @@
+id: "openscad"
+name: "OpenSCAD"
+
+main: "main.scad"
+template: |
+  echo("Hello, world!");
+
+compile: |
+  openscad main.scad -o main.stl
+run: |
+  cat main.stl

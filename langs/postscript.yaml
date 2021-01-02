@@ -1,0 +1,24 @@
+id: "postscript"
+aliases:
+  - "ps"
+  - "gs"
+  - "ghostscript"
+name: "PostScript"
+
+repl: |
+  rlwrap gs
+input: |
+  123 234 mul =
+
+main: "main.ps"
+template: |
+  (Hello, world!) =
+
+run: |
+  rlwrap gs main.ps
+
+scope:
+  code: |
+    123 234 mul
+  input: |
+    =

@@ -1,0 +1,24 @@
+id: "wolframlanguage"
+aliases:
+  - "wolfram"
+  - "mathematica"
+  - "mathics"
+  - "wolframmathematica"
+  - "wls"
+  - "expreduce"
+  - "symja"
+name: "Wolfram Language"
+
+repl: |
+  mathics
+
+main: "main.wls"
+template: |
+  Print["Hello, world!"]
+
+run: |
+  mathics --persist main.wls
+
+scope:
+  code: |
+    x = 123 * 234
