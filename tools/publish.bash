@@ -19,7 +19,7 @@ function cleanup {
 
 trap cleanup EXIT
 
-make pull-base scripts
+make pull-base all-scripts
 
 node tools/plan-publish.js --execute --publish --show-all --omit-unneeded-downloads \
     | tee "${tmpdir}/plan-publish.out"

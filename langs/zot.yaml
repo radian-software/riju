@@ -2,7 +2,7 @@ id: "zot"
 name: "Zot"
 
 install:
-  build:
+  prepare:
     apt:
       - qt5-qmake
       - qtscript5-dev

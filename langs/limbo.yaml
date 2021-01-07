@@ -5,7 +5,7 @@ aliases:
 name: "Limbo"
 
 install:
-  build:
+  prepare:
     apt:
       - gcc
       - libc6-dev:i386

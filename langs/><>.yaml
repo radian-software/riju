@@ -3,6 +3,14 @@ aliases:
   - "fishlang"
 name: "><>"
 
+install:
+  manual: |
+    wget https://gist.githubusercontent.com/anonymous/6392418/raw/fish.py
+    sed -i 's:^#!.*:#!/usr/bin/env python3:' fish.py
+    chmod +x fish.py
+    install -d "${pkg}/usr/local/bin"
+    mv fish.py "${pkg}/usr/local/bin/fish-lang"
+
 info:
   year: 2009
   desc: "Stack-based, reflective, two-dimensional esoteric programming language"

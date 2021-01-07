@@ -19,7 +19,7 @@ info:
   usage: personal
 
 install:
-  build:
+  prepare:
     apt:
       - golang
   apt:

@@ -7,7 +7,7 @@ aliases:
 name: "Рапира"
 
 install:
-  build:
+  prepare:
     apt:
       - clang
 

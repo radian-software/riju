@@ -119,7 +119,7 @@ export function bash(cmdline) {
     // single command (no shell logic).
     cmdline = "exec " + cmdline;
   }
-  return ["bash", "-c", cmdline];
+  return ["bash", "-c", `set -euo pipefail; ${cmdline}`];
 }
 
 export const log = {

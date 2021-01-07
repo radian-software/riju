@@ -1,16 +1,15 @@
 import { spawn } from "child_process";
-import fs from "fs";
+import { promises as fs } from "fs";
 
 import { v4 as getUUID } from "uuid";
 
-import { langs } from "./langs";
-import { MIN_UID, MAX_UID, borrowUser, ignoreUsers } from "./users";
+import { MIN_UID, MAX_UID, borrowUser, ignoreUsers } from "./users.js";
 import {
   privilegedSetup,
   privilegedSpawn,
   privilegedTeardown,
   run,
-} from "./util";
+} from "./util.js";
 
 function die(msg) {
   console.error(msg);
@@ -22,20 +21,9 @@ function log(msg) {
 }
 
 async function main() {
-  const dirs = await new Promise((resolve, reject) =>
-    fs.readdir("/tmp/riju", (err, dirs) => (err ? reject(err) : resolve(dirs)))
-  );
+  const dirs = await fs.readdir("/tmp/riju");
   const uids = (
-    await Promise.all(
-      dirs.map(
-        (dir) =>
-          new Promise((resolve, reject) =>
-            fs.stat(`/tmp/riju/${dir}`, (err, stat) =>
-              err ? reject(err) : resolve(stat.uid)
-            )
-          )
-      )
-    )
+    await Promise.all(dirs.map((dir) => fs.stat(`/tmp/riju/${dir}`)))
   ).filter((uid) => uid >= MIN_UID && uid < MAX_UID);
   await ignoreUsers(uids, log);
   const uuid = getUUID();

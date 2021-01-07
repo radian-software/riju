@@ -5,7 +5,7 @@ aliases:
 name: "Idris"
 
 install:
-  build:
+  prepare:
     apt:
       - chezscheme
       - gcc

@@ -5,7 +5,7 @@ aliases:
 name: "LOLCODE"
 
 install:
-  build:
+  prepare:
     apt:
       - cmake
 

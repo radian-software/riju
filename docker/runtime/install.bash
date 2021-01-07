@@ -61,7 +61,7 @@ deb [arch=amd64] https://dl.hhvm.com/ubuntu ${ubuntu_name} main
 deb [arch=amd64] https://deb.nodesource.com/${node_repo} ${ubuntu_name} main
 
 # R
-deb [arch=amd64] https://cloud.r-project.org/bin/linux/ubuntu ${ubuntu_name}-${cran_repo} main
+deb [arch=amd64] https://cloud.r-project.org/bin/linux/ubuntu ${ubuntu_name}-${cran_repo}/
 
 # Yarn
 deb [arch=amd64] https://dl.yarnpkg.com/debian/ stable main
@@ -72,8 +72,24 @@ apt-get install -y dctrl-tools
 
 libicu="$(grep-aptavail -wF Package 'libicu[0-9]+' -s Package -n | head -n1)"
 
-apt-get update
-apt-get install -y less clang jq "${libicu}" make man nodejs sudo tmux wget yarn
+packages="
+
+less
+clang
+jq
+${libicu}
+make
+man
+nodejs
+sudo
+tmux
+vim
+wget
+yarn
+
+"
+
+apt-get install -y $(sed 's/#.*//' <<< "${packages}")
 
 ver="$(latest_release watchexec/watchexec)"
 wget "https://github.com/watchexec/watchexec/releases/download/${ver}/watchexec-${ver}-x86_64-unknown-linux-gnu.deb"

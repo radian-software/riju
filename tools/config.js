@@ -39,6 +39,25 @@ export async function getPackages() {
   return packages;
 }
 
+// Correct whitespace problems in a language configuration,
+// destructively. Return the fixed configuration.
+//
+// This basically removes leading and trailing whitespace from all
+// values in the configuration recursively.
+function fixupLangConfig(langConfig) {
+  if (typeof langConfig === "string") {
+    return langConfig.trim();
+  } else if (typeof langConfig === "object") {
+    for (const key in langConfig) {
+      if (langConfig.id === "whitespace" && key === "template") {
+        continue;
+      }
+      langConfig[key] = fixupLangConfig(langConfig[key]);
+    }
+  }
+  return langConfig;
+}
+
 // Read the YAML config file for the language with the given string ID
 // and return it as an object.
 export async function readLangConfig(lang) {
@@ -50,5 +69,5 @@ export async function readLangConfig(lang) {
       `lang config id ${langConfig.id} doesn't match expected ${lang}`
     );
   }
-  return langConfig;
+  return fixupLangConfig(langConfig);
 }

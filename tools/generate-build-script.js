@@ -14,33 +14,56 @@ function makeLangScript(langConfig) {
   const {
     id,
     name,
-    install: { apt, pip, manual },
+    install: { prepare, apt, pip, manual, deb },
   } = langConfig;
   let parts = [];
   parts.push(`\
 #!/usr/bin/env bash
 
 set -euxo pipefail`);
+  if (prepare) {
+    const { apt, manual } = prepare;
+    if (apt && apt.length > 0) {
+      parts.push(`\
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get update
+sudo apt-get install -y ${apt.join(" ")}`);
+    }
+    if (manual) {
+      parts.push(manual);
+    }
+  }
+  if (manual) {
+    parts.push(manual);
+  }
+  if (deb) {
+    parts.push(
+      deb.map((deb) => `dpkg-deb --extract "${deb}" "\${pkg}"`).join("\n")
+    );
+  }
+  let depends = [];
+  if (apt) {
+    depends = depends.concat(apt);
+  }
+  if (deb) {
+    depends = depends.concat(
+      deb.map((fname) => `\$(dpkg-deb -f "${fname}" Depends)`)
+    );
+  }
+  parts.push(`depends=(${depends.map((dep) => `"${dep}"`).join(" ")})`);
   let debianControlData = `\
 Package: riju-lang-${id}
 Version: \$(date +%s%3N)
 Architecture: amd64
 Maintainer: Radon Rosborough <radon.neon@gmail.com>
-Description: The ${name} language packaged for Riju`;
-  if (apt.length > 0) {
-    debianControlData += `
-Depends: ${apt.join(", ")}`;
-  }
-  debianControlData += `
+Description: The ${name} language packaged for Riju
+Depends: \$(IFS=,; echo "\${depends[*]}")
 Riju-Script-Hash: \$(sha1sum "\$0" | awk '{ print \$1 }')`;
   parts.push(`\
 install -d "\${pkg}/DEBIAN"
 cat <<EOF > "\${pkg}/DEBIAN/control"
 ${debianControlData}
 EOF`);
-  for (const part of manual || []) {
-    parts.push(part);
-  }
   return parts.join("\n\n");
 }
 

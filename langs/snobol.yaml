@@ -6,7 +6,7 @@ aliases:
 name: "SNOBOL"
 
 install:
-  build:
+  prepare:
     apt:
       - m4
 

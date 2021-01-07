@@ -22,8 +22,25 @@ deb https://deb.nodesource.com/${node_repo} ${ubuntu_name} main
 deb https://dl.yarnpkg.com/debian/ stable main
 EOF
 
+packages="
+
+fakeroot
+git
+less
+make
+man
+nodejs
+ripgrep
+sudo
+tmux
+unzip
+wget
+yarn
+
+"
+
 apt-get update
-apt-get install -y fakeroot less make man nodejs sudo unzip wget yarn
+apt-get install -y $(sed 's/#.*//' <<< "${packages}")
 
 rm -rf /var/lib/apt/lists/*
 

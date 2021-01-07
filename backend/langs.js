@@ -9,25 +9,6 @@ import { log } from "./util.js";
 // populated at runtime and updated asynchronously.
 export let langs = {};
 
-// Correct whitespace problems in a language configuration,
-// destructively. Return the fixed configuration.
-//
-// This basically removes leading and trailing whitespace from all
-// values in the configuration recursively.
-function fixupLangConfig(langConfig) {
-  if (typeof langConfig === "string") {
-    return langConfig.trim();
-  } else if (typeof langConfig === "object") {
-    for (const key in langConfig) {
-      if (langConfig.id === "whitespace" && key === "template") {
-        continue;
-      }
-      langConfig[key] = fixupLangConfig(langConfig[key]);
-    }
-  }
-  return langConfig;
-}
-
 // Read languages from JSON files in /opt/riju/langs, and update the
 // global langs variable in this module. Never throw an error. If
 // there is a problem then just leave the languages as they previously
@@ -40,8 +21,8 @@ async function readLangsFromDisk() {
         continue;
       }
       const id = path.parse(filename).name;
-      const langConfig = fixupLangConfig(
-        JSON.parse(await fs.readFile(`/opt/riju/langs/${filename}`, "utf-8"))
+      const langConfig = JSON.parse(
+        await fs.readFile(`/opt/riju/langs/${filename}`, "utf-8")
       );
       if (langConfig.id !== id) {
         log.error(

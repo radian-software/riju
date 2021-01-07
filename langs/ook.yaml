@@ -2,7 +2,7 @@ id: "ook"
 name: "Ook"
 
 install:
-  build:
+  prepare:
     apt:
       - autoconf
 
