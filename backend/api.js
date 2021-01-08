@@ -28,8 +28,8 @@ export class Session {
     return this.uidInfo.uid;
   }
 
-  returnUID = async () => {
-    this.uidInfo && (await this.uidInfo.returnUID());
+  returnUser = async () => {
+    this.uidInfo && (await this.uidInfo.returnUser());
   };
 
   get context() {
@@ -65,8 +65,8 @@ export class Session {
   setup = async () => {
     try {
       allSessions.add(this);
-      const { uid, returnUID } = await borrowUser(this.log);
-      this.uidInfo = { uid, returnUID };
+      const { uid, returnUser } = await borrowUser();
+      this.uidInfo = { uid, returnUser };
       this.log(`Borrowed uid ${this.uid}`);
       await this.run(this.privilegedSetup());
       if (this.config.setup) {
@@ -425,7 +425,7 @@ export class Session {
       allSessions.delete(this);
       if (this.uidInfo) {
         await this.run(this.privilegedTeardown());
-        await this.returnUID();
+        await this.returnUser();
       }
       this.ws.terminate();
     } catch (err) {

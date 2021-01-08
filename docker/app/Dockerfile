@@ -11,3 +11,4 @@ RUN chown root:riju system/out/*-privileged && chmod a=,g=rx,u=rwxs system/out/*
 
 USER riju
 CMD ["make", "server"]
+ENV RIJU_ASSUME_SINGLE_PROCESS 1

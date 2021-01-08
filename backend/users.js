@@ -1,89 +1,104 @@
 import { spawn } from "child_process";
-import fs from "fs";
+import { promises as fs } from "fs";
 import os from "os";
 
 import AsyncLock from "async-lock";
 import _ from "lodash";
 import parsePasswd from "parse-passwd";
 
-import { privilegedUseradd, run } from "./util.js";
+import { asBool, privilegedUseradd, run, uuidRegexp } from "./util.js";
 
 // Keep in sync with system/src/riju-system-privileged.c
 export const MIN_UID = 2000;
 export const MAX_UID = 65000;
 
-const CUR_UID = os.userInfo().uid;
+function validUID(uid) {
+  return uid >= MIN_UID && uid < MAX_UID;
+}
 
-let availIds = null;
-let nextId = null;
+const CUR_UID = os.userInfo().uid;
+const ASSUME_SINGLE_PROCESS = asBool(
+  process.env.RIJU_ASSUME_SINGLE_PROCESS,
+  false
+);
+
+let initialized = false;
+let nextUserToCreate = null;
+let locallyBorrowedUsers = new Set();
+let availableUsers = new Set();
 let lock = new AsyncLock();
 
-async function readExistingUsers(log) {
-  availIds = parsePasswd(
-    await new Promise((resolve, reject) =>
-      fs.readFile("/etc/passwd", "utf-8", (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data);
-        }
-      })
+async function getCreatedUsers() {
+  return new Set(
+    parsePasswd(await fs.readFile("/etc/passwd", "utf-8"))
+      .map(({ uid }) => parseInt(uid))
+      .filter((uid) => !isNaN(uid) && validUID(uid))
+  );
+}
+
+async function getActiveUsers() {
+  return new Set(
+    (
+      await Promise.all(
+        (await fs.readdir("/tmp/riju"))
+          .filter((name) => name.match(uuidRegexp))
+          .map((name) => fs.stat(`/tmp/riju/${name}`))
+      )
     )
-  )
-    .filter(({ username }) => username.startsWith("riju"))
-    .map(({ uid }) => parseInt(uid))
-    .filter((uid) => !isNaN(uid) && uid >= MIN_UID && uid < MAX_UID)
-    .reverse();
-  nextId = (_.max(availIds) || MIN_UID - 1) + 1;
-  log(`Found ${availIds.length} existing users, next is riju${nextId}`);
+      .map(({ uid }) => uid)
+      .filter(validUID)
+  );
 }
 
 async function createUser(log) {
-  if (nextId >= MAX_UID) {
+  if (nextUserToCreate >= MAX_UID) {
     throw new Error("too many users");
   }
-  const uid = nextId;
+  const uid = nextUserToCreate;
   await run(privilegedUseradd(uid), log);
-  log(`Created new user with ID ${uid}`);
-  nextId += 1;
+  nextUserToCreate += 1;
   return uid;
-}
-
-export async function ignoreUsers(uids, log) {
-  await lock.acquire("key", async () => {
-    if (availIds === null || nextId === null) {
-      await readExistingUsers(log);
-    }
-    const uidSet = new Set(uids);
-    if (uidSet.size > 0) {
-      const plural = uidSet.size !== 1 ? "s" : "";
-      log(
-        `Ignoring user${plural} from open session${plural}: ${Array.from(uidSet)
-          .sort()
-          .map((uid) => `riju${uid}`)
-          .join(", ")}`
-      );
-    }
-    availIds = availIds.filter((uid) => !uidSet.has(uid));
-  });
 }
 
 export async function borrowUser(log) {
   return await lock.acquire("key", async () => {
-    if (availIds === null || nextId === null) {
-      await readExistingUsers(log);
+    if (!initialized || !ASSUME_SINGLE_PROCESS) {
+      const createdUsers = await getCreatedUsers();
+      const activeUsers = await getActiveUsers();
+      if (createdUsers.size > 0) {
+        nextUserToCreate = _.max([...createdUsers]) + 1;
+      } else {
+        nextUserToCreate = MIN_UID;
+      }
+      // If there are new users created, we want to make them
+      // available (unless they are already active). Similarly, if
+      // there are users that have become inactive, we want to make
+      // them available (unless they are already borrowed locally).
+      for (const user of createdUsers) {
+        if (!activeUsers.has(user) && !locallyBorrowedUsers.has(user)) {
+          availableUsers.add(user);
+        }
+      }
+      // If there are users that have become active, we want to make
+      // them unavailable.
+      for (const user of activeUsers) {
+        availableUsers.delete(user);
+      }
+      initialized = true;
     }
-    let uid;
-    if (availIds.length > 0) {
-      uid = availIds.pop();
-    } else {
-      uid = await createUser(log);
+    if (availableUsers.size === 0) {
+      availableUsers.add(await createUser(log));
     }
+    // https://stackoverflow.com/a/32539929/3538165
+    const user = availableUsers.values().next().value;
+    locallyBorrowedUsers.add(user);
+    availableUsers.delete(user);
     return {
-      uid,
-      returnUID: async () => {
+      uid: user,
+      returnUser: async () => {
         await lock.acquire("key", () => {
-          availIds.push(uid);
+          locallyBorrowedUsers.delete(user);
+          availableUsers.add(user);
         });
       },
     };

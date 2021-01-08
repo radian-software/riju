@@ -129,3 +129,23 @@ export const log = {
   warn: console.error,
   error: console.error,
 };
+
+// https://gist.github.com/bugventure/f71337e3927c34132b9a
+export const uuidRegexp = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/;
+
+export function asBool(value, def) {
+  if (def === undefined) {
+    throw new Error("asBool needs an explicit default value");
+  }
+  if (!value) {
+    return def;
+  }
+  value = value.toLowerCase().trim();
+  if (["y", "yes", "1", "on"].includes(value)) {
+    return true;
+  }
+  if (["n", "no", "0", "off"].includes(value)) {
+    return false;
+  }
+  throw new Error(`asBool doesn't understand value: ${value}`);
+}
