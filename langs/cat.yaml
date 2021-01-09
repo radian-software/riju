@@ -17,8 +17,35 @@ info:
   paradigm: stack
   usage: []
 
+install:
+  scripts:
+    cat-lang: |
+      #!/usr/bin/env -S NODE_PATH=/opt/cat node
+      const fs = require("fs");
+      const repl = require("repl");
+
+      const args = process.argv.slice(2);
+      if (args.length > 1) {
+        console.error("usage: repl.js [FILE]");
+        process.exit(1);
+      }
+
+      const program = args.length === 1 ? fs.readFileSync(args[0], "utf-8") : null;
+
+      const cat = require("cat");
+      const ce = new cat.CatLanguage.CatEvaluator();
+
+      if (program !== null) {
+        ce.eval(program);
+      }
+
+      repl.start({prompt: "cat> ", eval: (cmd, context, filename, callback) => callback(null, ce.eval(cmd))});
+  manual:
+    - |
+      git clone https://github.com/cdiggins/cat-language "${pkg}/opt/cat"
+
 repl: |
-  NODE_PATH=/opt/cat node /opt/cat/repl.js
+  cat-lang
 input: |
   123 234 mul
 
@@ -27,6 +54,6 @@ template: |
   72 101 108 108 111 44 32 119 111 114 108 100 33 10
 
 run: |
-  NODE_PATH=/opt/cat node /opt/cat/repl.js main.cat
+  cat-lang main.cat
 hello: |
   72,101,108,108,111,44,32,119,111,114,108,100,33,10

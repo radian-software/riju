@@ -20,15 +20,24 @@ function riju-exec {
 }
 
 function daemon {
-    has daemon && riju-exec "$(get daemon)"
+    if has daemon; then
+        echo "$(get daemon)"
+        riju-exec "$(get daemon)"
+    fi
 }
 
 function setup {
-    has setup && riju-exec "$(get setup)"
+    if has setup; then
+        echo "$(get setup)"
+        riju-exec "$(get setup)"
+    fi
 }
 
 function repl {
-    has repl && riju-exec "$(get repl)"
+    if has repl; then
+        echo "$(get repl)"
+        riju-exec "$(get repl)"
+    fi
 }
 
 function main {
@@ -39,11 +48,17 @@ function main {
 }
 
 function compile {
-    has compile && echo "$(get compile)" && riju-exec "$(get compile)"
+    if has compile; then
+        echo "$(get compile)"
+        riju-exec "$(get compile)"
+    fi
 }
 
 function run-only {
-    has run && echo "$(get run)" && riju-exec "$(get run)"
+    if has run; then
+        echo "$(get run)"
+        riju-exec "$(get run)"
+    fi
 }
 
 function run {
@@ -51,12 +66,21 @@ function run {
 }
 
 function format {
-    has format && echo "$(get format.run)" && riju-exec "( $(get format.run) ) < $(get main)"
+    if has format; then
+        echo "$(get format.run)"
+        riju-exec "( $(get format.run) ) < $(get main)"
+    fi
 }
 
 function lsp {
-    has lsp.setup && echo "$(get lsp.setup)" && riju-exec "$(get lsp.setup)"
-    has lsp && echo "$(get lsp.start)" && riju-exec "$(get lsp.start)"
+    if has lsp.setup; then
+        echo "$(get lsp.setup)"
+        riju-exec "$(get lsp.setup)"
+    fi
+    if has lsp; then
+        echo "$(get lsp.start)"
+        riju-exec "$(get lsp.start)"
+    fi
 }
 
 if [[ -z "$NS" ]]; then

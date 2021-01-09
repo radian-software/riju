@@ -30,9 +30,11 @@ less
 make
 man
 nodejs
+python3-pip
 ripgrep
 sudo
 tmux
+tree
 unzip
 vim
 wget

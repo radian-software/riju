@@ -26,6 +26,19 @@ info:
     - oo
   usage: []
 
+install:
+  apt:
+    - mono-runtime
+    - mono-devel
+  manual: |
+    install -d "${pkg}/usr/local/lib"
+    install -d "${pkg}/usr/local/bin"
+    wget https://github.com/boo-lang/boo/releases/download/unstable/boo-latest.zip
+    unzip boo-latest.zip
+    mv -T boo-latest "${pkg}/usr/local/lib/boo"
+    chmod +x "${pkg}/usr/local/lib/boo/booc" "${pkg}/usr/local/lib/boo/booish"
+    ln -s /usr/local/lib/boo/booc /usr/local/lib/boo/booish "${pkg}/usr/local/bin/"
+
 setup: |
   mkdir -p "$HOME/.local/share" && touch "$HOME/.local/share/booish_history"
 

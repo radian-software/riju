@@ -27,9 +27,39 @@ info:
 install:
   apt:
     - beef
+    - python3
+  scripts:
+    brainf: |
+      #!/usr/bin/env python3
+      import argparse
+      import readline
+      import subprocess
+      import tempfile
+
+      parser = argparse.ArgumentParser()
+      parser.add_argument("file", nargs="?")
+      args = parser.parse_args()
+
+      if args.file:
+          subprocess.run(["beef", args.file])
+      while True:
+          try:
+              code = input("bf> ")
+          except KeyboardInterrupt:
+              print("^C")
+              continue
+          except EOFError:
+              print("^D")
+              break
+          if not code:
+              continue
+          with tempfile.NamedTemporaryFile(mode="w") as f:
+              f.write(code)
+              f.flush()
+              subprocess.run(["beef", f.name])
 
 repl: |
-  brainf-repl
+  brainf
 input: |
   >++>+[>++++[-<++++>]<<]> [>>+>+<<<-]>>>[<<<+>>>-]<<+>[<->[>++++++++++<[->-[>+>>]>[+[-<+>]>+>>]<<<<<]>[-]++++++++[<++++++>-]>[<<+>>-]>[<<+>>-]<<]>]<[->>++++++++[<++++++>-]]<[.[-]<]<
 output: |
@@ -67,6 +97,6 @@ template: |
   >++.
 
 run: |
-  brainf-repl main.bf
+  brainf main.bf
 hello: |
   Hello World

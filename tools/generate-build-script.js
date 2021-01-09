@@ -38,17 +38,50 @@ sudo apt-get install -y ${apt.join(" ")}`);
       }
     }
     if (npm) {
-      for (const fullname of npm) {
-        const basename = fullname.replace(/^[^\/]+\//g, "");
+      for (let fullname of npm) {
+        let arg;
+        if (typeof fullname === "string") {
+          arg = fullname;
+        } else {
+          arg = fullname.arg;
+          fullname = fullname.name;
+        }
+        let basename = fullname.replace(/^[^\/]+\//g, "");
         parts.push(`\
 install -d "\${pkg}/usr/local/bin"
 install -d "\${pkg}/opt/${basename}/lib"
-npm install ${fullname} -g --prefix "\${pkg}/opt/${basename}"
+npm install ${arg} -g --prefix "\${pkg}/opt/${basename}"
 if [[ -d "$\{pkg}/opt/${basename}/bin" ]]; then
     ls "$\{pkg}/opt/${basename}/bin" | while read name; do
         if readlink "\${pkg}/opt/${basename}/bin/\${name}" | grep -q '/${fullname}/'; then
             ln -s "/opt/${basename}/bin/\${name}" "\${pkg}/usr/local/bin/\${name}"
         fi
+    done
+fi`);
+      }
+    }
+    if (pip) {
+      for (const basename of pip) {
+        parts.push(`\
+install -d "\${pkg}/usr/local/bin"
+pip3 install "${basename}" --prefix "\${pkg}/opt/${basename}"
+if [[ -d "\${pkg}/opt/${basename}/bin" ]]; then
+    ls "\${pkg}/opt/${basename}/bin" | while read name; do
+        version="$(ls "\${pkg}/opt/${basename}/lib" | head -n1)"
+        cat <<EOF > "\${pkg}/usr/local/bin/\${name}"
+#!/usr/bin/env bash
+exec env PYTHONPATH="/opt/${basename}/lib/\${version}/site-packages" "/opt/${basename}/bin/\${name}" "\\\$@"
+EOF
+        chmod +x "\${pkg}/usr/local/bin/\${name}"
+    done
+fi
+
+if [[ -d "\${pkg}/opt/${basename}/man" ]]; then
+    ls "\${pkg}/opt/${basename}/man" | while read dir; do
+        install -d "\${pkg}/usr/local/man/\${dir}"
+        ls "\${pkg}/opt/${basename}/man/\${dir}" | while read name; do
+            ln -s "/opt/${basename}/man/\${dir}/\${name}" "\${pkg}/usr/local/man/\${dir}/\${name}"
+        done
     done
 fi`);
       }

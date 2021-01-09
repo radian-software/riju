@@ -1,15 +1,6 @@
 id: "beatnik"
 name: "Beatnik"
 
-install:
-  apt:
-    - python2
-  manual: |
-    install -d "${pkg}/usr/local/bin"
-    git clone https://github.com/catseye/Beatnik.git
-    sed -i 's#env python#env python2#' Beatnik/script/beatnik.py
-    cp Beatnik/script/beatnik.py "${pkg}/usr/local/bin/beatnik"
-
 info:
   impl: "Cat's Eye Beatnik"
   year: 2001
@@ -27,6 +18,15 @@ info:
   typing: integer
   paradigm: stack
   usage: []
+
+install:
+  apt:
+    - python2
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+    git clone https://github.com/catseye/Beatnik.git
+    sed -i 's#env python#env python2#' Beatnik/script/beatnik.py
+    cp Beatnik/script/beatnik.py "${pkg}/usr/local/bin/beatnik"
 
 main: "main.beatnik"
 template: |
