@@ -15,16 +15,20 @@ function has {
     get "$@" | grep -vq '^null$'
 }
 
+function riju-exec {
+    bash -c "set -euo pipefail; $1"
+}
+
 function daemon {
-    has daemon && eval "$(get daemon)"
+    has daemon && riju-exec "$(get daemon)"
 }
 
 function setup {
-    has setup && eval "$(get setup)"
+    has setup && riju-exec "$(get setup)"
 }
 
 function repl {
-    has repl && eval "$(get repl)"
+    has repl && riju-exec "$(get repl)"
 }
 
 function main {
@@ -35,11 +39,11 @@ function main {
 }
 
 function compile {
-    has compile && echo "$(get compile)" && eval "$(get compile)"
+    has compile && echo "$(get compile)" && riju-exec "$(get compile)"
 }
 
 function run-only {
-    has run && echo "$(get run)" && eval "$(get run)"
+    has run && echo "$(get run)" && riju-exec "$(get run)"
 }
 
 function run {
@@ -47,12 +51,12 @@ function run {
 }
 
 function format {
-    has format && echo "$(get format.run)" && eval "( $(get format.run) ) < $(get main)"
+    has format && echo "$(get format.run)" && riju-exec "( $(get format.run) ) < $(get main)"
 }
 
 function lsp {
-    has lsp.setup && echo "$(get lsp.setup)" && eval "$(get lsp.setup)"
-    has lsp && echo "$(get lsp.start)" && eval "$(get lsp.start)"
+    has lsp.setup && echo "$(get lsp.setup)" && riju-exec "$(get lsp.setup)"
+    has lsp && echo "$(get lsp.start)" && riju-exec "$(get lsp.start)"
 }
 
 if [[ -z "$NS" ]]; then

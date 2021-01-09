@@ -66,9 +66,15 @@ pkg-debug:
 	@: $${L} $${T}
 	make pkg-build L=$(L) T=$(T) CMD=bash
 
+ifneq (,$(Z))
+NO_COMPRESS :=
+else
+NO_COMPRESS := -Znone
+endif
+
 pkg-deb:
 	@: $${L} $${T}
-	fakeroot dpkg-deb --build $(BUILD)/pkg $(BUILD)/$(DEB)
+	fakeroot dpkg-deb --build $(NO_COMPRESS) $(BUILD)/pkg $(BUILD)/$(DEB)
 
 pkg: pkg-clean pkg-build pkg-deb
 
@@ -113,7 +119,7 @@ endif
 install:
 	@: $${L} $${T}
 	if [[ -z "$$(ls -A /var/lib/apt/lists)" ]]; then sudo apt update; fi
-	sudo apt reinstall -y ./$(BUILD)/$(DEB)
+	DEBIAN_FRONTEND=noninteractive sudo -E apt reinstall -y ./$(BUILD)/$(DEB)
 
 installs:
 	@: $${L}

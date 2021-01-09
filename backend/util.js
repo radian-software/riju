@@ -114,7 +114,7 @@ export function privilegedTeardown({ uid, uuid }) {
 }
 
 export function bash(cmdline) {
-  if (!cmdline.match(/[;|&(){}=]/)) {
+  if (!cmdline.match(/[;|&(){}=\n]/)) {
     // Reduce number of subshells we generate, if we're just running a
     // single command (no shell logic).
     cmdline = "exec " + cmdline;

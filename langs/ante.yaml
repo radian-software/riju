@@ -20,6 +20,8 @@ install:
       # error: unrecognized command-line option ‘-Wnewline-eof’.
       CC=/usr/bin/clang CXX=/usr/bin/clang++ llvmenv build-entry -G Makefile -j$(nproc) 10.0.0
       llvmenv global 10.0.0
+  apt:
+    - gcc
   manual: |
     git clone https://github.com/jfecher/ante.git
     pushd ante
@@ -36,7 +38,7 @@ setup: |
 
 main: "main.an"
 template: |
-  puts("Hello, world!".cStr)
+  print "Hello, world!"
 
 compile: |
   ante main.an

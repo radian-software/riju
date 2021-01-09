@@ -1,3 +1,4 @@
+import nodePath from "path";
 import process from "process";
 
 import { Command } from "commander";
@@ -15,47 +16,72 @@ import { readLangConfig, readSharedDepConfig } from "./config.js";
 // package riju-shared-foo rather than a language installation
 // package.
 function makeLangScript(langConfig, isShared) {
-  const {
-    id,
-    name,
-    install: { prepare, apt, riju, pip, manual, deb },
-  } = langConfig;
+  const { id, name, install } = langConfig;
   let parts = [];
   parts.push(`\
 #!/usr/bin/env bash
 
 set -euxo pipefail`);
-  if (prepare) {
-    const { apt, manual } = prepare;
-    if (apt && apt.length > 0) {
-      parts.push(`\
+  let depends = [];
+  if (install) {
+    const { prepare, apt, riju, npm, pip, deb, scripts, manual } = install;
+    if (prepare) {
+      const { apt, manual } = prepare;
+      if (apt && apt.length > 0) {
+        parts.push(`\
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update
 sudo apt-get install -y ${apt.join(" ")}`);
+      }
+      if (manual) {
+        parts.push(manual);
+      }
+    }
+    if (npm) {
+      for (const fullname of npm) {
+        const basename = fullname.replace(/^[^\/]+\//g, "");
+        parts.push(`\
+install -d "\${pkg}/usr/local/bin"
+install -d "\${pkg}/opt/${basename}/lib"
+npm install ${fullname} -g --prefix "\${pkg}/opt/${basename}"
+if [[ -d "$\{pkg}/opt/${basename}/bin" ]]; then
+    ls "$\{pkg}/opt/${basename}/bin" | while read name; do
+        if readlink "\${pkg}/opt/${basename}/bin/\${name}" | grep -q '/${fullname}/'; then
+            ln -s "/opt/${basename}/bin/\${name}" "\${pkg}/usr/local/bin/\${name}"
+        fi
+    done
+fi`);
+      }
+    }
+    if (deb) {
+      parts.push(
+        deb.map((deb) => `dpkg-deb --extract "${deb}" "\${pkg}"`).join("\n")
+      );
+    }
+    if (scripts) {
+      for (const [script, contents] of Object.entries(scripts)) {
+        const path = "${pkg}" + nodePath.resolve("/usr/local/bin", script);
+        parts.push(`install -d "\${pkg}/usr/local/bin"
+cat <<"RIJU-EOF" > "${path}"
+${contents}
+RIJU-EOF
+chmod +x "${path}"`);
+      }
     }
     if (manual) {
       parts.push(manual);
     }
-  }
-  if (manual) {
-    parts.push(manual);
-  }
-  if (deb) {
-    parts.push(
-      deb.map((deb) => `dpkg-deb --extract "${deb}" "\${pkg}"`).join("\n")
-    );
-  }
-  let depends = [];
-  if (apt) {
-    depends = depends.concat(apt);
-  }
-  if (riju) {
-    depends = depends.concat(riju.map((name) => `riju-shared-${name}`));
-  }
-  if (deb) {
-    depends = depends.concat(
-      deb.map((fname) => `\$(dpkg-deb -f "${fname}" Depends)`)
-    );
+    if (apt) {
+      depends = depends.concat(apt);
+    }
+    if (riju) {
+      depends = depends.concat(riju.map((name) => `riju-shared-${name}`));
+    }
+    if (deb) {
+      depends = depends.concat(
+        deb.map((fname) => `\$(dpkg-deb -f "${fname}" Depends)`)
+      );
+    }
   }
   parts.push(`depends=(${depends.map((dep) => `"${dep}"`).join(" ")})`);
   let debianControlData = `\

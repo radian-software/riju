@@ -24,6 +24,14 @@ install:
       - golang
   apt:
     - yasm
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+    git clone https://github.com/xyproto/battlestar.git
+    pushd battlestar
+    make
+    cp cmd/battlestarc/battlestarc "${pkg}/usr/local/bin/"
+    cp scripts/bts.sh "${pkg}/usr/local/bin/bts"
+    popd
 
 main: "main.bts"
 template: |

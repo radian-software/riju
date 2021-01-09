@@ -7,6 +7,34 @@ install:
   npm:
     - befunge93
     - prompt-sync
+  scripts:
+    befunge: |
+      #!/usr/bin/env -S NODE_PATH=/opt/befunge93/lib/node_modules:/opt/prompt-sync/lib/node_modules node
+      const fs = require("fs");
+
+      const Befunge = require("befunge93");
+      const prompt = require("prompt-sync")();
+
+      const befunge = new Befunge();
+      befunge.onInput = prompt;
+      befunge.onOutput = (output) => {
+        if (typeof output === "string") {
+          process.stdout.write(output);
+        } else {
+          process.stdout.write(output + " ");
+        }
+      };
+
+      const args = process.argv.slice(2);
+      if (args.length !== 1) {
+        console.error("usage: befunge FILE");
+        process.exit(1);
+      }
+
+      befunge.run(fs.readFileSync(args[0], { encoding: "utf-8" })).catch((err) => {
+        console.error(err);
+        process.exit(1);
+      });
 
 info:
   impl: "amicloud Befunge-93"
@@ -39,4 +67,4 @@ template: |
   64+"!dlrow ,olleH">:#,_@
 
 run: |
-  befunge-repl main.be
+  befunge main.be

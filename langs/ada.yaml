@@ -33,9 +33,9 @@ install:
     wget https://dl.bintray.com/reznikmm/ada-language-server/linux-latest.tar.gz
     tar -xf linux-latest.tar.gz
     install -d "${pkg}/usr/local/bin"
-    install -d "${pkg}/usr/lib/x86_64-linux-gnu"
+    install -d "${pkg}/usr/local/lib/x86_64-linux-gnu"
     mv linux/ada_language_server "${pkg}/usr/local/bin/ada_language_server"
-    mv linux/*.so* "${pkg}/usr/lib/x86_64-linux-gnu/"
+    mv linux/*.so* "${pkg}/usr/local/lib/x86_64-linux-gnu/"
 
 main: "main.adb"
 template: |
