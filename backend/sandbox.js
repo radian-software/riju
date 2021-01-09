@@ -1,6 +1,8 @@
 import { spawn } from "child_process";
 import { promises as fs } from "fs";
+import process from "process";
 
+import { quote } from "shell-quote";
 import { v4 as getUUID } from "uuid";
 
 import { borrowUser } from "./users.js";
@@ -21,10 +23,19 @@ function log(msg) {
 }
 
 async function main() {
+  const sandboxScript = await fs.readFile("backend/sandbox.bash", "utf-8");
+  const lang = process.env.L;
+  if (!lang) {
+    die("environment variable unset: $L");
+  }
   const uuid = getUUID();
   const { uid, returnUser } = await borrowUser(log);
   await run(privilegedSetup({ uid, uuid }), log);
-  const args = privilegedSpawn({ uid, uuid }, ["bash"]);
+  const args = privilegedSpawn({ uid, uuid }, [
+    "bash",
+    "-c",
+    `exec env L='${lang}' bash --rcfile <(cat <<< ${quote([sandboxScript])})`,
+  ]);
   const proc = spawn(args[0], args.slice(1), {
     stdio: "inherit",
   });

@@ -60,7 +60,7 @@ pkg-clean:
 
 pkg-build:
 	@: $${L} $${T}
-	cd $(BUILD)/src && pkg="$(PWD)/$(BUILD)/pkg" $(or $(CMD),../build.bash)
+	cd $(BUILD)/src && pkg="$(PWD)/$(BUILD)/pkg" src="$(PWD)/$(BUILD)/src" $(or $(CMD),../build.bash)
 
 pkg-debug:
 	@: $${L} $${T}
@@ -148,7 +148,8 @@ test:
 	node backend/test-runner.js $(F)
 
 sandbox:
-	node backend/sandbox.js
+	@: $${L}
+	L=$(L) node backend/sandbox.js
 
 ### Fetch artifacts from registries
 

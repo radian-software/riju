@@ -3,18 +3,22 @@ import process from "process";
 import { Command } from "commander";
 import YAML from "yaml";
 
-import { readLangConfig } from "./config.js";
+import { readLangConfig, readSharedDepConfig } from "./config.js";
 
 // Given a language config object, return the text of a Bash script
 // that will build the (unpacked) riju-lang-foo Debian package into
 // ${pkg} when run in an appropriate environment. This is a package
 // that will install the language interpreter/compiler and associated
 // tools.
-function makeLangScript(langConfig) {
+//
+// isShared (optional) truthy means to generate a shared dependency
+// package riju-shared-foo rather than a language installation
+// package.
+function makeLangScript(langConfig, isShared) {
   const {
     id,
     name,
-    install: { prepare, apt, pip, manual, deb },
+    install: { prepare, apt, riju, pip, manual, deb },
   } = langConfig;
   let parts = [];
   parts.push(`\
@@ -45,6 +49,9 @@ sudo apt-get install -y ${apt.join(" ")}`);
   if (apt) {
     depends = depends.concat(apt);
   }
+  if (riju) {
+    depends = depends.concat(riju.map((name) => `riju-shared-${name}`));
+  }
   if (deb) {
     depends = depends.concat(
       deb.map((fname) => `\$(dpkg-deb -f "${fname}" Depends)`)
@@ -52,11 +59,13 @@ sudo apt-get install -y ${apt.join(" ")}`);
   }
   parts.push(`depends=(${depends.map((dep) => `"${dep}"`).join(" ")})`);
   let debianControlData = `\
-Package: riju-lang-${id}
+Package: riju-${isShared ? "shared" : "lang"}-${id}
 Version: \$(date +%s%3N)
 Architecture: amd64
 Maintainer: Radon Rosborough <radon.neon@gmail.com>
-Description: The ${name} language packaged for Riju
+Description: The ${name} ${
+    isShared ? "shared dependency" : "language"
+  } packaged for Riju
 Depends: \$(IFS=,; echo "\${depends[*]}")
 Riju-Script-Hash: \$(sha1sum "\$0" | awk '{ print \$1 }')`;
   parts.push(`\
@@ -107,7 +116,7 @@ EOF`);
 // that installs tools used by multiple languages, and can be declared
 // as a dependency.
 function makeSharedScript(langConfig) {
-  throw new Error("shared script generation not implemented yet");
+  return makeLangScript(langConfig, true);
 }
 
 // Parse command-line arguments, run main functionality, and exit.
@@ -129,7 +138,13 @@ async function main() {
     console.error(`make-script.js: unsupported --type ${program.type}`);
     process.exit(1);
   }
-  console.log(scriptMaker(await readLangConfig(program.lang)));
+  console.log(
+    scriptMaker(
+      program.type === "shared"
+        ? await readSharedDepConfig(program.lang)
+        : await readLangConfig(program.lang)
+    )
+  );
   process.exit(0);
 }
 

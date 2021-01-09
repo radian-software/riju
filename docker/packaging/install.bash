@@ -34,6 +34,7 @@ ripgrep
 sudo
 tmux
 unzip
+vim
 wget
 yarn
 

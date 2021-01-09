@@ -37,10 +37,19 @@ async function getCreatedUsers() {
 }
 
 async function getActiveUsers() {
+  let dirents;
+  try {
+    dirents = await fs.readdir("/tmp/riju");
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      return new Set();
+    }
+    throw err;
+  }
   return new Set(
     (
       await Promise.all(
-        (await fs.readdir("/tmp/riju"))
+        dirents
           .filter((name) => name.match(uuidRegexp))
           .map((name) => fs.stat(`/tmp/riju/${name}`))
       )
