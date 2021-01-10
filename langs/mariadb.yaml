@@ -5,10 +5,27 @@ name: "MariaDB"
 
 install:
   apt:
+    - libaio1
     - libtinfo5
+    - mysql-client
+  riju:
+    - sqls
+  files:
+    "/opt/mariadb/sqls.yml": |
+      connections:
+        - driver: mysql
+          dataSourceName: socket/mysql
+  manual: |
+    install -d "${pkg}/opt/mariadb"
+
+    ver="$(curl -sSL https://downloads.mariadb.org/ | grep 'href="/mariadb/[0-9]' | grep -Eo '[0-9][^/]+' | sort -rV | head -n1)"
+    wget "https://downloads.mariadb.org/f/mariadb-${ver}/bintar-linux-x86_64/mariadb-${ver}-linux-x86_64.tar.gz/from/http%3A//sfo1.mirrors.digitalocean.com/mariadb/?serve" -O mariadb.tar.gz
+    tar -xf mariadb.tar.gz -C "${pkg}/opt/mariadb" --strip-components=1
+    chmod a=rx,u=rwx "${pkg}/opt/mariadb/lib/plugin/auth_pam_tool_dir"
+    chmod a=rx,u=rwxs "${pkg}/opt/mariadb/lib/plugin/auth_pam_tool_dir/auth_pam_tool"
 
 repl: |
-  rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && mysql --socket="$PWD/socket"
+  rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && mysql --socket=socket
 input: |
   SELECT 123 * 234;
 
@@ -17,11 +34,11 @@ template: |
   SELECT 'Hello, world!';
 
 run: |
-  rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && (mysql --socket="$PWD/socket" < main.sql; mysql --socket="$PWD/socket")
+  rm -rf data && /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)" && (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &) && until [[ -e socket ]]; do sleep 0.01; done && (mysql --socket=socket < main.sql; mysql --socket=socket)
 
 lsp:
   start: |
-    sqls
+    sleep 5 && sqls -config /opt/mariadb/sqls.yml
 
 skip:
   - lsp

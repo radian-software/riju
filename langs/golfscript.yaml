@@ -3,6 +3,16 @@ aliases:
   - "golf"
 name: "GolfScript"
 
+install:
+  apt:
+    - ruby
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    wget http://www.golfscript.com/golfscript/golfscript.rb
+    chmod +x golfscript.rb
+    cp -T golfscript.rb "${pkg}/usr/local/bin/golfscript"
+
 main: "main.gs"
 template: |
   'Hello, world!'

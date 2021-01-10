@@ -30,6 +30,7 @@ EOF
 
 packages="
 
+apt-file
 docker-ce-cli
 g++
 git

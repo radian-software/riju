@@ -1,0 +1,10 @@
+id: "yj"
+
+install:
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    ver="$(latest_release sclevine/yj)"
+    wget "https://github.com/sclevine/yj/releases/download/${ver}/yj-linux"
+    chmod +x yj-linux
+    cp yj-linux "${pkg}/usr/local/bin/yj"

@@ -28,7 +28,8 @@ install:
   apt:
     - libtinfo5
   manual: |
-    wget "ftp://ftp.gnu.org/gnu/apl/$(curl -sS ftp://ftp.gnu.org/gnu/apl/ | grep -Eo 'apl_[-0-9.]+_amd64.deb$' | sort -rV | head -n1)" -O apl.deb
+    path="$(curl -sS ftp://ftp.gnu.org/gnu/apl/ | grep -Eo 'apl_[-0-9.]+_amd64.deb$' | sort -rV | head -n1)"
+    wget "ftp://ftp.gnu.org/gnu/apl/${path}" -O apl.deb
   deb:
     - apl.deb
 

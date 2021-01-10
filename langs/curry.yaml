@@ -9,7 +9,7 @@ install:
     - pakcs
 
 repl: |
-  pakcs
+  SWIPL=swipl pakcs
 
 main: "main.curry"
 template: |
@@ -17,7 +17,7 @@ template: |
   main = putStrLn "Hello, world!"
 
 run: |
-  pakcs :load main.curry :eval main
+  SWIPL=swipl pakcs :load main.curry :eval main
 
 scope:
   code: |

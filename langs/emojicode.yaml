@@ -5,6 +5,23 @@ aliases:
   - "emojicodec"
 name: "Emojicode"
 
+install:
+  apt:
+    - libtinfo5
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+    install -d "${pkg}/usr/local/include/emojicode"
+    install -d "${pkg}/usr/local/EmojicodePackages"
+
+    ver="$(latest_release emojicode/emojicode)"
+    wget "https://github.com/emojicode/emojicode/releases/download/${ver}/Emojicode-$(sed 's/^v//' <<< "$ver")-Linux-x86_64.tar.gz"
+    tar -xf Emojicode-*-Linux-x86_64.tar.gz
+    pushd Emojicode-*-Linux-x86_64
+    cp emojicodec "${pkg}/usr/local/bin/"
+    cp -R include/* "${pkg}/usr/local/include/emojicode/"
+    cp -R packages/* "${pkg}/usr/local/EmojicodePackages/"
+    popd
+
 main: "main.emojic"
 template: |
   🏁 🍇

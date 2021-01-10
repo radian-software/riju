@@ -3,6 +3,17 @@ aliases:
   - "ik"
 name: "Ioke"
 
+install:
+  apt:
+    - default-jdk
+  manual: |
+    install -d "${pkg}/opt/ioke"
+    install -d "${pkg}/usr/local/bin"
+
+    wget https://ioke.org/dist/ioke-ikj-latest.tar.gz -O ioke.tar.gz
+    tar -xf ioke.tar.gz -C "${pkg}/opt/ioke" --strip-components=1
+    ln -s /opt/ioke/bin/ioke "${pkg}/usr/local/bin/ioke"
+
 repl: |
   JAVA_OPTS="-Duser.home=$PWD" ioke
 

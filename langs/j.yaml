@@ -4,6 +4,12 @@ aliases:
   - "ijconsole"
 name: "J"
 
+install:
+  manual: |
+    wget "$(curl -sSL https://code.jsoftware.com/wiki/System/Installation/J901/Debian | grep -F '<a' | grep 'amd64\.deb' | grep -Eo 'http://.+?\.deb')" -O j.deb
+  deb:
+    - j.deb
+
 repl: |
   echo 'ijconsole:' && ijconsole
 

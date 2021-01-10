@@ -4,6 +4,14 @@ aliases:
   - "hex"
 name: "Hexagony"
 
+install:
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+    install -d "${pkg}/opt"
+
+    git clone https://github.com/m-ender/hexagony.git "${pkg}/opt/hexagony"
+    ln -sT /opt/hexagony/interpreter.rb "${pkg}/usr/local/bin/hexagony"
+
 main: "main.hxg"
 template: |2
      H ; e ;
@@ -15,4 +23,4 @@ template: |2
      4 ; * /
 
 run: |
-  /opt/hexagony/interpreter.rb main.hxg
+  hexagony main.hxg

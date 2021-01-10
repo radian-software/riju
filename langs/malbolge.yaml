@@ -3,6 +3,16 @@ aliases:
   - "mb"
 name: "Malbolge"
 
+install:
+  prepare:
+    apt:
+      - clang
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    git clone https://github.com/bipinu/malbolge.git
+    clang malbolge/malbolge.c -o "${pkg}/usr/local/bin/malbolge"
+
 main: "main.mb"
 template: |2
    (=<`#9]~6ZY32Vx/4Rs+0No-&Jk)"Fh}|Bcy?`=*z]Kw%oG4UUS0/@-ejc(:'8dc

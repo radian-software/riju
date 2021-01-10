@@ -8,6 +8,11 @@ install:
   apt:
     - default-jdk
     - clang-format
+  manual: |
+    install -d "${pkg}/opt/jdt"
+
+    wget https://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz
+    tar -xf jdt-language-server-latest.tar.gz -C "${pkg}/opt/jdt"
 
 main: "Main.java"
 template: |

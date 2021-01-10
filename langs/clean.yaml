@@ -26,6 +26,24 @@ info:
     - functional
   usage: []
 
+install:
+  apt:
+    - gcc
+  manual: |
+    install -d "${pkg}/opt/clean"
+    install -d "${pkg}/usr/local/bin"
+
+    url="$(curl -fsSL https://clean.cs.ru.nl/Download_Clean | grep linux/clean | grep -F 64.tar.gz | grep -Eo "https://[^>]+\.tar\.gz")"
+    wget "${url}"
+    tar -xf clean*_64.tar.gz -C "${pkg}/opt/clean" --strip-components=1
+    pushd "${pkg}/opt/clean"
+    make
+    popd
+    ln -s /opt/clean/bin/clm "${pkg}/usr/local/bin/"
+
+    sleep 2
+    find "${pkg}/opt/clean" -name '*.o' -exec touch '{}' ';'
+
 main: "main.icl"
 template: |
   module main

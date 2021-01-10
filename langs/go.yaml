@@ -5,8 +5,18 @@ name: "Go"
 monacoLang: go
 
 install:
+  prepare:
+    apt:
+      - golang
   apt:
     - golang
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    export GO111MODULE=on
+    export GOPATH="$PWD/go"
+    go get golang.org/x/tools/gopls@latest
+    cp go/bin/gopls "${pkg}/usr/local/bin/"
 
 main: "main.go"
 template: |

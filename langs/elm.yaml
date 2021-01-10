@@ -5,6 +5,21 @@ install:
   npm:
     - "@kachkaev/run-elm"
     - "@elm-tooling/elm-language-server"
+  manual: |
+    install -d "${pkg}/opt/elm"
+    install -d "${pkg}/usr/local/bin"
+
+    ver="$(latest_release elm/compiler)"
+    wget "https://github.com/elm/compiler/releases/download/${ver}/binary-for-linux-64-bit.gz"
+    gunzip binary-for-linux-64-bit.gz
+    chmod +x binary-for-linux-64-bit
+    cp binary-for-linux-64-bit "${pkg}/usr/local/bin/elm"
+
+    mkdir elm-project
+    pushd elm-project
+    (yes || true) | "${pkg}/usr/local/bin/elm" init
+    cat elm.json | jq '."source-directories" = ["."]' > "${pkg}/opt/elm/elm".json
+    popd
 
 repl: |
   elm repl

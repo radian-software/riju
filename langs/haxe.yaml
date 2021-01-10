@@ -6,6 +6,7 @@ name: "Haxe"
 install:
   apt:
     - haxe
+    - nodejs
 
 main: "Main.hx"
 template: |

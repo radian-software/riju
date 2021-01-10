@@ -8,6 +8,15 @@ aliases:
   - "eub"
 name: "Euphoria"
 
+install:
+  manual: |
+    install -d "${pkg}/opt/euphoria"
+    install -d "${pkg}/usr/local/bin"
+
+    wget http://www.rapideuphoria.com/31/euphor31.tar
+    tar -xf euphor*.tar -C "${pkg}/opt/euphoria" --strip-components=1
+    ln -s /opt/euphoria/bin/exu "${pkg}/usr/local/bin/"
+
 main: "main.exu"
 template: |
   puts(1, "Hello, world!\n")

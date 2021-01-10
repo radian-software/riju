@@ -61,11 +61,11 @@ export async function getPackages() {
 // Correct whitespace problems in a language configuration,
 // destructively. Return the fixed configuration.
 //
-// This basically removes leading and trailing whitespace from all
-// values in the configuration recursively.
+// This basically removes trailing whitespace from all values in the
+// configuration recursively.
 function fixupLangConfig(langConfig) {
   if (typeof langConfig === "string") {
-    return langConfig.trim();
+    return langConfig.trimRight();
   } else if (typeof langConfig === "object") {
     for (const key in langConfig) {
       if (langConfig.id === "whitespace" && key === "template") {

@@ -8,6 +8,10 @@ aliases:
   - "bsdmake"
 name: "Make"
 
+install:
+  apt:
+    - make
+
 main: "Makefile"
 template: |
   .PHONY: all

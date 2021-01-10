@@ -46,7 +46,7 @@ compile: |
 run: |
   node -e '
   eval.apply(this, [require("fs").readFileSync("main.js", {encoding: "utf-8"})])
-  require("/usr/lib/node_modules/coffeescript/repl").start()
+  require("/opt/coffeescript/lib/node_modules/coffeescript/repl").start()
   '
 
 scope:

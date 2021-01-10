@@ -1,6 +1,19 @@
 id: "ink"
 name: "Ink"
 
+install:
+  manual: |
+    install -d "${pkg}/opt/ink"
+    install -d "${pkg}/usr/local/bin"
+
+    ver="$(latest_release thesephist/ink)"
+    wget "https://github.com/thesephist/ink/releases/download/${ver}/ink-linux"
+    wget "https://github.com/thesephist/ink/releases/download/${ver}/std.ink"
+    wget "https://github.com/thesephist/ink/releases/download/${ver}/str.ink"
+    chmod +x ink-linux
+    cp -T ink-linux "${pkg}/usr/local/bin/ink"
+    cp std.ink str.ink "${pkg}/opt/ink/"
+
 repl: |
   ink
 

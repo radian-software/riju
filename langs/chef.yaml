@@ -21,7 +21,8 @@ info:
   usage: []
 
 install:
-  cpan: Acme::Chef
+  cpan:
+    - Acme::Chef
 
 main: "main.chef"
 template: |

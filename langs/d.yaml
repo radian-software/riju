@@ -3,6 +3,20 @@ aliases:
   - "dmd"
 name: "D"
 
+install:
+  prepare:
+    manual: |
+      file="$(curl -fsSL https://dlang.org/download.html | grep -Eo '"http://[^"]+amd64.deb"' | grep -v pre-release | tr -d '"')"
+      wget "${file}" -O dmd.deb
+      sudo apt-get install -y ./dmd.deb
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+    dub fetch dfmt@~master
+    dub run dfmt -- --version
+    cp "$HOME/.dub/packages/dfmt-master/dfmt/bin/dfmt" "${pkg}/usr/local/bin/"
+  deb:
+    - dmd.deb
+
 main: "main.d"
 template: |
   import std.stdio;

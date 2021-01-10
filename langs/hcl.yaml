@@ -6,6 +6,10 @@ aliases:
   - "hc"
 name: "HCL"
 
+install:
+  riju:
+    - yj
+
 main: "main.hcl"
 template: |
   output = "Hello, world!"

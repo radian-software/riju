@@ -18,19 +18,36 @@ import { readLangConfig, readSharedDepConfig } from "./config.js";
 function makeLangScript(langConfig, isShared) {
   const { id, name, install } = langConfig;
   let parts = [];
-  parts.push(`\
-#!/usr/bin/env bash
-
-set -euxo pipefail`);
   let depends = [];
+  if (
+    install &&
+    ((install.prepare &&
+      ((install.prepare.manual && install.prepare.manual.includes("apt-get")) ||
+        (install.prepare.apt && install.prepare.apt.length > 0))) ||
+      (install.apt &&
+        install.apt.filter((pkg) => pkg.includes("$")).length > 0))
+  ) {
+    parts.push(`\
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get update`);
+  }
   if (install) {
-    const { prepare, apt, riju, npm, pip, deb, scripts, manual } = install;
+    const {
+      prepare,
+      apt,
+      riju,
+      npm,
+      pip,
+      cpan,
+      files,
+      scripts,
+      manual,
+      deb,
+    } = install;
     if (prepare) {
       const { apt, manual } = prepare;
       if (apt && apt.length > 0) {
         parts.push(`\
-export DEBIAN_FRONTEND=noninteractive
-sudo apt-get update
 sudo apt-get install -y ${apt.join(" ")}`);
       }
       if (manual) {
@@ -51,6 +68,7 @@ sudo apt-get install -y ${apt.join(" ")}`);
 install -d "\${pkg}/usr/local/bin"
 install -d "\${pkg}/opt/${basename}/lib"
 npm install ${arg} -g --prefix "\${pkg}/opt/${basename}"
+
 if [[ -d "$\{pkg}/opt/${basename}/bin" ]]; then
     ls "$\{pkg}/opt/${basename}/bin" | while read name; do
         if readlink "\${pkg}/opt/${basename}/bin/\${name}" | grep -q '/${fullname}/'; then
@@ -65,6 +83,7 @@ fi`);
         parts.push(`\
 install -d "\${pkg}/usr/local/bin"
 pip3 install "${basename}" --prefix "\${pkg}/opt/${basename}"
+
 if [[ -d "\${pkg}/opt/${basename}/bin" ]]; then
     ls "\${pkg}/opt/${basename}/bin" | while read name; do
         version="$(ls "\${pkg}/opt/${basename}/lib" | head -n1)"
@@ -86,15 +105,47 @@ if [[ -d "\${pkg}/opt/${basename}/man" ]]; then
 fi`);
       }
     }
-    if (deb) {
-      parts.push(
-        deb.map((deb) => `dpkg-deb --extract "${deb}" "\${pkg}"`).join("\n")
-      );
+    if (cpan) {
+      for (const fullname of cpan) {
+        const basename = fullname.replace(/^.+:/, "").toLowerCase();
+        parts.push(`\
+install -d "\${pkg}/usr/local/bin"
+cpanm -l "\${pkg}/opt/${basename}" -n "${fullname}"
+
+if [[ -d "\${pkg}/opt/${basename}/bin" ]]; then
+    ls "\${pkg}/opt/${basename}/bin" | while read name; do
+        version="$(ls "\${pkg}/opt/${basename}/lib" | head -n1)"
+        cat <<EOF > "\${pkg}/usr/local/bin/\${name}"
+#!/usr/bin/env bash
+exec env PERL5LIB="/opt/${basename}/lib/\${version}" "/opt/${basename}/bin/\${name}" "\\\$@"
+EOF
+        chmod +x "\${pkg}/usr/local/bin/\${name}"
+    done
+fi
+
+if [[ -d "\${pkg}/opt/${basename}/man" ]]; then
+    ls "\${pkg}/opt/${basename}/man" | while read dir; do
+        install -d "\${pkg}/usr/local/man/\${dir}"
+        ls "\${pkg}/opt/${basename}/man/\${dir}" | while read name; do
+            ln -s "/opt/${basename}/man/\${dir}/\${name}" "\${pkg}/usr/local/man/\${dir}/\${name}"
+        done
+    done
+fi`);
+      }
+    }
+    if (files) {
+      for (const [file, contents] of Object.entries(files)) {
+        const path = "${pkg}" + file;
+        parts.push(`install -d "${nodePath.dirname(path)}"
+cat <<"RIJU-EOF" > "${path}"
+${contents}
+RIJU-EOF`);
+      }
     }
     if (scripts) {
       for (const [script, contents] of Object.entries(scripts)) {
         const path = "${pkg}" + nodePath.resolve("/usr/local/bin", script);
-        parts.push(`install -d "\${pkg}/usr/local/bin"
+        parts.push(`install -d "${nodePath.dirname(path)}"
 cat <<"RIJU-EOF" > "${path}"
 ${contents}
 RIJU-EOF
@@ -103,6 +154,11 @@ chmod +x "${path}"`);
     }
     if (manual) {
       parts.push(manual);
+    }
+    if (deb) {
+      parts.push(
+        deb.map((deb) => `dpkg-deb --extract "${deb}" "\${pkg}"`).join("\n")
+      );
     }
     if (apt) {
       depends = depends.concat(apt);
@@ -117,6 +173,12 @@ chmod +x "${path}"`);
     }
   }
   parts.push(`depends=(${depends.map((dep) => `"${dep}"`).join(" ")})`);
+  let stripDependsFilter = "";
+  if (install && install.stripDepends && install.stripDepends.length > 0) {
+    stripDependsFilter = ` | sed -E 's/(^| )(${install.stripDepends.join(
+      "|"
+    )}) *(\\([^)]*\\))? *(,|$)/\\1/g' | sed -E 's/^ *//g'`;
+  }
   let debianControlData = `\
 Package: riju-${isShared ? "shared" : "lang"}-${id}
 Version: \$(date +%s%3N)
@@ -125,13 +187,23 @@ Maintainer: Radon Rosborough <radon.neon@gmail.com>
 Description: The ${name} ${
     isShared ? "shared dependency" : "language"
   } packaged for Riju
-Depends: \$(IFS=,; echo "\${depends[*]}")
+Depends: \$(IFS=,; echo "\${depends[*]}" | sed -E 's/,([^ ])/, \\1/g'${stripDependsFilter} | sed -E 's/ +/ /g')
 Riju-Script-Hash: \$(sha1sum "\$0" | awk '{ print \$1 }')`;
   parts.push(`\
 install -d "\${pkg}/DEBIAN"
 cat <<EOF > "\${pkg}/DEBIAN/control"
 ${debianControlData}
 EOF`);
+  if (parts.join("\n\n").includes("latest_release")) {
+    parts.unshift(`\
+latest_release() {
+    curl -sSL "https://api.github.com/repos/\$1/releases/latest" | jq -r .tag_name
+}`);
+  }
+  parts.unshift(`\
+#!/usr/bin/env bash
+
+set -euxo pipefail`);
   return parts.join("\n\n");
 }
 

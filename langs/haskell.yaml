@@ -9,8 +9,30 @@ install:
   prepare:
     apt:
       - cabal-install
+    manual: |
+      cabal update
   apt:
     - ghc
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+    install -d "${pkg}/opt/brittany"
+
+    cabal install brittany --installdir "$PWD"
+    cp -L brittany "${pkg}/usr/local/bin/"
+
+    mkdir haskell-language-server
+    pushd haskell-language-server
+    ver="$(latest_release haskell/haskell-language-server)"
+    release="$(curl -fsSL "https://api.github.com/repos/haskell/haskell-language-server/releases/tags/${ver}")"
+    echo "${release}" | jq '.assets[].name' -r | grep Linux | grep -vF .tar | while read asset; do
+        wget "https://github.com/haskell/haskell-language-server/releases/download/${ver}/${asset}"
+        gunzip "${asset}"
+    done
+    chmod +x *
+    for binary in *; do
+        cp -T "${binary}" "${pkg}/usr/local/bin/${binary//-Linux/}"
+    done
+    popd
 
 repl: |
   rm -f .ghci && ghci
@@ -40,10 +62,8 @@ format:
       putStrLn "Hello, world!"
 
 lsp:
-  setup: |
-    cp /opt/haskell/hie.yaml hie.yaml
   start: |
-    HIE_HOOGLE_DATABASE=/opt/haskell/hoogle.hoo hie --lsp
+    haskell-language-server-wrapper --lsp
   init:
     languageServerHaskell: {}
 

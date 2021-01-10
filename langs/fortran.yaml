@@ -11,18 +11,18 @@ name: "FORTRAN"
 
 install:
   apt:
-    - flang
+    - gfortran
   pip:
     - fortran-language-server
 
-main: "main.f"
+main: "main.f95"
 template: |2
-         program hello
-            print *, "Hello, world!"
-         end program hello
+         PROGRAM hello
+            PRINT *, "Hello, world!"
+         END PROGRAM hello
 
 compile: |
-  flang main.f -o main
+  gfortran main.f95 -o main
 run: |
   ./main
 

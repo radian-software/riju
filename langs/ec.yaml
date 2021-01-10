@@ -7,8 +7,12 @@ aliases:
 name: "eC"
 
 install:
-  apt:
-    - ecere-dev
+  manual: |
+    ver="$(latest_release ecere/ecere-sdk)"
+    git clone https://github.com/ecere/ecere-sdk.git -b "${ver}"
+    pushd ecere-sdk
+    make
+    popd
 
 main: "main.ec"
 template: |

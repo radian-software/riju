@@ -1,6 +1,16 @@
 id: "grass"
 name: "Grass"
 
+install:
+  apt:
+    - ruby
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    wget http://www.blue.sky.or.jp/grass/grass.rb
+    chmod +x grass.rb
+    cp -T grass.rb "${pkg}/usr/local/bin/grass"
+
 main: "main.grass"
 template: |
   wWWwwww

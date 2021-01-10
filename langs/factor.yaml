@@ -3,6 +3,16 @@ aliases:
   - "fact"
 name: "Factor"
 
+install:
+  manual: |
+    install -d "${pkg}/opt/factor"
+    install -d "${pkg}/usr/local/bin"
+
+    ver="$(curl -sSL https://factorcode.org/ | grep -Eo 'release\?os=linux[^>]+>[^<]+' | sed -E 's/[^>]+>//' | head -n1)"
+    wget "https://downloads.factorcode.org/releases/${ver}/factor-linux-x86-64-${ver}.tar.gz" -O factor.tar.gz
+    tar -xf factor.tar.gz -C "${pkg}/opt/factor" --strip-components=1
+    ln -sT /opt/factor/factor "${pkg}/usr/local/bin/factor-lang"
+
 repl: |
   factor-lang
 input: |

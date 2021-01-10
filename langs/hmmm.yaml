@@ -1,6 +1,14 @@
 id: "hmmm"
 name: "HMMM"
 
+install:
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    wget https://www.cs.hmc.edu/~cs5grad/cs5/hmmm/code/hmmm
+    chmod +x hmmm
+    cp hmmm "${pkg}/usr/local/bin/"
+
 main: "main.hmmm"
 template: |2
    0 setn r1, 72

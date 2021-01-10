@@ -4,8 +4,16 @@ aliases:
 name: "Julia"
 
 install:
+  prepare:
+    apt:
+      - julia
   apt:
     - julia
+  manual: |
+    install -d "${pkg}/opt/julia-language-server"
+
+    export JULIA_DEPOT_PATH="${pkg}/opt/julia-language-server"
+    julia -e 'using Pkg; Pkg.add("LanguageServer")'
 
 repl: |
   julia
@@ -23,7 +31,7 @@ scope:
 
 lsp:
   start: |
-    JULIA_DEPOT_PATH=:/opt/julia julia -e 'using LanguageServer; run(LanguageServerInstance(stdin, stdout))'
+    JULIA_DEPOT_PATH=:/opt/julia-language-server julia -e 'using LanguageServer; run(LanguageServerInstance(stdin, stdout))'
   config: null
 
 skip:

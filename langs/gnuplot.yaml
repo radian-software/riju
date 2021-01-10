@@ -3,7 +3,7 @@ name: "Gnuplot"
 
 install:
   apt:
-    - gnuplot
+    - gnuplot-nox
 
 repl: |
   gnuplot

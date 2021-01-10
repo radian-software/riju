@@ -3,6 +3,16 @@ aliases:
   - "falselang"
 name: "FALSE"
 
+install:
+  apt:
+    - ruby
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    wget https://github.com/mame/quine-relay/raw/master/vendor/false.rb
+    cat <(echo '#!/usr/bin/env ruby') false.rb > "${pkg}/usr/local/bin/false-lang"
+    chmod +x "${pkg}/usr/local/bin/false-lang"
+
 main: "main.false"
 template: |
   "Hello, world!"

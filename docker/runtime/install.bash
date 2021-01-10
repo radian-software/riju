@@ -15,7 +15,15 @@ dpkg --add-architecture i386
 apt-get update
 (yes || true) | unminimize
 
-apt-get install -y curl gnupg lsb-release
+apt-get install -y curl gnupg lsb-release wget
+
+# Ceylon
+wget https://cacerts.digicert.com/DigiCertTLSRSASHA2562020CA1.crt.pem -O /usr/local/share/ca-certificates/DigiCertTLSRSASHA2562020CA1.crt
+
+# D
+wget https://letsencrypt.org/certs/lets-encrypt-r3.pem -O /usr/local/share/ca-certificates/lets-encrypt-r3.crt
+
+update-ca-certificates
 
 # Ceylon
 curl -fsSL https://downloads.ceylon-lang.org/apt/ceylon-debian-repo.gpg.key | apt-key add -
@@ -28,6 +36,9 @@ curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
 
 # Hack
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B4112585D386EB94
+
+# MongoDB
+curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
 
 # Node.js
 curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
@@ -57,6 +68,9 @@ deb [arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debi
 # Hack
 deb [arch=amd64] https://dl.hhvm.com/ubuntu ${ubuntu_name} main
 
+# MongoDB
+deb [arch=amd64] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse
+
 # Node.js
 deb [arch=amd64] https://deb.nodesource.com/${node_repo} ${ubuntu_name} main
 
@@ -74,6 +88,7 @@ libicu="$(grep-aptavail -wF Package 'libicu[0-9]+' -s Package -n | head -n1)"
 
 packages="
 
+apt-file
 less
 clang
 jq
@@ -81,10 +96,10 @@ ${libicu}
 make
 man
 nodejs
+strace
 sudo
 tmux
 vim
-wget
 yarn
 
 "

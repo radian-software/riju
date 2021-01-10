@@ -4,10 +4,25 @@ aliases:
 name: "Erlang"
 
 install:
+  prepare:
+    apt:
+      - erlang-nox
+      - erlang-dev
   apt:
-    - erlang
+    - erlang-nox
     - libodbc1  # workaround bug in APT
-    - rebar
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    wget https://s3.amazonaws.com/rebar3/rebar3
+    chmod +x rebar3
+    export PATH="$PWD:$PATH"
+
+    git clone https://github.com/erlang-ls/erlang_ls.git
+    pushd erlang_ls
+    make
+    cp _build/default/bin/erlang_ls "${pkg}/usr/local/bin/erlang_ls"
+    popd
 
 repl: |
   erl

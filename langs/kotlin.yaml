@@ -5,6 +5,25 @@ aliases:
 name: "Kotlin"
 monacoLang: kotlin
 
+install:
+  manual: |
+    install -d "${pkg}/opt"
+    install -d "${pkg}/usr/local/bin"
+    install -d "${pkg}/usr/local/lib"
+
+    ver="$(latest_release JetBrains/kotlin)"
+    wget "https://github.com/JetBrains/kotlin/releases/download/${ver}/kotlin-compiler-$(sed 's/^v//' <<< "$ver").zip" -O kotlin.zip
+    unzip kotlin.zip
+    cp -RT kotlinc "${pkg}/opt/kotlin"
+
+    ls "${pkg}/opt/kotlin/bin" | while read name; do
+        ln -s "/opt/kotlin/bin/${name}" "${pkg}/usr/local/bin/"
+    done
+
+    ls "${pkg}/opt/kotlin/lib" | while read name; do
+        ln -s "/opt/kotlin/lib/${name}" "${pkg}/usr/local/lib/"
+    done
+
 repl: |
   JAVA_OPTS="-Duser.home=$PWD" kotlinc
 

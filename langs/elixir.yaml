@@ -7,6 +7,15 @@ name: "Elixir"
 install:
   apt:
     - elixir
+    - erlang-edoc
+  manual: |
+    install -d "${pkg}/opt/elixir-ls"
+    install -d "${pkg}/usr/local/bin"
+
+    ver="$(latest_release elixir-lsp/elixir-ls)"
+    wget "https://github.com/elixir-lsp/elixir-ls/releases/download/${ver}/elixir-ls.zip"
+    unzip -d "${pkg}/opt/elixir-ls" elixir-ls.zip
+    ln -s /opt/elixir-ls/language_server.sh "${pkg}/usr/local/bin/elixir-ls"
 
 repl: |
   iex

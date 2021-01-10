@@ -7,14 +7,27 @@ name: "Limbo"
 install:
   prepare:
     apt:
-      - gcc
-      - libc6-dev:i386
+      - gcc-multilib
+      - libc6-dev-i386
       - libx11-dev:i386
       - libxext-dev:i386
-      - linux-libc-dev:i386
+  manual: |
+    install -d "${pkg}/opt/inferno"
+    install -d "${pkg}/usr/local/bin"
+
+    wget "$(curl -sSL http://www.vitanuova.com/inferno/downloads.html | grep -E 'inferno-[0-9]+\.tgz' | grep -Eo 'http://[^"]+')" -O inferno.tgz
+    tar -xf inferno.tgz -C "${pkg}/opt/inferno" --strip-components=1
+    chmod -R u+w,a=u,go-w "${pkg}/opt/inferno"
+    pushd "${pkg}/opt/inferno"
+    sed -i 's/gcc/gcc -m32/g' makemk.sh
+    sed -i "s#ROOT=.*#ROOT=${PWD}#" mkconfig
+    ./makemk.sh
+    PATH="$PWD/Linux/386/bin:$PATH" mk install
+    ln -s "/opt/inferno/Linux/386/bin/emu" "/opt/inferno/Linux/386/bin/limbo" "${pkg}/usr/local/bin/"
+    popd
 
 setup: |
-  ln -s /usr/local/inferno/* ./
+  ln -s /opt/inferno/* ./
 
 main: "riju/main.b"
 template: |

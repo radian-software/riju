@@ -5,6 +5,15 @@ aliases:
   - "vge"
 name: "Entropy"
 
+install:
+  apt:
+    - mono-runtime
+  manual: |
+    install -d "${pkg}/opt/entropy"
+
+    wget http://danieltemkin.com/Content/Entropy/Entropy.zip
+    unzip -d "${pkg}/opt/entropy" Entropy.zip
+
 main: "main.vge"
 template: |
   Program MyNamespace MyProgram [

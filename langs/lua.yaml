@@ -5,6 +5,12 @@ monacoLang: lua
 install:
   apt:
     - $(grep-aptavail -XF Provides lua -a -XF Version "$(grep-aptavail -XF Provides lua -s Version -n | sort -Vr | head -n1)" -s Package -n | head -n1)
+  manual: |
+    install -d "${pkg}/opt/emmylua"
+
+    ver="$(latest_release EmmyLua/EmmyLua-LanguageServer)"
+    wget "https://github.com/EmmyLua/EmmyLua-LanguageServer/releases/download/${ver}/EmmyLua-LS-all.jar"
+    cp EmmyLua-LS-all.jar "${pkg}/opt/emmylua/EmmyLua.jar"
 
 repl: |
   lua
@@ -22,7 +28,7 @@ scope:
 
 lsp:
   start: |
-    java -cp /usr/lib/EmmyLua-LS.jar com.tang.vscode.MainKt
+    java -cp /opt/emmylua/EmmyLua.jar com.tang.vscode.MainKt
 
 skip:
   - lsp

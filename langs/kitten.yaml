@@ -3,6 +3,22 @@ aliases:
   - "ktn"
 name: "Kitten"
 
+install:
+  prepare:
+    apt:
+      - haskell-stack
+  manual: |
+    install -d "${pkg}/opt/kitten"
+    install -d "${pkg}/usr/local/bin"
+
+    git clone https://github.com/evincarofautumn/kitten.git
+    pushd kitten
+    stack setup
+    stack build
+    cp "$(stack exec which kitten)" "${pkg}/usr/local/bin/"
+    cp common.ktn "${pkg}/opt/kitten/"
+    popd
+
 repl: |
   kitten
 input: |
