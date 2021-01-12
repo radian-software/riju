@@ -4,8 +4,6 @@ aliases:
 name: "GolfScript"
 
 install:
-  apt:
-    - ruby
   manual: |
     install -d "${pkg}/usr/local/bin"
 

@@ -7,7 +7,6 @@ monacoLang: objective-c
 
 install:
   apt:
-    - gcc
     - gnustep-devel
     - clang-format
     - clangd

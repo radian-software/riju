@@ -2,8 +2,6 @@ id: "grass"
 name: "Grass"
 
 install:
-  apt:
-    - ruby
   manual: |
     install -d "${pkg}/usr/local/bin"
 

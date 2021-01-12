@@ -3,6 +3,29 @@ aliases:
   - "mung"
 name: "TECO"
 
+install:
+  scripts:
+    teco-encode: |
+      #!/usr/bin/env -S python3 -u
+
+      import re
+      import sys
+
+      for line in sys.stdin:
+          line = re.sub(r"\^(.)", lambda m: chr(ord(m.group(1)) ^ 0b1000000), line)
+          line = line.replace("$", chr(27))
+          print(line, end="")
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    git clone https://github.com/blakemcbride/TECOC.git
+    pushd TECOC/src
+    make -f makefile.linux
+    cp tecoc "${pkg}/usr/local/bin/tecoc"
+    ln -s /usr/local/bin/tecoc "${pkg}/usr/local/bin/teco"
+    ln -s /usr/local/bin/tecoc "${pkg}/usr/local/bin/mung"
+    popd
+
 repl: |
   teco
 input: "123*234=\x1b\x1b"

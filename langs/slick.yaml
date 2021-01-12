@@ -2,8 +2,23 @@ id: "slick"
 name: "Slick"
 
 install:
-  opam:
-    - dune
+  prepare:
+    apt:
+      - libgmp-dev
+    opam:
+      - dune
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    git clone https://github.com/kwshi/slick.git
+    pushd slick
+    deps="$(dune external-lib-deps src --display=quiet | grep -F - | sed 's/- //; s/\..*//')"
+    opam init -n --disable-sandboxing
+    opam switch create .
+    opam install --switch . ${deps} menhir -y
+    opam exec --switch . dune build
+    cp _build/default/src/exe/main.exe "${pkg}/usr/local/bin/slick"
+    popd
 
 repl: |
   slick

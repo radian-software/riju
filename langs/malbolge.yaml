@@ -4,9 +4,6 @@ aliases:
 name: "Malbolge"
 
 install:
-  prepare:
-    apt:
-      - clang
   manual: |
     install -d "${pkg}/usr/local/bin"
 

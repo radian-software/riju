@@ -3,6 +3,20 @@ aliases:
   - "vlt"
 name: "Velato"
 
+install:
+  apt:
+    - mono-runtime
+  manual: |
+    install -d "${pkg}/opt/velato"
+    install -d "${pkg}/usr/local/bin"
+
+    file="$(curl -fsSL http://velato.net/ | grep -Eo 'Velato[0-9_]+.zip')"
+    wget "http://velato.net/Content/Velato/${file}" -O velato.zip
+    unzip -d "${pkg}/opt/velato" velato.zip
+
+    wget http://www.archduke.org/midi/asc2mid.c
+    clang asc2mid.c -o "${pkg}/usr/local/bin/asc2mid"
+
 main: "main.asc"
 template: |
   format=1 tracks=2 division=2880

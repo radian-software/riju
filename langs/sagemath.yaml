@@ -4,29 +4,81 @@ aliases:
 name: "SageMath"
 
 install:
+  prepare:
+    apt:
+      # This list was produced by running ./configure and seeing what
+      # packages it told me to install.
+      - cmake
+      - coinor-cbc
+      - coinor-libcbc-dev
+      - curl
+      - fflas-ffpack
+      - flintqs
+      - gfan
+      - glpk-utils
+      - lcalc
+      - libboost-dev
+      - libbraiding-dev
+      - libcdd-dev
+      - libcdd-tools
+      - libcurl4-openssl-dev
+      - libfile-slurp-perl
+      - libfreetype6-dev
+      - libgd-dev
+      - libgiac-dev
+      - libgivaro-dev
+      - libglpk-dev
+      - libgsl-dev
+      - libiml-dev
+      - libisl-dev
+      - libjson-perl
+      - liblfunction-dev
+      - liblrcalc-dev
+      - libm4rie-dev
+      - libmongodb-perl
+      - libmpfi-dev
+      - libnauty-dev
+      - libpcre3-dev
+      - libperl-dev
+      - libplanarity-dev
+      - libppl-dev
+      - librw-dev
+      - libssl-dev
+      - libsuitesparse-dev
+      - libsvg-perl
+      - libsymmetrica2-dev
+      - libterm-readkey-perl
+      - libterm-readline-gnu-perl
+      - libterm-readline-gnu-perl
+      - libxml-libxslt-perl
+      - libxml-writer-perl
+      - libxml2-dev
+      - libzmq3-dev
+      - libzn-poly-dev
+      - nauty
+      - ninja-build
+      - openssl
+      - palp
+      - pandoc
+      - pari-gp2c
+      - planarity
+      - ppl-dev
+      - r-base-dev
+      - r-cran-lattice
+      - sympow
+      - tachyon
+      - xcas
+      - yasm
   manual: |
-    sudo tee -a /etc/apt/sources.list.d/focal.list >/dev/null <<EOF
-    deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ focal main universe
-    EOF
+    file="$(curl -fsSL https://mirrors.mit.edu/sage/src/index.html | grep -Eo 'sage-[0-9.]+\.tar\.gz' | sort -rV | head -n1)"
+    wget "https://mirrors.mit.edu/sage/src/${file}" -O sage.tar.gz
+    mkdir sage
+    tar -xf sage.tar.gz -C sage --strip-components=1
 
-    sudo apt-get update
-
-    for name in libflint-2.5.2 libgsl23 sagemath sagemath-common; do
-        apt-get download "${name}"
-        mv "${name}"_*.deb "${name}.deb"
-    done
-  deb:
-    - sagemath.deb
-    - sagemath-common.deb
-    - libflint-2.5.2.deb
-    - libgsl23.deb
-  depends:
-    strip:
-      - sagemath-common
-      - libflint-2.5.2
-      - libgsl23
-    unpin:
-      - libgslcblas0
+    pushd sage
+    ./configure --prefix="${pkg}/usr/local"
+    make
+    popd
 
 repl: |
   sage

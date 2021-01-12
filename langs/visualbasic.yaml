@@ -10,6 +10,7 @@ monacoLang: vb
 install:
   apt:
     - mono-vbnc
+    - mono-runtime
 
 main: "main.vb"
 template: |

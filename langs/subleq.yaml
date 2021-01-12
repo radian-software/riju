@@ -4,6 +4,16 @@ aliases:
   - "asq"
 name: "Subleq"
 
+install:
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    git clone https://github.com/davidar/subleq.git
+    pushd subleq/src
+    make sq
+    cp sq "${pkg}/usr/local/bin/"
+    popd
+
 main: "main.sq"
 template: |
   12 12 3

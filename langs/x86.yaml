@@ -6,10 +6,6 @@ aliases:
   - "x86-64"
 name: "x86"
 
-install:
-  apt:
-    - clang
-
 main: "main.S"
 template: |2
   	.text

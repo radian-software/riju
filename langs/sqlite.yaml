@@ -9,6 +9,8 @@ monacoLang: sql
 install:
   apt:
     - sqlite
+  riju:
+    - sqls
 
 repl: |
   sqlite3

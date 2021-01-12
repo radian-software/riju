@@ -9,6 +9,17 @@ install:
   prepare:
     apt:
       - m4
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    file="$(curl -sSL ftp://ftp.snobol4.org/snobol/ | grep -Eo 'snobol4-.*\.tar\.gz' | sort -rV | head -n1)"
+    wget "ftp://ftp.snobol4.org/snobol/${file}" -O snobol.tar.gz
+    mkdir snobol
+    tar -xf snobol.tar.gz -C snobol --strip-components=1
+    pushd snobol
+    make snobol4
+    cp snobol4 "${pkg}/usr/local/bin/"
+    popd
 
 repl: |
   snobol4

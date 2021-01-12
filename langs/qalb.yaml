@@ -1,0 +1,59 @@
+id: "qalb"
+aliases:
+  - "قلب"
+name: "قلب"
+
+install:
+  scripts:
+    qalb: |
+      #!/usr/bin/env node
+
+      const fs = require("fs");
+      const repl = require("repl");
+
+      const args = process.argv.slice(2);
+      if (args.length > 1) {
+        console.error("usage: repl.js [FILE]");
+        process.exit(1);
+      }
+
+      const program = args.length === 1 ? fs.readFileSync(args[0], "utf-8") : null;
+
+      eval(fs.readFileSync("/opt/qalb/qlb.js", "utf-8"));
+      eval(fs.readFileSync("/opt/qalb/parser.js", "utf-8"));
+      eval(fs.readFileSync("/opt/qalb/primitives.js", "utf-8"));
+
+      Qlb.init({console});
+
+      if (program !== null) {
+        Qlb.execute(program);
+      }
+
+      repl.start({prompt: "قلب> ", eval: (cmd, context, filename, callback) => callback(null, Qlb.execute(cmd))});
+  manual: |
+    install -d "${pkg}/opt/qalb"
+
+    git clone https://github.com/nasser/---.git qalb
+    pushd qalb
+    cp public/qlb/*.js "${pkg}/opt/qalb/"
+    popd
+
+repl: |
+  qalb
+input: |
+  (ضرب ١٢٣ ٢٣٤)
+
+main: "main.qalb"
+template: |
+  (قول "مرحبا يا عالم")
+
+run: |
+  qalb main.qalb
+hello: |
+  مرحبا يا عالم
+
+scope:
+  code: |
+    (حدد خ (ضرب ١٢٣ ٢٣٤))
+  input: |
+    خ

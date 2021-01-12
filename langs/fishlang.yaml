@@ -1,6 +1,6 @@
-id: "><>"
+id: "fishlang"
 aliases:
-  - "fishlang"
+  - "><>"
 name: "><>"
 
 install:
@@ -9,7 +9,7 @@ install:
     sed -i 's:^#!.*:#!/usr/bin/env python3:' fish.py
     chmod +x fish.py
     install -d "${pkg}/usr/local/bin"
-    mv fish.py "${pkg}/usr/local/bin/fish-lang"
+    cp fish.py "${pkg}/usr/local/bin/fish-lang"
 
 info:
   year: 2009

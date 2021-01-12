@@ -92,21 +92,40 @@ libicu="$(grep-aptavail -wF Package 'libicu[0-9]+' -s Package -n | head -n1)"
 
 packages="
 
-apt-file
-less
+# compilation tools
 clang
+g++
+gcc
+make
+
+# base languages
+nodejs
+ocaml
+perl
+python3
+ruby
+
+# project tools
+yarn
+
+# packaging tools
+apt-file
+dctrl-tools
+
+# basic utilities
+less
 git
 jq
-${libicu}
 make
 man
-nodejs
 ripgrep
 strace
 sudo
 tmux
 vim
-yarn
+
+# shared dependencies
+${libicu}
 
 "
 

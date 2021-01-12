@@ -8,7 +8,6 @@ install:
   prepare:
     apt:
       - chezscheme
-      - gcc
   apt:
     - chezscheme
   manual: |

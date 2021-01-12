@@ -7,7 +7,6 @@ name: "Objective-C++"
 
 install:
   apt:
-    - gcc
     - gnustep-devel
     - gobjc++
     - clang-format

@@ -2,8 +2,6 @@ id: "antecards"
 name: "Ante (Cards)"
 
 install:
-  apt:
-    - ruby
   manual: |
     wget https://github.com/michaeldv/ante/raw/master/ante.rb
     chmod +x ante.rb

@@ -6,7 +6,6 @@ name: "Oberon"
 install:
   prepare:
     apt:
-      - clang
       - libgc-dev
   apt:
     - libgc-dev

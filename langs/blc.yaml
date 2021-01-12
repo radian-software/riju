@@ -26,11 +26,6 @@ info:
   usage: []
 
 install:
-  prepare:
-    apt:
-      - clang
-  apt:
-    - python3
   scripts:
     binary-to-text: |
       #!/usr/bin/env python3

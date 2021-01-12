@@ -1,6 +1,17 @@
 id: "thue"
 name: "Thue"
 
+install:
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    wget "$(curl -sSL https://catseye.tc/distribution/Thue_distribution | grep -Eo 'https://catseye.tc/distfiles/thue-[^"]+\.zip' | head -n1)" -O thue.zip
+    unzip thue.zip
+    pushd thue-*
+    ./build.sh
+    cp bin/thue "${pkg}/usr/local/bin/"
+    popd
+
 main: "main.thue"
 template: |
   a::=~Hello, world!

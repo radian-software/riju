@@ -3,8 +3,27 @@ aliases:
   - "ucm"
 name: "Unison"
 
+install:
+  prepare:
+    apt:
+      - haskell-stack
+  manual: |
+    mkdir -p "${pkg}/opt/unison/skel"
+    install -d "${pkg}/usr/local/bin"
+
+    git clone https://github.com/unisonweb/unison.git
+    pushd unison
+    stack build
+    cp "$(stack exec which unison)" "${pkg}/usr/local/bin/"
+    popd
+
+    pushd "${pkg}/opt/unison/skel"
+    "${pkg}/usr/local/bin/unison" -codebase . init
+    LESS="+q" "${pkg}/usr/local/bin/unison" -codebase . <<< 'pull https://github.com/unisonweb/base:.trunk .base'
+    popd
+
 setup: |
-  shopt -s dotglob && cp -R /opt/unison/project-template/* ./
+  shopt -s dotglob && cp -R /opt/unison/skel/* ./
 
 repl: |
   unison -codebase .

@@ -1,4 +1,4 @@
-id: "아희"
+id: "aheui"
 aliases:
   - "aheui"
   - "aheuis"
@@ -11,7 +11,18 @@ aliases:
   - "rsaheui"
   - "as3aheui"
   - "raheui"
+  - "아희"
 name: "아희"
+
+install:
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    git clone https://github.com/aheui/caheui.git
+    pushd caheui
+    make
+    cp aheui "${pkg}/usr/local/bin/"
+    popd
 
 main: "main.aheui"
 template: |

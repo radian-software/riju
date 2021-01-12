@@ -48,7 +48,7 @@ sudo apt-get update`);
       deb,
     } = install;
     if (prepare) {
-      const { apt, npm, manual } = prepare;
+      const { apt, npm, opam, manual } = prepare;
       if (apt && apt.length > 0) {
         parts.push(`\
 sudo apt-get install -y ${apt.join(" ")}`);
@@ -56,6 +56,12 @@ sudo apt-get install -y ${apt.join(" ")}`);
       if (npm && npm.length > 0) {
         parts.push(`\
 sudo npm install -g ${npm.join(" ")}`);
+      }
+      if (opam && opam.length > 0) {
+        parts.push(`\
+sudo opam init -n --disable-sandboxing --root /opt/opam
+sudo opam install "${opam.join(" ")}" -y --root /opt/opam
+sudo ln -s /opt/opam/default/bin/* /usr/local/bin/`);
       }
       if (manual) {
         parts.push(manual);

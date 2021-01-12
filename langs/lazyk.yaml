@@ -2,9 +2,6 @@ id: "lazyk"
 name: "Lazy K"
 
 install:
-  prepare:
-    apt:
-      - gcc
   manual: |
     install -d "${pkg}/usr/local/bin"
 

@@ -1,7 +1,7 @@
-id: "emacs"
+id: "emacslisp"
 aliases:
-  - "emacslisp"
   - "elisp"
+  - "emacs"
   - "gnuemacs"
   - "xemacs"
   - "ielm"

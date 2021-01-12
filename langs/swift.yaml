@@ -7,6 +7,15 @@ monacoLang: swift
 install:
   apt:
     - libpython2.7
+  manual: |
+    install -d "${pkg}/opt/swift"
+    install -d "${pkg}/usr/local/bin"
+
+    ver="$(latest_release apple/swift | grep -Eo '[0-9.]+')"
+    wget "https://swift.org/builds/swift-${ver}-release/ubuntu2004/swift-${ver}-RELEASE/swift-${ver}-RELEASE-ubuntu20.04.tar.gz" -O swift.tar.gz
+    tar -xf swift.tar.gz -C "${pkg}/opt/swift" --strip-components=2
+    ln -s /opt/swift/bin/swiftc "${pkg}/usr/local/bin/swiftc"
+    ln -s /opt/swift/bin/sourcekit-lsp "${pkg}/usr/local/bin/sourcekit-lsp"
 
 main: "main.swift"
 template: |

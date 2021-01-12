@@ -27,8 +27,6 @@ info:
   usage: []
 
 install:
-  apt:
-    - gcc
   manual: |
     install -d "${pkg}/opt/clean"
     install -d "${pkg}/usr/local/bin"

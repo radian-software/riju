@@ -1,0 +1,29 @@
+id: "ezhil"
+aliases:
+  - "ezhili"
+  - "ezhuthi"
+  - "tamil"
+  - "எழில்"
+name: "எழில்"
+
+install:
+  manual: |
+    install -d "${pkg}/opt/ezhil"
+    install -d "${pkg}/usr/local/bin"
+
+    wget https://github.com/raxod502/riju-cdn/releases/download/ezhil-2017.08.19/ezhil.tar.gz
+    tar -xf ezhil.tar.gz -C "${pkg}/opt/ezhil" --strip-components=2
+    cp "${pkg}/opt/ezhil/ezhili" "${pkg}/opt/ezhil/ezhuthi/"
+    ln -s /opt/ezhil/ezhuthi/ezhili "${pkg}/usr/local/bin/"
+
+repl: |
+  ezhili
+
+main: "main.n"
+template: |
+  பதிப்பி "வணக்கம், உலகமே!"
+
+run: |
+  ezhili main.n; ezhili
+hello: |
+  வணக்கம், உலகமே!

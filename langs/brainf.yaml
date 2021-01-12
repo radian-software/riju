@@ -27,7 +27,6 @@ info:
 install:
   apt:
     - beef
-    - python3
   scripts:
     brainf: |
       #!/usr/bin/env python3

@@ -39,28 +39,42 @@ EOF
 
 packages="
 
+# compilation tools
+clang
+g++
+gcc
+make
+
+# base languages
+nodejs
+ocaml
+perl
+python3
+ruby
+
+# package managers
+opam
+python3-pip
+yarn
+
+# packaging tools
 apt-file
 dctrl-tools
 fakeroot
+unzip
+
+# basic utilities
 git
 jq
 less
-make
 man
 moreutils
-nodejs
-opam
-perl
-python3-pip
 ripgrep
-ruby
 strace
 sudo
 tmux
 tree
-unzip
 vim
-yarn
 
 "
 
