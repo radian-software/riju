@@ -4,12 +4,23 @@ name: "Red"
 install:
   apt:
     - libcurl5:i386
+  manual: |
+    install -d "${pkg}/opt/red/skel"
+    install -d "${pkg}/usr/local/bin"
+
+    path="$(curl -sSL https://static.red-lang.org/download.html | grep -Eo '/dl/linux/[^"]+' | head -n1)"
+    wget "https://static.red-lang.org/${path}" -O red
+    chmod +x red
+    cp red "${pkg}/usr/local/bin/"
+
+    ./red <<< quit
+    cp -R "$HOME/.red" "${pkg}/opt/red/skel/"
 
 setup: |
-  cp -R /opt/red/template .red
+  shopt -s dotglob; cp -R /opt/red/skel/* ./
 
 repl: |
-  /usr/local/bin/red
+  red
 input: |
   DELAY: 1
   123 * 234
@@ -21,4 +32,4 @@ template: |
   print "Hello, world!"
 
 run: |
-  /usr/local/bin/red main.red; /usr/local/bin/red
+  red main.red; red

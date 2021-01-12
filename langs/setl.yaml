@@ -1,6 +1,13 @@
 id: "setl"
 name: "SETL"
 
+install:
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    wget https://setl.org/setl/bin/Linux-x86-64bit/setlbin.tgz
+    tar -xf setlbin.tgz -C "${pkg}/usr/local/bin"
+
 main: "main.setl"
 template: |
   print("Hello, world!");

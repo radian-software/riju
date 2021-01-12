@@ -6,14 +6,14 @@ name: "Ratfor"
 install:
   apt:
     - ratfor
-    - flang
+    - gfortran
 
 main: "main.r"
 template: |
-  print *, 'Hello, world!'
-  end
+  PRINT *, 'Hello, world!'
+  END
 
 compile: |
-  ratfor main.r -o main.f && flang main.f -o main
+  ratfor main.r -o main.f && gfortran main.f -o main
 run: |
   ./main

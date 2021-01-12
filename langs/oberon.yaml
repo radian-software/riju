@@ -7,6 +7,18 @@ install:
   prepare:
     apt:
       - clang
+      - libgc-dev
+  apt:
+    - libgc-dev
+  manual: |
+    path="$(curl -sSL https://miasap.se/obnc/ | grep -F obnc_ | grep -Eo 'obnc_[^"]+' | grep -v win | head -n1)"
+    wget "https://miasap.se/obnc/downloads/${path}" -O obnc.tar.gz
+    mkdir obnc
+    tar -xf obnc.tar.gz -C obnc --strip-components=1
+    pushd obnc
+    ./build
+    ./install --destdir="${pkg}"
+    popd
 
 main: "Main.obn"
 template: |

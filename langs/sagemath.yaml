@@ -4,8 +4,29 @@ aliases:
 name: "SageMath"
 
 install:
-  apt:
-    - sagemath
+  manual: |
+    sudo tee -a /etc/apt/sources.list.d/focal.list >/dev/null <<EOF
+    deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ focal main universe
+    EOF
+
+    sudo apt-get update
+
+    for name in libflint-2.5.2 libgsl23 sagemath sagemath-common; do
+        apt-get download "${name}"
+        mv "${name}"_*.deb "${name}.deb"
+    done
+  deb:
+    - sagemath.deb
+    - sagemath-common.deb
+    - libflint-2.5.2.deb
+    - libgsl23.deb
+  depends:
+    strip:
+      - sagemath-common
+      - libflint-2.5.2
+      - libgsl23
+    unpin:
+      - libgslcblas0
 
 repl: |
   sage

@@ -1,6 +1,15 @@
 id: "rebol"
 name: "REBOL"
 
+install:
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    file="$(curl -sSL http://www.rebol.com/downloads.html | sed '0,/x86-64/d' | grep -Eo 'downloads/[^"]+' | head -n1)"
+    wget "http://www.rebol.com/${file}" -O rebol.tar.gz
+    tar -xf rebol.tar.gz
+    cp rebol-core/rebol "${pkg}/usr/local/bin/"
+
 repl: |
   rebol
 

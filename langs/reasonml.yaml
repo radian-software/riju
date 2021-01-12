@@ -8,10 +8,31 @@ aliases:
 name: "ReasonML"
 
 install:
+  prepare:
+    apt:
+      - yarn
+    npm:
+      - bs-platform
   npm:
     - bs-platform
   opam:
-    - reason
+    - name: reason
+      binaries:
+        - refmt
+  manual: |
+    install -d "${pkg}/opt/reasonml/skel"
+    install -d "${pkg}/usr/local/bin"
+
+    ver="$(latest_release jaredly/reason-language-server)"
+    wget "https://github.com/jaredly/reason-language-server/releases/download/${ver}/rls-linux.zip"
+    unzip rls-linux.zip
+    cp rls-linux/reason-language-server "${pkg}/usr/local/bin/"
+
+    pushd "${pkg}/opt/reasonml/skel"
+    bsb -init .
+    cat bsconfig.json | jq '.name = "riju-project"' | sponge bsconfig.json
+    yarn install
+    popd
 
 main: "main.re"
 template: |
@@ -30,7 +51,7 @@ format:
 
 lsp:
   setup: |
-    cp -a /opt/reasonml/project-template/* ./
+    cp -a /opt/reasonml/skel/* ./
   start: |
     reason-language-server
 

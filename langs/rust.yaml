@@ -5,6 +5,23 @@ aliases:
 name: "Rust"
 monacoLang: rust
 
+install:
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    export CARGO_HOME="${pkg}/opt/rustup"
+    export RUSTUP_HOME="${pkg}/opt/rustup"
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+    "${pkg}/opt/rustup/bin/rustup" component add rls rust-analysis rust-src
+
+    ls "${pkg}/opt/rustup/bin" | while read name; do
+        cat <<EOF > "${pkg}/usr/local/bin/${name}"
+    #!/usr/bin/env bash
+    exec env RUSTUP_HOME=/opt/rustup "/opt/rustup/bin/${name}" "\$@"
+    EOF
+        chmod +x "${pkg}/usr/local/bin/${name}"
+    done
+
 main: "main.rs"
 template: |
   fn main() {

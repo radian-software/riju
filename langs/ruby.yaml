@@ -6,6 +6,9 @@ name: "Ruby"
 monacoLang: ruby
 
 install:
+  prepare:
+    apt:
+      - ruby-dev
   apt:
     - ruby
   gem:

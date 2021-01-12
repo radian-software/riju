@@ -19,14 +19,17 @@ wget https://letsencrypt.org/certs/lets-encrypt-r3.pem -O /usr/local/share/ca-ce
 
 update-ca-certificates
 
-curl -fsSL https://downloads.ceylon-lang.org/apt/ceylon-debian-repo.gpg.key | apt-key add -
-curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
-curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-
 ubuntu_ver="$(lsb_release -rs)"
 ubuntu_name="$(lsb_release -cs)"
 
 node_repo="$(curl -sS https://deb.nodesource.com/setup_current.x | grep NODEREPO= | grep -Eo 'node_[0-9]+\.x' | head -n1)"
+
+wget "https://packages.microsoft.com/config/ubuntu/${ubuntu_ver}/packages-microsoft-prod.deb"
+apt-get install ./packages-microsoft-prod.deb
+
+curl -fsSL https://downloads.ceylon-lang.org/apt/ceylon-debian-repo.gpg.key | apt-key add -
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
+curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 
 tee -a /etc/apt/sources.list.d/custom.list >/dev/null <<EOF
 deb [arch=amd64] https://downloads.ceylon-lang.org/apt/ unstable main
@@ -44,10 +47,13 @@ jq
 less
 make
 man
+moreutils
 nodejs
+opam
 perl
 python3-pip
 ripgrep
+ruby
 strace
 sudo
 tmux

@@ -25,6 +25,16 @@ wget https://letsencrypt.org/certs/lets-encrypt-r3.pem -O /usr/local/share/ca-ce
 
 update-ca-certificates
 
+ubuntu_ver="$(lsb_release -rs)"
+ubuntu_name="$(lsb_release -cs)"
+
+cran_repo="$(curl -fsSL https://cran.r-project.org/bin/linux/ubuntu/ | grep '<tr>' | grep "${ubuntu_name}" | grep -Eo 'cran[0-9]+' | head -n1)"
+node_repo="$(curl -fsSL https://deb.nodesource.com/setup_current.x | grep NODEREPO= | grep -Eo 'node_[0-9]+\.x' | head -n1)"
+
+# .NET
+wget "https://packages.microsoft.com/config/ubuntu/${ubuntu_ver}/packages-microsoft-prod.deb"
+apt-get install ./packages-microsoft-prod.deb
+
 # Ceylon
 curl -fsSL https://downloads.ceylon-lang.org/apt/ceylon-debian-repo.gpg.key | apt-key add -
 
@@ -48,12 +58,6 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB
 
 # Yarn
 curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-
-ubuntu_ver="$(lsb_release -rs)"
-ubuntu_name="$(lsb_release -cs)"
-
-cran_repo="$(curl -fsSL https://cran.r-project.org/bin/linux/ubuntu/ | grep '<tr>' | grep "${ubuntu_name}" | grep -Eo 'cran[0-9]+' | head -n1)"
-node_repo="$(curl -fsSL https://deb.nodesource.com/setup_current.x | grep NODEREPO= | grep -Eo 'node_[0-9]+\.x' | head -n1)"
 
 tee -a /etc/apt/sources.list.d/custom.list >/dev/null <<EOF
 # Ceylon
@@ -91,11 +95,13 @@ packages="
 apt-file
 less
 clang
+git
 jq
 ${libicu}
 make
 man
 nodejs
+ripgrep
 strace
 sudo
 tmux

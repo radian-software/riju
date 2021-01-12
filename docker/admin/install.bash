@@ -31,6 +31,7 @@ EOF
 packages="
 
 apt-file
+dctrl-tools
 docker-ce-cli
 g++
 git

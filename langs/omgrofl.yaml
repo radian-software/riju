@@ -4,6 +4,13 @@ aliases:
   - "rofl"
 name: "Omgrofl"
 
+install:
+  manual: |
+    install -d "${pkg}/opt/omgrofl"
+
+    ver="$(latest_release OlegSmelov/omgrofl-interpreter)"
+    wget "https://github.com/OlegSmelov/omgrofl-interpreter/releases/download/${ver}/Omgrofl.jar" -O "${pkg}/opt/omgrofl/omgrofl.jar"
+
 main: "main.omgrofl"
 template: |
   lol iz 72
@@ -33,4 +40,4 @@ template: |
   rofl lol
 
 run: |
-  java -jar /opt/omgrofl/Omgrofl.jar main.omgrofl
+  java -jar /opt/omgrofl/omgrofl.jar main.omgrofl

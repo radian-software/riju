@@ -4,6 +4,13 @@ aliases:
   - "mozart2"
 name: "Oz"
 
+install:
+  manual: |
+    ver="$(latest_release mozart/mozart2 | sed 's/^v//')"
+    wget "https://github.com/mozart/mozart2/releases/download/v${ver}/mozart2-${ver}-x86_64-linux.deb" -O mozart.deb
+  deb:
+    - mozart.deb
+
 main: "main.oz"
 template: |
   functor

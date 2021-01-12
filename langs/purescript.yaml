@@ -5,14 +5,41 @@ aliases:
 name: "PureScript"
 
 install:
+  prepare:
+    apt:
+      - libtinfo5
+    npm:
+      - purescript
+      - spago
   apt:
     - libtinfo5
   npm:
     - purescript
     - spago
+  manual: |
+    install -d "${pkg}/opt/purescript"
+
+    mkdir skel
+    pushd skel
+    spago init -C
+    rm -rf .gitignore test
+    sed -i 's#, "test/\*\*/\*\.purs"##' spago.dhall
+    cat <<"EOF" > src/Main.spago
+    import Prelude
+
+    import Effect (Effect)
+
+    main :: Effect Unit
+    main = pure unit
+    EOF
+    spago build
+    spago repl < /dev/null
+    rm -rf src
+    popd
+    cp -R skel "${pkg}/opt/purescript/"
 
 setup: |
-  shopt -s dotglob; cp -R /opt/purescript/project-template/* "$PWD/"
+  shopt -s dotglob; cp -R /opt/purescript/skel/* "$PWD/"
 
 repl: |
   spago repl

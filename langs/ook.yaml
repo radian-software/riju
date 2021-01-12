@@ -5,6 +5,16 @@ install:
   prepare:
     apt:
       - autoconf
+      - libtool
+      - libgmp-dev
+  manual: |
+    git clone https://git.code.sf.net/p/esco/code esco
+    pushd esco
+    autoreconf -fi
+    ./configure --prefix="${pkg}/usr/local"
+    make
+    make install
+    popd
 
 main: "main.ook"
 template: |

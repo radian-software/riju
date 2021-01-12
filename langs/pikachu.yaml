@@ -13,6 +13,8 @@ aliases:
 name: "Pikachu"
 
 install:
+  apt:
+    - python3-setuptools
   pip:
     - pikalang
 

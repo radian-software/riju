@@ -3,6 +3,14 @@ aliases:
   - "psc"
 name: "PSeInt"
 
+install:
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    wget "$(curl -sSL "http://pseint.sourceforge.net/index.php?page=descargas.php&os=lnx" | grep -Eo 'http://[^"]+l64[^"]+\.tgz\?download')" -O pseint.tgz
+    tar -xf pseint.tgz
+    cp pseint/bin/pseint "${pkg}/usr/local/bin/"
+
 main: "main.psc"
 template: |
   Proceso Main

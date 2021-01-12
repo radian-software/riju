@@ -41,6 +41,9 @@ function repl {
 }
 
 function main {
+    if get main | grep -q /; then
+        mkdir -p "$(dirname "$(get main)")"
+    fi
     : > "$(get main)"
     has prefix && get prefix >> "$(get main)"
     get template >> "$(get main)"

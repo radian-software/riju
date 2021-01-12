@@ -19,6 +19,7 @@ function makeLangScript(langConfig, isShared) {
   const { id, name, install } = langConfig;
   let parts = [];
   let depends = [];
+  const dependsCfg = (install && install.depends) || {};
   if (
     install &&
     ((install.prepare &&
@@ -38,23 +39,30 @@ sudo apt-get update`);
       riju,
       npm,
       pip,
+      gem,
       cpan,
+      opam,
       files,
       scripts,
       manual,
       deb,
     } = install;
     if (prepare) {
-      const { apt, manual } = prepare;
+      const { apt, npm, manual } = prepare;
       if (apt && apt.length > 0) {
         parts.push(`\
 sudo apt-get install -y ${apt.join(" ")}`);
+      }
+      if (npm && npm.length > 0) {
+        parts.push(`\
+sudo npm install -g ${npm.join(" ")}`);
       }
       if (manual) {
         parts.push(manual);
       }
     }
-    if (npm) {
+    if (npm && npm.length > 0) {
+      depends.push("nodejs");
       for (let fullname of npm) {
         let arg;
         if (typeof fullname === "string") {
@@ -78,7 +86,8 @@ if [[ -d "$\{pkg}/opt/${basename}/bin" ]]; then
 fi`);
       }
     }
-    if (pip) {
+    if (pip && pip.length > 0) {
+      depends.push("python3");
       for (const basename of pip) {
         parts.push(`\
 install -d "\${pkg}/usr/local/bin"
@@ -105,15 +114,41 @@ if [[ -d "\${pkg}/opt/${basename}/man" ]]; then
 fi`);
       }
     }
-    if (cpan) {
+    if (gem && gem.length > 0) {
+      depends.push("ruby");
+      for (const name of gem) {
+        parts.push(`\
+install -d "\${pkg}/usr/local/bin"
+gem install "${name}" -i "/opt/${name}" -n "/opt/${name}/bin" --build-root "\${pkg}"
+
+if [[ -d "\${pkg}/opt/${name}/bin" ]]; then
+    (
+        set +e
+        ls "\${pkg}/opt/${name}/gems/${name}"-*/bin
+        ls "\${pkg}/opt/${name}/gems/${name}"-*/exe
+        true
+    ) | while read name; do
+        if [[ -x "\${pkg}/opt/${name}/bin/\${name}" ]]; then
+            cat <<EOF > "\${pkg}/usr/local/bin/\${name}"
+#!/usr/bin/env bash
+exec env GEM_PATH="/opt/${name}" "/opt/${name}/bin/\${name}" "\\\$@"
+EOF
+            chmod +x "\${pkg}/usr/local/bin/\${name}"
+        fi
+    done
+fi`);
+      }
+    }
+    if (cpan && cpan.length > 0) {
+      depends.push("perl");
       for (const fullname of cpan) {
-        const basename = fullname.replace(/^.+:/, "").toLowerCase();
+        const basename = fullname.replace(/:+/g, "-").toLowerCase();
         parts.push(`\
 install -d "\${pkg}/usr/local/bin"
 cpanm -l "\${pkg}/opt/${basename}" -n "${fullname}"
 
 if [[ -d "\${pkg}/opt/${basename}/bin" ]]; then
-    ls "\${pkg}/opt/${basename}/bin" | while read name; do
+    ls "\${pkg}/opt/${basename}/bin" | (grep -v config_data || true) | while read name; do
         version="$(ls "\${pkg}/opt/${basename}/lib" | head -n1)"
         cat <<EOF > "\${pkg}/usr/local/bin/\${name}"
 #!/usr/bin/env bash
@@ -121,16 +156,35 @@ exec env PERL5LIB="/opt/${basename}/lib/\${version}" "/opt/${basename}/bin/\${na
 EOF
         chmod +x "\${pkg}/usr/local/bin/\${name}"
     done
-fi
-
-if [[ -d "\${pkg}/opt/${basename}/man" ]]; then
-    ls "\${pkg}/opt/${basename}/man" | while read dir; do
-        install -d "\${pkg}/usr/local/man/\${dir}"
-        ls "\${pkg}/opt/${basename}/man/\${dir}" | while read name; do
-            ln -s "/opt/${basename}/man/\${dir}/\${name}" "\${pkg}/usr/local/man/\${dir}/\${name}"
-        done
-    done
 fi`);
+      }
+    }
+    if (opam && opam.length > 0) {
+      depends.push("ocaml-nox");
+      for (let opts of opam) {
+        if (typeof opts === "string") {
+          opts = { name: opts, binaries: [opts] };
+        }
+        const { name, source, binaries } = opts;
+        let installCmd;
+        if (source) {
+          installCmd = `opam pin add "${name}" "${source}" -y --root "\${pkg}/opt/${name}"`;
+        } else {
+          installCmd = `opam install "${name}" -y --root "\${pkg}/opt/${name}"`;
+        }
+        parts.push(`\
+install -d "\${pkg}/usr/local/bin"
+
+opam init -n --disable-sandboxing --root "\${pkg}/opt/${name}"
+${installCmd}`);
+        parts.push(
+          binaries
+            .map(
+              (binary) =>
+                `ln -s "/opt/${name}/default/bin/${binary}" "\${pkg}/usr/local/bin/"`
+            )
+            .join("\n")
+        );
       }
     }
     if (files) {
@@ -163,6 +217,9 @@ chmod +x "${path}"`);
     if (apt) {
       depends = depends.concat(apt);
     }
+    if (dependsCfg.unpin) {
+      depends = depends.concat(dependsCfg.unpin);
+    }
     if (riju) {
       depends = depends.concat(riju.map((name) => `riju-shared-${name}`));
     }
@@ -174,8 +231,9 @@ chmod +x "${path}"`);
   }
   parts.push(`depends=(${depends.map((dep) => `"${dep}"`).join(" ")})`);
   let stripDependsFilter = "";
-  if (install && install.stripDepends && install.stripDepends.length > 0) {
-    stripDependsFilter = ` | sed -E 's/(^| )(${install.stripDepends.join(
+  const stripDepends = (dependsCfg.strip || []).concat(dependsCfg.unpin || []);
+  if (stripDepends.length > 0) {
+    stripDependsFilter = ` | sed -E 's/(^| )(${stripDepends.join(
       "|"
     )}) *(\\([^)]*\\))? *(,|$)/\\1/g' | sed -E 's/^ *//g'`;
   }
@@ -187,7 +245,7 @@ Maintainer: Radon Rosborough <radon.neon@gmail.com>
 Description: The ${name} ${
     isShared ? "shared dependency" : "language"
   } packaged for Riju
-Depends: \$(IFS=,; echo "\${depends[*]}" | sed -E 's/,([^ ])/, \\1/g'${stripDependsFilter} | sed -E 's/ +/ /g')
+Depends: \$(IFS=,; echo "\${depends[*]}" | sed -E 's/,([^ ])/, \\1/g'${stripDependsFilter} | sed -E 's/ +/ /g' | sed -E 's/ *, *$//')
 Riju-Script-Hash: \$(sha1sum "\$0" | awk '{ print \$1 }')`;
   parts.push(`\
 install -d "\${pkg}/DEBIAN"

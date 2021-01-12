@@ -5,6 +5,21 @@ aliases:
 name: "PowerShell"
 monacoLang: powershell
 
+install:
+  manual: |
+    install -d "${pkg}/opt/powershell"
+    install -d "${pkg}/usr/local/bin"
+
+    ver="$(latest_release PowerShell/PowerShell | sed 's/^v//')"
+    wget "https://github.com/PowerShell/PowerShell/releases/download/v${ver}/powershell-${ver}-linux-x64.tar.gz" -O powershell.tar.gz
+    tar -xf powershell.tar.gz -C "${pkg}/opt/powershell"
+    ln -s /opt/powershell/pwsh "${pkg}/usr/local/bin/"
+
+    ver="$(latest_release PowerShell/PowerShellEditorServices)"
+    wget "https://github.com/PowerShell/PowerShellEditorServices/releases/download/${ver}/PowerShellEditorServices.zip"
+    unzip PowerShellEditorServices.zip
+    cp -RT PowerShellEditorServices "${pkg}/opt/powershell-editor-services"
+
 repl: |
   SHELL=/usr/bin/pwsh pwsh
 input: |

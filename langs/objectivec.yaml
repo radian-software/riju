@@ -9,6 +9,8 @@ install:
   apt:
     - gcc
     - gnustep-devel
+    - clang-format
+    - clangd
 
 main: "main.m"
 template: |

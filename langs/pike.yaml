@@ -3,8 +3,8 @@ name: "Pike"
 
 install:
   apt:
-    - $(grep-aptavail -eF Package "^pike[0-9.]+$" -s Package -n | sort -Vr | head -n1)
-    - $(grep-aptavail -eF Package "^pike[0-9.]+$" -s Package -n | sort -Vr | head -n1)-doc
+    - $(grep-aptavail -wF Package "pike[0-9.]+" -s Package -n | sort -Vr | head -n1)
+    - $(grep-aptavail -wF Package "pike[0-9.]+" -s Package -n | sort -Vr | head -n1)-doc
 
 repl: |
   pike

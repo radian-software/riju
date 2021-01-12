@@ -4,6 +4,22 @@ aliases:
   - "pawnrun"
 name: "PAWN"
 
+install:
+  prepare:
+    apt:
+      - cmake
+  manual: |
+    install -d "${pkg}/opt/pawn"
+    install -d "${pkg}/usr/local/bin"
+
+    git clone https://github.com/compuphase/pawn.git
+    pushd pawn
+    cmake .
+    make
+    cp pawncc pawnrun "${pkg}/usr/local/bin/"
+    cp -R include "${pkg}/opt/pawn/"
+    popd
+
 main: "main.pawn"
 template: |
   #include <core>

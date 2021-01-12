@@ -22,10 +22,11 @@ install:
     - mongodb-clients.deb
     - mongodb-server.deb
     - mongodb-server-core.deb
-  stripDepends:
-    - mongodb-clients
-    - mongodb-server
-    - mongodb-server-core
+  depends:
+    strip:
+      - mongodb-clients
+      - mongodb-server
+      - mongodb-server-core
 
 repl: |
   while ps -u "$(id -un)" -o comm | grep -q mongod; do sleep 0.01; done && rm -rf data && mkdir data && (mongod --dbpath=data --unixSocketPrefix="$PWD" --bind_ip=, &) && until mongo --host "$PWD/mongodb-27017.sock" --eval ' ' &>/dev/null; do sleep 0.01; done && mongo --host "$PWD/mongodb-27017.sock"

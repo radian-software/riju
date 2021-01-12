@@ -3,10 +3,13 @@ name: "OCaml"
 
 install:
   apt:
-    - ocaml
+    - ocaml-nox
   opam:
     - ocamlformat
-    - ocaml-lsp-server: "https://github.com/ocaml/ocaml-lsp.git"
+    - name: ocaml-lsp-server
+      source: "https://github.com/ocaml/ocaml-lsp.git"
+      binaries:
+        - ocamllsp
 
 repl: |
   ocaml

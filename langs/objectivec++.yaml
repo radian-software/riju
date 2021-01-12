@@ -10,6 +10,8 @@ install:
     - gcc
     - gnustep-devel
     - gobjc++
+    - clang-format
+    - clangd
 
 main: "main.mm"
 template: |
