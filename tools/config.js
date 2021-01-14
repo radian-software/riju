@@ -32,7 +32,7 @@ export async function getSharedDeps() {
 // the function implementation for the full list of keys.
 export async function getPackages() {
   const packages = [];
-  for (const dep of await getSharedDeps()) {
+  for (const lang of await getSharedDeps()) {
     const type = "shared";
     const name = `riju-${type}-${lang}`;
     packages.push({
