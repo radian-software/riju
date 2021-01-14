@@ -26,6 +26,7 @@ EOF
 
 packages="
 
+clang
 docker-ce-cli
 g++
 git
