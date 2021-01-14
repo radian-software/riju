@@ -7,7 +7,7 @@ import { Command } from "commander";
 import _ from "lodash";
 import { v4 as getUUID } from "uuid";
 
-import { getPackages } from "./config.js";
+import { getLangs, getPackages, readLangConfig } from "./config.js";
 import {
   getLocalImageDigest,
   getLocalImageLabel,
@@ -85,7 +85,7 @@ async function planDebianPackages(opts) {
   const sharedUUIDs = Object.fromEntries(
     packages
       .filter(({ type }) => type === "shared")
-      .map(({ lang }) => [lang, uuids[name]])
+      .map(({ lang }) => [lang, uuids[lang]])
   );
   const langConfigs = Object.fromEntries(
     await Promise.all(
