@@ -6,7 +6,8 @@ latest_release() {
     curl -sSL "https://api.github.com/repos/$1/releases/latest" | jq -r .tag_name
 }
 
-pushd /tmp
+mkdir /tmp/riju-work
+pushd /tmp/riju-work
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -146,5 +147,6 @@ mkdir -p /opt/riju/langs
 touch /opt/riju/langs/.keep
 
 popd
+rm -rf /tmp/riju-work
 
 rm "$0"
