@@ -32,6 +32,17 @@ export async function getSharedDeps() {
 // the function implementation for the full list of keys.
 export async function getPackages() {
   const packages = [];
+  for (const dep of await getSharedDeps()) {
+    const type = "shared";
+    const name = `riju-${type}-${lang}`;
+    packages.push({
+      lang,
+      type,
+      name,
+      buildScriptPath: `build/${type}/${lang}/build.bash`,
+      debPath: `build/${type}/${lang}/${name}.deb`,
+    });
+  }
   for (const lang of await getLangs()) {
     for (const type of ["lang", "config"]) {
       const name = `riju-${type}-${lang}`;
@@ -43,17 +54,6 @@ export async function getPackages() {
         debPath: `build/${type}/${lang}/${name}.deb`,
       });
     }
-  }
-  for (const dep of await getSharedDeps()) {
-    const type = "shared";
-    const name = `riju-${type}-${lang}`;
-    packages.push({
-      lang,
-      type,
-      name,
-      buildScriptPath: `build/${type}/${lang}/build.bash`,
-      debPath: `build/${type}/${lang}/${name}.deb`,
-    });
   }
   return packages;
 }

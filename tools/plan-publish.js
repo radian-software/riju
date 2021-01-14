@@ -74,10 +74,23 @@ async function planDebianPackages(opts) {
     })
   );
   const packages = await getPackages();
+  const uuids = Object.fromEntries(
+    packages.map(({ name }) => [name, getUUID()])
+  );
   const langUUIDs = Object.fromEntries(
     packages
       .filter(({ type }) => type === "lang")
-      .map(({ lang }) => ["lang", getUUID()])
+      .map(({ lang, name }) => [lang, uuids[name]])
+  );
+  const sharedUUIDs = Object.fromEntries(
+    packages
+      .filter(({ type }) => type === "shared")
+      .map(({ lang }) => [lang, uuids[name]])
+  );
+  const langConfigs = Object.fromEntries(
+    await Promise.all(
+      (await getLangs()).map(async (id) => [id, await readLangConfig(id)])
+    )
   );
   return await Promise.all(
     packages.map(async ({ lang, type, name, buildScriptPath, debPath }) => {
@@ -101,11 +114,19 @@ async function planDebianPackages(opts) {
           ).stdout.trim() || null;
       }
       const remote = remoteHashes[name] || null;
+      let sharedDeps = [];
+      if (type === "lang") {
+        const cfg = langConfigs[lang];
+        sharedDeps = ((cfg.install && cfg.install.riju) || []).map(
+          (id) => sharedUUIDs[id]
+        );
+      }
       return {
-        id: getUUID(),
+        id: uuids[name],
         deps: [
           ...(deps || []),
-          type === "config" ? langUUIDs[lang] : getUUID(),
+          ...(type === "config" ? [langUUIDs[lang]] : []),
+          ...sharedDeps,
         ],
         artifact: "Debian package",
         name,
