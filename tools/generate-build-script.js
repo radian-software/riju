@@ -264,6 +264,13 @@ latest_release() {
     curl -sSL "https://api.github.com/repos/\$1/releases/latest" | jq -r .tag_name
 }`);
   }
+  if (install && install.disallowCI) {
+    parts.unshift(`\
+if [[ -n "\${CI:-}" ]]; then
+    echo "language ${id} cannot be built in CI" >&2
+    exit 1
+fi`);
+  }
   parts.unshift(`\
 #!/usr/bin/env bash
 
