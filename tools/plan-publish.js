@@ -145,9 +145,9 @@ async function planDebianPackages(opts) {
           if (type === "config") {
             const clauses = [];
             for (const dep of (langConfigs[lang].install || {}).riju || []) {
-              clauses.push("make install T=shared L=${dep}");
+              clauses.push(`make install T=shared L=${dep}`);
             }
-            clauses.push("make installs L=${lang}");
+            clauses.push(`make installs L=${lang}`);
             clauses.push("make test");
             await runCommand(
               `make shell I=runtime CMD="${clauses.join(" && ")}"`
