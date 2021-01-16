@@ -17,6 +17,10 @@ export DEBIAN_FRONTEND=noninteractive
 
 apt-get update
 
+riju-curl /shared | while read lang; do
+    riju-apt-install "/fs/build/shared/${lang}/riju-shared-${lang}.deb"
+done
+
 riju-curl /langs | while read lang; do
     riju-apt-install "/fs/build/lang/${lang}/riju-lang-${lang}.deb"
     riju-apt-install "/fs/build/config/${lang}/riju-config-${lang}.deb"

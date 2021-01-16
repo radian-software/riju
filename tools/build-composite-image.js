@@ -3,7 +3,7 @@ import http from "http";
 
 import express from "express";
 
-import { getLangs, getPackages } from "./config.js";
+import { getLangs, getPackages, getSharedDeps } from "./config.js";
 import { getLocalImageLabel } from "./docker-util.js";
 import { hashDockerfile } from "./hash-dockerfile.js";
 import { runCommand } from "./util.js";
@@ -11,10 +11,13 @@ import { runCommand } from "./util.js";
 // Get a Node.js http server object that will serve information and
 // files for packages that should be installed into the composite
 // Docker image.
-function getServer(langs) {
+function getServer({ langs, sharedDeps }) {
   const app = express();
   app.get("/langs", (req, res) => {
     res.send(langs.map((lang) => lang + "\n").join(""));
+  });
+  app.get("/shared", (req, res) => {
+    res.send(sharedDeps.map((lang) => lang + "\n").join(""));
   });
   app.use("/fs", express.static("."));
   return http.createServer(app);
@@ -46,7 +49,10 @@ async function main() {
       },
     }
   );
-  const server = getServer(await getLangs());
+  const server = getServer({
+    langs: await getLangs(),
+    sharedDeps: await getSharedDeps(),
+  });
   await new Promise((resolve) => server.listen(8487, "localhost", resolve));
   try {
     await runCommand(
