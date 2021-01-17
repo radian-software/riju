@@ -43,6 +43,7 @@ make
 man
 nodejs
 packer
+pstree
 skopeo
 ssh
 sudo

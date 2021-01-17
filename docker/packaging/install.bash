@@ -70,6 +70,7 @@ jq
 less
 man
 moreutils
+pstree
 ripgrep
 strace
 sudo

@@ -3,6 +3,7 @@
 // hence having a single script that does the whole thing.
 
 import { promises as fs } from "fs";
+import nodePath from "path";
 import process from "process";
 import url from "url";
 
@@ -12,11 +13,10 @@ import { generateBuildScript } from "./generate-build-script.js";
 // Parse command-line arguments, run main functionality, and exit.
 async function main() {
   for (const { lang, type } of await getPackages()) {
-    await fs.mkdir(`build/${type}/${lang}`, { recursive: true });
-    await fs.writeFile(
-      `build/${type}/${lang}/build.bash`,
-      await generateBuildScript({ lang, type })
-    );
+    const scriptPath = `build/${type}/${lang}/build.bash`;
+    await fs.mkdir(nodePath.dirname(scriptPath), { recursive: true });
+    await fs.writeFile(scriptPath, await generateBuildScript({ lang, type }));
+    await fs.chmod(scriptPath, 0o755);
   }
   process.exit(0);
 }

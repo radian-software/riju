@@ -120,6 +120,7 @@ git
 jq
 make
 man
+pstree
 ripgrep
 strace
 sudo
