@@ -19,4 +19,4 @@ EOF
 
 runuser -u riju -- yarn install
 
-exec runuser -u riju "$@"
+exec runuser -u riju -- "$@"
