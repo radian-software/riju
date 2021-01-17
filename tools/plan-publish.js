@@ -92,71 +92,79 @@ async function planDebianPackages(opts) {
       (await getLangs()).map(async (id) => [id, await readLangConfig(id)])
     )
   );
-  return await Promise.all(
-    packages.map(async ({ lang, type, name, buildScriptPath, debPath }) => {
-      const desired = crypto
-        .createHash("sha1")
-        .update(await fs.readFile(buildScriptPath, "utf-8"))
-        .digest("hex");
-      let debExists = true;
-      try {
-        await fs.access(debPath);
-      } catch (err) {
-        debExists = false;
-      }
-      let local = null;
-      if (debExists) {
-        local =
-          (
-            await runCommand(`dpkg-deb -f ${debPath} Riju-Script-Hash`, {
-              getStdout: true,
-            })
-          ).stdout.trim() || null;
-      }
-      const remote = remoteHashes[name] || null;
-      let sharedDeps = [];
-      if (type === "lang") {
-        const cfg = langConfigs[lang];
-        sharedDeps = ((cfg.install && cfg.install.riju) || []).map(
-          (id) => sharedUUIDs[id]
-        );
-      }
-      return {
-        id: uuids[name],
-        deps: [
-          ...(deps || []),
-          ...(type === "config" ? [langUUIDs[lang]] : []),
-          ...sharedDeps,
-        ],
-        artifact: "Debian package",
-        name,
-        desired,
-        local,
-        remote,
-        download: async () => {
-          await runCommand(`make download L=${lang} T=${type}`);
-        },
-        build: async () => {
-          await runCommand(
-            `make shell I=packaging CMD="make pkg L=${lang} T=${type}"`
+  return _.sortBy(
+    await Promise.all(
+      packages.map(async ({ lang, type, name, buildScriptPath, debPath }) => {
+        const desired = crypto
+          .createHash("sha1")
+          .update(await fs.readFile(buildScriptPath, "utf-8"))
+          .digest("hex");
+        let debExists = true;
+        try {
+          await fs.access(debPath);
+        } catch (err) {
+          debExists = false;
+        }
+        let local = null;
+        if (debExists) {
+          local =
+            (
+              await runCommand(`dpkg-deb -f ${debPath} Riju-Script-Hash`, {
+                getStdout: true,
+              })
+            ).stdout.trim() || null;
+        }
+        const remote = remoteHashes[name] || null;
+        let sharedDeps = [];
+        if (type === "lang") {
+          const cfg = langConfigs[lang];
+          sharedDeps = ((cfg.install && cfg.install.riju) || []).map(
+            (id) => sharedUUIDs[id]
           );
-        },
-        upload: async () => {
-          if (type === "config") {
-            const clauses = [];
-            for (const dep of (langConfigs[lang].install || {}).riju || []) {
-              clauses.push(`make install T=shared L=${dep}`);
-            }
-            clauses.push(`make installs L=${lang}`);
-            clauses.push("make test");
+        }
+        return {
+          id: uuids[name],
+          deps: [
+            ...(deps || []),
+            ...(type === "config" ? [langUUIDs[lang]] : []),
+            ...sharedDeps,
+          ],
+          artifact: "Debian package",
+          name,
+          desired,
+          local,
+          remote,
+          download: async () => {
+            await runCommand(`make download L=${lang} T=${type}`);
+          },
+          build: async () => {
             await runCommand(
-              `make shell I=runtime CMD="${clauses.join(" && ")}"`
+              `make shell I=packaging CMD="make pkg L=${lang} T=${type}"`
             );
-          }
-          await runCommand(`make upload L=${lang} T=${type}`);
-        },
-      };
-    })
+          },
+          upload: async () => {
+            if (type === "config") {
+              const clauses = [];
+              for (const dep of (langConfigs[lang].install || {}).riju || []) {
+                clauses.push(`make install T=shared L=${dep}`);
+              }
+              clauses.push(`make installs L=${lang}`);
+              clauses.push("make test");
+              await runCommand(
+                `make shell I=runtime CMD="${clauses.join(" && ")}"`
+              );
+            }
+            await runCommand(`make upload L=${lang} T=${type}`);
+          },
+          type,
+        };
+      })
+    ),
+    ({ type, desired, local, remote }) => {
+      // If *not* a shared package, and all we have to do is download
+      // it, then sort to the end.
+      return type !== "shared" && local !== desired && remote === desired;
+    }
   );
 }
 
