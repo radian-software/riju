@@ -23,21 +23,9 @@ info:
   usage: []
 
 install:
-  prepare:
-    apt:
-      - wine
-      - wine32
   apt:
     - wine
     - wine32
-  manual: |
-    install -d "${pkg}/opt/cmd/skel"
-    wine cmd < /dev/null
-    cp -R "$HOME/.wine" "${pkg}/opt/cmd/skel/"
-    chmod -R a=u,go-w "${pkg}/opt/cmd/skel"
-
-setup: |
-  shopt -s dotglob; cp -R /opt/cmd/skel/* ./
 
 repl: |
   wine cmd
