@@ -57,7 +57,7 @@ scripts:
 	node tools/make-foreach.js --types script L=$(L)
 
 all-scripts:
-	node tools/make-foreach.js --pkgs script
+	node tools/write-all-build-scripts.js
 
 pkg-clean:
 	@: $${L} $${T}

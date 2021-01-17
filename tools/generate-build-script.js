@@ -1,5 +1,6 @@
 import nodePath from "path";
 import process from "process";
+import url from "url";
 
 import { Command } from "commander";
 import YAML from "yaml";
@@ -321,6 +322,22 @@ function makeSharedScript(langConfig) {
   return makeLangScript(langConfig, true);
 }
 
+export async function generateBuildScript({ lang, type }) {
+  const scriptMaker = {
+    lang: makeLangScript,
+    config: makeConfigScript,
+    shared: makeSharedScript,
+  }[type];
+  if (!scriptMaker) {
+    throw new Error(`unsupported script type ${type}`);
+  }
+  return scriptMaker(
+    type === "shared"
+      ? await readSharedDepConfig(lang)
+      : await readLangConfig(lang)
+  );
+}
+
 // Parse command-line arguments, run main functionality, and exit.
 async function main() {
   const program = new Command();
@@ -331,26 +348,13 @@ async function main() {
       "package category (lang, config, shared)"
     );
   program.parse(process.argv);
-  const scriptMaker = {
-    lang: makeLangScript,
-    config: makeConfigScript,
-    shared: makeSharedScript,
-  }[program.type];
-  if (!scriptMaker) {
-    console.error(`make-script.js: unsupported --type ${program.type}`);
-    process.exit(1);
-  }
-  console.log(
-    scriptMaker(
-      program.type === "shared"
-        ? await readSharedDepConfig(program.lang)
-        : await readLangConfig(program.lang)
-    )
-  );
+  console.log(generateBuildScript({ lang: program.lang, type: program.type }));
   process.exit(0);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] === url.fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
