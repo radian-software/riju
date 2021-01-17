@@ -114,6 +114,7 @@ apt-file
 dctrl-tools
 
 # basic utilities
+bind9-dnsutils
 less
 git
 jq

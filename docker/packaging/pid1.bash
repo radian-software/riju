@@ -7,4 +7,4 @@ useradd -u "$(stat -c %u "$PWD")" -g "$(stat -c %g "$PWD")" -o -p '!' -m -N -l -
 
 runuser -u riju touch /home/riju/.sudo_as_admin_successful
 
-exec runuser -u riju "$@"
+exec runuser -u riju -- "$@"

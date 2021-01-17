@@ -31,6 +31,7 @@ EOF
 packages="
 
 apt-file
+bind9-dnsutils
 clang
 dctrl-tools
 docker-ce-cli

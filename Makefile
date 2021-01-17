@@ -12,6 +12,12 @@ S3_DEBS := s3://$(S3_BUCKET)-debs
 S3_DEB := $(S3_DEBS)/debs/$(DEB)
 S3_HASH := $(S3_DEBS)/hashes/riju-$(T)-$(L)
 
+ifneq ($(CMD),)
+BASH_CMD := bash -c '$(CMD)'
+else
+BASH_CMD :=
+endif
+
 .PHONY: all $(MAKECMDGOALS)
 
 help:
@@ -60,7 +66,7 @@ pkg-clean:
 
 pkg-build:
 	@: $${L} $${T}
-	cd $(BUILD)/src && pkg="$(PWD)/$(BUILD)/pkg" src="$(PWD)/$(BUILD)/src" $(or $(CMD),../build.bash)
+	cd $(BUILD)/src && pkg="$(PWD)/$(BUILD)/pkg" src="$(PWD)/$(BUILD)/src" $(or $(BASH_CMD),../build.bash)
 
 pkg-debug:
 	@: $${L} $${T}
@@ -107,13 +113,13 @@ endif
 shell:
 	@: $${I}
 ifneq (,$(filter $(I),admin ci))
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.ssh:/var/riju/.ssh -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) --network host riju:$(I) $(CMD)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.ssh:/var/riju/.ssh -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) --network host riju:$(I) $(BASH_CMD)
 else ifneq (,$(filter $(I),compile app))
-	docker run -it --rm --hostname $(I) $(SHELL_PORTS) riju:$(I) $(CMD)
+	docker run -it --rm --hostname $(I) $(SHELL_PORTS) riju:$(I) $(BASH_CMD)
 else ifneq (,$(filter $(I),runtime composite))
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src --label riju-install-target=yes $(SHELL_PORTS) riju:$(I) $(CMD)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src --label riju-install-target=yes $(SHELL_PORTS) riju:$(I) $(BASH_CMD)
 else
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) riju:$(I) $(CMD)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) riju:$(I) $(BASH_CMD)
 endif
 
 install:

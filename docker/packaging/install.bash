@@ -64,6 +64,7 @@ fakeroot
 unzip
 
 # basic utilities
+bind9-dnsutils
 git
 jq
 less
