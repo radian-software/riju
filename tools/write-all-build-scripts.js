@@ -15,7 +15,10 @@ async function main() {
   for (const { lang, type } of await getPackages()) {
     const scriptPath = `build/${type}/${lang}/build.bash`;
     await fs.mkdir(nodePath.dirname(scriptPath), { recursive: true });
-    await fs.writeFile(scriptPath, await generateBuildScript({ lang, type }));
+    await fs.writeFile(
+      scriptPath,
+      (await generateBuildScript({ lang, type })) + "\n"
+    );
     await fs.chmod(scriptPath, 0o755);
   }
   process.exit(0);
