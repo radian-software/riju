@@ -21,6 +21,7 @@ install:
     pushd "${pkg}/opt/inferno"
     sed -i 's/gcc/gcc -m32/g' makemk.sh
     sed -i "s#ROOT=.*#ROOT=${PWD}#" mkconfig
+    sed -i "s#CFLAGS=#CFLAGS=-fcommon#" mkfiles/mkfile-Linux-arm
     ./makemk.sh
     PATH="$PWD/Linux/386/bin:$PATH" mk install
     ln -s "/opt/inferno/Linux/386/bin/emu" "/opt/inferno/Linux/386/bin/limbo" "${pkg}/usr/local/bin/"
