@@ -11,8 +11,6 @@ install:
   apt:
     - postgresql
     - postgresql-client
-  riju:
-    - sqls
 
 repl: |
   rm -rf data
@@ -38,10 +36,3 @@ run: |
   set +e
   psql -h "$PWD/data" postgres -f main.sql
   psql -h "$PWD/data" postgres
-
-lsp:
-  start: |
-    sqls
-
-skip:
-  - lsp

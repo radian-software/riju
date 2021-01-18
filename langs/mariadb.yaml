@@ -8,13 +8,6 @@ install:
     - libaio1
     - libtinfo5
     - mysql-client
-  riju:
-    - sqls
-  files:
-    "/opt/mariadb/sqls.yml": |
-      connections:
-        - driver: mysql
-          dataSourceName: socket/mysql
   manual: |
     install -d "${pkg}/opt/mariadb"
 
@@ -48,11 +41,3 @@ run: |
       sleep 0.01
   done
   (mysql --socket=socket < main.sql; mysql --socket=socket)
-
-lsp:
-  start: |
-    sleep 5
-    sqls -config /opt/mariadb/sqls.yml
-
-skip:
-  - lsp

@@ -7,8 +7,6 @@ install:
   apt:
     - mysql-server
     - mysql-client
-  riju:
-    - sqls
 
 repl: |
   rm -rf data
@@ -34,10 +32,3 @@ run: |
       sleep 0.01
   done
   (mysql --socket="$PWD/socket" -u root < main.sql; mysql --socket="$PWD/socket" -u root)
-
-lsp:
-  start: |
-    sqls
-
-skip:
-  - lsp
