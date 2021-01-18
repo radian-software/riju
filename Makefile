@@ -165,6 +165,10 @@ sandbox:
 	@: $${L}
 	L=$(L) node backend/sandbox.js
 
+lsp:
+	@: $${C}
+	node backend/lsp-repl.js $(C)
+
 ### Fetch artifacts from registries
 
 pull-base:

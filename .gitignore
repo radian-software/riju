@@ -1,6 +1,7 @@
 *.log
 *.pem
 .env
+.lsp-repl-history
 .terraform
 build
 node_modules

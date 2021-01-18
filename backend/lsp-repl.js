@@ -5,7 +5,7 @@ import readline from "historic-readline";
 import { quote } from "shell-quote";
 import rpc from "vscode-jsonrpc";
 
-import { langs } from "./langs";
+import { langsPromise } from "./langs.js";
 
 const args = process.argv.slice(2);
 
@@ -22,6 +22,8 @@ if (["-h", "-help", "--help", "help"].includes(args[0])) {
   printUsage();
   process.exit(0);
 }
+
+const langs = await langsPromise;
 
 let cmdline;
 if (args.length === 1 && langs[args[0]] && langs[args[0]].lsp) {
