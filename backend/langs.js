@@ -9,6 +9,9 @@ import { log } from "./util.js";
 // populated at runtime and updated asynchronously.
 export let langs = {};
 
+// Map from language aliases and IDs to canonical language IDs.
+export let aliases = {};
+
 // Read languages from JSON files in /opt/riju/langs, and update the
 // global langs variable in this module. Never throw an error. If
 // there is a problem then just leave the languages as they previously
@@ -16,6 +19,7 @@ export let langs = {};
 async function readLangsFromDisk() {
   try {
     const newLangs = {};
+    const newAliases = {};
     for (const filename of await fs.readdir("/opt/riju/langs")) {
       if (path.parse(filename).ext !== ".json") {
         continue;
@@ -31,6 +35,10 @@ async function readLangsFromDisk() {
         continue;
       }
       newLangs[id] = langConfig;
+      newAliases[id] = id;
+      for (const alias of langConfig.aliases || []) {
+        newAliases[alias] = id;
+      }
     }
     log.info(
       `Loaded ${
@@ -38,6 +46,7 @@ async function readLangsFromDisk() {
       } language configuration(s) from disk`
     );
     langs = newLangs;
+    aliases = newAliases;
   } catch (err) {
     log.error("Failed to read languages from disk:", err);
   }

@@ -7,7 +7,7 @@ import ws from "express-ws";
 import _ from "lodash";
 
 import * as api from "./api.js";
-import { langs } from "./langs.js";
+import { aliases, langs } from "./langs.js";
 import { log } from "./util.js";
 
 const host = process.env.HOST || "localhost";
@@ -28,10 +28,7 @@ app.get("/", (_, res) => {
       analyticsEnabled,
     });
   } else {
-    res.send(
-      503,
-      "Still loading languages, or encountered error while doing so\n"
-    );
+    res.send(503, "Encountered unexpected error while loading languages\n");
   }
 });
 for (const [lang, { aliases }] of Object.entries(langs)) {
@@ -48,14 +45,19 @@ app.get("/:lang", (req, res) => {
   const lowered = lang.toLowerCase();
   if (lowered !== lang) {
     res.redirect(301, `/${lowered}`);
-  } else if (langs[lang]) {
-    res.render(path.resolve("frontend/pages/app"), {
-      config: { id: lang, ...langs[lang] },
-      analyticsEnabled,
-    });
-  } else {
-    res.send(404, `No such language: ${lang}\n`);
+    return;
   }
+  const canonical = aliases[lang];
+  if (!canonical) {
+    res.send(404, `No such language: ${lang}\n`);
+  } else if (canonical !== lang) {
+    res.redirect(301, `/${canonical}`);
+    return;
+  }
+  res.render(path.resolve("frontend/pages/app"), {
+    config: langs[lang],
+    analyticsEnabled,
+  });
 });
 app.use("/css", express.static("frontend/styles"));
 app.use("/js", express.static("frontend/out"));
