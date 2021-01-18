@@ -237,7 +237,8 @@ template: |
   BA   67   CR      7/10   TR  1   CH 16   End of track
 
 compile: |
-  asc2mid main.asc > main.mid && mono /opt/velato/Vlt.exe /s main.mid
+  asc2mid main.asc > main.mid
+  mono /opt/velato/Vlt.exe /s main.mid
 run: |
   mono main.exe
 hello: |

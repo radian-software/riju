@@ -14,7 +14,8 @@ template: |
   write, "Hello, world!"
 
 run: |
-  echo "Type '#include \"main.i\"' to run the code." && rlwrap yorick
+  echo "Type '#include \"main.i\"' to run the code."
+  rlwrap yorick
 helloInput: |
   #include "main.i"
 

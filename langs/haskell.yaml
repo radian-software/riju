@@ -35,7 +35,8 @@ install:
     popd
 
 repl: |
-  rm -f .ghci && ghci
+  rm -f .ghci
+  ghci
 
 main: "Main.hs"
 template: |

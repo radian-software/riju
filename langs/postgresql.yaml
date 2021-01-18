@@ -15,7 +15,11 @@ install:
     - sqls
 
 repl: |
-  rm -rf data && /usr/lib/postgresql/*/bin/initdb -D data && (echo "listen_addresses = ''" && echo "unix_socket_directories = '.'") >> data/postgresql.conf && /usr/lib/postgresql/*/bin/pg_ctl -D data -w start && psql -h "$PWD/data" postgres
+  rm -rf data
+  /usr/lib/postgresql/*/bin/initdb -D data
+  (echo "listen_addresses = ''"; echo "unix_socket_directories = '.'") >> data/postgresql.conf
+  /usr/lib/postgresql/*/bin/pg_ctl -D data -w start
+  psql -h "$PWD/data" postgres
 input: |
   SELECT 123 * 234;
 
@@ -24,7 +28,16 @@ template: |
   SELECT 'Hello, world!';
 
 run: |
-  rm -rf data && /usr/lib/postgresql/*/bin/initdb -D data && (echo "listen_addresses = ''" && echo "unix_socket_directories = '.'") >> data/postgresql.conf && /usr/lib/postgresql/*/bin/pg_ctl -D data -w start && (psql -h "$PWD/data" postgres -f main.sql; psql -h "$PWD/data" postgres)
+  set -e
+
+  rm -rf data
+  /usr/lib/postgresql/*/bin/initdb -D data
+  (echo "listen_addresses = ''"; echo "unix_socket_directories = '.'") >> data/postgresql.conf
+  /usr/lib/postgresql/*/bin/pg_ctl -D data -w start
+
+  set +e
+  psql -h "$PWD/data" postgres -f main.sql
+  psql -h "$PWD/data" postgres
 
 lsp:
   start: |

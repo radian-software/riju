@@ -50,6 +50,11 @@ template: |
 
 compile: |
   export LD_LIBRARY_PATH=/usr/local/lib/ec
-  ecp -c main.ec -o main.sym && ecc -c main.ec -o main.c && ecs -console main.sym main.imp -o main.main.ec && ecp -c main.main.ec -o main.main.sym && ecc -c main.main.ec -o main.main.c && clang main.c main.main.c -lecereCOM -o main
+  ecp -c main.ec -o main.sym
+  ecc -c main.ec -o main.c
+  ecs -console main.sym main.imp -o main.main.ec
+  ecp -c main.main.ec -o main.main.sym
+  ecc -c main.main.ec -o main.main.c
+  clang main.c main.main.c -lecereCOM -o main
 run: |
   ./main

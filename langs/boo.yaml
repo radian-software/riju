@@ -40,7 +40,8 @@ install:
     ln -s /usr/local/lib/boo/booc /usr/local/lib/boo/booish "${pkg}/usr/local/bin/"
 
 setup: |
-  mkdir -p "$HOME/.local/share" && touch "$HOME/.local/share/booish_history"
+  mkdir -p "$HOME/.local/share"
+  touch "$HOME/.local/share/booish_history"
 
 repl: |
   booish

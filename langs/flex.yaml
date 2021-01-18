@@ -28,8 +28,10 @@ template: |
   }
 
 compile: |
-  lex -o main.c main.lex && clang main.c -o main
+  lex -o main.c main.lex
+  clang main.c -o main
 run: |
-  echo 'Reading from stdin, ctrl+D to end input...' >&2 && ./main
+  echo 'Reading from stdin, ctrl+D to end input...' >&2
+  ./main
 helloInput: |
   EOF

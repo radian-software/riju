@@ -22,7 +22,8 @@ template: |
   ]
 
 compile: |
-  mono /opt/entropy/entc.exe main.vge | grep -Ev 'WARNING:|Using default' > main.cs && mcs -lib:/opt/entropy -r:Rottytooth.Esolang.Entropy main.cs
+  mono /opt/entropy/entc.exe main.vge | grep -Ev 'WARNING:|Using default' > main.cs
+  mcs -lib:/opt/entropy -r:Rottytooth.Esolang.Entropy main.cs
 run: |
   MONO_PATH=/opt/entropy mono main.exe
 hello: |

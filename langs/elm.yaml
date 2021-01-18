@@ -32,7 +32,10 @@ template: |
   output = "Hello, world!"
 
 run: |
-  cp /opt/elm/elm.json elm.json && run-elm Main.elm; elm repl
+  cp /opt/elm/elm.json elm.json || exit
+
+  run-elm Main.elm
+  elm repl
 
 scope:
   code: |

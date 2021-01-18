@@ -296,7 +296,7 @@ export class Session {
       if (code) {
         cmdline = run;
         if (compile) {
-          cmdline = `( ${compile} ) && ( ${run} )`;
+          cmdline = `( ${compile} ) && ( set +e; ${run} )`;
         }
       } else if (repl) {
         cmdline = repl;

@@ -11,7 +11,8 @@ install:
     - j.deb
 
 repl: |
-  echo 'ijconsole:' && ijconsole
+  echo 'ijconsole:'
+  ijconsole
 
 main: "main.ijs"
 template: |

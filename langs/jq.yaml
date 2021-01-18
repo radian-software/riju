@@ -6,7 +6,10 @@ install:
     - jq
 
 repl: |
-  echo 'Reading from stdin...' >&2 && while true; do jq .; done
+  echo 'Reading from stdin...' >&2
+  while true; do
+      jq .
+  done
 input: |
   {"foo":"bar"}
 output: |
@@ -17,7 +20,10 @@ template: |
   "Hello, world!"
 
 run: |
-  echo 'Reading from stdin...' >&2 && while true; do jq "$(< main.jq)"; done
+  echo 'Reading from stdin...' >&2
+  while true; do
+      jq "$(< main.jq)"
+  done
 helloInput: |
   {}
 runReplOutput: |
