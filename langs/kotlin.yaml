@@ -6,6 +6,8 @@ name: "Kotlin"
 monacoLang: kotlin
 
 install:
+  apt:
+    - default-jre
   manual: |
     install -d "${pkg}/opt"
     install -d "${pkg}/usr/local/bin"
@@ -32,4 +34,5 @@ template: |
   println("Hello, world!")
 
 run: |
-  JAVA_OPTS="-Duser.home=$PWD" kotlinc -script main.kts; kotlinc
+  JAVA_OPTS="-Duser.home=$PWD" kotlinc -script main.kts
+  kotlinc
