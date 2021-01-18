@@ -11,9 +11,15 @@ install:
     - sqlite
   riju:
     - sqls
+  files:
+    "/opt/sqlite/sqls.yml": |
+      connections:
+        - driver: sqlite3
+          dataSourceName: db.sqlite3
 
 repl: |
-  sqlite3
+  rm -f db.sqlite3
+  sqlite3 db.sqlite3
 input: |
   SELECT 123 * 234;
 
@@ -22,11 +28,12 @@ template: |
   SELECT 'Hello, world!';
 
 run: |
-  sqlite3 -cmd "$(< main.sql)"
+  rm -f db.sqlite3
+  sqlite3 db.sqlite3 -cmd "$(< main.sql)"
 
 lsp:
   start: |
-    sqls
+    sqls -config /opt/sqlite/sqls.yml
 
 skip:
   - lsp

@@ -1,9 +1,13 @@
 id: "sqls"
 
 install:
+  prepare:
+    apt:
+      - golang
   manual: |
     install -d "${pkg}/usr/local/bin"
 
-    ver="$(latest_release lighttiger2505/sqls | sed 's/^v//')"
-    wget "https://github.com/lighttiger2505/sqls/releases/download/v${ver}/sqls_${ver}_Linux_x86_64.tar.gz" -O sqls.tar.gz
-    tar -xf sqls.tar.gz -C "${pkg}/usr/local/bin"
+    export GO111MODULE=on
+    export GOPATH="$PWD/go"
+    go get github.com/lighttiger2505/sqls
+    cp go/bin/sqls "${pkg}/usr/local/bin/"
