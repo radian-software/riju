@@ -11,6 +11,9 @@ install:
       - libc6-dev-i386
       - libx11-dev:i386
       - libxext-dev:i386
+  apt:
+    - libx11-6:i386
+    - libxext6:i386
   manual: |
     install -d "${pkg}/opt/inferno"
     install -d "${pkg}/usr/local/bin"
