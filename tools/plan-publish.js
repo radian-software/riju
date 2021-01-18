@@ -156,6 +156,7 @@ async function planDebianPackages(opts) {
           await runCommand(`make upload L=${lang} T=${type}`);
         },
         type,
+        lang,
       };
     })
   );
