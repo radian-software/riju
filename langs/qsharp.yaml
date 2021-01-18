@@ -5,25 +5,37 @@ aliases:
 name: "Q#"
 
 install:
+  # Apparently, the Q# project template is hardcoded to use version
+  # 3.x of the .NET SDK. Not sure why.
   prepare:
     apt:
-      - $(grep-aptavail -wF Package "dotnet-sdk-[0-9.]+" -s Package -n | sort -Vr | head -n1)
+      - $(grep-aptavail -wF Package "dotnet-sdk-3\.[0-9.]+" -s Package -n | sort -Vr | head -n1)
   apt:
-    - $(grep-aptavail -wF Package "dotnet-sdk-[0-9.]+" -s Package -n | sort -Vr | head -n1)
+    - $(grep-aptavail -wF Package "dotnet-sdk-3\.[0-9.]+" -s Package -n | sort -Vr | head -n1)
+  # We should cache the .dotnet directory to avoid a .NET banner being
+  # printed, and we should cache the main directory because there is a
+  # generated main.csproj file that is needed by .NET. Finally we
+  # should cache the .nuget directory as well as the build artifacts
+  # inside main to avoid a 30s initial compile time.
+  #
+  # We could optimize further but I don't feel like it right now.
   manual: |
-    install -d "${pkg}/opt/qsharp"
+    install -d "${pkg}/opt/qsharp/skel"
 
     dotnet new -i Microsoft.Quantum.ProjectTemplates
     dotnet new console -lang Q# -o main
-    cp -R main "${pkg}/opt/qsharp/skel"
-    rm "${pkg}/opt/qsharp/skel/Program.qs"
-    cp -R "$HOME/.dotnet" "${pkg}/opt/qsharp/dotnet"
-    chmod -R a=u,go-w "${pkg}/opt/qsharp/dotnet"
+    dotnet run --project main
+
+    shopt -s dotglob
+    cp -R * "${HOME}/.dotnet" "${HOME}/.nuget" "${pkg}/opt/qsharp/skel/"
+    rm "${pkg}/opt/qsharp/skel/main/Program.qs"
+    chmod -R a=u,go-w "${pkg}/opt/qsharp/skel"
 
 setup: |
-  cp -R /opt/qsharp/dotnet ./.dotnet && cp -R /opt/qsharp/skel/* ./
+  shopt -s dotglob
+  cp -R /opt/qsharp/skel/* ./
 
-main: "Main.qs"
+main: "main/Main.qs"
 template: |
   namespace main {
 
@@ -37,4 +49,4 @@ template: |
   }
 
 run: |
-  dotnet run
+  dotnet run --project main
