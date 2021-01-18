@@ -31,6 +31,8 @@ export async function getSharedDeps() {
 // Return a list of objects representing the packages to be built. See
 // the function implementation for the full list of keys.
 export async function getPackages() {
+  // The order (shared, lang, config) is important to get dependencies
+  // correct due to poor abstractions in plan-publish.js.
   const packages = [];
   for (const lang of await getSharedDeps()) {
     const type = "shared";

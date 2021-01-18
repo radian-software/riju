@@ -92,80 +92,92 @@ async function planDebianPackages(opts) {
       (await getLangs()).map(async (id) => [id, await readLangConfig(id)])
     )
   );
-  return _.sortBy(
-    await Promise.all(
-      packages.map(async ({ lang, type, name, buildScriptPath, debPath }) => {
-        const desired = crypto
-          .createHash("sha1")
-          .update(await fs.readFile(buildScriptPath, "utf-8"))
-          .digest("hex");
-        let debExists = true;
-        try {
-          await fs.access(debPath);
-        } catch (err) {
-          debExists = false;
-        }
-        let local = null;
-        if (debExists) {
-          local =
-            (
-              await runCommand(`dpkg-deb -f ${debPath} Riju-Script-Hash`, {
-                getStdout: true,
-              })
-            ).stdout.trim() || null;
-        }
-        const remote = remoteHashes[name] || null;
-        let sharedDeps = [];
-        if (type === "lang") {
-          const cfg = langConfigs[lang];
-          sharedDeps = ((cfg.install && cfg.install.riju) || []).map(
-            (id) => sharedUUIDs[id]
+  const plan = await Promise.all(
+    packages.map(async ({ lang, type, name, buildScriptPath, debPath }) => {
+      const desired = crypto
+        .createHash("sha1")
+        .update(await fs.readFile(buildScriptPath, "utf-8"))
+        .digest("hex");
+      let debExists = true;
+      try {
+        await fs.access(debPath);
+      } catch (err) {
+        debExists = false;
+      }
+      let local = null;
+      if (debExists) {
+        local =
+          (
+            await runCommand(`dpkg-deb -f ${debPath} Riju-Script-Hash`, {
+              getStdout: true,
+            })
+          ).stdout.trim() || null;
+      }
+      const remote = remoteHashes[name] || null;
+      let sharedDeps = [];
+      if (type === "lang") {
+        const cfg = langConfigs[lang];
+        sharedDeps = ((cfg.install && cfg.install.riju) || []).map(
+          (id) => sharedUUIDs[id]
+        );
+      }
+      return {
+        id: uuids[name],
+        deps: [
+          ...(deps || []),
+          ...(type === "config" ? [langUUIDs[lang]] : []),
+          ...sharedDeps,
+        ],
+        artifact: "Debian package",
+        name,
+        desired,
+        local,
+        remote,
+        download: async () => {
+          await runCommand(`make download L=${lang} T=${type}`);
+        },
+        build: async () => {
+          await runCommand(
+            `make shell I=packaging CMD="make pkg L=${lang} T=${type}"`
           );
-        }
-        return {
-          id: uuids[name],
-          deps: [
-            ...(deps || []),
-            ...(type === "config" ? [langUUIDs[lang]] : []),
-            ...sharedDeps,
-          ],
-          artifact: "Debian package",
-          name,
-          desired,
-          local,
-          remote,
-          download: async () => {
-            await runCommand(`make download L=${lang} T=${type}`);
-          },
-          build: async () => {
-            await runCommand(
-              `make shell I=packaging CMD="make pkg L=${lang} T=${type}"`
-            );
-          },
-          upload: async () => {
-            if (type === "config") {
-              const clauses = [];
-              for (const dep of (langConfigs[lang].install || {}).riju || []) {
-                clauses.push(`make install T=shared L=${dep}`);
-              }
-              clauses.push(`make installs L=${lang}`);
-              clauses.push("make test");
-              await runCommand(
-                `make shell I=runtime CMD="${clauses.join(" && ")}"`
-              );
+        },
+        upload: async () => {
+          if (type === "config") {
+            const clauses = [];
+            for (const dep of (langConfigs[lang].install || {}).riju || []) {
+              clauses.push(`make install T=shared L=${dep}`);
             }
-            await runCommand(`make upload L=${lang} T=${type}`);
-          },
-          type,
-        };
-      })
-    ),
-    ({ type, desired, local, remote }) => {
-      // If *not* a shared package, and all we have to do is download
-      // it, then sort to the end.
-      return type !== "shared" && local !== desired && remote === desired;
-    }
+            clauses.push(`make installs L=${lang}`);
+            clauses.push("make test");
+            await runCommand(
+              `make shell I=runtime CMD="${clauses.join(" && ")}"`
+            );
+          }
+          await runCommand(`make upload L=${lang} T=${type}`);
+        },
+        type,
+      };
+    })
   );
+  const lazilyDownloadedLanguages = new Set();
+  for (const { type, lang, desired, local, remote } of plan) {
+    if (type === "shared") {
+      continue;
+    }
+    // If *not* a shared package, and all we have to do is download
+    // it, then sort to the end. Unless of course this is the lang
+    // package, and we need to rebuild the config package, in which
+    // case the config package (which comes later) will remove that
+    // lang from the set again.
+    if (local !== desired && remote === desired) {
+      lazilyDownloadedLanguages.add(lang);
+    } else {
+      lazilyDownloadedLanguages.delete(lang);
+    }
+  }
+  return _.sortBy(plan, ({ type, lang }) => {
+    return type !== "shared" && lazilyDownloadedLanguages.has(lang);
+  });
 }
 
 async function computePlan() {
