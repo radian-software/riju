@@ -10,12 +10,7 @@ install:
   apt:
     - sqlite
   riju:
-    - sqls
-  files:
-    "/opt/sqlite/sqls.yml": |
-      connections:
-        - driver: sqlite3
-          dataSourceName: db.sqlite3
+    - sql-language-server
 
 repl: |
   rm -f db.sqlite3
@@ -33,7 +28,7 @@ run: |
 
 lsp:
   start: |
-    sqls -config /opt/sqlite/sqls.yml
+    sql-language-server up -m stdio -d
 
 skip:
   - lsp

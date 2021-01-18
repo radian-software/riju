@@ -1,0 +1,11 @@
+id: "sql-language-server"
+
+install:
+  prepare:
+    apt:
+      - python2
+    manual: |
+      ln -s /usr/bin/python2 python
+      export PATH="$PWD:$PATH"
+  npm:
+    - sql-language-server
