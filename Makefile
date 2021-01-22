@@ -18,6 +18,9 @@ else
 BASH_CMD :=
 endif
 
+# Get rid of 'Entering directory' / 'Leaving directory' messages.
+MAKE_QUIETLY := MAKELEVEL= make
+
 .PHONY: all $(MAKECMDGOALS)
 
 help:
@@ -70,7 +73,7 @@ pkg-build:
 
 pkg-debug:
 	@: $${L} $${T}
-	make pkg-build L=$(L) T=$(T) CMD=bash
+	$(MAKE_QUIETLY) pkg-build L=$(L) T=$(T) CMD=bash
 
 ifneq (,$(Z))
 NO_COMPRESS :=
@@ -90,7 +93,7 @@ pkgs:
 
 repkg: script
 	@: $${L} $${T}
-	make shell I=packaging CMD="make pkg L=$(L) T=$(T)"
+	$(MAKE_QUIETLY) shell I=packaging CMD="make pkg L=$(L) T=$(T)"
 	ctr="$$(docker container ls -f label="riju-install-target=yes" -l -q)"; test "$${ctr}" || (echo "no valid container is live"; exit 1); docker exec "$${ctr}" make install L=$(L) T=$(T)
 
 repkgs:
@@ -156,7 +159,7 @@ server-dev:
 build: frontend system
 
 dev:
-	make -j3 frontend-dev system-dev server-dev
+	$(MAKE_QUIETLY) -j3 frontend-dev system-dev server-dev
 
 test:
 	node backend/test-runner.js $(F)

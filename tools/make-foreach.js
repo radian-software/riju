@@ -15,12 +15,14 @@ async function main() {
   switch (selector) {
     case "--pkgs":
       for (const { lang, type } of await getPackages()) {
-        await runCommand(`make ${targets.join(" ")} L=${lang} T=${type}`);
+        await runCommand(
+          `MAKELEVEL= make ${targets.join(" ")} L=${lang} T=${type}`
+        );
       }
       break;
     case "--types":
       for (const type of ["lang", "config"]) {
-        await runCommand(`make ${targets.join(" ")} T=${type}`);
+        await runCommand(`MAKELEVEL= make ${targets.join(" ")} T=${type}`);
       }
       break;
     default:
