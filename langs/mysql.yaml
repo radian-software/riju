@@ -10,8 +10,8 @@ install:
 
 repl: |
   rm -rf data
-  mysqld -h "$PWD/data" --initialize-insecure
-  (mysqld -h "$PWD/data" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &)
+  mysqld -h "$PWD/data" --log-error="$PWD/error.log" --initialize-insecure
+  (mysqld -h "$PWD/data" --log-error="$PWD/error.log" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &)
   until [[ -e socket ]]; do
       sleep 0.01
   done
@@ -26,8 +26,8 @@ template: |
 run: |
   set -e
   rm -rf data
-  mysqld -h "$PWD/data" --initialize-insecure
-  (mysqld -h "$PWD/data" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &)
+  mysqld -h "$PWD/data" --log-error="$PWD/error.log" --initialize-insecure
+  (mysqld -h "$PWD/data" --log-error="$PWD/error.log" --socket="$PWD/socket" --pid-file="$PWD/pid-file" --mysqlx=OFF --skip-networking &)
   until [[ -e socket ]]; do
       sleep 0.01
   done
