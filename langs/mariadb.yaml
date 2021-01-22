@@ -19,8 +19,8 @@ install:
 
 repl: |
   rm -rf data
-  /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)"
-  (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &)
+  /opt/mariadb/scripts/mariadb-install-db --no-defaults --user="$(id -un)"
+  (/opt/mariadb/bin/mysqld --no-defaults --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &)
   until [[ -e socket ]]; do
       sleep 0.01
   done
@@ -35,8 +35,8 @@ template: |
 run: |
   set -e
   rm -rf data
-  /opt/mariadb/scripts/mariadb-install-db --user="$(id -un)"
-  (/opt/mariadb/bin/mysqld --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &)
+  /opt/mariadb/scripts/mariadb-install-db --no-defaults --user="$(id -un)"
+  (/opt/mariadb/bin/mysqld --no-defaults --datadir="$PWD/data" --socket="$PWD/socket" --skip-networking &)
   until [[ -e socket ]]; do
       sleep 0.01
   done
