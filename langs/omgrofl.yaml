@@ -5,6 +5,8 @@ aliases:
 name: "Omgrofl"
 
 install:
+  apt:
+    - default-jre
   manual: |
     install -d "${pkg}/opt/omgrofl"
 
