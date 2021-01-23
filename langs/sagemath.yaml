@@ -19,7 +19,10 @@ install:
 
     sudo mkdir /opt/sagemath
     sudo chown riju:riju /opt/sagemath
-    tar -xf sage.tar.bz2 -C /opt/sagemath --strip-components=1
+
+    # Verbose output because otherwise CircleCI thinks nothing is
+    # happening for too long, and kills the job.
+    tar -xvf sage.tar.bz2 -C /opt/sagemath --strip-components=1
 
     python2 /opt/sagemath/relocate-once.py
 
