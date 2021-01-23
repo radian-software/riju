@@ -31,7 +31,7 @@ function makeLangScript(langConfig, isShared) {
   ) {
     parts.push(`\
 export DEBIAN_FRONTEND=noninteractive
-sudo apt-get update`);
+sudo -E apt-get update`);
   }
   if (install) {
     const {
@@ -52,17 +52,17 @@ sudo apt-get update`);
       const { apt, npm, opam, manual } = prepare;
       if (apt && apt.length > 0) {
         parts.push(`\
-sudo apt-get install -y ${apt.join(" ")}`);
+sudo -E apt-get install -y ${apt.join(" ")}`);
       }
       if (npm && npm.length > 0) {
         parts.push(`\
-sudo npm install -g ${npm.join(" ")}`);
+sudo -E npm install -g ${npm.join(" ")}`);
       }
       if (opam && opam.length > 0) {
         parts.push(`\
-sudo opam init -n --disable-sandboxing --root /opt/opam
-sudo opam install "${opam.join(" ")}" -y --root /opt/opam
-sudo ln -s /opt/opam/default/bin/* /usr/local/bin/`);
+sudo -E opam init -n --disable-sandboxing --root /opt/opam
+sudo -E opam install "${opam.join(" ")}" -y --root /opt/opam
+sudo -E ln -s /opt/opam/default/bin/* /usr/local/bin/`);
       }
       if (manual) {
         parts.push(manual);
@@ -240,9 +240,9 @@ chmod +x "${path}"`);
   let stripDependsFilter = "";
   const stripDepends = (dependsCfg.strip || []).concat(dependsCfg.unpin || []);
   if (stripDepends.length > 0) {
-    stripDependsFilter = ` | sed -E 's/(^| )(${stripDepends.join(
+    stripDependsFilter = ` | sed -E 's/\\{(${stripDepends.join(
       "|"
-    )}) *(\\([^)]*\\))? *(,|$)/\\1/g' | sed -E 's/^ *//g'`;
+    )})[^}]*\\}//g'`;
   }
   let debianControlData = `\
 Package: riju-${isShared ? "shared" : "lang"}-${id}
@@ -252,7 +252,7 @@ Maintainer: Radon Rosborough <radon.neon@gmail.com>
 Description: The ${name} ${
     isShared ? "shared dependency" : "language"
   } packaged for Riju
-Depends: \$(IFS=,; echo "\${depends[*]}" | sed -E 's/,([^ ])/, \\1/g'${stripDependsFilter} | sed -E 's/ +/ /g' | sed -E 's/ *, *$//')
+Depends: \$(IFS=,; echo "\${depends[*]}" | sed -E 's/^[ ,]*|[ ,]*$| *(, *)+/},{/g' | sed -E 's/ *(\\| *)+/}\\|{/g'${stripDependsFilter} | tr -d '{}' | sed -E 's/^[,|]+|[,|]+$//g' | sed -E 's/[,|]*,[,|]*/,/g' | sed -E 's/\\|+/|/g')
 Riju-Script-Hash: \$(sha1sum "\$0" | awk '{ print \$1 }')`;
   parts.push(`\
 install -d "\${pkg}/DEBIAN"
