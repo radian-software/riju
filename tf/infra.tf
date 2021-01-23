@@ -67,7 +67,7 @@ resource "aws_iam_user_policy_attachment" "deploy" {
 }
 
 resource "aws_s3_bucket" "riju_debs" {
-  bucket = "riju-debs"
+  bucket = "${data.external.env.result.S3_BUCKET}-debs"
   acl    = "public-read"
   tags   = local.tags
 }
