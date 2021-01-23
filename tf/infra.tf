@@ -33,6 +33,10 @@ resource "aws_iam_user" "deploy" {
   tags = local.tags
 }
 
+resource "aws_iam_access_key" "deploy" {
+  user = aws_iam_user.deploy.name
+}
+
 data "aws_iam_policy_document" "deploy" {
   statement {
     actions = [
@@ -66,10 +70,47 @@ resource "aws_iam_user_policy_attachment" "deploy" {
   policy_arn = aws_iam_policy.deploy.arn
 }
 
+data "aws_iam_policy_document" "riju_debs" {
+  statement {
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${aws_s3_bucket.riju_debs.bucket}",
+    ]
+  }
+
+  statement {
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${aws_s3_bucket.riju_debs.bucket}/*",
+    ]
+  }
+}
+
 resource "aws_s3_bucket" "riju_debs" {
   bucket = "${data.external.env.result.S3_BUCKET}-debs"
   acl    = "public-read"
   tags   = local.tags
+}
+
+resource "aws_s3_bucket_policy" "riju_debs" {
+  bucket = aws_s3_bucket.riju_debs.id
+  policy = data.aws_iam_policy_document.riju_debs.json
 }
 
 data "aws_ami" "server" {
@@ -137,4 +178,16 @@ resource "aws_volume_attachment" "data" {
   device_name = "/dev/sdh"
   volume_id   = aws_ebs_volume.data.id
   instance_id = aws_instance.server.id
+}
+
+output "server_ip_address" {
+  value = aws_instance.server.public_ip
+}
+
+output "deploy_aws_access_key_id" {
+  value = aws_iam_access_key.deploy.id
+}
+
+output "deploy_aws_secret_access_key" {
+  value = aws_iam_access_key.deploy.secret
 }
