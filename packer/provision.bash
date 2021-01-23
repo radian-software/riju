@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+mkdir /tmp/riju
+pushd /tmp/riju
+
 export DEBIAN_FRONTEND=noninteractive
 
 sudo -E apt-get update
@@ -18,7 +21,11 @@ deb [arch=amd64] https://download.docker.com/linux/ubuntu ${ubuntu_name} stable
 EOF
 
 sudo -E apt-get update
-sudo -E apt-get install -y certbot docker-ce docker-ce-cli containerd.io whois
+sudo -E apt-get install -y certbot docker-ce docker-ce-cli containerd.io unzip whois
+
+wget -nv https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -O awscli.zip
+unzip -q awscli.zip
+sudo ./aws/install
 
 sudo chown root:root /tmp/riju /tmp/riju-deploy /tmp/riju.service
 sudo mv /tmp/riju /tmp/riju-deploy /tmp/riju-install-certbot-hooks /usr/local/bin/
@@ -60,3 +67,6 @@ sudo hostnamectl set-hostname riju
 sudo systemctl enable riju
 
 sudo passwd -l ubuntu
+
+popd
+rm -rf /tmp/riju
