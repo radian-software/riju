@@ -44,6 +44,7 @@ man
 nodejs
 packer
 psmisc
+pwgen
 skopeo
 ssh
 sudo
