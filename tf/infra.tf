@@ -1,6 +1,5 @@
 terraform {
   backend "s3" {
-    bucket = "riju-tf"
     key    = "state"
     region = "us-west-1"
   }
