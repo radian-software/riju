@@ -6,6 +6,16 @@ install:
     apt:
       - qt5-qmake
       - qtscript5-dev
+  apt:
+    - libqt5script5
+  manual: |
+    install -d "${pkg}/usr/local/bin"
+
+    git clone https://github.com/manyoso/zot.git
+    pushd zot
+    ./build.sh
+    cp build/bin/zot "${pkg}/usr/local/bin/"
+    popd
 
 main: "main.zot"
 template: |

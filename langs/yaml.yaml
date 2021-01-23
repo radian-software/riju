@@ -9,6 +9,7 @@ install:
     - jq
   riju:
     - prettier
+    - yj
 
 main: "main.yaml"
 template: |

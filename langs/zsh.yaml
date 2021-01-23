@@ -8,6 +8,7 @@ monacoLang: shell
 install:
   apt:
     - zsh
+    - zsh-doc
 
 repl: |
   SHELL=/usr/bin/zsh zsh
