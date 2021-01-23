@@ -19,8 +19,9 @@ install:
 setup: |
   shopt -s dotglob; cp -R /opt/red/skel/* ./
 
+# https://github.com/red/red/issues/543#issuecomment-25404212
 repl: |
-  red
+  "$(which red)"
 input: |
   DELAY: 1
   123 * 234
@@ -32,4 +33,4 @@ template: |
   print "Hello, world!"
 
 run: |
-  red main.red; red
+  "$(which red)" main.red; "$(which red)"
