@@ -104,7 +104,6 @@ data "aws_iam_policy_document" "riju_debs" {
 
 resource "aws_s3_bucket" "riju_debs" {
   bucket = "${data.external.env.result.S3_BUCKET}-debs"
-  acl    = "public-read"
   tags   = local.tags
 }
 
