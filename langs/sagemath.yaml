@@ -6,79 +6,28 @@ name: "SageMath"
 install:
   prepare:
     apt:
-      # This list was produced by running ./configure and seeing what
-      # packages it told me to install.
-      - cmake
-      - coinor-cbc
-      - coinor-libcbc-dev
-      - curl
-      - fflas-ffpack
-      - flintqs
-      - gfan
-      - glpk-utils
-      - lcalc
-      - libboost-dev
-      - libbraiding-dev
-      - libcdd-dev
-      - libcdd-tools
-      - libcurl4-openssl-dev
-      - libfile-slurp-perl
-      - libfreetype6-dev
-      - libgd-dev
-      - libgiac-dev
-      - libgivaro-dev
-      - libglpk-dev
-      - libgsl-dev
-      - libiml-dev
-      - libisl-dev
-      - libjson-perl
-      - liblfunction-dev
-      - liblrcalc-dev
-      - libm4rie-dev
-      - libmongodb-perl
-      - libmpfi-dev
-      - libnauty-dev
-      - libpcre3-dev
-      - libperl-dev
-      - libplanarity-dev
-      - libppl-dev
-      - librw-dev
-      - libssl-dev
-      - libsuitesparse-dev
-      - libsvg-perl
-      - libsymmetrica2-dev
-      - libterm-readkey-perl
-      - libterm-readline-gnu-perl
-      - libterm-readline-gnu-perl
-      - libxml-libxslt-perl
-      - libxml-writer-perl
-      - libxml2-dev
-      - libzmq3-dev
-      - libzn-poly-dev
-      - nauty
-      - ninja-build
-      - openssl
-      - palp
-      - pandoc
-      - pari-gp2c
-      - planarity
-      - ppl-dev
-      - r-base-dev
-      - r-cran-lattice
-      - sympow
-      - tachyon
-      - xcas
-      - yasm
+      - python2
+  apt:
+    - libpng16-16
+    - libfreetype6
   manual: |
-    file="$(curl -fsSL https://mirrors.mit.edu/sage/src/index.html | grep -Eo 'sage-[0-9.]+\.tar\.gz' | sort -rV | head -n1)"
-    wget "https://mirrors.mit.edu/sage/src/${file}" -O sage.tar.gz
-    mkdir sage
-    tar -xf sage.tar.gz -C sage --strip-components=1
+    install -d "${pkg}/opt/sagemath"
+    install -d "${pkg}/usr/local/bin"
 
-    pushd sage
-    ./configure --prefix="${pkg}/usr/local"
-    make
-    popd
+    file="$(curl -fsSL https://mirrors.mit.edu/sage/linux/64bit/index.html | grep -Eo 'sage-[^"]+\.tar\.bz2' | grep Ubuntu | sort -rV | head -n1)"
+    wget "https://mirrors.mit.edu/sage/linux/64bit/${file}" -O sage.tar.bz2
+
+    sudo mkdir /opt/sagemath
+    sudo chown riju:riju /opt/sagemath
+    tar -xf sage.tar.bz2 -C /opt/sagemath --strip-components=1
+
+    python2 /opt/sagemath/relocate-once.py
+
+    shopt -s dotglob
+    mv /opt/sagemath/* "${pkg}/opt/sagemath/"
+    sudo rmdir /opt/sagemath
+
+    ln -s /opt/sagemath/sage "${pkg}/usr/local/bin/"
 
 repl: |
   sage
