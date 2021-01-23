@@ -15,4 +15,6 @@ jobs:
       image: ubuntu-2004:202010-01
     steps:
       - checkout
-      - run: tools/ci-bootstrap.bash
+      - run:
+          command: tools/ci-bootstrap.bash
+          no_output_timeout: 1h
