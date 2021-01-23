@@ -75,15 +75,11 @@ pkg-debug:
 	@: $${L} $${T}
 	$(MAKE_QUIETLY) pkg-build L=$(L) T=$(T) CMD=bash
 
-ifneq (,$(Z))
-NO_COMPRESS :=
-else
-NO_COMPRESS := -Znone
-endif
+Z ?= none
 
 pkg-deb:
 	@: $${L} $${T}
-	fakeroot dpkg-deb --build $(NO_COMPRESS) $(BUILD)/pkg $(BUILD)/$(DEB)
+	fakeroot dpkg-deb --build -Z$(Z) $(BUILD)/pkg $(BUILD)/$(DEB)
 
 pkg: pkg-clean pkg-build pkg-deb
 
