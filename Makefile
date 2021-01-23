@@ -27,11 +27,11 @@ help:
 	@echo "usage:"
 	@echo
 	@cat Makefile | \
-		grep -E '^[^.:[:space:]]+:|[#]##' | \
+		grep -E '^[^.:[:space:]]+:|[#]#' | \
 		sed -E 's/([^.:[:space:]]+):.*/  make \1/' | \
-		sed -E 's/[#]## *(.+)/\n    (\1)\n/'
+		sed -E 's/[#][#]# *(.+)/\n    (\1)\n/'
 
-### Build artifacts locally
+### Build packaging scripts
 
 ifneq ($(NC),)
 NO_CACHE := --no-cache
@@ -62,6 +62,8 @@ scripts:
 all-scripts:
 	node tools/write-all-build-scripts.js
 
+### Run packaging scripts
+
 pkg-clean:
 	@: $${L} $${T}
 	rm -rf $(BUILD)/src $(BUILD)/pkg
@@ -87,16 +89,18 @@ pkgs:
 	@: $${L}
 	node tools/make-foreach.js --types pkg L=$(L)
 
-repkg: script
+### Install packages
+
+install:
 	@: $${L} $${T}
-	$(MAKE_QUIETLY) shell I=packaging CMD="make pkg L=$(L) T=$(T)"
-	ctr="$$(docker container ls -f label="riju-install-target=yes" -l -q)"; test "$${ctr}" || (echo "no valid container is live"; exit 1); docker exec "$${ctr}" make install L=$(L) T=$(T)
+	if [[ -z "$$(ls -A /var/lib/apt/lists)" ]]; then sudo apt update; fi
+	DEBIAN_FRONTEND=noninteractive sudo -E apt reinstall -y ./$(BUILD)/$(DEB)
 
-repkgs:
+installs:
 	@: $${L}
-	node tools/make-foreach.js --types repkg L=$(L)
+	node tools/make-foreach.js --types install L=$(L)
 
-### Manipulate artifacts inside Docker
+### Orchestrate Docker containers
 
 VOLUME_MOUNT ?= $(PWD)
 
@@ -123,14 +127,14 @@ else
 	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
 endif
 
-install:
+repkg: script
 	@: $${L} $${T}
-	if [[ -z "$$(ls -A /var/lib/apt/lists)" ]]; then sudo apt update; fi
-	DEBIAN_FRONTEND=noninteractive sudo -E apt reinstall -y ./$(BUILD)/$(DEB)
+	$(MAKE_QUIETLY) shell I=packaging CMD="make pkg L=$(L) T=$(T)"
+	ctr="$$(docker container ls -f label="riju-install-target=yes" -l -q)"; test "$${ctr}" || (echo "no valid container is live"; exit 1); docker exec "$${ctr}" make install L=$(L) T=$(T)
 
-installs:
+repkgs:
 	@: $${L}
-	node tools/make-foreach.js --types install L=$(L)
+	node tools/make-foreach.js --types repkg L=$(L)
 
 ### Build and run application code
 
@@ -156,6 +160,8 @@ build: frontend system
 
 dev:
 	$(MAKE_QUIETLY) -j3 frontend-dev system-dev server-dev
+
+### Application tools
 
 test:
 	node backend/test-runner.js $(F)
