@@ -66,6 +66,7 @@ unzip
 # basic utilities
 bind9-dnsutils
 git
+htop
 jq
 less
 man

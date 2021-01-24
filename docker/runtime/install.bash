@@ -117,6 +117,7 @@ dctrl-tools
 bind9-dnsutils
 less
 git
+htop
 jq
 make
 man
