@@ -1,7 +1,7 @@
 FROM riju:compile AS compile
 FROM riju:composite
 
-ENTRYPOINT ["/usr/local/sbin/my_init"]
+ENTRYPOINT ["/usr/local/sbin/my_init", "--quiet", "--"]
 RUN useradd -p '!' -m -l -s /usr/bin/bash riju
 
 WORKDIR /src
