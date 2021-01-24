@@ -17,4 +17,4 @@ jobs:
       - checkout
       - run:
           command: tools/ci-bootstrap.bash
-          no_output_timeout: 1h
+          no_output_timeout: 2h
