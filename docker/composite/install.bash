@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+shard="$1"
+
 function riju-curl {
     curl -fsSL "localhost:8487$1"
 }
@@ -17,13 +19,8 @@ export DEBIAN_FRONTEND=noninteractive
 
 apt-get update
 
-riju-curl /shared | while read lang; do
-    riju-apt-install "/fs/build/shared/${lang}/riju-shared-${lang}.deb"
-done
-
-riju-curl /langs | while read lang; do
-    riju-apt-install "/fs/build/lang/${lang}/riju-lang-${lang}.deb"
-    riju-apt-install "/fs/build/config/${lang}/riju-config-${lang}.deb"
+riju-curl "/shard/${shard}" | while read path; do
+    riju-apt-install "/fs/${path}"
 done
 
 rm -rf *.deb
