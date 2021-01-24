@@ -25,7 +25,7 @@ MAKE_QUIETLY := MAKELEVEL= make
 
  all: help
 
-### Build packaging scripts
+### Docker management
 
 ifneq ($(NC),)
 NO_CACHE := --no-cache
@@ -45,6 +45,48 @@ else ifneq (,$(filter $(I),admin ci))
 else
 	hash="$$(node tools/hash-dockerfile.js $(I) | grep .)"; docker build . -f docker/$(I)/Dockerfile -t riju:$(I) --label riju.image-hash="$${hash}" $(NO_CACHE)
 endif
+
+VOLUME_MOUNT ?= $(PWD)
+
+P1 ?= 6119
+P2 ?= 6120
+
+ifneq (,$(E))
+SHELL_PORTS := -p 127.0.0.1:$(P1):6119 -p 127.0.0.1:$(P2):6120
+else
+SHELL_PORTS :=
+endif
+
+SHELL_ENV := -e Z -e CI -e TEST_PATIENCE -e TEST_CONCURRENCY
+
+shell: # I=<shell> [E=1] [P1|P2=<port>] : Launch Docker image with shell
+	@: $${I}
+ifneq (,$(filter $(I),admin ci))
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.ssh:/var/riju/.ssh -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) --network host riju:$(I) $(BASH_CMD)
+else ifneq (,$(filter $(I),compile app))
+	docker run -it --rm --hostname $(I) $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
+else ifneq (,$(filter $(I),runtime composite))
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src --label riju-install-target=yes $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
+else
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
+endif
+
+## This is equivalent to 'make pkg' in a fresh packaging container
+## followed by 'make install' in a persistent runtime container.
+
+repkg: script # L=<lang> T=<type> : Build fresh .deb and install into live container
+	@: $${L} $${T}
+	$(MAKE_QUIETLY) shell I=packaging CMD="make pkg L=$(L) T=$(T)"
+	ctr="$$(docker container ls -f label="riju-install-target=yes" -l -q)"; test "$${ctr}" || (echo "no valid container is live"; exit 1); docker exec "$${ctr}" make install L=$(L) T=$(T)
+
+## This is equivalent to 'make repkg T=lang', 'make repkg T=config'.
+## For shared dependencies, use 'make repkg T=shared' directly.
+
+repkgs: # L=<lang> : Build and install fresh lang and config .debs
+	@: $${L}
+	node tools/make-foreach.js --types repkg L=$(L)
+
+### Build packaging scripts
 
 script: # L=<lang> T=<type> : Generate a packaging script
 	@: $${L} $${T}
@@ -112,48 +154,6 @@ install: # L=<lang> T=<type> : Install built .deb
 installs: # L=<lang> : Install both lang and config .debs
 	@: $${L}
 	node tools/make-foreach.js --types install L=$(L)
-
-### Orchestrate Docker containers
-
-VOLUME_MOUNT ?= $(PWD)
-
-P1 ?= 6119
-P2 ?= 6120
-
-ifneq (,$(E))
-SHELL_PORTS := -p 127.0.0.1:$(P1):6119 -p 127.0.0.1:$(P2):6120
-else
-SHELL_PORTS :=
-endif
-
-SHELL_ENV := -e Z -e CI -e TEST_PATIENCE -e TEST_CONCURRENCY
-
-shell: # I=<shell> [E=1] [P1|P2=<port>] : Launch Docker image with shell
-	@: $${I}
-ifneq (,$(filter $(I),admin ci))
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.ssh:/var/riju/.ssh -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) --network host riju:$(I) $(BASH_CMD)
-else ifneq (,$(filter $(I),compile app))
-	docker run -it --rm --hostname $(I) $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
-else ifneq (,$(filter $(I),runtime composite))
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src --label riju-install-target=yes $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
-else
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
-endif
-
-## This is equivalent to 'make pkg' in a fresh packaging container
-## followed by 'make install' in a persistent runtime container.
-
-repkg: script # L=<lang> T=<type> : Build fresh .deb and install into live container
-	@: $${L} $${T}
-	$(MAKE_QUIETLY) shell I=packaging CMD="make pkg L=$(L) T=$(T)"
-	ctr="$$(docker container ls -f label="riju-install-target=yes" -l -q)"; test "$${ctr}" || (echo "no valid container is live"; exit 1); docker exec "$${ctr}" make install L=$(L) T=$(T)
-
-## This is equivalent to 'make repkg T=lang', 'make repkg T=config'.
-## For shared dependencies, use 'make repkg T=shared' directly.
-
-repkgs: # L=<lang> : Build and install fresh lang and config .debs
-	@: $${L}
-	node tools/make-foreach.js --types repkg L=$(L)
 
 ### Build and run application code
 
