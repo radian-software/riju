@@ -28,7 +28,9 @@ app.get("/", (_, res) => {
       analyticsEnabled,
     });
   } else {
-    res.send(503, "Encountered unexpected error while loading languages\n");
+    res
+      .status(503)
+      .send("Encountered unexpected error while loading languages\n");
   }
 });
 for (const [lang, { aliases }] of Object.entries(langs)) {
@@ -49,7 +51,7 @@ app.get("/:lang", (req, res) => {
   }
   const canonical = aliases[lang];
   if (!canonical) {
-    res.send(404, `No such language: ${lang}\n`);
+    res.status(404).send(`No such language: ${lang}\n`);
   } else if (canonical !== lang) {
     res.redirect(301, `/${canonical}`);
     return;
