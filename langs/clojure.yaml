@@ -35,10 +35,11 @@ install:
     - clojure
   manual: |
     install -d "${pkg}/usr/local/bin"
+
     ver="$(latest_release snoe/clojure-lsp)"
     wget "https://github.com/snoe/clojure-lsp/releases/download/${ver}/clojure-lsp"
     chmod +x clojure-lsp
-    mv clojure-lsp "${pkg}/usr/local/bin/"
+    cp clojure-lsp "${pkg}/usr/local/bin/"
 
 repl: |
   clojure
