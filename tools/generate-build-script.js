@@ -99,6 +99,7 @@ fi`);
         parts.push(`\
 install -d "\${pkg}/usr/local/bin"
 pip3 install "${basename}" --prefix "\${pkg}/opt/${basename}"
+find "\${pkg}/opt/${basename}" -name __pycache__ -exec rm -rf '{}' ';' -prune
 
 if [[ -d "\${pkg}/opt/${basename}/bin" ]]; then
     ls "\${pkg}/opt/${basename}/bin" | while read name; do
