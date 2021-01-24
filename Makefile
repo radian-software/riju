@@ -218,7 +218,7 @@ pull: # I=<image> : Pull last published Riju image from Docker Hub
 download: # L=<lang> T=<type> : Download last published .deb from S3
 	@: $${L} $${T} $${S3_BUCKET}
 	mkdir -p $(BUILD)
-	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB)
+	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB) --no-sign-request
 
 plan: # Display plan to pull/rebuild outdated or missing artifacts
 	node tools/plan-publish.js
