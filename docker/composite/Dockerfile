@@ -14,3 +14,5 @@ RUN /tmp/install.bash 6
 RUN /tmp/install.bash 7
 RUN /tmp/install.bash 8
 RUN /tmp/install.bash 9
+
+RUN rm /tmp/install.bash

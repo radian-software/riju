@@ -10,7 +10,7 @@ function riju-curl {
 
 function riju-apt-install {
     riju-curl "$1" > "$(basename "$1")"
-    apt-get reinstall -y "./$(basename "$1")"
+    apt-get install -y "./$(basename "$1")"
 }
 
 pushd /tmp
@@ -27,5 +27,3 @@ rm -rf *.deb
 rm -rf /var/lib/apt/lists/*
 
 popd
-
-rm "$0"
