@@ -35,8 +35,8 @@ function getEnv({ uid, uuid }) {
   return {
     HOME: cwd,
     HOSTNAME: "riju",
-    LANG: process.env.LANG || "",
-    LC_ALL: process.env.LC_ALL || "",
+    LANG: "C.UTF-8",
+    LC_ALL: "C.UTF-8",
     LOGNAME: username,
     PATH: path.join(":"),
     PWD: cwd,
