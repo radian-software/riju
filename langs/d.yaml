@@ -6,7 +6,7 @@ name: "D"
 install:
   prepare:
     manual: |
-      file="$(curl -fsSL https://dlang.org/download.html | grep -Eo '"http://[^"]+amd64.deb"' | grep -v pre-release | tr -d '"')"
+      file="$(curl -fsSL https://dlang.org/download.html | grep -Eo '"https://[^"]+amd64.deb"' | grep -v pre-release | tr -d '"')"
       wget "${file}" -O dmd.deb
       sudo apt-get install -y ./dmd.deb
   manual: |
