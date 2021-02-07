@@ -30,8 +30,8 @@ example a binary intended for `/usr/local/bin/prettier` would be
 placed at `${pkg}/usr/local/bin/prettier`. Then the `${pkg}` directory
 can be turned into a `.deb`, which can be installed on any system.
 
-*If you have trouble, see the tutorial on [debugging package
-installation](install-debugging.md).*
+**If you have trouble, see the tutorial on [debugging package
+installation](install-debugging.md).**
 
 ## Download a binary or script
 

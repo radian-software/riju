@@ -120,8 +120,8 @@ completes, you should see your language at <http://localhost:6119>.
 Furthermore, you can switch to the runtime image (`control-b n`) and
 run `make sandbox L=mylanguage` to test your language at the command
 line (e.g. type `run` to print `Hello, world!`). Each time you modify
-the language configuration, run `make repkgs` to reinstall the
-language.
+the language configuration, run `make repkgs L=mylanguage` to
+reinstall the language.
 
 Follow these steps to augment your language configuration:
 
