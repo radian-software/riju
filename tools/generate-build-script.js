@@ -31,7 +31,7 @@ function makeLangScript(langConfig, isShared) {
   ) {
     parts.push(`\
 export DEBIAN_FRONTEND=noninteractive
-sudo -E apt-get update`);
+sudo --preserve-env=DEBIAN_FRONTEND apt-get update`);
   }
   if (install) {
     const {
@@ -52,17 +52,17 @@ sudo -E apt-get update`);
       const { apt, npm, opam, manual } = prepare;
       if (apt && apt.length > 0) {
         parts.push(`\
-sudo -E apt-get install -y ${apt.join(" ")}`);
+sudo --preserve-env=DEBIAN_FRONTEND apt-get install -y ${apt.join(" ")}`);
       }
       if (npm && npm.length > 0) {
         parts.push(`\
-sudo -E npm install -g ${npm.join(" ")}`);
+sudo npm install -g ${npm.join(" ")}`);
       }
       if (opam && opam.length > 0) {
         parts.push(`\
-sudo -E opam init -n --disable-sandboxing --root /opt/opam
-sudo -E opam install "${opam.join(" ")}" -y --root /opt/opam
-sudo -E ln -s /opt/opam/default/bin/* /usr/local/bin/`);
+sudo opam init -n --disable-sandboxing --root /opt/opam
+sudo opam install "${opam.join(" ")}" -y --root /opt/opam
+sudo ln -s /opt/opam/default/bin/* /usr/local/bin/`);
       }
       if (manual) {
         parts.push(manual);
