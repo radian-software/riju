@@ -8,6 +8,8 @@ install:
     - libaio1
     - libtinfo5
     - mysql-client
+  riju:
+    - sqls
   manual: |
     install -d "${pkg}/opt/mariadb"
 
@@ -41,3 +43,10 @@ run: |
       sleep 0.01
   done
   (mysql --socket=socket < main.sql; mysql --socket=socket)
+
+lsp:
+  start: |
+    sqls
+
+skip:
+  - lsp

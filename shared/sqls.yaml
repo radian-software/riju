@@ -9,5 +9,5 @@ install:
 
     export GO111MODULE=on
     export GOPATH="$PWD/go"
-    go get github.com/lighttiger2505/sqls
+    go get github.com/lighttiger2505/sqls@master
     cp go/bin/sqls "${pkg}/usr/local/bin/"
