@@ -8,8 +8,8 @@ install:
     install -d "${pkg}/opt/red/skel"
     install -d "${pkg}/usr/local/bin"
 
-    path="$(curl -fsSL http://static.red-lang.org/download.html | grep -Eo '/dl/linux/[^"]+' | head -n1)"
-    wget "http://static.red-lang.org${path}" -O red
+    path="$(curl -fsSL https://static.red-lang.org/download.html | grep -Eo '/dl/linux/[^"]+' | head -n1)"
+    wget "https://static.red-lang.org${path}" -O red
     chmod +x red
     cp red "${pkg}/usr/local/bin/"
 
