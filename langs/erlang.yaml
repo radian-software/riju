@@ -10,7 +10,6 @@ install:
       - erlang-dev
   apt:
     - erlang-nox
-    - libodbc1  # workaround bug in APT
   manual: |
     install -d "${pkg}/usr/local/bin"
 
