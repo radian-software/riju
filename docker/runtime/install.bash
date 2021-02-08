@@ -86,6 +86,24 @@ deb [arch=amd64] https://cloud.r-project.org/bin/linux/ubuntu ${ubuntu_name}-${c
 deb [arch=amd64] https://dl.yarnpkg.com/debian/ stable main
 EOF
 
+# Work around brutal packaging error courtesy of Microsoft.
+# Unfortunately, the Microsoft repo includes a duplicate version of
+# the libodbc1 package whose version is not in sync with the one
+# shipped by the corresponding release of Ubuntu. If this one happens
+# to be newer, then it'll cause a horrifyingly difficult to diagnose
+# error later on while building the composite image because there's a
+# conflict between the default-available versions of libodbc1 and
+# libodbc1:i386, which surfaces as an inability to install
+# dependencies for Erlang. Thanks Microsoft. Please don't. Anyway,
+# solution is to pin this repository at a lower priority than the
+# Ubuntu standard packages, so the correct version of libodbc1 gets
+# installed by default.
+tee -a /etc/apt/preferences.d/riju >/dev/null <<EOF
+Package: *
+Pin: origin packages.microsoft.com
+Pin-Priority: 1
+EOF
+
 apt-get update
 apt-get install -y dctrl-tools
 

@@ -2,6 +2,9 @@
 
 set -euxo pipefail
 
+# See install.bash for the runtime image for much of the same, but
+# with more comments.
+
 mkdir /tmp/riju-work
 pushd /tmp/riju-work
 
@@ -35,6 +38,12 @@ tee -a /etc/apt/sources.list.d/custom.list >/dev/null <<EOF
 deb [arch=amd64] https://downloads.ceylon-lang.org/apt/ unstable main
 deb [arch=amd64] https://deb.nodesource.com/${node_repo} ${ubuntu_name} main
 deb [arch=amd64] https://dl.yarnpkg.com/debian/ stable main
+EOF
+
+tee -a /etc/apt/preferences.d/riju >/dev/null <<EOF
+Package: *
+Pin: origin packages.microsoft.com
+Pin-Priority: 1
 EOF
 
 packages="
