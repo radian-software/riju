@@ -7,14 +7,11 @@ aliases:
 name: "எழில்"
 
 install:
-  manual: |
-    install -d "${pkg}/opt/ezhil"
-    install -d "${pkg}/usr/local/bin"
-
-    wget https://github.com/raxod502/riju-cdn/releases/download/ezhil-2017.08.19/ezhil.tar.gz
-    tar -xf ezhil.tar.gz -C "${pkg}/opt/ezhil" --strip-components=2
-    cp "${pkg}/opt/ezhil/ezhili" "${pkg}/opt/ezhil/ezhuthi/"
-    ln -s /opt/ezhil/ezhuthi/ezhili "${pkg}/usr/local/bin/"
+  pip:
+    - ezhil
+  manual:
+    # https://github.com/Ezhil-Language-Foundation/Ezhil-Lang/issues/210
+    sed -i 's/clock,//' "${pkg}"/opt/ezhil/lib/*/site-packages/ezhil/ezhil.py
 
 repl: |
   ezhili
