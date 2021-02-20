@@ -139,6 +139,7 @@ htop
 jq
 make
 man
+moreutils
 psmisc
 ripgrep
 strace
