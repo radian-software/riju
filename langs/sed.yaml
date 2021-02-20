@@ -13,4 +13,4 @@ template: |
 
 run: |
   echo 'Reading from stdin...' >&2; sed -f main.sed
-helloInput: |
+helloInput: ""
