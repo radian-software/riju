@@ -19,6 +19,11 @@ install:
     cp common.ktn "${pkg}/opt/kitten/"
     popd
 
+    pat="$(strings "${pkg}/usr/local/bin/kitten" | grep share | tr -d '\n' | xxd -p | tr -d '\n')"
+    repl="$(echo -n /opt/kitten | xxd -p | tr -d '\n')"
+    repl="$(printf "%-$(echo -n "${pat}" | wc -c)s" "${repl}" | sed 's/ /0/g')"
+    cat "${pkg}/usr/local/bin/kitten" | xxd -p | tr -d '\n' | sed "s/${pat}/${repl}/g" | xxd -p -r | sponge "${pkg}/usr/local/bin/kitten"
+
 repl: |
   kitten
 input: |
