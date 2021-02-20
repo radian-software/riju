@@ -38,6 +38,8 @@ run: |
 lsp:
   start: |
     sqls
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

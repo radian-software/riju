@@ -54,6 +54,8 @@ pkg:
 lsp:
   start: |
     solargraph stdio
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - repl

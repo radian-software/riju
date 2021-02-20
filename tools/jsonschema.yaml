@@ -1,0 +1,899 @@
+# https://json-schema.org/draft/2019-09/json-schema-validation.html
+# https://tools.ietf.org/html/draft-handrews-json-schema-02
+
+$schema: "http://json-schema.org/draft/2019-09/schema#"
+type: object
+additionalProperties: false
+required: [id, name, main, template, run]
+properties:
+
+  id:
+    title: "Canonical language ID"
+    description: |
+      This is a short unique identifier for the language. It should be
+      the full name, unabbreviated, but stripped of punctuation
+      (except pluses) and all lowercase. ASCII only. The canonical
+      language ID appears in URLs, e.g. <https://riju.codes/python>.
+
+      Canonical language IDs shouldn't include version numbers, and
+      they should not reference the implementation or compiler being
+      used. They should refer only to the abstract language being
+      implemented, e.g. 'python' instead of 'python3' or 'cpython'. In
+      some cases such as 'parser3', the language name actually does
+      include a version number, but this is unusual.
+    type: string
+    pattern: "^[a-z0-9+]+$"
+    examples:
+      - "python"
+      - "c++"
+      - "x86"
+      - "objectivec"
+      - "fsharp"
+  aliases:
+    title: "Language ID aliases"
+    description: |
+      Aliases are basically non-canonical language IDs. Specifying an
+      alias 'python3' for language 'python', for example, will set up
+      a URL redirect from <https://riju.codes/python3> to
+      <https://riju.codes/python>. Typically, common extensions are
+      set up as aliases as well, such as 'py' for 'python'. (But only
+      one language can have a given alias, so if there is a conflict
+      then resolve it in favor of the more popular/recognized
+      language.)
+    type: array
+    items:
+      type: string
+      minLength: 1
+  name:
+    title: "Language display name"
+    description: |
+      Human-readable, properly punctuated, canonical version of the
+      language name. Like 'id', the 'name' shouldn't include version
+      numbers or reference the implementation or compiler. The display
+      name is basically just a prettier version of the canonical
+      identifier. However, display names can use the full space of
+      Unicode, so foreign programming languages should be rendered in
+      their native alphabets.
+    type: string
+    minLength: 1
+    examples:
+      - "Python"
+      - "C++"
+      - "x86"
+      - "Objective-C"
+      - "F#"
+  monacoLang:
+    title: "Monaco language ID"
+    description: |
+      Language ID to pass to Monaco for syntax highlighting, see:
+      <https://github.com/microsoft/monaco-languages/tree/master/src>.
+
+      This is optional because most languages don't have syntax
+      highlighting support yet.
+    type: string
+    pattern: "^[a-z0-9-]+$"
+    examples:
+      - python
+      - cpp
+      - objective-c
+
+  info:
+    type: object
+    additionalProperties: false
+    required:
+      - year
+      - desc
+      - ext
+      - web
+      - category
+      - mode
+      - platform
+      - syntax
+      - typing
+      - paradigm
+      - usage
+    properties:
+      impl:
+        title: "Implementation name"
+        description: |
+          If there are multiple available implementations of the
+          language runtime or compiler, the name of the one used on
+          Riju.
+        type: string
+        minLength: 1
+        examples:
+          - "CPython"
+          - "GNU Bash"
+          - "ATS2/Postiats"
+          - "Pandoc"
+      version:
+        title: "Language version"
+        description: |
+          Major version of the language, if there are multiple. This
+          is not the full version number, which might change every
+          time a language is rebuilt. It only applies to the case
+          where there are meaningfully different dialects of a
+          language with distinct, widely recognizable version numbers.
+        type: string
+        minLength: 1
+        examples:
+          - "Python 3"
+          - "C++20"
+          - "COBOL 2014"
+      year:
+        title: "Year of initial release"
+        description: |
+          The year when the language was first available in some form.
+          This information is frequently available on Wikipedia in the
+          sidebar.
+        type: integer
+        minimum: 1900
+        maximum: 2100
+      desc:
+        title: "Language description"
+        description: |
+          One-sentence description of the distinguishing features of
+          the language. Typically can be copied from Wikipedia or the
+          programming language's website. No trailing period.
+        type: string
+        pattern: "[^.]$"
+        examples:
+          - "Interpreted, high-level, general-purpose programming language"
+          - "Compiler for Clojure that targets JavaScript"
+          - "Popular RISC architecture used in mobile devices"
+          - "Two-dimensional esoteric programming language invented in 1993 by Chris Pressey with the goal of being as difficult to compile as possible"
+      ext:
+        definitions:
+          ext:
+            title: "File extension"
+            description: |
+              A file extension used for files written in the given
+              language (no leading period). The list should typically
+              include the file extension used for 'main', although it
+              may not in extreme cases (e.g. Confluence, which
+              *really* doesn't have a standard extension).
+            type: string
+            pattern: "^[a-zA-Z0-9]+$"
+            examples:
+              - py
+              - cljs
+              - chef
+              - S
+        anyOf:
+          - ref: "#/properties/info/properties/ext/definitions/ext"
+          - type: array
+            items:
+              ref: "#/properties/info/properties/ext/definitions/ext"
+      web:
+        type: object
+        additionalProperties: false
+        required: [source]
+        properties:
+          wiki:
+            title: "Link to Wikipedia"
+            description: |
+              The language's Wikipedia page, if it has one.
+            type: string
+            pattern: "^https://en\\.wikipedia\\.org/wiki/[^/]+$"
+            examples:
+              - "https://en.wikipedia.org/wiki/Python_(programming_language)"
+              - "https://en.wikipedia.org/wiki/C%2B%2B"
+              - "https://en.wikipedia.org/wiki/ARM_architecture"
+              - "https://en.wikipedia.org/wiki/Confluence_(software)"
+          esolang:
+            title: "Link to Esolang wiki"
+            description: |
+              The language's page on the Esolang wiki, if it has one.
+            type: string
+            pattern: "^https://esolangs\\.org/wiki/[^/]+$"
+            examples:
+              - "https://esolangs.org/wiki/Binary_lambda_calculus"
+          home:
+            title: "Link to official website"
+            description: |
+              The language's official website, if it has one. Note
+              that oftentimes ancient languages such as C and C++ will
+              not have an official website. (An official website for a
+              specific compiler or implementation of a language is not
+              the same as an official website for the language as a
+              whole; see the 'impl' key.)
+            type: string
+            pattern: "^https?://"
+            examples:
+              - "https://www.python.org/"
+              - "https://tromp.github.io/cl/Binary_lambda_calculus.html"
+              - "https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/windows-commands"
+          impl:
+            title: "Link to implementation website"
+            description: |
+              The website for the particular implementation Riju uses
+              for a language, if there is one. This shouldn't be a
+              GitHub link (see the 'source' key for that).
+            type: string
+            pattern: "^https?://"
+            examples:
+              - "https://gcc.gnu.org/"
+              - "https://sourceforge.net/projects/gnucobol/"
+              - "https://kiyuko.org/software/beef"
+              - "https://www.ioccc.org/2012/tromp/hint.html"
+          source:
+            definitions:
+              source:
+                title: "Link to language source code"
+                description: |
+                  Link to GitHub, SourceForge, etc. for the language
+                  implementation used on Riju. This can very
+                  occasionally be omitted in cases of freely available
+                  proprietary languages on Riju, such as Cmd.
+                type: string
+                pattern: "^https?://"
+                examples:
+                  - "https://github.com/python/cpython"
+                  - "https://sourceforge.net/p/gnucobol/_list/svn"
+                  - "https://jmvdveer.home.xs4all.nl/en.algol-68-genie.html"
+                  - "http://search.cpan.org/author/SMUELLER/Acme-Chef/"
+            anyOf:
+              - ref: "#/properties/info/properties/web/properties/source/definitions/source"
+              - const: null
+      category:
+        definitions:
+          category:
+            anyOf:
+              - const: assembly
+                description: |
+                  An assembly language.
+                examples:
+                  - "x86"
+                  - "arm"
+                  - "battlestar"
+              - const: config
+                description: |
+                  A language for writing configuration files.
+                examples:
+                  - "json"
+                  - "yaml"
+                  - "dhall"
+              - const: database
+                description: |
+                  A database scripting language.
+                examples:
+                  - "sqlite"
+                  - "mongodb"
+                  - "redis"
+              - const: editor
+                description: |
+                  A text editor scripting language.
+                examples:
+                  - "emacslisp"
+                  - "vimscript"
+                  - "teco"
+              - const: esoteric
+                description: |
+                  An esoteric programming language.
+                examples:
+                  - "brainf"
+                  - "befunge"
+                  - "chef"
+                  - "blc"
+              - const: general
+                description: |
+                  A general-purpose programming language. This
+                  category fits most languages that are not obviously
+                  something special.
+                examples:
+                  - "python"
+                  - "racket"
+                  - "ceylon"
+                  - "mumps"
+              - const: markup
+                description: |
+                  A language for typesetting text as opposed to data
+                  manipulation or more general programming facilities.
+                examples:
+                  - "markdown"
+                  - "org"
+                  - "tex"
+              - const: pure
+                description: |
+                  A language for pure data manipulation, with no
+                  input/output facilities.
+                examples:
+                  - "cat"
+              - const: shell
+                description: |
+                  A shell-scripting language.
+                examples:
+                  - "bash"
+                  - "fish"
+                  - "cmd"
+              - const: tool
+                description: |
+                  The control language for a command-line utility.
+                examples:
+                  - "sed"
+                  - "awk"
+                  - "jq"
+        anyOf:
+          - ref: "#/properties/info/properties/category/definitions/category"
+          - array:
+              items:
+                ref: "#/properties/info/properties/category/definitions/category"
+      mode:
+        definitions:
+          mode:
+            anyOf:
+              - const: compiled
+                description: |
+                  A language whose programs *can* be compiled to an
+                  executable. Data manipulation and markup languages
+                  are neither compiled nor interpreted: Although they
+                  produce a compiled artifact, it is not an
+                  executable.
+                examples:
+                  - "c"
+                  - "coffeescript"
+              - const: interpreted
+                description: |
+                  A language whose programs *can* be run without a
+                  preliminary compilation step.
+        anyOf:
+          - ref: "#/properties/info/properties/mode/definitions/mode"
+          - array:
+              items:
+                ref: "#/properties/info/properties/mode/definitions/mode"
+      platform:
+        definitions:
+          platform:
+            anyOf:
+              - const: bf
+                description: |
+                  A language that compiles to Brainfuck or runs under
+                  the Brainfuck model of execution.
+                examples:
+                  - "brainf"
+                  - "ook"
+                  - "pikachu"
+              - const: clr
+                description: |
+                  A language that runs on the Common Language Runtime
+                  (CLR).
+                examples:
+                  - "csharp"
+                  - "boo"
+                  - "entropy"
+                  - "visualbasic"
+              - const: js
+                description: |
+                  A language that is part of the JavaScript/Node.js
+                  ecosystem.
+                examples:
+                  - "javascript"
+                  - "clojurescript"
+                  - "haxe"
+              - const: jvm
+                description: |
+                  A language that runs on the Java Virtual Machine
+                  (JVM).
+                examples:
+                  - "java"
+                  - "clojure"
+                  - "groovy"
+              - const: python
+                description: |
+                  A language that is part of the Python ecosystem.
+                examples:
+                  - "python"
+                  - "hy"
+                  - "bython"
+              - const: windows
+                description: |
+                  A language that is clearly tied to the Windows
+                  "ecosystem" (or as some people might say, the
+                  Windows "hazardous waste zone").
+                examples:
+                  - "cmd"
+        anyOf:
+          - ref: "#/properties/info/properties/platform/definitions/platform"
+          - array:
+              items:
+                ref: "#/properties/info/properties/platform/definitions/platform"
+      syntax:
+        definitions:
+          syntax:
+            anyOf:
+              # TODO: fill in documentation
+              - const: assembly
+              - const: basic
+              - const: c
+              - const: golf
+              - const: haskell
+              - const: lisp
+              - const: pascal
+              - const: python
+              - const: text
+              - const: tokens
+
+              - const: 2d
+              - const: column
+              - const: extensible
+              - const: foreign
+              - const: symbol
+              - const: whitespace
+        anyOf:
+          - ref: "#/properties/info/properties/syntax/definitions/syntax"
+          - array:
+              items:
+                ref: "#/properties/info/properties/syntax/definitions/syntax"
+      typing:
+        definitions:
+          typing:
+            anyOf:
+              - const: static
+              - const: dynamic
+
+              - const: theorem
+
+              - const: float
+              - const: integer
+              - const: lambda
+              - const: string
+              - const: weak
+        anyOf:
+          - ref: "#/properties/info/properties/typing/definitions/typing"
+          - array:
+              items:
+                ref: "#/properties/info/properties/typing/definitions/typing"
+      paradigm:
+        definitions:
+          paradigm:
+            anyOf:
+              - const: array
+              - const: declarative
+              - const: functional
+              - const: imperative
+              - const: oo
+              - const: stack
+              - const: turing
+        anyOf:
+          - ref: "#/properties/info/properties/paradigm/definitions/paradigm"
+          - array:
+              items:
+                ref: "#/properties/info/properties/paradigm/definitions/paradigm"
+      usage:
+        definitions:
+          usage:
+            anyOf:
+              - const: abandoned
+              - const: personal
+              - const: popular
+        anyOf:
+          - ref: "#/properties/info/properties/usage/definitions/usage"
+          - array:
+              items:
+                ref: "#/properties/info/properties/usage/definitions/usage"
+
+  # TODO: fill in documentation
+  install:
+    type: object
+    additionalProperties: false
+    properties:
+      prepare:
+        type: object
+        additionalProperties: false
+        properties:
+          apt:
+            type: array
+            items:
+              type: string
+              minLength: 1
+          npm:
+            type: array
+            items:
+              type: string
+              minLength: 1
+          opam:
+            type: array
+            items:
+              type: string
+              minLength: 1
+          manual:
+            type: string
+            minLength: 1
+      apt:
+        type: array
+        items:
+          type: string
+          minLength: 1
+      riju:
+        type: array
+        items:
+          type: string
+          minLength: 1
+      npm:
+        type: array
+        items:
+          anyOf:
+            - type: string
+              minLength: 1
+            - type: object
+              additionalProperties: false
+              required: [name, arg]
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                arg:
+                  type: string
+                  minLength: 1
+      pip:
+        type: array
+        items:
+          type: string
+          minLength: 1
+      gem:
+        type: array
+        items:
+          type: string
+          minLength: 1
+      cpan:
+        type: array
+        items:
+          type: string
+          minLength: 1
+      opam:
+        type: array
+        items:
+          anyOf:
+            - type: string
+              minLength: 1
+            - type: object
+              additionalProperties: false
+              required: [name, binaries]
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                source:
+                  type: string
+                  minLength: 1
+                binaries:
+                  type: array
+                  items:
+                    type: string
+                    minLength: 1
+      files:
+        type: object
+      scripts:
+        type: object
+      manual:
+        type: string
+        minLength: 1
+      deb:
+        type: array
+        items:
+          type: string
+          pattern: "\\.deb$"
+      depends:
+        type: object
+        additionalProperties: false
+        properties:
+          strip:
+            type: array
+            items:
+              type: string
+              minLength: 1
+          unpin:
+            type: array
+            items:
+              type: string
+              minLength: 1
+      disallowCI:
+        type: boolean
+        default: false
+
+  daemon:
+    title: "Persistent background daemon"
+    description: |
+      Shell command to run in the background when opening a new
+      language session, for example to set up a daemon in the case
+      that the language operates using a client-server model. You
+      might think this would be used for database languages, but
+      typically we start the database in the "run" command since we
+      want to kick it over every time the code is run. Currently it
+      has no uses; the keyword was introduced while investigating
+      whether Dockerfile could be supported on Riju.
+    type: string
+    minLength: 1
+  setup:
+    title: "Initial setup command"
+    description: |
+      Shell command to run synchronously when opening a new language
+      session, before allowing any further operations to proceed. This
+      should have no chance of failing.
+
+      The typical usage of this command is to copy a previously
+      prepared skeleton directory into the new session folder.
+    type: string
+    minLength: 1
+
+  repl:
+    title: "REPL command"
+    description: |
+      Shell command to run an interactive session with the language
+      interpreter, with no input loaded from the 'main' file.
+    type: string
+    minLength: 1
+  input:
+    title: "REPL input for 'repl' and 'runrepl' tests"
+    description: |
+      By default the 'repl' and 'runrepl' tests operate by entering
+      '123 * 234' into the REPL and sending a newline, expecting to
+      receive '28782' as output. This key, if specified, overrides the
+      input value.
+
+      This value can be multiline if multiple lines need to be entered
+      into the REPL to perform a calculation. A line can be of the
+      form 'DELAY: n' where n is an integer, to insert a delay of n
+      seconds before sending the next line of input.
+
+      This can be overridden further by the 'runReplInput' key.
+    type: string
+    minLength: 1
+    default: |
+      123 * 234
+  output:
+    title: "Expected REPL output for 'repl' and 'runrepl' tests"
+    description: |
+      See the 'input' detail for more context. This key overrides the
+      expected output string for the 'repl' and 'runrepl' tests. It
+      can be multiline to expect multiple lines of output.
+    type: string
+    minLength: 1
+    default: |
+      28782
+
+  main:
+    title: "Filename in which to write user code for execution"
+    description: |
+      Name of file to write user code. This can include path
+      separators if needed, although it's uncommon. Typically it's
+      just 'main' (or 'Main') with a standard file extension,
+      depending on the conventions of the language.
+
+      Occasionally languages (mostly shells, but there are some other
+      hacks related to variable scoping) won't be able to load code
+      from an arbitrary file properly, and you have to set a main
+      filename that corresponds to a profile or 'rc' file.
+    type: string
+    minLength: 1
+    examples:
+      - "main.py"
+      - "Main.java"
+      - "src/Main.purs"
+      - ".zshrc"
+  template:
+    title: 'Default user code printing "Hello, world!"'
+    description: |
+      Default code to populate in the Riju code editor. When run, this
+      should print exactly the text "Hello, world!" with a trailing
+      newline, to stdout. If that's not feasible for whatever reason,
+      it should do the most similar thing that can be managed.
+    type: string
+    minLength: 1
+  prefix:
+    title: "Code to prepend to user code before running"
+    description: |
+      If this is provided, then its value (plus a following newline)
+      is silently prepended to the user-submitted code before it is
+      written to the 'main' file. This can be used to configure the
+      environment in ways that can't be done via environment variables
+      or command-line options, and which would not normally be needed
+      except to account for the Riju environment.
+    type: string
+    minLength: 1
+  suffix:
+    title: "Code to append to user code before running"
+    description: |
+      If this is provided, then its value (plus a preceding newline)
+      is silently appended to the user-submitted code before it is
+      written to the 'main' file. This can be used to set up a
+      debugger or perform other hackery to make the language work
+      nicely with the Riju environment.
+    type: string
+    minLength: 1
+  createEmpty:
+    title: "Overwrite the 'main' file when executing 'repl' command"
+    description: |
+      Normally, the 'template' code is immediately written into the
+      'main' file at session start. This is to satisfy various
+      language servers which expect files to actually exist on disk
+      before they can be analyzed. The 'createEmpty' option overrides
+      this, so that the value of the option (typically an empty
+      string) will be written to the 'main' file instead.
+
+      This is to account for languages such as Zsh, where 'main' has
+      to be set to '.zshrc', which would result in the 'repl' command
+      executing the 'template' code just like the 'run' command if it
+      were not for the 'createEmpty' option.
+    type: string
+    examples:
+      - ""
+
+  compile:
+    title: "Compilation command"
+    description: |
+      Shell command to compile the 'main' file into an object file or
+      executable, if the language has a compilation step.
+    type: string
+    minLength: 1
+  run:
+    title: "Run command"
+    description: |
+      Command to execute the 'main' file (or whatever the 'main' file
+      was compiled into, if 'compile' was provided) and then start an
+      interactive session, preferably with all local variables from
+      the 'main' file still in scope.
+    type: string
+    minLength: 1
+  helloInput:
+    title: "Program input for 'run' test"
+    description: |
+      By default the 'run' test operates by simply running the
+      'template' code and expecting to see "Hello, world!" as output.
+      If some input needs to be provided before the output can be
+      printed (e.g. for stream processing languages like jq and sed),
+      it can be given as part of this option.
+
+      This value can be multiline if multiple lines of input need to
+      be entered to get the desired output. A line can be of the form
+      'DELAY: n' where n is an integer, to insert a delay of n seconds
+      before sending the next line of input.
+
+      An empty string means just an input of a single newline
+      character.
+    type: string
+  hello:
+    title: "Expected output for 'run' test"
+    description: |
+      If the language cannot reasonably print "Hello, world!" exactly,
+      provide this option to specify what it actually prints. Note
+      that the 'run' test does not actually check for the trailing
+      newline, although it's still desired.
+
+      Newlines are allowed, and are not interpreted specially.
+
+      This is interpreted as a JavaScript regular expression instead
+      of a literal string, if 'helloMaxLength' is provided. That
+      feature can be useful if the output of a programming language is
+      always nondeterministic.
+    type: string
+    minLength: 1
+    default: "Hello, world!"
+  helloMaxLength:
+    title: "Maximum length for 'hello' regular expression matches"
+    description: |
+      If this is provided, then the value of the 'hello' option is
+      interpreted as a regular expression to match against the program
+      output for the 'run' test. Regex matching is difficult to do
+      efficiently against a stream, so to help the implementation, in
+      this case it is required to provide an upper bound on how long
+      matches can be. (In most reasonable cases, all matches will be
+      the same length, so this just means the length of any match for
+      the regular expression.)
+    type: integer
+    minimum: 1
+  runReplInput:
+    title: "REPL input for 'runrepl' test specifically"
+    description: |
+      This is the same as 'input', but it is used only for the
+      'runrepl' test and hence can be used as an override in the case
+      that the needed input for 'runrepl' is different than that for
+      'repl'.
+    type: string
+    minLength: 1
+  runReplOutput:
+    title: "Expected REPL output for 'runrepl' test specifically"
+    description: |
+      This is the same as 'output', but it is used only for the
+      'runrepl' test and hence can be used as an override in the case
+      that the expected output for 'runrepl' is different than that
+      for 'repl'.
+    type: string
+    minLength: 1
+
+  # TODO: fill in documentation
+  scope:
+    type: object
+    additionalProperties: false
+    required: [code]
+    properties:
+      code:
+        type: string
+        minLength: 1
+      after:
+        type: string
+        minLength: 1
+      input:
+        type: string
+        minLength: 1
+      output:
+        type: string
+        minLength: 1
+
+  ensure:
+    type: string
+    minLength: 1
+
+  format:
+    type: object
+    additionalProperties: false
+    required: [run]
+    properties:
+      run:
+        type: string
+        minLength: 1
+      input:
+        type: string
+        minLength: 1
+      output:
+        type: string
+        minLength: 1
+
+  pkg:
+    type: object
+    additionalProperties: false
+    required: [install]
+    properties:
+      install:
+        type: string
+        pattern: "NAME"
+      uninstall:
+        type: string
+        pattern: "NAME"
+      all:
+        type: string
+        minLength: 1
+      search:
+        type: string
+        pattern: "NAME"
+
+  lsp:
+    type: object
+    additionalProperties: false
+    required: [start, code, item]
+    properties:
+      setup:
+        type: string
+        minLength: 1
+      start:
+        type: string
+        minLength: 1
+      disableDynamicRegistration:
+        type: boolean
+        default: false
+      init: {}
+      config: {}
+      lang:
+        type: string
+        minLength: 1
+      code:
+        type: string
+        minLength: 1
+      after:
+        type: string
+        minLength: 1
+      item:
+        type: string
+        minLength: 1
+
+  skip:
+    type: array
+    items:
+      enum:
+        - ensure
+        - run
+        - repl
+        - runrepl
+        - scope
+        - format
+        - lsp

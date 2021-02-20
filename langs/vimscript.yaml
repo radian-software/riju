@@ -31,6 +31,8 @@ scope:
 lsp:
   start: |
     vim-language-server --stdio
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

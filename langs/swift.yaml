@@ -28,6 +28,8 @@ run: |
 lsp:
   start: |
     sourcekit-lsp
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

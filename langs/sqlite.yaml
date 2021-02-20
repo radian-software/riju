@@ -34,6 +34,8 @@ run: |
 lsp:
   start: |
     sqls -config /opt/sqlite/sqls.yml
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

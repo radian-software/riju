@@ -29,6 +29,8 @@ run: |
 lsp:
   start: |
     fortls
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

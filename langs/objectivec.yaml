@@ -45,6 +45,8 @@ lsp:
     (gnustep-config --objc-flags && gnustep-config --base-libs) | sed -E 's/\s+/\n/g' > compile_flags.txt
   start: |
     clangd
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

@@ -67,6 +67,8 @@ lsp:
     haskell-language-server-wrapper --lsp
   init:
     languageServerHaskell: {}
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

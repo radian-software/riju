@@ -40,9 +40,8 @@ install:
       }
 
       repl.start({prompt: "cat> ", eval: (cmd, context, filename, callback) => callback(null, ce.eval(cmd))});
-  manual:
-    - |
-      git clone https://github.com/cdiggins/cat-language "${pkg}/opt/cat"
+  manual: |
+    git clone https://github.com/cdiggins/cat-language "${pkg}/opt/cat"
 
 repl: |
   cat-lang

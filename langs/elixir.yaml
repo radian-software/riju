@@ -44,6 +44,8 @@ scope:
 lsp:
   start: |
     /opt/elixir-ls/language_server.sh
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

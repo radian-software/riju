@@ -36,6 +36,8 @@ run: |
 lsp:
   start: |
     rls
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

@@ -41,6 +41,8 @@ scope:
 lsp:
   start: |
     pwsh -NoLogo -NoProfile -Command "/opt/powershell-editor-services/PowerShellEditorServices/Start-EditorServices.ps1 -BundledModulesPath /opt/powershell-editor-services -LogPath '$PWD/.powershell-editor-services/lsp.log' -SessionDetailsPath '$PWD/.powershell-editor-services/session.json' -FeatureFlags @() -AdditionalModules @() -HostName Riju -HostProfileId 'riju' -HostVersion 0.0 -Stdio -LogLevel Normal"
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - repl

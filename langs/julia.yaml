@@ -33,6 +33,8 @@ lsp:
   start: |
     JULIA_DEPOT_PATH=:/opt/julia-language-server julia -e 'using LanguageServer; run(LanguageServerInstance(stdin, stdout))'
   config: null
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

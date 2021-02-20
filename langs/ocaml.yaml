@@ -41,6 +41,8 @@ lsp:
   start: |
     ocamllsp
   lang: "ocaml"
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

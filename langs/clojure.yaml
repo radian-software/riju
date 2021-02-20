@@ -60,6 +60,8 @@ scope:
 lsp:
   start: |
     clojure-lsp
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

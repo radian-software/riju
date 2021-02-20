@@ -20,6 +20,8 @@ lsp:
     dart /usr/lib/dart/bin/snapshots/analysis_server.dart.snapshot --lsp
   disableDynamicRegistration: true
   lang: "dart"
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

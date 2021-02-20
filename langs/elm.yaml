@@ -49,6 +49,8 @@ lsp:
     cp /opt/elm/elm.json elm.json
   start: |
     elm-language-server --stdio
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

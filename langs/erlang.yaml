@@ -53,6 +53,8 @@ scope:
 lsp:
   start: |
     erlang_ls
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

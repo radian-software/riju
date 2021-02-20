@@ -29,6 +29,8 @@ scope:
 lsp:
   start: |
     java -cp /opt/emmylua/EmmyLua.jar com.tang.vscode.MainKt
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

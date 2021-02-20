@@ -33,6 +33,8 @@ scope:
 lsp:
   start: |
     intelephense --stdio
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

@@ -54,6 +54,8 @@ lsp:
     cp -a /opt/reasonml/skel/* ./
   start: |
     reason-language-server
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp

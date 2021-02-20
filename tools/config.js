@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 
+import { validate as validateJSONSchema } from "jsonschema";
 import YAML from "yaml";
 
 // The build scripts in the language configs assume a specific build
@@ -11,6 +12,12 @@ import YAML from "yaml";
 //   to the directory where the package should be built; this
 //   directory also starts out empty
 // * we are using bash with 'set -euxo pipefail'
+
+async function readJSONSchemaFromDisk() {
+  return YAML.parse(await fs.readFile("tools/jsonschema.yaml", "utf-8"));
+}
+
+const jsonSchemaPromise = readJSONSchemaFromDisk();
 
 // Return a list of the IDs of all the configured languages. Each such
 // ID can be passed to readLangConfig.
@@ -85,6 +92,7 @@ export async function readLangConfig(lang) {
   const langConfig = YAML.parse(
     await fs.readFile(`langs/${lang}.yaml`, "utf-8")
   );
+  validateJSONSchema(langConfig, await jsonSchemaPromise, { throwAll: true });
   if (langConfig.id !== lang) {
     throw new Error(
       `lang config id ${langConfig.id} doesn't match expected ${lang}`

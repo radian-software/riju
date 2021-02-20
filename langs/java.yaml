@@ -151,6 +151,8 @@ lsp:
           enabled: true
         trace:
           server: "off"
+  code: "TODO"
+  item: "TODO"
 
 skip:
   - lsp
