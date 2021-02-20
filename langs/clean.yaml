@@ -33,10 +33,18 @@ install:
 
     url="$(curl -fsSL https://clean.cs.ru.nl/Download_Clean | grep linux/clean | grep -F 64.tar.gz | grep -Eo "https://[^>]+\.tar\.gz")"
     wget "${url}"
-    tar -xf clean*_64.tar.gz -C "${pkg}/opt/clean" --strip-components=1
-    pushd "${pkg}/opt/clean"
+
+    sudo mkdir /opt/clean
+    sudo chown riju:riju /opt/clean
+    tar -xf clean*_64.tar.gz -C /opt/clean --strip-components=1
+
+    pushd /opt/clean
     make
     popd
+
+    mv /opt/clean/* "${pkg}/opt/clean/"
+    sudo rmdir /opt/clean
+
     ln -s /opt/clean/bin/clm "${pkg}/usr/local/bin/"
 
     sleep 2
