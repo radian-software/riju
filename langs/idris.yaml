@@ -11,13 +11,18 @@ install:
   apt:
     - chezscheme
   manual: |
+    install -d "${pkg}/usr/local/bin"
+
     wget https://www.idris-lang.org/idris2-src/idris2-latest.tgz
     mkdir idris
     tar -xf idris2-latest.tgz -C idris --strip-components=1
     pushd idris
-    make bootstrap-build SCHEME=chezscheme PREFIX="${pkg}/usr/local"
-    make install PREFIX="${pkg}/usr/local"
-    chmod -R a=u,go-w "${pkg}/usr/local"/idris2-*
+    make bootstrap-build SCHEME=chezscheme PREFIX=/usr/local
+    sudo make install PREFIX=/usr/local
+    sudo mv /usr/local/idris* "${pkg}/usr/local/"
+    sudo mv /usr/local/bin/idris* "${pkg}/usr/local/bin/"
+    sudo chown -R riju:riju "${pkg}/usr/local"
+    chmod -R a=u,go-w "${pkg}/usr/local"/idris*
     popd
 
 repl: |
