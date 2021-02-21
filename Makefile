@@ -262,7 +262,7 @@ env: # Run shell with .env file loaded and $PATH fixed
 tmux: # Start or attach to tmux session
 	MAKELEVEL= tmux attach || MAKELEVEL= tmux new-session -s tmux
 
- usage:
+usage:
 	@cat Makefile | \
 		grep -E '^[^.:[:space:]]+:|[#]##' | \
 		sed -E 's/:[^#]*#([^:]+)$$/: #:\1/' | \
