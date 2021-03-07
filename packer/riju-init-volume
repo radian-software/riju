@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+function print {
+    echo >&2 "riju-init-volume: $@"
+}
+
+mount_point=/mnt/riju/data
+
+mkdir -p "${mount_point}"
+
+disks="$(lsblk -l -d -b -o name,size | grep nvme)"
+num_disks="$(wc -l <<< "${disks}")"
+
+if [[ "${num_disks}" != 2 ]]; then
+    print "found unexpected number of disks from lsblk:"
+    printf >&2 '%s\n' "${disks}"
+    exit 1
+fi
+
+disk="$(sort -n -k2 <<< "${disks}" | tail -n1 | awk '{ print $1 }')"
+print "identified data volume: ${disk}"
+
+num_parts="$(lsblk -l -o name | (grep "${disk}." || true) | wc -l)"
+print "volume has ${num_parts} partition(s)"
+if [[ "${num_parts}" != 1 ]]; then
+    print "repartitioning so we have exactly one partition"
+    sfdisk -X gpt "/dev/${disk}" <<< ";"
+fi
+
+part="$(lsblk -l -o name | (grep "${disk}." || true) | head -n1)"
+print "identified data partition: ${part}"
+
+if ! blkid "/dev/${part}" | grep -q "\bUUID="; then
+    print "no filesystem detected; initializing with ext4"
+    mkfs.ext4 "/dev/${part}"
+fi
+
+blkid_env="$(blkid /dev/${part} -o export)"
+uuid="$(eval "${blkid_env}"; echo "${UUID}")"
+
+print "identified filesystem UUID: ${uuid}"
+
+if ! cat /etc/fstab | grep -q "${uuid}"; then
+    print "filesystem not listed in /etc/fstab; appending"
+    cat <<EOF >> /etc/fstab
+UUID=${uuid} ${mount_point} ext4 defaults 0 2
+EOF
+fi
+
+mount -a
+
+print "filesystem mounted at ${mount_point}"
+
+docker_args="-g ${mount_point}"
+
+if ! cat /lib/systemd/system/docker.service | grep -q -- "${docker_args}"; then
+    print "adding '${docker_args}' to docker.service"
+    sed -Ei "s|ExecStart=.+|& ${docker_args}|" /lib/systemd/system/docker.service
+
+    print "restarting Docker daemon"
+    systemctl daemon-reload
+    systemctl restart docker
+fi

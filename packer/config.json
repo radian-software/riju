@@ -38,6 +38,11 @@
     },
     {
       "type": "file",
+      "source": "riju-init-volume",
+      "destination": "/tmp/riju-init-volume"
+    },
+    {
+      "type": "file",
       "source": "riju-deploy",
       "destination": "/tmp/riju-deploy"
     },
