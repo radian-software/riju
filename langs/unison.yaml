@@ -33,7 +33,7 @@ setup: |
 repl: |
   unison -codebase .
 input: |
-  DELAY: 3
+  DELAY: 10
   find : [a] -> [a]
 output: |
   base.List.reverse
