@@ -29,7 +29,7 @@ update-ca-certificates
 ubuntu_ver="$(lsb_release -rs)"
 ubuntu_name="$(lsb_release -cs)"
 
-cran_repo="$(curl -fsSL https://cran.r-project.org/bin/linux/ubuntu/ | grep '<tr>' | grep "${ubuntu_name}" | grep -Eo 'cran[0-9]+' | head -n1)"
+cran_repo="$(curl -fsSL https://cran.r-project.org/bin/linux/ubuntu/ | grep -Eo 'cran[0-9]+' | head -n1)"
 node_repo="$(curl -fsSL https://deb.nodesource.com/setup_current.x | grep NODEREPO= | grep -Eo 'node_[0-9]+\.x' | head -n1)"
 
 # .NET
