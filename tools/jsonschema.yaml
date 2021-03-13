@@ -403,9 +403,39 @@ properties:
             anyOf:
               # TODO: fill in documentation
               - const: assembly
+                description: |
+                  A language that uses assembly syntax of some kind,
+                  characterized by sequential, atomic statements
+                  without advanced control flow.
+                examples:
+                  - "x86"
+                  - "riscv"
+                  - "jasmin"
               - const: basic
+                description: |
+                  A language that uses BASIC-derived syntax,
+                  characterized by a lack of syntactic control
+                  characters and (often) uppercase keywords.
+                examples:
+                  - cmd
+                  - cobol
               - const: c
+                description: |
+                  A language that uses C-derived syntax, characterized
+                  by ubiquitous curly braces and semicolons for
+                  control flow scoping.
+                examples:
+                  - objectivec
+                  - java
               - const: golf
+                description: |
+                  A language that uses syntax remniscent of code
+                  golfing, characterized by single-letter or otherwise
+                  very short commands and control flow syntax.
+                examples:
+                  - befunge
+                  - fishlang
+                  - apl
               - const: haskell
               - const: lisp
               - const: pascal
