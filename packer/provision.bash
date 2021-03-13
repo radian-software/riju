@@ -31,8 +31,6 @@ sudo chown root:root /tmp/riju /tmp/riju-deploy /tmp/riju.service
 sudo mv /tmp/riju /tmp/riju-deploy /tmp/riju-init-volume /tmp/riju-install-certbot-hooks /usr/local/bin/
 sudo mv /tmp/riju.service /etc/systemd/system/
 
-sudo riju-init-volume
-
 for user in admin deploy; do
     if ! grep -vq "PRIVATE KEY" "/tmp/id_${user}.pub"; then
         echo "${user} public key was set to a private key, aborting" >&2

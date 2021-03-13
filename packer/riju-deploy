@@ -9,6 +9,8 @@ fi
 
 image="$1"
 
+riju-init-volume
+
 echo "Pull image to be deployed..."
 docker pull "${image}"
 
