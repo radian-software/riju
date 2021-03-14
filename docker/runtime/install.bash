@@ -145,6 +145,7 @@ ripgrep
 strace
 sudo
 tmux
+tree
 vim
 
 # shared dependencies
