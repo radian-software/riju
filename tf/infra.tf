@@ -169,7 +169,7 @@ resource "aws_instance" "server" {
 resource "aws_ebs_volume" "data" {
   availability_zone = "${data.aws_region.current.name}b"
   size              = 125
-  type              = "sc1"
+  type              = "gp3"
   tags              = local.tags
 }
 
