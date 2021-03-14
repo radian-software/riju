@@ -4,7 +4,11 @@ set -euo pipefail
 
 domain="$(ls /etc/letsencrypt/live | grep -v README | head -n1)" || true
 
-if [[ -n "${domain}" ]]; then
+if [[ -n "${DISABLE_TLS:-}" ]]; then
+    echo "Disabling TLS due to DISABLE_TLS=${DISABLE_TLS}" >&2
+elif [[ -z "${domain}" ]]; then
+    echo "No certs installed in /etc/letsencrypt/live, disabling TLS" >&2
+else
     echo "Detected cert for domain: ${domain}, enabling TLS" >&2
     export TLS=1
     TLS_PRIVATE_KEY="$(base64 "/etc/letsencrypt/live/${domain}/privkey.pem")"
@@ -16,8 +20,6 @@ if [[ -n "${domain}" ]]; then
     else
         echo "Domain is not riju.codes, disabling analytics" >&2
     fi
-else
-    echo "No certs installed in /etc/letsencrypt/live, disabling TLS" >&2
 fi
 
 if [[ -n "${DETACH:-}" ]]; then
@@ -29,8 +31,14 @@ else
 fi
 
 port_args="${PORT_MAPPING:--p 0.0.0.0:80:6119 -p 0.0.0.0:443:6120}"
+image_name="${IMAGE_NAME:-riju:app}"
+container_name="${CONTAINER_NAME:-riju-prod}"
+
+if docker container inspect ${container_name} &>/dev/null; then
+    docker stop ${container_name}
+fi
 
 docker run --rm ${port_args} ${extra_args} \
        -e TLS -e TLS_PRIVATE_KEY -e TLS_CERTIFICATE -e ANALYTICS \
-       -h riju --name "${CONTAINER_NAME:-riju-prod}" \
-       "${IMAGE_NAME:-riju:app}"
+       -h riju --name "${container_name}" \
+       "${image_name}"
