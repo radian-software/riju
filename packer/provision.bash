@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-mkdir /tmp/riju
-pushd /tmp/riju
+mkdir /tmp/riju-work
+pushd /tmp/riju-work
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -69,4 +69,4 @@ sudo systemctl enable riju
 sudo passwd -l ubuntu
 
 popd
-rm -rf /tmp/riju
+rm -rf /tmp/riju-work
