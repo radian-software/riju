@@ -163,14 +163,18 @@ resource "aws_instance" "server" {
   ami               = data.aws_ami.server.id
   availability_zone = "${data.aws_region.current.name}b"
   security_groups   = [aws_security_group.server.name]
-  tags              = local.tags
+  tags = merge(local.tags, {
+    Name = "Riju server"
+  })
 }
 
 resource "aws_ebs_volume" "data" {
   availability_zone = "${data.aws_region.current.name}b"
   size              = 125
   type              = "gp3"
-  tags              = local.tags
+  tags = merge(local.tags, {
+    Name = "Riju Docker data"
+  })
 }
 
 resource "aws_volume_attachment" "data" {
