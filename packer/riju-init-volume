@@ -10,7 +10,7 @@ mount_point=/mnt/riju/data
 
 mkdir -p "${mount_point}"
 
-disks="$(lsblk -l -d -b -o name,size | grep nvme)"
+disks="$(lsblk -l -d -b -o name,size | grep -Ev 'loop|NAME')"
 num_disks="$(wc -l <<< "${disks}")"
 
 if [[ "${num_disks}" != 2 ]]; then
