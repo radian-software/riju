@@ -18,7 +18,9 @@ RUN make frontend
 
 COPY frontend/pages ./frontend/pages/
 COPY frontend/styles ./frontend/styles/
+COPY lib ./lib/
 COPY backend ./backend/
+COPY langs ./langs/
 
 FROM ubuntu:rolling
 

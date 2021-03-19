@@ -1,7 +1,7 @@
 import process from "process";
 import url from "url";
 
-import { getPackages } from "./config.js";
+import { getPackages } from "../lib/yaml.js";
 import { runCommand } from "./util.js";
 
 // Parse command-line arguments, run main functionality, and exit.

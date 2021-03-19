@@ -5,7 +5,7 @@ import url from "url";
 import { Command } from "commander";
 import YAML from "yaml";
 
-import { readLangConfig, readSharedDepConfig } from "./config.js";
+import { readLangConfig, readSharedDepConfig } from "../lib/yaml.js";
 
 // Given a language config object, return the text of a Bash script
 // that will build the (unpacked) riju-lang-foo Debian package into

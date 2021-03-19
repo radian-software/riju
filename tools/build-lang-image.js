@@ -4,7 +4,7 @@ import http from "http";
 import { Command } from "commander";
 import express from "express";
 
-import { readLangConfig } from "./config.js";
+import { readLangConfig } from "../lib/yaml.js";
 import { getLocalImageLabel } from "./docker-util.js";
 import { hashDockerfile } from "./hash-dockerfile.js";
 import { getDebHash, runCommand } from "./util.js";
@@ -67,7 +67,9 @@ async function main() {
   process.exit(0);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] === url.fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

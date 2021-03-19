@@ -7,7 +7,7 @@ import nodePath from "path";
 import process from "process";
 import url from "url";
 
-import { getPackages } from "./config.js";
+import { getPackages } from "../lib/yaml.js";
 import { generateBuildScript } from "./generate-build-script.js";
 
 // Parse command-line arguments, run main functionality, and exit.

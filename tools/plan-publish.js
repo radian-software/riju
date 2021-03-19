@@ -7,7 +7,7 @@ import { Command } from "commander";
 import _ from "lodash";
 import { v4 as getUUID } from "uuid";
 
-import { getLangs, getPackages, readLangConfig } from "./config.js";
+import { getLangs, getPackages, readLangConfig } from "../lib/yaml.js";
 import {
   getLocalImageDigest,
   getLocalImageLabel,

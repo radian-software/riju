@@ -5,5 +5,6 @@
 **/.lsp-repl-history
 **/.terraform
 **/build
+**/build-docker
 **/node_modules
 **/out
