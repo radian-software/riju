@@ -24,3 +24,7 @@ EOF
 
 apt-get update
 apt-get install -y clang g++ make nodejs sudo yarn
+
+rm -rf /var/lib/apt/lists/*
+
+rm "$0"

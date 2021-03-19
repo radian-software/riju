@@ -36,10 +36,11 @@ endif
 ## Pass NC=1 to disable the Docker cache. Base images are not pulled;
 ## see 'make pull-base' for that.
 
-image: # I=<image> [NC=1] : Build a Docker image
+image: # I=<image> [L=<lang>] [NC=1] : Build a Docker image
 	@: $${I}
-ifeq ($(I),composite)
-	node tools/build-composite-image.js
+ifeq ($(I),lang)
+	@: $${L}
+	node tools/build-lang-image.js --lang $(L)
 else ifneq (,$(filter $(I),admin ci))
 	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) $(NO_CACHE)
 else
@@ -59,14 +60,23 @@ endif
 
 SHELL_ENV := -e Z -e CI -e TEST_PATIENCE -e TEST_CONCURRENCY
 
-shell: # I=<shell> [E=1] [P1|P2=<port>] : Launch Docker image with shell
+ifeq ($(I),lang)
+LANG_TAG := lang-$(L)
+else
+LANG_TAG := $(I)
+endif
+
+shell: # I=<shell> [L=<lang>] [E=1] [P1|P2=<port>] : Launch Docker image with shell
 	@: $${I}
 ifneq (,$(filter $(I),admin ci))
 	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.ssh:/var/riju/.ssh -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) --network host riju:$(I) $(BASH_CMD)
-else ifneq (,$(filter $(I),compile app))
+else ifeq ($(I),app)
 	docker run -it --rm --hostname $(I) $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
-else ifneq (,$(filter $(I),runtime composite))
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src --label riju-install-target=yes $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
+else ifneq (,$(filter $(I),runtime lang))
+ifeq ($(I),lang)
+	@: $${L}
+endif
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src --label riju-install-target=yes $(SHELL_PORTS) $(SHELL_ENV) riju:$(LANG_TAG) $(BASH_CMD)
 else
 	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
 endif

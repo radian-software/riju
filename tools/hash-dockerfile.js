@@ -187,8 +187,8 @@ async function main() {
   }
   const [name] = program.args;
   const { debug } = program.opts();
-  if (name === "composite") {
-    throw new Error("use build-composite-image.js instead for this");
+  if (name === "lang") {
+    throw new Error("use build-lang-image.js instead for this");
   }
   if (debug) {
     console.log(
