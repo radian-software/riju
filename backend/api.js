@@ -6,12 +6,10 @@ import pty from "node-pty";
 import pQueue from "p-queue";
 const PQueue = pQueue.default;
 import rpc from "vscode-jsonrpc";
-import { v4 as getUUID } from "uuid";
 
 import { langs } from "./langs.js";
-import { borrowUser } from "./users.js";
 import * as util from "./util.js";
-import { bash } from "./util.js";
+import { bash, getUUID } from "./util.js";
 
 const allSessions = new Set();
 
@@ -24,16 +22,8 @@ export class Session {
     return langs[this.lang];
   }
 
-  get uid() {
-    return this.uidInfo.uid;
-  }
-
-  returnUser = async () => {
-    this.uidInfo && (await this.uidInfo.returnUser());
-  };
-
   get context() {
-    return { uid: this.uid, uuid: this.uuid };
+    return { uuid: this.uuid, lang: this.lang };
   }
 
   log = (msg) => this.logPrimitive(`[${this.uuid}] ${msg}`);
@@ -43,7 +33,7 @@ export class Session {
     this.uuid = getUUID();
     this.lang = lang;
     this.tearingDown = false;
-    this.uidInfo = null;
+    this.container = null;
     this.term = null;
     this.lsp = null;
     this.daemon = null;
@@ -57,24 +47,48 @@ export class Session {
     return await util.run(args, this.log, options);
   };
 
-  privilegedSetup = () => util.privilegedSetup(this.context);
-  privilegedSpawn = (args) => util.privilegedSpawn(this.context, args);
-  privilegedUseradd = () => util.privilegedUseradd(this.uid);
-  privilegedTeardown = () => util.privilegedTeardown(this.context);
+  privilegedSession = () => util.privilegedSession(this.context);
+  privilegedWait = () => util.privilegedWait(this.context);
+  privilegedExec = (args) => util.privilegedExec(this.context, args);
 
   setup = async () => {
     try {
       allSessions.add(this);
-      const { uid, returnUser } = await borrowUser();
-      this.uidInfo = { uid, returnUser };
-      this.log(`Borrowed uid ${this.uid}`);
-      await this.run(this.privilegedSetup());
+      const containerArgs = this.privilegedSession();
+      const containerProc = spawn(containerArgs[0], containerArgs.slice(1));
+      this.container = {
+        proc: containerProc,
+      };
+      for (const stream of [containerProc.stdout, containerProc.stderr]) {
+        stream.on("data", (data) =>
+          this.send({
+            event: "serviceLog",
+            service: "container",
+            output: data.toString("utf8"),
+          })
+        );
+        containerProc.on("close", (code, signal) =>
+          this.send({
+            event: "serviceFailed",
+            service: "container",
+            error: `Exited with status ${signal || code}`,
+          })
+        );
+        containerProc.on("error", (err) =>
+          this.send({
+            event: "serviceFailed",
+            service: "container",
+            error: `${err}`,
+          })
+        );
+      }
+      await this.run(this.privilegedWait(this.context));
       if (this.config.setup) {
-        await this.run(this.privilegedSpawn(bash(this.config.setup)));
+        await this.run(this.privilegedExec(bash(this.config.setup)));
       }
       await this.runCode();
       if (this.config.daemon) {
-        const daemonArgs = this.privilegedSpawn(bash(this.config.daemon));
+        const daemonArgs = this.privilegedExec(bash(this.config.daemon));
         const daemonProc = spawn(daemonArgs[0], daemonArgs.slice(1));
         this.daemon = {
           proc: daemonProc,
@@ -105,9 +119,9 @@ export class Session {
       }
       if (this.config.lsp) {
         if (this.config.lsp.setup) {
-          await this.run(this.privilegedSpawn(bash(this.config.lsp.setup)));
+          await this.run(this.privilegedExec(bash(this.config.lsp.setup)));
         }
-        const lspArgs = this.privilegedSpawn(bash(this.config.lsp.start));
+        const lspArgs = this.privilegedExec(bash(this.config.lsp.start));
         const lspProc = spawn(lspArgs[0], lspArgs.slice(1));
         this.lsp = {
           proc: lspProc,
@@ -252,7 +266,7 @@ export class Session {
   writeCode = async (code) => {
     if (this.config.main.includes("/")) {
       await this.run(
-        this.privilegedSpawn([
+        this.privilegedExec([
           "mkdir",
           "-p",
           path.dirname(`${this.homedir}/${this.config.main}`),
@@ -260,7 +274,7 @@ export class Session {
       );
     }
     await this.run(
-      this.privilegedSpawn([
+      this.privilegedExec([
         "sh",
         "-c",
         `cat > ${path.resolve(this.homedir, this.config.main)}`,
@@ -283,7 +297,7 @@ export class Session {
       } = this.config;
       if (this.term) {
         const pid = this.term.pty.pid;
-        const args = this.privilegedSpawn(
+        const args = this.privilegedExec(
           bash(`kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`)
         );
         spawn(args[0], args.slice(1));
@@ -310,7 +324,7 @@ export class Session {
         code += suffix + "\n";
       }
       await this.writeCode(code);
-      const termArgs = this.privilegedSpawn(bash(cmdline));
+      const termArgs = this.privilegedExec(bash(cmdline));
       const term = {
         pty: pty.spawn(termArgs[0], termArgs.slice(1), {
           name: "xterm-color",
@@ -349,14 +363,14 @@ export class Session {
       }
       if (this.formatter) {
         const pid = this.formatter.proc.pid;
-        const args = this.privilegedSpawn(
+        const args = this.privilegedExec(
           bash(`kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`)
         );
         spawn(args[0], args.slice(1));
         this.formatter.live = false;
         this.formatter = null;
       }
-      const args = this.privilegedSpawn(bash(this.config.format.run));
+      const args = this.privilegedExec(bash(this.config.format.run));
       const formatter = {
         proc: spawn(args[0], args.slice(1)),
         live: true,
@@ -409,7 +423,7 @@ export class Session {
   };
 
   ensure = async (cmd) => {
-    const code = await this.run(this.privilegedSpawn(bash(cmd)), {
+    const code = await this.run(this.privilegedExec(bash(cmd)), {
       check: false,
     });
     this.send({ event: "ensured", code });
@@ -422,11 +436,15 @@ export class Session {
       }
       this.log(`Tearing down session`);
       this.tearingDown = true;
-      allSessions.delete(this);
-      if (this.uidInfo) {
-        await this.run(this.privilegedTeardown());
-        await this.returnUser();
+      if (this.container) {
+        // SIGTERM should be sufficient as the command running in the
+        // foreground is just 'tail -f /dev/null' which won't try to
+        // block signals. Killing the foreground process (i.e. pid1)
+        // should cause the Docker runtime to bring everything else
+        // down in flames.
+        this.container.proc.kill();
       }
+      allSessions.delete(this);
       this.ws.terminate();
     } catch (err) {
       this.log(`Error during teardown`);

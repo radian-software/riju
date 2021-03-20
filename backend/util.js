@@ -3,55 +3,12 @@ import os from "os";
 import process from "process";
 
 import { quote } from "shell-quote";
-
-import { MIN_UID, MAX_UID } from "./users.js";
+import { v4 as getUUIDOrig } from "uuid";
 
 export const rijuSystemPrivileged = "system/out/riju-system-privileged";
 
-const rubyVersion = (() => {
-  try {
-    return spawnSync("ruby", ["-e", "puts RUBY_VERSION"])
-      .stdout.toString()
-      .trim();
-  } catch (err) {
-    return null;
-  }
-})();
-
-function getEnv({ uid, uuid }) {
-  const cwd = `/tmp/riju/${uuid}`;
-  const path = [
-    rubyVersion && `${cwd}/.gem/ruby/${rubyVersion}/bin`,
-    `${cwd}/.local/bin`,
-    `${cwd}/node_modules/.bin`,
-    `/usr/local/sbin`,
-    `/usr/local/bin`,
-    `/usr/sbin`,
-    `/usr/bin`,
-    `/bin`,
-  ].filter((x) => x);
-  const username =
-    uid >= MIN_UID && uid < MAX_UID ? `riju${uid}` : os.userInfo().username;
-  return {
-    HOME: cwd,
-    HOSTNAME: "riju",
-    LANG: "C.UTF-8",
-    LC_ALL: "C.UTF-8",
-    LOGNAME: username,
-    PATH: path.join(":"),
-    PWD: cwd,
-    SHELL: "/usr/bin/bash",
-    TERM: "xterm-256color",
-    TMPDIR: `${cwd}`,
-    USER: username,
-    USERNAME: username,
-  };
-}
-
-function getEnvString(ctx) {
-  return Object.entries(getEnv(ctx))
-    .map(([key, val]) => `${key}=${quote([val])}`)
-    .join(" ");
+export function getUUID() {
+  return getUUIDOrig().replace(/-/g, "");
 }
 
 export async function run(args, log, options) {
@@ -87,30 +44,16 @@ export async function run(args, log, options) {
   });
 }
 
-export function privilegedUseradd(uid) {
-  return [rijuSystemPrivileged, "useradd", `${uid}`];
+export function privilegedSession({ uuid, lang }) {
+  return [rijuSystemPrivileged, "session", uuid, lang];
 }
 
-export function privilegedSetup({ uid, uuid }) {
-  return [rijuSystemPrivileged, "setup", `${uid}`, uuid];
+export function privilegedWait({ uuid }) {
+  return [rijuSystemPrivileged, "wait", uuid];
 }
 
-export function privilegedSpawn(ctx, args) {
-  const { uid, uuid } = ctx;
-  return [
-    rijuSystemPrivileged,
-    "spawn",
-    `${uid}`,
-    uuid,
-    "sh",
-    "-c",
-    `exec env -i ${getEnvString(ctx)} "$@"`,
-    "--",
-  ].concat(args);
-}
-
-export function privilegedTeardown({ uid, uuid }) {
-  return [rijuSystemPrivileged, "teardown", `${uid}`, uuid];
+export function privilegedExec({ uuid }, args) {
+  return [rijuSystemPrivileged, "exec", uuid].concat(args);
 }
 
 export function bash(cmdline) {
@@ -129,9 +72,6 @@ export const log = {
   warn: console.error,
   error: console.error,
 };
-
-// https://gist.github.com/bugventure/f71337e3927c34132b9a
-export const uuidRegexp = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/;
 
 export function asBool(value, def) {
   if (def === undefined) {

@@ -5,10 +5,10 @@ import _ from "lodash";
 import pQueue from "p-queue";
 const PQueue = pQueue.default;
 import stripAnsi from "strip-ansi";
-import { v4 as getUUID } from "uuid";
 
 import * as api from "./api.js";
 import { langsPromise } from "./langs.js";
+import { getUUID } from "./util.js";
 
 let langs = {};
 

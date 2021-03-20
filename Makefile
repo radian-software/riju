@@ -72,11 +72,13 @@ ifneq (,$(filter $(I),admin ci))
 	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.ssh:/var/riju/.ssh -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) --network host riju:$(I) $(BASH_CMD)
 else ifeq ($(I),app)
 	docker run -it --rm --hostname $(I) $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
-else ifneq (,$(filter $(I),runtime lang))
+else ifneq (,$(filter $(I),base lang))
 ifeq ($(I),lang)
 	@: $${L}
 endif
 	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src --label riju-install-target=yes $(SHELL_PORTS) $(SHELL_ENV) riju:$(LANG_TAG) $(BASH_CMD)
+else ifeq ($(I),runtime)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
 else
 	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
 endif

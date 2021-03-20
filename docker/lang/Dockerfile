@@ -1,4 +1,4 @@
-FROM riju:runtime
+FROM riju:base
 
 ARG LANG
 

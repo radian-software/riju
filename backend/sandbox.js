@@ -3,9 +3,9 @@ import { promises as fs } from "fs";
 import process from "process";
 
 import { quote } from "shell-quote";
-import { v4 as getUUID } from "uuid";
 
-import { borrowUser } from "./users.js";
+import { getUUID } from "./util.js";
+
 import {
   privilegedSetup,
   privilegedSpawn,
@@ -29,9 +29,8 @@ async function main() {
     die("environment variable unset: $L");
   }
   const uuid = getUUID();
-  const { uid, returnUser } = await borrowUser(log);
-  await run(privilegedSetup({ uid, uuid }), log);
-  const args = privilegedSpawn({ uid, uuid }, [
+  await run(privilegedSetup({ uuid }), log);
+  const args = privilegedSpawn({ uuid }, [
     "bash",
     "-c",
     `exec env L='${lang}' bash --rcfile <(cat <<< ${quote([sandboxScript])})`,
@@ -43,7 +42,7 @@ async function main() {
     proc.on("error", reject);
     proc.on("close", resolve);
   });
-  await run(privilegedTeardown({ uid, uuid }), log);
+  await run(privilegedTeardown({ uuid }), log);
   await returnUser();
 }
 

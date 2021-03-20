@@ -28,10 +28,7 @@ async function main() {
   const hash = await hashDockerfile(
     "lang",
     {
-      "riju:runtime": await getLocalImageLabel(
-        "riju:runtime",
-        "riju.image-hash"
-      ),
+      "riju:base": await getLocalImageLabel("riju:base", "riju.image-hash"),
     },
     {
       salt: {
@@ -52,7 +49,7 @@ async function main() {
   try {
     if (debug) {
       await runCommand(
-        `docker run -it --rm -e LANG=${lang} -w /tmp/riju-work --network host riju:runtime`
+        `docker run -it --rm -e LANG=${lang} -w /tmp/riju-work --network host base:runtime`
       );
     } else {
       await runCommand(

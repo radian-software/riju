@@ -19,9 +19,7 @@ for src in system/src/*.c; do
     out="${out/.c}"
     verbosely clang -Wall -Wextra -Werror -std=c11 "${src}" -o "${out}"
     if [[ "${out}" == *-privileged ]]; then
-        if getent group riju >/dev/null; then
-            sudo chown root:riju "${out}"
-        fi
-        sudo chmod a=,g=rx,u=rwxs "${out}"
+        verbosely sudo chown root:riju "${out}"
+        verbosely sudo chmod a=,g=rx,u=rwxs "${out}"
     fi
 done

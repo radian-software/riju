@@ -22,17 +22,10 @@ COPY lib ./lib/
 COPY backend ./backend/
 COPY langs ./langs/
 
-FROM ubuntu:rolling
+FROM riju:runtime
 
-COPY docker/app/install.bash /tmp/
-RUN /tmp/install.bash
-
-COPY docker/shared/my_init /usr/local/sbin/
 ENTRYPOINT ["/usr/local/sbin/my_init", "--quiet", "--"]
-
 RUN useradd -p '!' -m -l -s /usr/bin/bash riju
-
-WORKDIR /src
 COPY --chown=riju:riju --from=build /src ./
 RUN chown root:riju system/out/*-privileged && chmod a=,g=rx,u=rwxs system/out/*-privileged
 

@@ -2,8 +2,8 @@
 
 set -euxo pipefail
 
-# See install.bash for the runtime image for much of the same, but
-# with more comments.
+# See install.bash for the base image for much of the same, but with
+# more comments.
 
 mkdir /tmp/riju-work
 pushd /tmp/riju-work

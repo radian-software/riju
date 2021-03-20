@@ -149,9 +149,7 @@ async function planDebianPackages(opts) {
             }
             clauses.push(`make installs L=${lang}`);
             clauses.push("make test");
-            await runCommand(
-              `make shell I=runtime CMD="${clauses.join(" && ")}"`
-            );
+            await runCommand(`make shell I=base CMD="${clauses.join(" && ")}"`);
           }
           await runCommand(`make upload L=${lang} T=${type}`);
         },
@@ -186,12 +184,12 @@ async function computePlan() {
     "ubuntu:rolling": await getLocalImageDigest("ubuntu:rolling"),
   };
   const packaging = await planDockerImage("packaging", dependentHashes);
-  const runtime = await planDockerImage("runtime", dependentHashes);
+  const base = await planDockerImage("base", dependentHashes);
   const packages = await planDebianPackages({
-    deps: [packaging.id, runtime.id],
+    deps: [packaging.id, base.id],
   });
   const composite = await planDockerImage("composite", dependentHashes, {
-    deps: [runtime.id, ...packages.map(({ id }) => id)],
+    deps: [base.id, ...packages.map(({ id }) => id)],
     hashOpts: {
       salt: {
         packageHashes: packages.map(({ desired }) => desired).sort(),
@@ -202,7 +200,7 @@ async function computePlan() {
   const app = await planDockerImage("app", dependentHashes, {
     deps: [composite.id, compile.id],
   });
-  return [packaging, runtime, ...packages, composite, compile, app];
+  return [packaging, base, ...packages, composite, compile, app];
 }
 
 function printTable(data, headers) {

@@ -12,7 +12,7 @@ import _ from "lodash";
 import { getLocalImageDigest, getLocalImageLabel } from "./docker-util.js";
 import { runCommand } from "./util.js";
 
-// Given a string like "runtime" that identifies the relevant
+// Given a string like "base" that identifies the relevant
 // Dockerfile, read it from disk and parse it into a list of commands.
 async function parseDockerfile(name) {
   const contents = await fs.readFile(`docker/${name}/Dockerfile`, "utf-8");
