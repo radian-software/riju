@@ -4,7 +4,7 @@ import http from "http";
 import { Command } from "commander";
 import express from "express";
 
-import { readLangConfig } from "../lib/yaml.js";
+import { getSharedDepsForLangConfig, readLangConfig } from "../lib/yaml.js";
 import { getLocalImageLabel } from "./docker-util.js";
 import { hashDockerfile } from "./hash-dockerfile.js";
 import { getDebHash, runCommand } from "./util.js";
@@ -35,7 +35,7 @@ async function main() {
         langHash: await getDebHash(`build/lang/${lang}/riju-lang-${lang}.deb`),
         sharedHashes: (
           await Promise.all(
-            (((await readLangConfig(lang)).install || {}).riju || []).map(
+            getSharedDepsForLangConfig(await readLangConfig(lang)).map(
               async (name) =>
                 await getDebHash(`build/shared/${name}/riju-shared-${name}.deb`)
             )

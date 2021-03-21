@@ -64,6 +64,24 @@ async function listFiles(path) {
   }
 }
 
+export async function getBaseImages(name) {
+  const dockerfile = await parseDockerfile(name);
+  const baseImages = [];
+  dockerfile.map(({ name, args, error }) => {
+    if (error) {
+      throw error;
+      if (name === "FROM") {
+        if (typeof args !== "string") {
+          throw new Error("got unexpected non-string for FROM args");
+        }
+        const image = args.split(" ")[0];
+        baseImages.push(image);
+      }
+    }
+  });
+  return baseImages;
+}
+
 // Given a Dockerfile name like "packaging", read all the necessary
 // files from disk and then convert the Dockerfile into a JavaScript
 // object which includes all relevant build context. The idea is that

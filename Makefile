@@ -41,6 +41,9 @@ image: # I=<image> [L=<lang>] [NC=1] : Build a Docker image
 ifeq ($(I),lang)
 	@: $${L}
 	node tools/build-lang-image.js --lang $(L)
+else ifeq ($(I),ubuntu)
+	docker pull ubuntu:rolling
+	docker tag ubuntu:rolling riju:ubuntu
 else ifneq (,$(filter $(I),admin ci))
 	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) $(NO_CACHE)
 else
@@ -66,21 +69,23 @@ else
 LANG_TAG := $(I)
 endif
 
+IMAGE_HASH := -e RIJU_IMAGE_HASH="$$(docker inspect riju:$(LANG_TAG) | jq '.[0].Config.Labels["riju.image-hash"]' -r)"
+
 shell: # I=<shell> [L=<lang>] [E=1] [P1|P2=<port>] : Launch Docker image with shell
 	@: $${I}
 ifneq (,$(filter $(I),admin ci))
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.ssh:/var/riju/.ssh -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) --network host riju:$(I) $(BASH_CMD)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.ssh:/var/riju/.ssh -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) --network host riju:$(I) $(BASH_CMD)
 else ifeq ($(I),app)
-	docker run -it --rm --hostname $(I) $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
+	docker run -it --rm --hostname $(I) $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) riju:$(I) $(BASH_CMD)
 else ifneq (,$(filter $(I),base lang))
 ifeq ($(I),lang)
 	@: $${L}
 endif
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src --label riju-install-target=yes $(SHELL_PORTS) $(SHELL_ENV) riju:$(LANG_TAG) $(BASH_CMD)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src --label riju-install-target=yes $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) riju:$(LANG_TAG) $(BASH_CMD)
 else ifeq ($(I),runtime)
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) riju:$(I) $(BASH_CMD)
 else
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) riju:$(I) $(BASH_CMD)
 endif
 
 ## This is equivalent to 'make pkg' in a fresh packaging container
@@ -194,11 +199,12 @@ dev: # Compile, run, and watch all artifacts and server for development
 
 ### Application tools
 
-## L can be a language identifier or a test type (run, repl, lsp,
-## format, etc.). Multiple identifiers can be separated by spaces to
-## form a conjunction (AND), or by commas to form a disjunction (OR).
+## L is a language identifier or a comma-separated list of them, to
+## filter tests by language. T is a test type (run, repl, lsp, format,
+## etc.) or a set of them to filter tests that way. If both filters
+## are provided, then only tests matching both are run.
 
-test: # L=<filter> : Run test(s) for language or test category
+test: # [L=<lang>[,...]] [T=<test>[,...]] : Run test(s) for language or test category
 	node backend/test-runner.js $(L)
 
 ## Functions such as 'repl', 'run', 'format', etc. are available in
@@ -219,9 +225,6 @@ lsp: # L=<lang|cmd> : Run LSP REPL for language or custom command line
 
 ### Fetch artifacts from registries
 
-pull-base: # Pull latest base image(s) from Docker Hub
-	docker pull ubuntu:rolling
-
 pull: # I=<image> : Pull last published Riju image from Docker Hub
 	@: $${I} $${DOCKER_REPO}
 	docker pull $(DOCKER_REPO):$(I)
@@ -231,12 +234,6 @@ download: # L=<lang> T=<type> : Download last published .deb from S3
 	@: $${L} $${T} $${S3_BUCKET}
 	mkdir -p $(BUILD)
 	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB) --no-sign-request
-
-plan: # Display plan to pull/rebuild outdated or missing artifacts
-	node tools/plan-publish.js
-
-sync: # Pull/rebuild outdated or missing artifacts
-	node tools/plan-publish.js --execute
 
 ### Publish artifacts to registries
 
@@ -250,11 +247,6 @@ upload: # L=<lang> T=<type> : Upload .deb to S3
 	aws s3 rm --recursive $(S3_HASH)
 	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
 	hash="$$(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash | grep .)"; aws s3 cp - "$(S3_HASH)/$${hash}" < /dev/null
-
-## You should probably only run this from CI.
-
-publish: # Full synchronization and prod deployment
-	tools/publish.bash
 
 ### Miscellaneous
 
@@ -274,7 +266,7 @@ env: # Run shell with .env file loaded and $PATH fixed
 tmux: # Start or attach to tmux session
 	MAKELEVEL= tmux attach || MAKELEVEL= tmux new-session -s tmux
 
-usage:
+ usage:
 	@cat Makefile | \
 		grep -E '^[^.:[:space:]]+:|[#]##' | \
 		sed -E 's/:[^#]*#([^:]+)$$/: #:\1/' | \

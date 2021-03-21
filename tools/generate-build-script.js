@@ -254,7 +254,7 @@ Description: The ${name} ${
     isShared ? "shared dependency" : "language"
   } packaged for Riju
 Depends: \$(IFS=,; echo "\${depends[*]}" | sed -E 's/^[ ,]*|[ ,]*$| *(, *)+/},{/g' | sed -E 's/ *(\\| *)+/}\\|{/g'${stripDependsFilter} | tr -d '{}' | sed -E 's/^[,|]+|[,|]+$//g' | sed -E 's/[,|]*,[,|]*/,/g' | sed -E 's/\\|+/|/g')
-Riju-Script-Hash: \$(sha1sum "\$0" | awk '{ print \$1 }')`;
+Riju-Script-Hash: \$((cat "\$0"; echo "\${RIJU_IMAGE_HASH}") | sha1sum - | awk '{ print \$1 }')`;
   parts.push(`\
 install -d "\${pkg}/DEBIAN"
 cat <<EOF > "\${pkg}/DEBIAN/control"
