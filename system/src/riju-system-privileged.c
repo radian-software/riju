@@ -51,7 +51,7 @@ void session(char *uuid, char *lang)
   char *argv[] = {
     "docker",
     "run",
-    "--rm",
+    "--rm", "-i",
     "-e", "HOME=/home/riju",
     "-e", "HOSTNAME=riju",
     "-e", "LANG=C.UTF-8",
@@ -66,7 +66,7 @@ void session(char *uuid, char *lang)
     "-e", "USERNAME=riju",
     "--hostname", "riju",
     "--name", container,
-    image, "tail", "-f", "/dev/null", NULL,
+    image, "cat", NULL,
   };
   execvp(argv[0], argv);
   die("execvp failed");

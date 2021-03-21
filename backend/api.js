@@ -442,7 +442,7 @@ export class Session {
         // block signals. Killing the foreground process (i.e. pid1)
         // should cause the Docker runtime to bring everything else
         // down in flames.
-        this.container.proc.kill();
+        this.container.proc.stdin.end();
       }
       allSessions.delete(this);
       this.ws.terminate();
