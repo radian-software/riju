@@ -228,8 +228,9 @@ async function getDeployArtifact(langs) {
     dependencies: ["image:app"]
       .concat(langs.map((lang) => `image:lang-${lang}`))
       .concat(langs.map((lang) => `test:lang-${lang}`)),
-    getLocalHash: async () => {
-      return null;
+    publishOnly: true,
+    publishToRegistry: async () => {
+      await runCommand(`tools/deploy.bash`);
     },
   };
 }
@@ -273,6 +274,10 @@ async function getDepGraph() {
   return { informationalDependencies, artifacts };
 }
 
+async function executeDepGraph({ publish, yes, targets }) {
+  //
+}
+
 async function main() {
   const program = new Command();
   program.usage("<target>...");
@@ -293,7 +298,7 @@ async function main() {
   if (program.args.length === 0) {
     program.help({ error: true });
   }
-  console.log("doing things now");
+  await executeDepGraph({ publish, yes, targets: program.args });
 }
 
 if (process.argv[1] === url.fileURLToPath(import.meta.url)) {
