@@ -28,9 +28,11 @@ if dpkg-deb -f "riju-lang-${LANG}.deb" -f Depends | grep .; then
     apt-get update
 fi
 
-for file in ./riju-shared-*.deb; do
-    apt-get install -y "${file}"
-done
+if compgen -G "./riju-shared-*.deb"; then
+    for file in ./riju-shared-*.deb; do
+        apt-get install -y "${file}"
+    done
+fi
 
 apt-get install -y "./riju-lang-${LANG}.deb"
 

@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import http from "http";
+import url from "url";
 
 import { Command } from "commander";
 import express from "express";
@@ -24,7 +25,7 @@ async function main() {
   program.requiredOption("--lang <id>", "language ID");
   program.option("--debug", "interactive debugging");
   program.parse(process.argv);
-  const { lang, debug } = program;
+  const { lang, debug } = program.opts();
   const hash = await hashDockerfile(
     "lang",
     {
@@ -35,7 +36,7 @@ async function main() {
         langHash: await getDebHash(`build/lang/${lang}/riju-lang-${lang}.deb`),
         sharedHashes: (
           await Promise.all(
-            getSharedDepsForLangConfig(await readLangConfig(lang)).map(
+            (await getSharedDepsForLangConfig(await readLangConfig(lang))).map(
               async (name) =>
                 await getDebHash(`build/shared/${name}/riju-shared-${name}.deb`)
             )

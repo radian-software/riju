@@ -15,7 +15,7 @@ const allSessions = new Set();
 
 export class Session {
   get homedir() {
-    return `/tmp/riju/${this.uuid}`;
+    return "/home/riju/src";
   }
 
   get config() {
