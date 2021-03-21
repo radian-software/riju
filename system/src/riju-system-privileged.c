@@ -81,7 +81,7 @@ void wait_alarm(int signum)
 void wait(char *uuid)
 {
   char *cmdline;
-  if (asprintf(&cmdline, "docker inspect riju-session-%s", uuid) < 0)
+  if (asprintf(&cmdline, "docker inspect riju-session-%s >/dev/null 2>&1", uuid) < 0)
     die("asprintf failed");
   struct timespec ts;
   ts.tv_sec = 0;
@@ -92,6 +92,10 @@ void wait(char *uuid)
     FILE *proc = popen(cmdline, "r");
     if (proc == NULL)
       die("popen failed");
+    char buf[1024];
+    while (fgets(buf, 1024, proc) != NULL);
+    if (ferror(proc))
+      die("fgets failed");
     int status = pclose(proc);
     if (status < 0)
       die("pclose failed");
