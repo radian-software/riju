@@ -50,6 +50,7 @@ export class Session {
   privilegedSession = () => util.privilegedSession(this.context);
   privilegedWait = () => util.privilegedWait(this.context);
   privilegedExec = (args) => util.privilegedExec(this.context, args);
+  privilegedPty = (args) => util.privilegedPty(this.context, args);
 
   setup = async () => {
     try {
@@ -324,7 +325,7 @@ export class Session {
         code += suffix + "\n";
       }
       await this.writeCode(code);
-      const termArgs = this.privilegedExec(bash(cmdline));
+      const termArgs = this.privilegedPty(bash(cmdline));
       const term = {
         pty: pty.spawn(termArgs[0], termArgs.slice(1), {
           name: "xterm-color",

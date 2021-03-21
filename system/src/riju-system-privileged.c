@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <grp.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,7 +22,8 @@ void die_with_usage()
   die("usage:\n"
       "  riju-system-privileged session UUID LANG\n"
       "  riju-system-privileged wait UUID\n"
-      "  riju-system-privileged exec UUID CMDLINE...");
+      "  riju-system-privileged exec UUID CMDLINE...\n"
+      "  riju-system-privileged pty UUID CMDLINE...");
 }
 
 char *parseUUID(char *uuid)
@@ -107,7 +109,7 @@ void wait(char *uuid)
   }
 }
 
-void exec(char *uuid, int argc, char **cmdline)
+void exec(char *uuid, int argc, char **cmdline, bool pty)
 {
   char *container;
   if (asprintf(&container, "riju-session-%s", uuid) < 0)
@@ -115,7 +117,7 @@ void exec(char *uuid, int argc, char **cmdline)
   char *argvPrefix[] = {
     "docker",
     "exec",
-    "-it",
+    pty ? "-it" : "-i",
     container,
   };
   char **argv = malloc(sizeof(argvPrefix) + (argc + 1) * sizeof(char *));
@@ -152,7 +154,13 @@ int main(int argc, char **argv)
   if (!strcmp(argv[1], "exec")) {
     if (argc < 4)
       die_with_usage();
-    exec(parseUUID(argv[2]), argc, &argv[3]);
+    exec(parseUUID(argv[2]), argc, &argv[3], false);
+    return 0;
+  }
+  if (!strcmp(argv[1], "pty")) {
+    if (argc < 4)
+      die_with_usage();
+    exec(parseUUID(argv[2]), argc, &argv[3], true);
     return 0;
   }
   die_with_usage();

@@ -56,6 +56,10 @@ export function privilegedExec({ uuid }, args) {
   return [rijuSystemPrivileged, "exec", uuid].concat(args);
 }
 
+export function privilegedPty({ uuid }, args) {
+  return [rijuSystemPrivileged, "pty", uuid].concat(args);
+}
+
 export function bash(cmdline) {
   if (!cmdline.match(/[;|&(){}=\n]/)) {
     // Reduce number of subshells we generate, if we're just running a
