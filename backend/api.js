@@ -437,11 +437,6 @@ export class Session {
       this.log(`Tearing down session`);
       this.tearingDown = true;
       if (this.container) {
-        // SIGTERM should be sufficient as the command running in the
-        // foreground is just 'tail -f /dev/null' which won't try to
-        // block signals. Killing the foreground process (i.e. pid1)
-        // should cause the Docker runtime to bring everything else
-        // down in flames.
         this.container.proc.stdin.end();
       }
       allSessions.delete(this);
