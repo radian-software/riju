@@ -102,16 +102,18 @@ async function getImageArtifact({ tag, isBaseImage, isLangImage }) {
         return null;
       }
       const dependentDockerHashes = {};
-      for (const baseImageTag of baseImageTag) {
+      for (const baseImageTag of baseImageTags) {
         dependentDockerHashes[`riju:${baseImageTag}`] =
           dependencyHashes[`image:${baseImageTag}`];
       }
-      const salt = null;
+      let salt = null;
       if (isLangImage) {
-        salt.langHash = dependencyHashes[`deb:lang-${isLangImage.lang}`];
-        salt.sharedHashes = isLangImage.sharedDeps.map(
-          (name) => dependencyHashes[`deb:shared-${name}`]
-        );
+        salt = {
+          langHash: dependencyHashes[`deb:lang-${isLangImage.lang}`],
+          sharedHashes: isLangImage.sharedDeps.map(
+            (name) => dependencyHashes[`deb:shared-${name}`]
+          ),
+        };
       }
       return await hashDockerfile(name, dependentDockerHashes, { salt });
     },
@@ -151,13 +153,12 @@ async function getDebArtifact({ type, lang }) {
     getPublishedHash: async ({ s3DebHashes }) => {
       return s3DebHashes[`riju-${type}-${lang}`] || null;
     },
-    getDesiredHash: async () => {
+    getDesiredHash: async (dependencyHashes) => {
       let contents = await fs.readFile(
         `build/${type}/${lang}/build.bash`,
         "utf-8"
       );
-      contents +=
-        (await getLocalImageLabel("riju:packaging", "riju.image-hash")) + "\n";
+      contents += dependencyHashes["image:packaging"] + "\n";
       return crypto.createHash("sha1").update(contents).digest("hex");
     },
     buildLocally: async () => {
@@ -198,8 +199,8 @@ async function getLanguageTestArtifact({ lang }) {
     getPublishedHash: async ({ s3TestHashes }) => {
       return s3TestHashes[lang];
     },
-    getDesiredHash: async () => {
-      return await getTestHash(lang);
+    getDesiredHash: async (dependencyHashes) => {
+      return await getTestHash(lang, dependencyHashes["image:runtime"]);
     },
     buildLocally: async () => {
       await runCommand(`make shell I=runtime CMD="make test L=${lang}"`);
@@ -296,7 +297,47 @@ async function executeDepGraph({ depgraph, publish, yes, targets }) {
     artifacts[artifact.name] = artifact;
   }
   const transitiveTargets = getTransitiveDependencies({ artifacts, targets });
-  console.log(transitiveTargets);
+  const requiredInfo = new Set();
+  for (const target of transitiveTargets) {
+    for (const name of Object.values(
+      artifacts[target].informationalDependencies || {}
+    )) {
+      requiredInfo.add(name);
+    }
+  }
+  const info = {};
+  await Promise.all(
+    [...requiredInfo].map(async (name) => {
+      info[name] = await depgraph.informationalDependencies[name]();
+    })
+  );
+  const hashes = {
+    local: {},
+    published: {},
+    desired: {},
+  };
+  await Promise.all(
+    transitiveTargets.map(async (target) => {
+      const {
+        publishOnly,
+        getLocalHash,
+        getPublishedHash,
+        getDesiredHash,
+      } = artifacts[target];
+      await Promise.all([
+        getLocalHash(info).then((hash) => {
+          hashes.local[target] = hash;
+        }),
+        getPublishedHash(info).then((hash) => {
+          hashes.published[target] = hash;
+        }),
+        getDesiredHash(info).then((hash) => {
+          hashes.desired[target] = hash;
+        }),
+      ]);
+    })
+  );
+  console.log(hashes);
 }
 
 async function main() {

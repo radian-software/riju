@@ -743,7 +743,7 @@ async function main() {
     await fs.mkdir(`build/test-hashes/lang`, { recursive: true });
     await fs.writeFile(
       `build/test-hashes/lang/${lang}`,
-      await getTestHash(lang)
+      await getTestHash(lang, process.env.RIJU_IMAGE_HASH)
     );
   }
   process.exit(failed.size > 0 ? 1 : 0);
