@@ -291,10 +291,19 @@ function getTransitiveDependencies({ artifacts, targets }) {
   return _.sortBy([...found], (name) => Object.keys(artifacts).indexOf(name));
 }
 
-async function executeDepGraph({ depgraph, publish, yes, targets }) {
+async function executeDepGraph({ depgraph, manual, publish, yes, targets }) {
   const artifacts = {};
   for (const artifact of depgraph.artifacts) {
     artifacts[artifact.name] = artifact;
+  }
+  if (manual) {
+    for (const target of targets) {
+      if (artifacts[target].dependencies.length > 0) {
+        throw new Error(
+          `cannot build target ${target} with --manual as it is not a leaf artifact`
+        );
+      }
+    }
   }
   const transitiveTargets = getTransitiveDependencies({ artifacts, targets });
   const requiredInfo = new Set();
@@ -316,6 +325,41 @@ async function executeDepGraph({ depgraph, publish, yes, targets }) {
     published: {},
     desired: {},
   };
+  const promises = {
+    local: {},
+    published: {},
+    desired: {},
+  };
+  for (const target of transitiveTargets) {
+    promises.local[target] = artifacts[target].getLocalHash(info);
+    promises.published[target] = artifacts[target].getPublishedHash(info);
+    promises.desired[target] = (async () => {
+      if (manual) {
+        return null;
+      }
+      const dependencyHashes = {};
+      for (const dependency of artifacts[target].dependencies) {
+        dependencyHashes[dependency] = await promises.desired[dependency];
+      }
+      let hash = await artifacts[target].getDesiredHash(dependencyHashes);
+      if (hash !== null) {
+        return hash;
+      }
+      // If hash is missing, cast about in blind panic for another
+      // possible way to compute it.
+      hash = await promises.published[target];
+      if (hash !== null) {
+        return hash;
+      }
+      hash = await promises.local[target];
+      if (hash !== null) {
+        return hash;
+      }
+      throw new Error(
+        `artifact must be built manually: dep ${target} --manual [--publish]`
+      );
+    })();
+  }
   await Promise.all(
     transitiveTargets.map(async (target) => {
       const {
@@ -325,13 +369,13 @@ async function executeDepGraph({ depgraph, publish, yes, targets }) {
         getDesiredHash,
       } = artifacts[target];
       await Promise.all([
-        getLocalHash(info).then((hash) => {
+        promises.local[target].then((hash) => {
           hashes.local[target] = hash;
         }),
-        getPublishedHash(info).then((hash) => {
+        promises.published[target].then((hash) => {
           hashes.published[target] = hash;
         }),
-        getDesiredHash(info).then((hash) => {
+        promises.desired[target].then((hash) => {
           hashes.desired[target] = hash;
         }),
       ]);
@@ -344,10 +388,11 @@ async function main() {
   const program = new Command();
   program.usage("<target>...");
   program.option("--list", "list available artifacts; ignore other arguments");
+  program.option("--manual", "operate manually on leaf artifacts");
   program.option("--publish", "publish artifacts to remote registries");
   program.option("--yes", "execute plan without confirmation");
   program.parse(process.argv);
-  const { list, publish, yes } = program.opts();
+  const { list, manual, publish, yes } = program.opts();
   const depgraph = await getDepGraph();
   if (list) {
     for (const { name } of depgraph.artifacts) {
@@ -360,7 +405,13 @@ async function main() {
   if (program.args.length === 0) {
     program.help({ error: true });
   }
-  await executeDepGraph({ depgraph, publish, yes, targets: program.args });
+  await executeDepGraph({
+    depgraph,
+    manual,
+    publish,
+    yes,
+    targets: program.args,
+  });
 }
 
 if (process.argv[1] === url.fileURLToPath(import.meta.url)) {
