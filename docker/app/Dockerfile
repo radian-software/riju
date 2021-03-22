@@ -1,4 +1,4 @@
-FROM ubuntu:rolling AS build
+FROM riju:ubuntu AS build
 
 COPY docker/app/install-build.bash /tmp/
 RUN /tmp/install-build.bash

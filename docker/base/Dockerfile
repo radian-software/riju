@@ -1,4 +1,4 @@
-FROM ubuntu:rolling
+FROM riju:ubuntu
 
 COPY docker/base/install.bash /tmp/
 RUN /tmp/install.bash

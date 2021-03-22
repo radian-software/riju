@@ -4,6 +4,7 @@ import process from "process";
 import url from "url";
 
 import { Command } from "commander";
+import _ from "lodash";
 
 import { getTestHash } from "../lib/hash-test.js";
 import {
@@ -76,13 +77,11 @@ async function getImageArtifact({ tag, isBaseImage, isLangImage }) {
       }
       return baseImage.replace(/^riju:/, "");
     });
-    dependencies = baseImageTags.map(
-      (baseImageName) => `image:${baseImageTag}`
-    );
+    dependencies = baseImageTags.map((baseImageTag) => `image:${baseImageTag}`);
   }
   if (isLangImage) {
     dependencies.push(`deb:lang-${isLangImage.lang}`);
-    dependencies.concat(
+    dependencies = dependencies.concat(
       isLangImage.sharedDeps.map((name) => `deb:shared-${name}`)
     );
   }
@@ -178,7 +177,7 @@ async function getDebArtifact({ type, lang }) {
 async function getLanguageTestArtifact({ lang }) {
   return {
     name: `test:lang-${lang}`,
-    dependencies: ["image:runtime"],
+    dependencies: ["image:runtime", `image:lang-${lang}`],
     informationalDependencies: {
       getPublishedHash: "s3TestHashes",
       retrieveFromRegistry: "s3TestHashes",
@@ -274,8 +273,30 @@ async function getDepGraph() {
   return { informationalDependencies, artifacts };
 }
 
-async function executeDepGraph({ publish, yes, targets }) {
-  //
+function getTransitiveDependencies({ artifacts, targets }) {
+  let queue = targets;
+  let found = new Set();
+  while (queue.length > 0) {
+    const name = queue.pop();
+    if (found.has(name)) {
+      continue;
+    }
+    if (!artifacts[name]) {
+      throw new Error(`no such artifact: ${name}`);
+    }
+    queue = queue.concat(artifacts[name].dependencies);
+    found.add(name);
+  }
+  return _.sortBy([...found], (name) => Object.keys(artifacts).indexOf(name));
+}
+
+async function executeDepGraph({ depgraph, publish, yes, targets }) {
+  const artifacts = {};
+  for (const artifact of depgraph.artifacts) {
+    artifacts[artifact.name] = artifact;
+  }
+  const transitiveTargets = getTransitiveDependencies({ artifacts, targets });
+  console.log(transitiveTargets);
 }
 
 async function main() {
@@ -298,7 +319,7 @@ async function main() {
   if (program.args.length === 0) {
     program.help({ error: true });
   }
-  await executeDepGraph({ publish, yes, targets: program.args });
+  await executeDepGraph({ depgraph, publish, yes, targets: program.args });
 }
 
 if (process.argv[1] === url.fileURLToPath(import.meta.url)) {

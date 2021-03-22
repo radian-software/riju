@@ -70,13 +70,13 @@ export async function getBaseImages(name) {
   dockerfile.map(({ name, args, error }) => {
     if (error) {
       throw error;
-      if (name === "FROM") {
-        if (typeof args !== "string") {
-          throw new Error("got unexpected non-string for FROM args");
-        }
-        const image = args.split(" ")[0];
-        baseImages.push(image);
+    }
+    if (name === "FROM") {
+      if (typeof args !== "string") {
+        throw new Error("got unexpected non-string for FROM args");
       }
+      const image = args.split(" ")[0];
+      baseImages.push(image);
     }
   });
   return baseImages;
