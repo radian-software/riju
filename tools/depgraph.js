@@ -335,7 +335,8 @@ async function executeDepGraph({ depgraph, manual, publish, yes, targets }) {
     promises.published[target] = artifacts[target].getPublishedHash(info);
     promises.desired[target] = (async () => {
       if (manual) {
-        return null;
+        // Artifact has no dependencies in this case.
+        return await artifacts[target].getDesiredHash({});
       }
       const dependencyHashes = {};
       for (const dependency of artifacts[target].dependencies) {
