@@ -37,7 +37,7 @@ function getInformationalDependencies() {
         JSON.parse(
           (
             await runCommand(
-              `aws s3api list-objects-v2 --bucket riju-debs --prefix hashes`,
+              `aws s3api list-objects-v2 --bucket '${getS3Bucket()}' --prefix hashes`,
               { getStdout: true }
             )
           ).stdout || '{"Contents": []}'
@@ -52,7 +52,7 @@ function getInformationalDependencies() {
         JSON.parse(
           (
             await runCommand(
-              `aws s3api list-objects-v2 --bucket riju-debs --prefix test-hashes/lang`,
+              `aws s3api list-objects-v2 --bucket '${getS3Bucket()}' --prefix test-hashes/lang`,
               { getStdout: true }
             )
           ).stdout || '{"Contents": []}'

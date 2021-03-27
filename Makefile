@@ -8,7 +8,7 @@ export
 
 BUILD := build/$(T)/$(L)
 DEB := riju-$(T)-$(L).deb
-S3_DEBS := s3://$(S3_BUCKET)-debs
+S3_DEBS := s3://$(S3_BUCKET)
 S3_DEB := $(S3_DEBS)/debs/$(DEB)
 S3_HASH := $(S3_DEBS)/hashes/riju-$(T)-$(L)
 
@@ -146,9 +146,9 @@ pkg-deb: # L=<lang> T=<type> [Z=gzip|xz] : Build .deb from packaging environment
 	@: $${L} $${T}
 	fakeroot dpkg-deb --build -Z$(Z) $(BUILD)/pkg $(BUILD)/$(DEB)
 
-## This is equivalent to the sequence 'pkg-clean', 'pkg-build', 'pkg-deb'.
+## This is equivalent to the sequence 'script', 'pkg-clean', 'pkg-build', 'pkg-deb'.
 
-pkg: pkg-clean pkg-build pkg-deb # L=<lang> T=<type> [Z=gzip|xz] : Build fresh .deb
+pkg: script pkg-clean pkg-build pkg-deb # L=<lang> T=<type> [Z=gzip|xz] : Build fresh .deb
 
 ## This is equivalent to 'make pkg T=lang', 'make pkg T=config'. For
 ## shared dependencies, use 'make pkg T=shared' directly.

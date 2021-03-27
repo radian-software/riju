@@ -43,7 +43,7 @@ data "aws_iam_policy_document" "deploy" {
     ]
 
     resources = [
-      "arn:aws:s3:::${aws_s3_bucket.riju_debs.bucket}",
+      "arn:aws:s3:::${aws_s3_bucket.riju.bucket}",
     ]
   }
 
@@ -53,7 +53,7 @@ data "aws_iam_policy_document" "deploy" {
     ]
 
     resources = [
-      "arn:aws:s3:::${aws_s3_bucket.riju_debs.bucket}/*",
+      "arn:aws:s3:::${aws_s3_bucket.riju.bucket}/*",
     ]
   }
 }
@@ -69,7 +69,7 @@ resource "aws_iam_user_policy_attachment" "deploy" {
   policy_arn = aws_iam_policy.deploy.arn
 }
 
-data "aws_iam_policy_document" "riju_debs" {
+data "aws_iam_policy_document" "riju" {
   statement {
     principals {
       type        = "*"
@@ -81,7 +81,7 @@ data "aws_iam_policy_document" "riju_debs" {
     ]
 
     resources = [
-      "arn:aws:s3:::${aws_s3_bucket.riju_debs.bucket}",
+      "arn:aws:s3:::${aws_s3_bucket.riju.bucket}",
     ]
   }
 
@@ -96,19 +96,19 @@ data "aws_iam_policy_document" "riju_debs" {
     ]
 
     resources = [
-      "arn:aws:s3:::${aws_s3_bucket.riju_debs.bucket}/*",
+      "arn:aws:s3:::${aws_s3_bucket.riju.bucket}/*",
     ]
   }
 }
 
-resource "aws_s3_bucket" "riju_debs" {
-  bucket = "${data.external.env.result.S3_BUCKET}-debs"
+resource "aws_s3_bucket" "riju" {
+  bucket = data.external.env.result.S3_BUCKET
   tags   = local.tags
 }
 
-resource "aws_s3_bucket_policy" "riju_debs" {
-  bucket = aws_s3_bucket.riju_debs.id
-  policy = data.aws_iam_policy_document.riju_debs.json
+resource "aws_s3_bucket_policy" "riju" {
+  bucket = aws_s3_bucket.riju.id
+  policy = data.aws_iam_policy_document.riju.json
 }
 
 data "aws_ami" "server" {

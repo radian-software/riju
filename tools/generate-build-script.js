@@ -349,9 +349,7 @@ async function main() {
       "package category (lang, config, shared)"
     );
   program.parse(process.argv);
-  console.log(
-    await generateBuildScript({ lang: program.lang, type: program.type })
-  );
+  console.log(await generateBuildScript(program.opts()));
   process.exit(0);
 }
 
