@@ -130,7 +130,11 @@ async function getImageArtifact({ tag, isBaseImage, isLangImage }) {
       return await hashDockerfile(name, dependentDockerHashes, { salt });
     },
     buildLocally: async () => {
-      await runCommand(`make image I=${tag}`);
+      if (isLangImage) {
+        await runCommand(`make image I=${name} L=${isLangImage.lang}`);
+      } else {
+        await runCommand(`make image I=${name}`);
+      }
     },
     retrieveFromRegistry: async () => {
       await runCommand(`make pull I=${tag}`);
@@ -563,15 +567,19 @@ async function executeDepGraph({
         .join(", ")
   );
   console.log();
-  console.log("Do you want to perform these actions?");
-  console.log("  Depgraph will perform the actions described above.");
-  console.log("  Only 'yes' will be accepted to approve.");
-  console.log();
-  const resp = await getUserInput("  Enter a value: ");
-  if (resp !== "yes") {
+  if (yes) {
+    console.log("Skipping confirmation since --yes was passed.");
+  } else {
+    console.log("Do you want to perform these actions?");
+    console.log("  Depgraph will perform the actions described above.");
+    console.log("  Only 'yes' will be accepted to approve.");
     console.log();
-    console.log("Apply cancelled.");
-    process.exit(1);
+    const resp = await getUserInput("  Enter a value: ");
+    if (resp !== "yes") {
+      console.log();
+      console.log("Apply cancelled.");
+      process.exit(1);
+    }
   }
   for (let idx = 0; idx < plan.length; idx++) {
     const { artifact, action } = plan[idx];
