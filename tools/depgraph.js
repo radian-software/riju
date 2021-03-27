@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { promises as fs } from "fs";
 import process from "process";
+import readline from "readline";
 import url from "url";
 
 import { Command } from "commander";
@@ -287,7 +288,7 @@ async function getDepGraph() {
 }
 
 function getTransitiveDependencies({ artifacts, targets }) {
-  let queue = targets;
+  let queue = [...targets];
   let found = new Set();
   while (queue.length > 0) {
     const name = queue.pop();
@@ -303,26 +304,56 @@ function getTransitiveDependencies({ artifacts, targets }) {
   return _.sortBy([...found], (name) => Object.keys(artifacts).indexOf(name));
 }
 
+function printTable(data, headers) {
+  const widths = headers.map(({ key, title }) =>
+    Math.max(title.length, ...data.map((datum) => datum[key].length))
+  );
+  [
+    headers.map(({ title }) => title.toUpperCase()),
+    widths.map((width) => "-".repeat(width)),
+    ...data.map((datum) => headers.map(({ key }) => datum[key])),
+  ].map((values) =>
+    console.log(
+      values.map((value, idx) => value.padEnd(widths[idx])).join("  ")
+    )
+  );
+}
+
+async function getUserInput(prompt) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    prompt: prompt,
+  });
+  rl.prompt();
+  const resp = await new Promise((resolve) => {
+    rl.on("line", (line) => {
+      resolve(line);
+    });
+  });
+  rl.close();
+  return resp;
+}
+
 async function executeDepGraph({
   depgraph,
   manual,
   holdManual,
+  all,
   publish,
   yes,
   targets,
 }) {
   const artifacts = {};
   for (const artifact of depgraph.artifacts) {
-    artifacts[artifact.name] = artifact;
-  }
-  if (manual) {
-    for (const target of targets) {
-      if (artifacts[target].dependencies.length > 0) {
+    for (const dep of artifact.dependencies) {
+      if (!artifacts[dep]) {
         throw new Error(
-          `cannot build target ${target} with --manual as it is not a leaf artifact`
+          `artifact ${artifact.name} appears before dependency ${dep} in depgraph`
         );
       }
     }
+    artifacts[artifact.name] = artifact;
   }
   const transitiveTargets = getTransitiveDependencies({ artifacts, targets });
   const requiredInfo = new Set();
@@ -363,7 +394,7 @@ async function executeDepGraph({
           dependencyHashes[dependency] = await promises.desired[dependency];
           if (!dependencyHashes[dependency]) {
             throw new Error(
-              `manual dependency must be built explicitly: dep ${target} --manual [--publish]`
+              `manual dependency must be built explicitly: dep ${dependency} --manual [--publish]`
             );
           }
         }
@@ -389,12 +420,9 @@ async function executeDepGraph({
   }
   await Promise.all(
     transitiveTargets.map(async (target) => {
-      const {
-        publishOnly,
-        getLocalHash,
-        getPublishedHash,
-        getDesiredHash,
-      } = artifacts[target];
+      const { getLocalHash, getPublishedHash, getDesiredHash } = artifacts[
+        target
+      ];
       await Promise.all([
         promises.local[target].then((hash) => {
           hashes.local[target] = hash;
@@ -408,7 +436,156 @@ async function executeDepGraph({
       ]);
     })
   );
-  console.log(hashes);
+  const statuses = {};
+  for (const name in artifacts) {
+    if (!hashes.desired[name]) {
+      statuses[name] = "buildLocally";
+    } else if (
+      hashes.published[name] === hashes.desired[name] &&
+      hashes.local[name] === hashes.desired[name]
+    ) {
+      statuses[name] = null;
+    } else if (
+      hashes.local[name] === hashes.desired[name] &&
+      hashes.published[name] !== hashes.desired[name]
+    ) {
+      statuses[name] = "publishToRegistry";
+    } else if (
+      hashes.published[name] === hashes.desired[name] &&
+      hashes.local[name] !== hashes.desired[name]
+    ) {
+      statuses[name] = "downloadFromRegistry";
+    } else {
+      statuses[name] = "buildLocally";
+    }
+  }
+  let priorityTargets;
+  if (all) {
+    priorityTargets = transitiveTargets;
+  } else {
+    const queue = [...targets];
+    const found = new Set();
+    while (queue.length > 0) {
+      const name = queue.pop();
+      if (found.has(name)) {
+        continue;
+      }
+      for (const dep of artifacts[name].dependencies) {
+        if (statuses[dep] === "buildLocally") {
+          queue.push(dep);
+        }
+      }
+      found.add(name);
+    }
+    priorityTargets = [...found];
+  }
+  priorityTargets = _.sortBy(priorityTargets, (name) =>
+    Object.keys(artifacts).indexOf(name)
+  );
+  const plan = [];
+  const seen = new Set();
+  for (const target of priorityTargets) {
+    for (const dep of artifacts[target].dependencies) {
+      if (artifacts[target].publishTarget) {
+        if (statuses === "publishToRegistry") {
+          plan.push({
+            artifact: dep,
+            action: "publishToRegistry",
+          });
+        }
+      } else {
+        if (statuses === "downloadFromRegistry") {
+          plan.push({
+            artifact: dep,
+            action: "downloadFromRegistry",
+          });
+        }
+      }
+      if (seen.has(dep)) {
+        continue;
+      }
+      seen.add(dep);
+    }
+    if (statuses[target]) {
+      if (!artifacts[target].publishTarget) {
+        plan.push({
+          artifact: target,
+          action: statuses[target],
+        });
+      }
+      if (statuses[target] === "buildLocally" && publish) {
+        plan.push({
+          artifact: target,
+          action: "publishToRegistry",
+        });
+      }
+    }
+    seen.add(target);
+  }
+  const shortnames = {
+    buildLocally: "rebuild",
+    downloadFromRegistry: "download",
+    publishToRegistry: "publish",
+  };
+  const totals = {};
+  for (let { action } of plan) {
+    action = shortnames[action];
+    totals[action] = (totals[action] || 0) + 1;
+  }
+  console.log();
+  if (plan.length === 0) {
+    console.log("No updates needed.");
+    return;
+  }
+  printTable(
+    plan.map(({ artifact, action }) => {
+      const desc = {
+        buildLocally: "          rebuild",
+        downloadFromRegistry: "download",
+        publishToRegistry: "                   publish",
+      }[action];
+      if (!desc) {
+        throw new Error(`unexpected action key ${action}`);
+      }
+      return { artifact, desc };
+    }),
+    [
+      { key: "artifact", title: "Artifact" },
+      { key: "desc", title: "Action" },
+    ]
+  );
+  console.log();
+  console.log(
+    `Plan: ` +
+      ["download", "rebuild", "publish"]
+        .filter((action) => totals[action])
+        .map((action) => `${totals[action]} to ${action}`)
+        .join(", ")
+  );
+  console.log();
+  console.log("Do you want to perform these actions?");
+  console.log("  Depgraph will perform the actions described above.");
+  console.log("  Only 'yes' will be accepted to approve.");
+  console.log();
+  const resp = await getUserInput("  Enter a value: ");
+  if (resp !== "yes") {
+    console.log();
+    console.log("Apply cancelled.");
+    process.exit(1);
+  }
+  for (let idx = 0; idx < plan.length; idx++) {
+    const { artifact, action } = plan[idx];
+    console.log();
+    console.log(
+      `===== Step ${idx + 1} of ${plan.length}: ${
+        shortnames[action]
+      } ${artifact} =====`
+    );
+    console.log();
+    await artifacts[artifact][action](info);
+  }
+  console.log();
+  console.log("Apply successful!");
 }
 
 async function main() {
@@ -417,10 +594,11 @@ async function main() {
   program.option("--list", "list available artifacts; ignore other arguments");
   program.option("--manual", "operate explicitly on manual artifacts");
   program.option("--hold-manual", "prefer local versions of manual artifacts");
+  program.option("--all", "do not skip unneeded intermediate artifacts");
   program.option("--publish", "publish artifacts to remote registries");
   program.option("--yes", "execute plan without confirmation");
   program.parse(process.argv);
-  const { list, manual, holdManual, publish, yes } = program.opts();
+  const { list, manual, holdManual, all, publish, yes } = program.opts();
   const depgraph = await getDepGraph();
   if (list) {
     for (const { name } of depgraph.artifacts) {
@@ -437,6 +615,7 @@ async function main() {
     depgraph,
     manual,
     holdManual,
+    all,
     publish,
     yes,
     targets: program.args,
