@@ -17,6 +17,7 @@ import {
   getDockerRepo,
   getLocalImageLabel,
   getRemoteImageLabel,
+  getRemoteRepositoryTags,
 } from "./docker-util.js";
 import { getBaseImages, hashDockerfile } from "./hash-dockerfile.js";
 import { runCommand } from "./util.js";
@@ -60,6 +61,9 @@ function getInformationalDependencies() {
         })
       );
     },
+    dockerRepoTags: async () => {
+      return await getRemoteRepositoryTags(getDockerRepo());
+    },
   };
 }
 
@@ -88,13 +92,20 @@ async function getImageArtifact({ tag, isBaseImage, isLangImage }) {
   return {
     name: `image:${tag}`,
     dependencies: dependencies,
+    informationalDependencies: {
+      getPublishedHash: "dockerRepoTags",
+    },
     getLocalHash: async () => {
       return await getLocalImageLabel(`riju:${tag}`, "riju.image-hash");
     },
-    getPublishedHash: async () => {
+    getPublishedHash: async ({ dockerRepoTags }) => {
+      if (!dockerRepoTags.includes(tag)) {
+        return null;
+      }
       return await getRemoteImageLabel(
         `${DOCKER_REPO}:${tag}`,
-        "riju.image-hash"
+        "riju.image-hash",
+        dockerRepoTags
       );
     },
     getDesiredHash: async (dependencyHashes) => {
@@ -137,6 +148,7 @@ async function getDebArtifact({ type, lang }) {
       getPublishedHash: "s3DebHashes",
     },
     getLocalHash: async () => {
+      const debPath = `build/${type}/${lang}/riju-${type}-${lang}.deb`;
       try {
         await fs.access(debPath);
       } catch (err) {
@@ -228,7 +240,7 @@ async function getDeployArtifact(langs) {
     dependencies: ["image:app"]
       .concat(langs.map((lang) => `image:lang-${lang}`))
       .concat(langs.map((lang) => `test:lang-${lang}`)),
-    publishOnly: true,
+    publishTarget: true,
     publishToRegistry: async () => {
       await runCommand(`tools/deploy.bash`);
     },
@@ -338,36 +350,42 @@ async function executeDepGraph({
     desired: {},
   };
   for (const target of transitiveTargets) {
-    promises.local[target] = artifacts[target].getLocalHash(info);
-    promises.published[target] = artifacts[target].getPublishedHash(info);
-    promises.desired[target] = (async () => {
-      const dependencyHashes = {};
-      for (const dependency of artifacts[target].dependencies) {
-        dependencyHashes[dependency] = await promises.desired[dependency];
-        if (!dependencyHashes[dependency]) {
-          throw new Error(
-            `manual dependency must be built explicitly: dep ${target} --manual [--publish]`
-          );
+    if (artifacts[target].publishTarget) {
+      promises.local[target] = Promise.resolve(null);
+      promises.published[target] = Promise.resolve(null);
+      promises.desired[target] = Promise.resolve(null);
+    } else {
+      promises.local[target] = artifacts[target].getLocalHash(info);
+      promises.published[target] = artifacts[target].getPublishedHash(info);
+      promises.desired[target] = (async () => {
+        const dependencyHashes = {};
+        for (const dependency of artifacts[target].dependencies) {
+          dependencyHashes[dependency] = await promises.desired[dependency];
+          if (!dependencyHashes[dependency]) {
+            throw new Error(
+              `manual dependency must be built explicitly: dep ${target} --manual [--publish]`
+            );
+          }
         }
-      }
-      let hash = await artifacts[target].getDesiredHash(dependencyHashes);
-      if (hash || manual) {
-        return hash;
-      }
-      const promiseSets = [promises.published, promises.local];
-      if (holdManual) {
-        promiseSets.reverse();
-      }
-      for (const promiseSet of promiseSets) {
-        const hash = await promiseSet[target];
-        if (hash) {
+        let hash = await artifacts[target].getDesiredHash(dependencyHashes);
+        if (hash || manual) {
           return hash;
         }
-      }
-      throw new Error(
-        `manual artifact must be built explicitly: dep ${target} --manual [--publish]`
-      );
-    })();
+        const promiseSets = [promises.published, promises.local];
+        if (holdManual) {
+          promiseSets.reverse();
+        }
+        for (const promiseSet of promiseSets) {
+          const hash = await promiseSet[target];
+          if (hash) {
+            return hash;
+          }
+        }
+        throw new Error(
+          `manual artifact must be built explicitly: dep ${target} --manual [--publish]`
+        );
+      })();
+    }
   }
   await Promise.all(
     transitiveTargets.map(async (target) => {
