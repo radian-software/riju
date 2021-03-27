@@ -291,7 +291,14 @@ function getTransitiveDependencies({ artifacts, targets }) {
   return _.sortBy([...found], (name) => Object.keys(artifacts).indexOf(name));
 }
 
-async function executeDepGraph({ depgraph, manual, publish, yes, targets }) {
+async function executeDepGraph({
+  depgraph,
+  manual,
+  holdManual,
+  publish,
+  yes,
+  targets,
+}) {
   const artifacts = {};
   for (const artifact of depgraph.artifacts) {
     artifacts[artifact.name] = artifact;
@@ -334,30 +341,31 @@ async function executeDepGraph({ depgraph, manual, publish, yes, targets }) {
     promises.local[target] = artifacts[target].getLocalHash(info);
     promises.published[target] = artifacts[target].getPublishedHash(info);
     promises.desired[target] = (async () => {
-      if (manual) {
-        // Artifact has no dependencies in this case.
-        return await artifacts[target].getDesiredHash({});
-      }
       const dependencyHashes = {};
       for (const dependency of artifacts[target].dependencies) {
         dependencyHashes[dependency] = await promises.desired[dependency];
+        if (!dependencyHashes[dependency]) {
+          throw new Error(
+            `manual dependency must be built explicitly: dep ${target} --manual [--publish]`
+          );
+        }
       }
       let hash = await artifacts[target].getDesiredHash(dependencyHashes);
-      if (hash !== null) {
+      if (hash || manual) {
         return hash;
       }
-      // If hash is missing, cast about in blind panic for another
-      // possible way to compute it.
-      hash = await promises.published[target];
-      if (hash !== null) {
-        return hash;
+      const promiseSets = [promises.published, promises.local];
+      if (holdLocal) {
+        sets.reverse();
       }
-      hash = await promises.local[target];
-      if (hash !== null) {
-        return hash;
+      for (const promiseSet of promiseSets) {
+        const hash = await promiseSet[target];
+        if (hash) {
+          return hash;
+        }
       }
       throw new Error(
-        `artifact must be built manually: dep ${target} --manual [--publish]`
+        `manual artifact must be built explicitly: dep ${target} --manual [--publish]`
       );
     })();
   }
@@ -389,11 +397,12 @@ async function main() {
   const program = new Command();
   program.usage("<target>...");
   program.option("--list", "list available artifacts; ignore other arguments");
-  program.option("--manual", "operate manually on leaf artifacts");
+  program.option("--manual", "operate explicitly on manual artifacts");
+  program.option("--hold-manual", "prefer local versions of manual artifacts");
   program.option("--publish", "publish artifacts to remote registries");
   program.option("--yes", "execute plan without confirmation");
   program.parse(process.argv);
-  const { list, manual, publish, yes } = program.opts();
+  const { list, manual, holdManual, publish, yes } = program.opts();
   const depgraph = await getDepGraph();
   if (list) {
     for (const { name } of depgraph.artifacts) {
@@ -409,6 +418,7 @@ async function main() {
   await executeDepGraph({
     depgraph,
     manual,
+    holdManual,
     publish,
     yes,
     targets: program.args,
