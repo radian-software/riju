@@ -38,7 +38,7 @@ function getInformationalDependencies() {
               `aws s3api list-objects-v2 --bucket riju-debs --prefix hashes`,
               { getStdout: true }
             )
-          ).stdout
+          ).stdout || '{"Contents": []}'
         ).Contents.map(({ Key: key }) => {
           const [_, remoteName, remoteHash] = key.split("/");
           return [remoteName, remoteHash];
@@ -53,7 +53,7 @@ function getInformationalDependencies() {
               `aws s3api list-objects-v2 --bucket riju-debs --prefix test-hashes/lang`,
               { getStdout: true }
             )
-          ).stdout
+          ).stdout || '{"Contents": []}'
         ).Contents.map(({ Key: key }) => {
           const [_1, _2, remoteName, remoteHash] = key.split("/");
           return [remoteName, remoteHash];
@@ -355,7 +355,7 @@ async function executeDepGraph({
         return hash;
       }
       const promiseSets = [promises.published, promises.local];
-      if (holdLocal) {
+      if (holdManual) {
         sets.reverse();
       }
       for (const promiseSet of promiseSets) {

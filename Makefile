@@ -43,7 +43,7 @@ ifeq ($(I),lang)
 	node tools/build-lang-image.js --lang $(L)
 else ifeq ($(I),ubuntu)
 	docker pull ubuntu:rolling
-	docker tag ubuntu:rolling riju:ubuntu
+	hash="$$(docker inspect ubuntu:rolling | jq '.[0].Id' -r | sha1sum | awk '{ print $1 }')"; echo "FROM ubuntu:rolling" | docker build --label riju.image-hash="$${hash}" -t riju:$(I) -
 else ifneq (,$(filter $(I),admin ci))
 	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) $(NO_CACHE)
 else
