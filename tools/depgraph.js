@@ -197,7 +197,7 @@ async function getLanguageTestArtifact({ lang }) {
       }
     },
     getPublishedHash: async ({ s3TestHashes }) => {
-      return s3TestHashes[lang];
+      return s3TestHashes[lang] || null;
     },
     getDesiredHash: async (dependencyHashes) => {
       return await getTestHash(lang, dependencyHashes["image:runtime"]);
@@ -356,7 +356,7 @@ async function executeDepGraph({
       }
       const promiseSets = [promises.published, promises.local];
       if (holdManual) {
-        sets.reverse();
+        promiseSets.reverse();
       }
       for (const promiseSet of promiseSets) {
         const hash = await promiseSet[target];
