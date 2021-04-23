@@ -1,6 +1,7 @@
-id: "aspectc++"
+id: "aspectcpp"
 aliases:
-  - "aspectcpp"
+  - "aspectc++"
+  - "aspectcplusplus"
 name: "AspectC++"
 
 install:

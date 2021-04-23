@@ -1,8 +1,9 @@
-id: "objectivec++"
+id: "objectivecpp"
 aliases:
   - "objc++"
   - "objcpp"
-  - "objectivecpp"
+  - "objectivec++"
+  - "objectivecplusplus"
 name: "Objective-C++"
 
 install:
