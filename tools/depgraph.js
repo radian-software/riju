@@ -344,6 +344,7 @@ async function executeDepGraph({
   manual,
   holdManual,
   all,
+  localOnly,
   publish,
   yes,
   targets,
@@ -362,10 +363,16 @@ async function executeDepGraph({
   const transitiveTargets = getTransitiveDependencies({ artifacts, targets });
   const requiredInfo = new Set();
   for (const target of transitiveTargets) {
-    for (const name of Object.values(
+    for (const [method, name] of Object.entries(
       artifacts[target].informationalDependencies || {}
     )) {
-      requiredInfo.add(name);
+      if (
+        !(
+          localOnly &&
+          ["getPublishedHash", "retrieveFromRegistry"].includes(method)
+        )
+      )
+        requiredInfo.add(name);
     }
   }
   const info = {};
@@ -391,7 +398,9 @@ async function executeDepGraph({
       promises.desired[target] = Promise.resolve(null);
     } else {
       promises.local[target] = artifacts[target].getLocalHash(info);
-      promises.published[target] = artifacts[target].getPublishedHash(info);
+      promises.published[target] = localOnly
+        ? Promise.resolve(null)
+        : artifacts[target].getPublishedHash(info);
       promises.desired[target] = (async () => {
         const dependencyHashes = {};
         for (const dependency of artifacts[target].dependencies) {
@@ -424,9 +433,6 @@ async function executeDepGraph({
   }
   await Promise.all(
     transitiveTargets.map(async (target) => {
-      const { getLocalHash, getPublishedHash, getDesiredHash } = artifacts[
-        target
-      ];
       await Promise.all([
         promises.local[target].then((hash) => {
           hashes.local[target] = hash;
@@ -600,16 +606,28 @@ async function executeDepGraph({
 }
 
 async function main() {
-  const program = new Command();
+  const program = new Command("dep");
   program.usage("<target>...");
   program.option("--list", "list available artifacts; ignore other arguments");
   program.option("--manual", "operate explicitly on manual artifacts");
   program.option("--hold-manual", "prefer local versions of manual artifacts");
   program.option("--all", "do not skip unneeded intermediate artifacts");
+  program.option(
+    "--local-only",
+    "do not fetch artifacts from remote registries"
+  );
   program.option("--publish", "publish artifacts to remote registries");
   program.option("--yes", "execute plan without confirmation");
   program.parse(process.argv);
-  const { list, manual, holdManual, all, publish, yes } = program.opts();
+  const {
+    list,
+    manual,
+    holdManual,
+    all,
+    localOnly,
+    publish,
+    yes,
+  } = program.opts();
   const depgraph = await getDepGraph();
   if (list) {
     for (const { name } of depgraph.artifacts) {
@@ -627,6 +645,7 @@ async function main() {
     manual,
     holdManual,
     all,
+    localOnly,
     publish,
     yes,
     targets: program.args,
