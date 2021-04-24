@@ -733,7 +733,7 @@ async function main() {
   passed.forEach((_, { lang }) => {
     langsValidated[lang] = true;
   });
-  failed.forEach(({ lang }) => {
+  failed.forEach((_, { lang }) => {
     langsValidated[lang] = false;
   });
   for (const [lang, validated] of Object.entries(langsValidated)) {

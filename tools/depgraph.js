@@ -640,6 +640,7 @@ async function main() {
   if (program.args.length === 0) {
     program.help({ error: true });
   }
+  await runCommand("make all-scripts");
   await executeDepGraph({
     depgraph,
     manual,
