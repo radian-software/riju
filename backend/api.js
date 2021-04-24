@@ -56,33 +56,33 @@ export class Session {
     try {
       allSessions.add(this);
       const containerArgs = this.privilegedSession();
-      const containerProc = spawn(containerArgs[0], containerArgs.slice(1));
+      const containerPty = pty.spawn(containerArgs[0], containerArgs.slice(1), {
+        name: "xterm-color",
+      });
       this.container = {
-        proc: containerProc,
+        pty: containerPty,
       };
-      for (const stream of [containerProc.stdout, containerProc.stderr]) {
-        stream.on("data", (data) =>
-          this.send({
-            event: "serviceLog",
-            service: "container",
-            output: data.toString("utf8"),
-          })
-        );
-        containerProc.on("close", (code, signal) =>
-          this.send({
-            event: "serviceFailed",
-            service: "container",
-            error: `Exited with status ${signal || code}`,
-          })
-        );
-        containerProc.on("error", (err) =>
-          this.send({
-            event: "serviceFailed",
-            service: "container",
-            error: `${err}`,
-          })
-        );
-      }
+      containerPty.on("data", (data) =>
+        this.send({
+          event: "serviceLog",
+          service: "container",
+          output: data.toString("utf8"),
+        })
+      );
+      containerPty.on("close", (code, signal) =>
+        this.send({
+          event: "serviceFailed",
+          service: "container",
+          error: `Exited with status ${signal || code}`,
+        })
+      );
+      containerPty.on("error", (err) =>
+        this.send({
+          event: "serviceFailed",
+          service: "container",
+          error: `${err}`,
+        })
+      );
       await this.run(this.privilegedWait(this.context));
       if (this.config.setup) {
         await this.run(this.privilegedExec(bash(this.config.setup)));
@@ -438,7 +438,7 @@ export class Session {
       this.log(`Tearing down session`);
       this.tearingDown = true;
       if (this.container) {
-        this.container.proc.stdin.end();
+        this.container.pty.kill();
       }
       allSessions.delete(this);
       this.ws.terminate();

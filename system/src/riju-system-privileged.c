@@ -53,7 +53,7 @@ void session(char *uuid, char *lang)
   char *argv[] = {
     "docker",
     "run",
-    "--rm", "-i",
+    "--rm", "-it",
     "-e", "HOME=/home/riju",
     "-e", "HOSTNAME=riju",
     "-e", "LANG=C.UTF-8",
