@@ -49,8 +49,10 @@ export class Session {
 
   privilegedSession = () => util.privilegedSession(this.context);
   privilegedWait = () => util.privilegedWait(this.context);
-  privilegedExec = (args) => util.privilegedExec(this.context, args);
-  privilegedPty = (args) => util.privilegedPty(this.context, args);
+  privilegedExec = (cmdline) =>
+    util.privilegedExec(this.context, bash(cmdline));
+  privilegedPty = (cmdline) =>
+    util.privilegedPty(this.context, bash(cmdline, { stty: true }));
 
   setup = async () => {
     try {
@@ -85,11 +87,11 @@ export class Session {
       );
       await this.run(this.privilegedWait(this.context));
       if (this.config.setup) {
-        await this.run(this.privilegedExec(bash(this.config.setup)));
+        await this.run(this.privilegedExec(this.config.setup));
       }
       await this.runCode();
       if (this.config.daemon) {
-        const daemonArgs = this.privilegedExec(bash(this.config.daemon));
+        const daemonArgs = this.privilegedExec(this.config.daemon);
         const daemonProc = spawn(daemonArgs[0], daemonArgs.slice(1));
         this.daemon = {
           proc: daemonProc,
@@ -120,9 +122,9 @@ export class Session {
       }
       if (this.config.lsp) {
         if (this.config.lsp.setup) {
-          await this.run(this.privilegedExec(bash(this.config.lsp.setup)));
+          await this.run(this.privilegedExec(this.config.lsp.setup));
         }
-        const lspArgs = this.privilegedExec(bash(this.config.lsp.start));
+        const lspArgs = this.privilegedExec(this.config.lsp.start);
         const lspProc = spawn(lspArgs[0], lspArgs.slice(1));
         this.lsp = {
           proc: lspProc,
@@ -266,22 +268,11 @@ export class Session {
 
   writeCode = async (code) => {
     if (this.config.main.includes("/")) {
-      await this.run(
-        this.privilegedExec([
-          "mkdir",
-          "-p",
-          path.dirname(`${this.homedir}/${this.config.main}`),
-        ])
-      );
+      const dir = path.dirname(`${this.homedir}/${this.config.main}`);
+      await this.run(this.privilegedExec(`mkdir -p ${dir}`));
     }
-    await this.run(
-      this.privilegedExec([
-        "sh",
-        "-c",
-        `cat > ${path.resolve(this.homedir, this.config.main)}`,
-      ]),
-      { input: code }
-    );
+    const file = path.resolve(this.homedir, this.config.main);
+    await this.run(this.privilegedExec(`cat > ${file}`), { input: code });
   };
 
   runCode = async (code) => {
@@ -299,7 +290,7 @@ export class Session {
       if (this.term) {
         const pid = this.term.pty.pid;
         const args = this.privilegedExec(
-          bash(`kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`)
+          `kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`
         );
         spawn(args[0], args.slice(1));
         // Signal to terminalOutput message generator using closure.
@@ -325,7 +316,7 @@ export class Session {
         code += suffix + "\n";
       }
       await this.writeCode(code);
-      const termArgs = this.privilegedPty(bash(cmdline));
+      const termArgs = this.privilegedPty(cmdline);
       const term = {
         pty: pty.spawn(termArgs[0], termArgs.slice(1), {
           name: "xterm-color",
@@ -365,13 +356,13 @@ export class Session {
       if (this.formatter) {
         const pid = this.formatter.proc.pid;
         const args = this.privilegedExec(
-          bash(`kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`)
+          `kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`
         );
         spawn(args[0], args.slice(1));
         this.formatter.live = false;
         this.formatter = null;
       }
-      const args = this.privilegedExec(bash(this.config.format.run));
+      const args = this.privilegedExec(this.config.format.run);
       const formatter = {
         proc: spawn(args[0], args.slice(1)),
         live: true,
@@ -424,7 +415,7 @@ export class Session {
   };
 
   ensure = async (cmd) => {
-    const code = await this.run(this.privilegedExec(bash(cmd)), {
+    const code = await this.run(this.privilegedExec(cmd), {
       check: false,
     });
     this.send({ event: "ensured", code });

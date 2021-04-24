@@ -60,14 +60,19 @@ export function privilegedPty({ uuid }, args) {
   return [rijuSystemPrivileged, "pty", uuid].concat(args);
 }
 
-export function bash(cmdline) {
+export function bash(cmdline, opts) {
+  const stty = opts && opts.stty;
   if (!cmdline.match(/[;|&(){}=\n]/)) {
     // Reduce number of subshells we generate, if we're just running a
     // single command (no shell logic).
     cmdline = "exec " + cmdline;
   }
-  // Workaround https://github.com/moby/moby/issues/25450
-  cmdline = "stty cols 80 rows 24; " + cmdline;
+  if (stty) {
+    // Workaround https://github.com/moby/moby/issues/25450 (the issue
+    // thread claims the bug is resolved and released, but not in my
+    // testing).
+    cmdline = "stty cols 80 rows 24; " + cmdline;
+  }
   return ["bash", "-c", `set -euo pipefail; ${cmdline}`];
 }
 
