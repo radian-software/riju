@@ -66,6 +66,8 @@ export function bash(cmdline) {
     // single command (no shell logic).
     cmdline = "exec " + cmdline;
   }
+  // Workaround https://github.com/moby/moby/issues/25450
+  cmdline = "stty cols 80 rows 24; " + cmdline;
   return ["bash", "-c", `set -euo pipefail; ${cmdline}`];
 }
 
