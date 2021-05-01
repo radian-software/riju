@@ -81,7 +81,7 @@ else ifneq (,$(filter $(I),base lang))
 ifeq ($(I),lang)
 	@: $${L}
 endif
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src --label riju-install-target=yes $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) riju:$(LANG_TAG) $(BASH_CMD)
+	docker run -it --rm --hostname $(LANG_TAG) -v $(VOLUME_MOUNT):/src --label riju-install-target=yes $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) riju:$(LANG_TAG) $(BASH_CMD)
 else ifeq ($(I),runtime)
 	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) riju:$(I) $(BASH_CMD)
 else

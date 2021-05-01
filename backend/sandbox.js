@@ -2,14 +2,17 @@ import { spawn } from "child_process";
 import { promises as fs } from "fs";
 import process from "process";
 
+import pty from "node-pty";
 import { quote } from "shell-quote";
 
-import { getUUID } from "./util.js";
-
+import { readLangConfig } from "../lib/yaml.js";
 import {
-  privilegedSetup,
-  privilegedSpawn,
-  privilegedTeardown,
+  bash,
+  getUUID,
+  privilegedExec,
+  privilegedPty,
+  privilegedSession,
+  privilegedWait,
   run,
 } from "./util.js";
 
@@ -28,22 +31,40 @@ async function main() {
   if (!lang) {
     die("environment variable unset: $L");
   }
+  const langConfig = await readLangConfig(lang);
   const uuid = getUUID();
-  await run(privilegedSetup({ uuid }), log);
-  const args = privilegedSpawn({ uuid }, [
-    "bash",
-    "-c",
-    `exec env L='${lang}' bash --rcfile <(cat <<< ${quote([sandboxScript])})`,
-  ]);
+  console.log(`Starting session with UUID ${uuid}`);
+  const sessionArgs = privilegedSession({ uuid, lang });
+  const session = pty.spawn(sessionArgs[0], sessionArgs.slice(1), {
+    name: "xterm-color",
+  });
+  await run(privilegedWait({ uuid }), log);
+  console.log(
+    bash(
+      `env L='${lang}' LANG_CONFIG=${quote([
+        JSON.stringify(langConfig),
+      ])} bash --rcfile <(cat <<< ${quote([sandboxScript])})`
+    )[2]
+  );
+  const args = privilegedPty(
+    { uuid },
+    bash(
+      `env L='${lang}' LANG_CONFIG=${quote([
+        JSON.stringify(langConfig),
+      ])} bash --rcfile <(cat <<< ${quote([sandboxScript])})`
+    )
+  );
   const proc = spawn(args[0], args.slice(1), {
     stdio: "inherit",
   });
-  await new Promise((resolve, reject) => {
-    proc.on("error", reject);
-    proc.on("close", resolve);
-  });
-  await run(privilegedTeardown({ uuid }), log);
-  await returnUser();
+  try {
+    await new Promise((resolve, reject) => {
+      proc.on("error", reject);
+      proc.on("close", resolve);
+    });
+  } finally {
+    session.kill();
+  }
 }
 
 main().catch(die);

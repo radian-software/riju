@@ -13,10 +13,9 @@ export let langs = {};
 // Map from language aliases and IDs to canonical language IDs.
 export let aliases = {};
 
-// Read languages from JSON files in /opt/riju/langs, and update the
-// global langs variable in this module. Never throw an error. If
-// there is a problem then just leave the languages as they previously
-// were.
+// Read languages from YAML, and update the global langs variable in
+// this module. Never throw an error. If there is a problem then just
+// leave the languages as they previously were.
 async function updateLangsFromDisk() {
   try {
     const newLangs = {};
