@@ -111,6 +111,11 @@ resource "aws_s3_bucket_policy" "riju" {
   policy = data.aws_iam_policy_document.riju.json
 }
 
+resource "aws_ecr_repository" "riju" {
+  name                 = "riju"
+  image_tag_mutability = "IMMUTABLE"
+}
+
 data "aws_ami" "server" {
   owners = ["self"]
 
