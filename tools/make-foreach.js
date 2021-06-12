@@ -20,11 +20,6 @@ async function main() {
         );
       }
       break;
-    case "--types":
-      for (const type of ["lang", "config"]) {
-        await runCommand(`MAKELEVEL= make ${targets.join(" ")} T=${type}`);
-      }
-      break;
     default:
       console.error(`make-foreach.js: unknown selector: ${selector}`);
       process.exit(1);

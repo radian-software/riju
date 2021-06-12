@@ -2,17 +2,14 @@ id: "mongodb"
 aliases:
   - "mongo"
   - "mongod"
+  - "webscale"
 name: "MongoDB"
 
 install:
   prepare:
+    aptRepo:
+      - "http://archive.ubuntu.com/ubuntu/ focal main universe"
     manual: |
-      sudo tee -a /etc/apt/sources.list.d/focal.list >/dev/null <<EOF
-      deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ focal main universe
-      EOF
-
-      sudo apt-get update
-
       for name in mongodb mongodb-clients mongodb-server mongodb-server-core; do
           apt-get download "${name}"
           mv "${name}"_*.deb "${name}.deb"

@@ -18,9 +18,11 @@ import { readLangConfig, readSharedDepConfig } from "../lib/yaml.js";
 // package.
 function makeLangScript(langConfig, isShared) {
   const { id, name, install } = langConfig;
+  let prefaceParts = [];
   let parts = [];
   let depends = [];
   const dependsCfg = (install && install.depends) || {};
+  let needsAptGetUpdate = false;
   if (
     install &&
     ((install.prepare &&
@@ -30,8 +32,21 @@ function makeLangScript(langConfig, isShared) {
         install.apt.filter((pkg) => pkg.includes("$")).length > 0))
   ) {
     parts.push(`\
-export DEBIAN_FRONTEND=noninteractive
-sudo --preserve-env=DEBIAN_FRONTEND apt-get update`);
+export DEBIAN_FRONTEND=noninteractive`);
+    if (
+      install.prepare &&
+      ((install.prepare.manual &&
+        install.prepare.manual.includes("apt-get") &&
+        install.prepare.manual.includes(":i386")) ||
+        (install.prepare.apt &&
+          install.prepare.apt.filter((pkg) => pkg.includes(":i386")).length >
+            0))
+    ) {
+      parts.push(`\
+dpkg --add-architecture i386`);
+    }
+    parts.push(`\
+      sudo --preserve-env=DEBIAN_FRONTEND apt-get update`);
   }
   if (install) {
     const {
@@ -49,23 +64,67 @@ sudo --preserve-env=DEBIAN_FRONTEND apt-get update`);
       deb,
     } = install;
     if (prepare) {
-      const { apt, npm, opam, manual } = prepare;
+      const {
+        preface,
+        cert,
+        aptKey,
+        aptRepo,
+        apt,
+        npm,
+        opam,
+        manual,
+      } = prepare;
+      if (preface) {
+        prefaceParts.push(preface);
+      }
+      if (cert && cert.length > 0) {
+        prefaceParts.push(
+          cert
+            .map(
+              (url, idx) =>
+                `sudo wget "${url}" -O /usr/local/share/ca-certificates/riju-${id}-${idx}.crt`
+            )
+            .join("\n")
+        );
+        prefaceParts.push(`sudo update-ca-certificates`);
+      }
+      if (aptKey && aptKey.length > 0) {
+        prefaceParts.push(
+          aptKey
+            .map((src) => {
+              if (src.startsWith("http://") || src.startsWith("https://")) {
+                return `curl -fsSL "${src}" | sudo apt-key add -`;
+              } else if (/^[0-9A-F]+$/.match(src)) {
+                return `sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys "${src}"`;
+              } else {
+                throw new Error(`unknown aptKey format: ${src}`);
+              }
+            })
+            .join("\n")
+        );
+      }
+      if (aptRepo && aptRepo.length > 0) {
+        prefaceParts.push(`sudo tee -a /etc/apt/sources.list.d/custom.list >/dev/null <<EOF
+${aptRepo.join("\n")}
+EOF`);
+      }
       if (apt && apt.length > 0) {
-        parts.push(`\
+        needsAptGetUpdate = true;
+        prefaceParts.push(`\
 sudo --preserve-env=DEBIAN_FRONTEND apt-get install -y ${apt.join(" ")}`);
       }
       if (npm && npm.length > 0) {
-        parts.push(`\
+        prefaceParts.push(`\
 sudo npm install -g ${npm.join(" ")}`);
       }
       if (opam && opam.length > 0) {
-        parts.push(`\
+        prefaceParts.push(`\
 sudo opam init -n --disable-sandboxing --root /opt/opam
 sudo opam install "${opam.join(" ")}" -y --root /opt/opam
 sudo ln -s /opt/opam/default/bin/* /usr/local/bin/`);
       }
       if (manual) {
-        parts.push(manual);
+        prefaceParts.push(manual);
       }
     }
     if (npm && npm.length > 0) {
@@ -215,6 +274,9 @@ chmod +x "${path}"`);
       }
     }
     if (manual) {
+      if (manual.includes("apt-get")) {
+        needsAptGetUpdate = true;
+      }
       parts.push(manual);
     }
     if (deb) {
@@ -223,6 +285,9 @@ chmod +x "${path}"`);
       );
     }
     if (apt) {
+      if (apt.filter((pkg) => pkg.includes("$")).length > 0) {
+        needsAptGetUpdate = true;
+      }
       depends = depends.concat(apt);
     }
     if (dependsCfg.unpin) {
@@ -237,6 +302,13 @@ chmod +x "${path}"`);
       );
     }
   }
+  if (needsAptGetUpdate) {
+    prefaceParts.unshift(`\
+export DEBIAN_FRONTEND=noninteractive`);
+    prefaceParts.push(`\
+sudo --preserve-env=DEBIAN_FRONTEND apt-get update`);
+  }
+  parts = prefaceParts.concat(parts);
   parts.push(`depends=(${depends.map((dep) => `"${dep}"`).join(" ")})`);
   let stripDependsFilter = "";
   const stripDepends = (dependsCfg.strip || []).concat(dependsCfg.unpin || []);
@@ -281,40 +353,6 @@ set -euxo pipefail`);
 }
 
 // Given a language config object, return the text of a Bash script
-// that will build the (unpacked) riju-config-foo Debian package into
-// ${pkg} when run in an appropriate environment. This is a package
-// that will install configuration files and/or small scripts that
-// encode the language configuration so that Riju can operate on any
-// installed languages without knowing their configuration in advance.
-function makeConfigScript(langConfig) {
-  const { id, name } = langConfig;
-  let parts = [];
-  parts.push(`\
-#!/usr/bin/env bash
-
-set -euxo pipefail`);
-  let debianControlData = `\
-Package: riju-config-${id}
-Version: \$(date +%s%3N)
-Architecture: all
-Maintainer: Radon Rosborough <radon.neon@gmail.com>
-Description: Riju configuration for the ${name} language
-Depends: riju-lang-${id}
-Riju-Script-Hash: \$(sha1sum "$0" | awk '{ print $1 }')`;
-  parts.push(`\
-install -d "\${pkg}/DEBIAN"
-cat <<EOF > "\${pkg}/DEBIAN/control"
-${debianControlData}
-EOF`);
-  parts.push(`\
-install -d "\${pkg}/opt/riju/langs"
-cat <<"EOF" > "\${pkg}/opt/riju/langs/${id}.json"
-${JSON.stringify(langConfig, null, 2)}
-EOF`);
-  return parts.join("\n\n");
-}
-
-// Given a language config object, return the text of a Bash script
 // that will build the (unpacked) riju-shared-foo Debian package into
 // ${pkg} when run in an appropriate environment. This is a package
 // that installs tools used by multiple languages, and can be declared
@@ -323,20 +361,66 @@ function makeSharedScript(langConfig) {
   return makeLangScript(langConfig, true);
 }
 
+// Given a language ID, return the text of a Bash script that will do
+// any necessary setup before the language package is installed (along
+// with its shared dependencies, if any).
+function makeInstallScript(lang) {
+  let parts = [];
+  if (install) {
+    const { apt, cert, aptKey, aptRepo } = install;
+    if (apt && apt.filter((pkg) => pkg.includes(":i386")).length > 0) {
+      parts.push(`\
+dpkg --add-architecture i386`);
+    }
+    if (cert && cert.length > 0) {
+      parts.push(
+        cert
+          .map(
+            (url, idx) =>
+              `sudo wget "${url}" -O /usr/local/share/ca-certificates/riju-${id}-${idx}.crt`
+          )
+          .join("\n")
+      );
+      parts.push(`sudo update-ca-certificates`);
+    }
+    if (aptKey && aptKey.length > 0) {
+      parts.push(
+        aptKey
+          .map((src) => {
+            if (src.startsWith("http://") || src.startsWith("https://")) {
+              return `curl -fsSL "${src}" | sudo apt-key add -`;
+            } else if (/^[0-9A-F]+$/.match(src)) {
+              return `sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys "${src}"`;
+            } else {
+              throw new Error(`unknown aptKey format: ${src}`);
+            }
+          })
+          .join("\n")
+      );
+    }
+    if (aptRepo && aptRepo.length > 0) {
+      parts.push(`sudo tee -a /etc/apt/sources.list.d/custom.list >/dev/null <<EOF
+${aptRepo.join("\n")}
+EOF`);
+    }
+  }
+  parts.unshift(`\
+#!/usr/bin/env bash
+
+set -euxo pipefail`);
+  return parts.join("\n\n");
+}
+
 export async function generateBuildScript({ lang, type }) {
   const scriptMaker = {
-    lang: makeLangScript,
-    config: makeConfigScript,
-    shared: makeSharedScript,
+    lang: async () => makeLangScript(await readLangConfig(lang)),
+    shared: async () => makeSharedScript(await readSharedDepConfig(lang)),
+    install: async () => await makeInstallScript(lang),
   }[type];
   if (!scriptMaker) {
     throw new Error(`unsupported script type ${type}`);
   }
-  return scriptMaker(
-    type === "shared"
-      ? await readSharedDepConfig(lang)
-      : await readLangConfig(lang)
-  );
+  return scriptMaker();
 }
 
 // Parse command-line arguments, run main functionality, and exit.
@@ -346,7 +430,7 @@ async function main() {
     .requiredOption("--lang <id>", "language ID")
     .requiredOption(
       "--type <value>",
-      "package category (lang, config, shared)"
+      "package category (lang, shared, install)"
     );
   program.parse(process.argv);
   console.log(await generateBuildScript(program.opts()));

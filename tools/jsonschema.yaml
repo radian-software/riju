@@ -511,6 +511,31 @@ properties:
         type: object
         additionalProperties: false
         properties:
+          preface: &preface
+            type: string
+            minLength: 1
+          cert: &cert
+            type: array
+            items:
+              type: string
+              pattern: "^https?://"
+              examples:
+                - "https://cacerts.digicert.com/DigiCertTLSRSASHA2562020CA1.crt.pem"
+          aptKey: &aptKey
+            type: array
+            items:
+              type: string
+              pattern: "^https?://|^[0-9A-F]+$"
+              examples:
+                - "https://downloads.ceylon-lang.org/apt/ceylon-debian-repo.gpg.key"
+                - "B4112585D386EB94"
+          aptRepo: &aptRepo
+            type: array
+            items:
+              type: string
+              pattern: "^https?://"
+              examples:
+                - "https://downloads.ceylon-lang.org/apt/ unstable main"
           apt:
             type: array
             items:
@@ -529,6 +554,10 @@ properties:
           manual:
             type: string
             minLength: 1
+      preface: *preface
+      cert: *cert
+      aptKey: *aptKey
+      aptRepo: *aptRepo
       apt:
         type: array
         items:

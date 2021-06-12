@@ -14,6 +14,7 @@ function riju-curl {
 
 export DEBIAN_FRONTEND=noninteractive
 
+riju-curl "build/lang/${LANG}/install.bash" > "install-lang-${LANG}.bash"
 riju-curl "build/lang/${LANG}/riju-lang-${LANG}.deb" > "riju-lang-${LANG}.deb"
 
 (
@@ -21,11 +22,18 @@ riju-curl "build/lang/${LANG}/riju-lang-${LANG}.deb" > "riju-lang-${LANG}.deb"
         (grep -Eo 'riju-shared-[^, ]+' || true) |
         sed 's/riju-shared-//'
 ) | while read name; do
+    riju-curl "build/shared/${name}/install.bash" > "install-shared-${name}.bash"
     riju-curl "build/shared/${name}/riju-shared-${name}.deb" > "riju-shared-${name}.deb"
 done
 
 if dpkg-deb -f "riju-lang-${LANG}.deb" -f Depends | grep .; then
     apt-get update
+fi
+
+if compgen -G "./install-shared-*.bash"; then
+    for file in ./install-shared-*.bash; do
+        "${file}"
+    done
 fi
 
 if compgen -G "./riju-shared-*.deb"; then
@@ -34,6 +42,7 @@ if compgen -G "./riju-shared-*.deb"; then
     done
 fi
 
+"./install-lang-${LANG}.bash"
 apt-get install -y "./riju-lang-${LANG}.deb"
 
 popd

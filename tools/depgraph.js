@@ -349,7 +349,6 @@ async function executeDepGraph({
   yes,
   targets,
 }) {
-  await runCommand(`make all-scripts`);
   const artifacts = {};
   for (const artifact of depgraph.artifacts) {
     for (const dep of artifact.dependencies) {

@@ -5,6 +5,10 @@ name: "R"
 monacoLang: r
 
 install:
+  aptKey:
+    - "E298A3A825C0D65DFD57CBB651716619E084DAB9"
+  aptRepo:
+    - "https://cloud.r-project.org/bin/linux/ubuntu ${ubuntu_name}-$(curl -fsSL https://cran.r-project.org/bin/linux/ubuntu/ | grep -Eo 'cran[0-9]+' | head -n1)/"
   apt:
     - r-base
 

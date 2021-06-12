@@ -96,27 +96,16 @@ repkg: script # L=<lang> T=<type> : Build fresh .deb and install into live conta
 	$(MAKE_QUIETLY) shell I=packaging CMD="make pkg L=$(L) T=$(T)"
 	ctr="$$(docker container ls -f label="riju-install-target=yes" -l -q)"; test "$${ctr}" || (echo "no valid container is live"; exit 1); docker exec "$${ctr}" make install L=$(L) T=$(T)
 
-## This is equivalent to 'make repkg T=lang', 'make repkg T=config'.
-## For shared dependencies, use 'make repkg T=shared' directly.
-
-repkgs: # L=<lang> : Build and install fresh lang and config .debs
-	@: $${L}
-	node tools/make-foreach.js --types repkg L=$(L)
-
 ### Build packaging scripts
 
 script: # L=<lang> T=<type> : Generate a packaging script
 	@: $${L} $${T}
 	mkdir -p $(BUILD)
 	node tools/generate-build-script.js --lang $(L) --type $(T) > $(BUILD)/build.bash
+ifeq ($(T),lang)
+	node tools/generate-build-script.js --lang $(L) --type install > $(BUILD)/install.bash
+endif
 	chmod +x $(BUILD)/build.bash
-
-scripts: # L=<lang> : Generate both lang and config packaging scripts
-	@: $${L}
-	node tools/make-foreach.js --types script L=$(L)
-
-## This is equivalent to 'make script T=lang', 'make script T=config'.
-## For shared dependencies, use 'make script T=shared' directly.
 
 all-scripts: # Generate packaging scripts for all languages
 	node tools/write-all-build-scripts.js
@@ -146,20 +135,9 @@ pkg-deb: # L=<lang> T=<type> [Z=gzip|xz] : Build .deb from packaging environment
 	@: $${L} $${T}
 	fakeroot dpkg-deb --build -Z$(Z) $(BUILD)/pkg $(BUILD)/$(DEB)
 
-## This is equivalent to the sequence 'script', 'pkg-clean', 'pkg-build', 'pkg-deb'.
+## This is equivalent to the sequence 'pkg-clean', 'pkg-build', 'pkg-deb'.
 
-pkg: script pkg-clean pkg-build pkg-deb # L=<lang> T=<type> [Z=gzip|xz] : Build fresh .deb
-
-## This is equivalent to 'make pkg T=lang', 'make pkg T=config'. For
-## shared dependencies, use 'make pkg T=shared' directly.
-#
-## Z is the compression type to use; defaults to none. Higher
-## compression levels (gzip is moderate, xz is high) take much longer
-## but produce much smaller packages.
-
-pkgs: # L=<lang> [Z=gzip|xz] : Build both lang and config .debs
-	@: $${L}
-	node tools/make-foreach.js --types pkg L=$(L)
+pkg: pkg-clean pkg-build pkg-deb # L=<lang> T=<type> [Z=gzip|xz] : Build fresh .deb
 
 ### Install packages
 
@@ -167,10 +145,6 @@ install: # L=<lang> T=<type> : Install built .deb
 	@: $${L} $${T}
 	if [[ -z "$$(ls -A /var/lib/apt/lists)" ]]; then sudo apt update; fi
 	DEBIAN_FRONTEND=noninteractive sudo -E apt reinstall -y ./$(BUILD)/$(DEB)
-
-installs: # L=<lang> : Install both lang and config .debs
-	@: $${L}
-	node tools/make-foreach.js --types install L=$(L)
 
 ### Build and run application code
 

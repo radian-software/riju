@@ -4,11 +4,14 @@ aliases:
 name: "D"
 
 install:
-  prepare:
+  prepare: &add-d-cert
+    cert:
+      - "https://letsencrypt.org/certs/lets-encrypt-r3.pem"
     manual: |
       file="$(curl -fsSL https://dlang.org/download.html | grep -Eo '"https://[^"]+amd64.deb"' | grep -v pre-release | tr -d '"')"
       wget "${file}" -O dmd.deb
-      sudo apt-get install -y ./dmd.deb
+      sudo --preserve-env=DEBIAN_FRONTEND apt-get install -y ./dmd.deb
+  <<: *add-d-cert
   manual: |
     install -d "${pkg}/usr/local/bin"
     dub fetch dfmt@~master
