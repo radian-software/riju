@@ -364,8 +364,9 @@ function makeSharedScript(langConfig) {
 // Given a language ID, return the text of a Bash script that will do
 // any necessary setup before the language package is installed (along
 // with its shared dependencies, if any).
-function makeInstallScript(lang) {
+function makeInstallScript(langConfig) {
   let parts = [];
+  const { install } = langConfig;
   if (install) {
     const { apt, cert, aptKey, aptRepo } = install;
     if (apt && apt.filter((pkg) => pkg.includes(":i386")).length > 0) {

@@ -12,6 +12,7 @@ pushd /tmp/riju-work
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get update
+apt-get dist-upgrade -y
 (yes || true) | unminimize
 
 apt-get install -y curl gnupg lsb-release wget
@@ -65,10 +66,9 @@ vim
 apt-get update
 apt-get install -y $(sed 's/#.*//' <<< "${packages}")
 
-ver="$(latest_release watchexec/watchexec)"
-wget "https://github.com/watchexec/watchexec/releases/download/${ver}/watchexec-${ver}-x86_64-unknown-linux-gnu.deb"
+ver="$(latest_release watchexec/watchexec | sed 's/^cli-v//')"
+wget "https://github.com/watchexec/watchexec/releases/download/cli-v${ver}/watchexec-${ver}-x86_64-unknown-linux-gnu.deb"
 apt-get install -y ./watchexec-*.deb
-rm watchexec-*.deb
 
 rm -rf /var/lib/apt/lists/*
 
