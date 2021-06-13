@@ -22,31 +22,27 @@ function makeLangScript(langConfig, isShared) {
   let parts = [];
   let depends = [];
   const dependsCfg = (install && install.depends) || {};
-  let needsAptGetUpdate = false;
+  let prefaceNeedsAptGetUpdate = false;
+  let prepareNeedsAptGetUpdate = false;
   if (
     install &&
     ((install.prepare &&
-      ((install.prepare.manual && install.prepare.manual.includes("apt-get")) ||
-        (install.prepare.apt && install.prepare.apt.length > 0))) ||
-      (install.apt &&
-        install.apt.filter((pkg) => pkg.includes("$")).length > 0))
-  ) {
-    parts.push(`\
-export DEBIAN_FRONTEND=noninteractive`);
-    if (
-      install.prepare &&
       ((install.prepare.manual &&
         install.prepare.manual.includes("apt-get") &&
         install.prepare.manual.includes(":i386")) ||
         (install.prepare.apt &&
           install.prepare.apt.filter((pkg) => pkg.includes(":i386")).length >
-            0))
-    ) {
-      parts.push(`\
+            0))) ||
+      (install.preface &&
+        ((install.preface.manual &&
+          install.preface.manual.includes("apt-get") &&
+          install.preface.manual.includes(":i386")) ||
+          (install.preface.apt &&
+            install.preface.apt.filter((pkg) => pkg.includes(":i386")).length >
+              0))))
+  ) {
+    prefaceParts.push(`\
 dpkg --add-architecture i386`);
-    }
-    parts.push(`\
-      sudo --preserve-env=DEBIAN_FRONTEND apt-get update`);
   }
   if (install) {
     const {
@@ -109,7 +105,7 @@ ${aptRepo.join("\n")}
 EOF`);
       }
       if (apt && apt.length > 0) {
-        needsAptGetUpdate = true;
+        prefaceNeedsAptGetUpdate = true;
         prefaceParts.push(`\
 sudo --preserve-env=DEBIAN_FRONTEND apt-get install -y ${apt.join(" ")}`);
       }
@@ -286,7 +282,7 @@ chmod +x "${path}"`);
     }
     if (apt) {
       if (apt.filter((pkg) => pkg.includes("$")).length > 0) {
-        needsAptGetUpdate = true;
+        prepareNeedsAptGetUpdate = true;
       }
       depends = depends.concat(apt);
     }
@@ -302,10 +298,12 @@ chmod +x "${path}"`);
       );
     }
   }
-  if (needsAptGetUpdate) {
+  if (prefaceNeedsAptGetUpdate) {
     prefaceParts.unshift(`\
-export DEBIAN_FRONTEND=noninteractive`);
-    prefaceParts.push(`\
+sudo --preserve-env=DEBIAN_FRONTEND apt-get update`);
+  }
+  if (prepareNeedsAptGetUpdate) {
+    parts.unshift(`\
 sudo --preserve-env=DEBIAN_FRONTEND apt-get update`);
   }
   parts = prefaceParts.concat(parts);
@@ -348,7 +346,9 @@ fi`);
   parts.unshift(`\
 #!/usr/bin/env bash
 
-set -euxo pipefail`);
+set -euxo pipefail
+
+export DEBIAN_FRONTEND=noninteractive`);
   return parts.join("\n\n");
 }
 
@@ -366,7 +366,7 @@ function makeSharedScript(langConfig) {
 // with its shared dependencies, if any).
 function makeInstallScript(langConfig) {
   let parts = [];
-  const { install } = langConfig;
+  const { id, install } = langConfig;
   if (install) {
     const { apt, cert, aptKey, aptRepo } = install;
     if (apt && apt.filter((pkg) => pkg.includes(":i386")).length > 0) {
@@ -390,7 +390,7 @@ dpkg --add-architecture i386`);
           .map((src) => {
             if (src.startsWith("http://") || src.startsWith("https://")) {
               return `curl -fsSL "${src}" | sudo apt-key add -`;
-            } else if (/^[0-9A-F]+$/.match(src)) {
+            } else if (src.match(/^[0-9A-F]+$/)) {
               return `sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys "${src}"`;
             } else {
               throw new Error(`unknown aptKey format: ${src}`);
@@ -416,7 +416,7 @@ export async function generateBuildScript({ lang, type }) {
   const scriptMaker = {
     lang: async () => makeLangScript(await readLangConfig(lang)),
     shared: async () => makeSharedScript(await readSharedDepConfig(lang)),
-    install: async () => await makeInstallScript(lang),
+    install: async () => makeInstallScript(await readLangConfig(lang)),
   }[type];
   if (!scriptMaker) {
     throw new Error(`unsupported script type ${type}`);
