@@ -6,14 +6,15 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 2.70"
+      version = "~> 3.45"
     }
   }
 }
 
 locals {
   tags = {
-    Terraform = "Managed by Terraform"
+    Terraform       = "Managed by Terraform"
+    BillingCategory = "Riju"
   }
 }
 
@@ -171,6 +172,11 @@ resource "aws_instance" "server" {
   tags = merge(local.tags, {
     Name = "Riju server"
   })
+  root_block_device {
+    tags = merge(local.tags, {
+      Name = "Riju server root volume"
+    })
+  }
 }
 
 resource "aws_ebs_volume" "data" {
