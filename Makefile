@@ -55,7 +55,9 @@ VOLUME_MOUNT ?= $(PWD)
 P1 ?= 6119
 P2 ?= 6120
 
-ifneq (,$(E))
+ifneq (,$(EE))
+SHELL_PORTS := -p 0.0.0.0:$(P1):6119 -p 0.0.0.0:$(P2):6120
+else ifneq (,$(E))
 SHELL_PORTS := -p 127.0.0.1:$(P1):6119 -p 127.0.0.1:$(P2):6120
 else
 SHELL_PORTS :=
@@ -144,13 +146,6 @@ pkg-deb: # L=<lang> T=<type> [Z=gzip|xz] : Build .deb from packaging environment
 ## This is equivalent to the sequence 'pkg-clean', 'pkg-build', 'pkg-deb'.
 
 pkg: pkg-clean pkg-build pkg-deb # L=<lang> T=<type> [Z=gzip|xz] : Build fresh .deb
-
-### Install packages
-
-install: # L=<lang> T=<type> : Install built .deb
-	@: $${L} $${T}
-	if [[ -z "$$(ls -A /var/lib/apt/lists)" ]]; then sudo apt update; fi
-	DEBIAN_FRONTEND=noninteractive sudo -E apt reinstall -y ./$(BUILD)/$(DEB)
 
 ### Build and run application code
 
