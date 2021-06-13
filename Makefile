@@ -122,7 +122,7 @@ all-scripts: # Generate packaging scripts for all languages
 
 pkg-clean: # L=<lang> T=<type> : Set up fresh packaging environment
 	@: $${L} $${T}
-	rm -rf $(BUILD)/src $(BUILD)/pkg
+	sudo rm -rf $(BUILD)/src $(BUILD)/pkg
 	mkdir -p $(BUILD)/src $(BUILD)/pkg
 
 pkg-build: # L=<lang> T=<type> : Run packaging script in packaging environment
