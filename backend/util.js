@@ -2,8 +2,11 @@ import { spawn, spawnSync } from "child_process";
 import os from "os";
 import process from "process";
 
-import { quote } from "shell-quote";
 import { v4 as getUUIDOrig } from "uuid";
+
+export function quote(str) {
+  return "'" + str.replace(/'/g, `'"'"'`) + "'";
+}
 
 export const rijuSystemPrivileged = "system/out/riju-system-privileged";
 

@@ -32,7 +32,6 @@
     "parse-passwd": "^1.0.0",
     "prettier": "^2.3.1",
     "regenerator-runtime": "^0.13.7",
-    "shell-quote": "^1.7.2",
     "strip-ansi": "^6.0.0",
     "style-loader": "^2.0.0",
     "uuid": "^8.3.2",

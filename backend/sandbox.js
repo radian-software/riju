@@ -3,7 +3,6 @@ import { promises as fs } from "fs";
 import process from "process";
 
 import pty from "node-pty";
-import { quote } from "shell-quote";
 
 import { readLangConfig } from "../lib/yaml.js";
 import {
@@ -13,6 +12,7 @@ import {
   privilegedPty,
   privilegedSession,
   privilegedWait,
+  quote,
   run,
 } from "./util.js";
 
@@ -39,19 +39,12 @@ async function main() {
     name: "xterm-color",
   });
   await run(privilegedWait({ uuid }), log);
-  console.log(
-    bash(
-      `env L='${lang}' LANG_CONFIG=${quote([
-        JSON.stringify(langConfig),
-      ])} bash --rcfile <(cat <<< ${quote([sandboxScript])})`
-    )[2]
-  );
   const args = privilegedPty(
     { uuid },
     bash(
-      `env L='${lang}' LANG_CONFIG=${quote([
+      `env L='${lang}' LANG_CONFIG=${quote(
         JSON.stringify(langConfig),
-      ])} bash --rcfile <(cat <<< ${quote([sandboxScript])})`
+      )} bash --rcfile <(cat <<< ${quote(sandboxScript)})`
     )
   );
   const proc = spawn(args[0], args.slice(1), {

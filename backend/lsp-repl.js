@@ -2,10 +2,10 @@ import child_process from "child_process";
 import process from "process";
 
 import readline from "historic-readline";
-import { quote } from "shell-quote";
 import rpc from "vscode-jsonrpc";
 
 import { langsPromise } from "./langs.js";
+import { quote } from "./util.js";
 
 const args = process.argv.slice(2);
 
@@ -32,7 +32,7 @@ if (args.length === 1 && langs[args[0]] && langs[args[0]].lsp) {
   cmdline = args;
 }
 
-console.error(quote(cmdline));
+console.error(cmdline.map(quote).join(" "));
 const proc = child_process.spawn(cmdline[0], cmdline.slice(1));
 
 proc.stderr.on("data", (data) => process.stderr.write(data));
