@@ -45,17 +45,19 @@ char *parseLang(char *lang) {
 
 void session(char *uuid, char *lang)
 {
-  char *image, *container;
+  char *image, *container, *hostname;
   if (asprintf(&image, "riju:lang-%s", lang) < 0)
     die("asprintf failed");
   if (asprintf(&container, "riju-session-%s", uuid) < 0)
+    die("asprintf failed");
+  if (asprintf(&hostname, "HOSTNAME=%s", lang) < 0)
     die("asprintf failed");
   char *argv[] = {
     "docker",
     "run",
     "--rm", "-it",
     "-e", "HOME=/home/riju",
-    "-e", "HOSTNAME=riju",
+    "-e", hostname,
     "-e", "LANG=C.UTF-8",
     "-e", "LC_ALL=C.UTF-8",
     "-e", "LOGNAME=riju",
@@ -66,7 +68,7 @@ void session(char *uuid, char *lang)
     "-e", "TMPDIR=/tmp",
     "-e", "USER=riju",
     "-e", "USERNAME=riju",
-    "--hostname", "riju",
+    "--hostname", lang,
     "--name", container,
     image, "cat", NULL,
   };
