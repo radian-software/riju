@@ -74,6 +74,7 @@ IMAGE_HASH := -e RIJU_IMAGE_HASH="$$(docker inspect riju:$(LANG_TAG) | jq '.[0].
 shell: # I=<shell> [L=<lang>] [E=1] [P1|P2=<port>] : Launch Docker image with shell
 	@: $${I}
 ifneq (,$(filter $(I),admin ci))
+	@mkdir -p $(HOME)/.aws $(HOME)/.docker $(HOME)/.ssh $(HOME)/.terraform.d
 	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.ssh:/var/riju/.ssh -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) --network host riju:$(I) $(BASH_CMD)
 else ifeq ($(I),app)
 	docker run -it --rm --hostname $(I) $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) riju:$(I) $(BASH_CMD)
