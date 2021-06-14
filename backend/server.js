@@ -52,6 +52,7 @@ app.get("/:lang", (req, res) => {
   const canonical = aliases[lang];
   if (!canonical) {
     res.status(404).send(`No such language: ${lang}\n`);
+    return;
   } else if (canonical !== lang) {
     res.redirect(301, `/${canonical}`);
     return;
