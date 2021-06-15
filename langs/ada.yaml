@@ -40,6 +40,6 @@ template: |
   end Main;
 
 compile: |
-  x86_64-linux-gnu-gnatmake-9 main.adb
+  gnatmake main.adb
 run: |
   ./main
