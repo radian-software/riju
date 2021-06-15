@@ -21,7 +21,7 @@
     "file-loader": "^6.2.0",
     "historic-readline": "^1.0.8",
     "jsonschema": "^1.4.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "monaco-editor": "0.20.0",
     "monaco-editor-webpack-plugin": "1.9.0",
     "monaco-languageclient": "0.13.0",
