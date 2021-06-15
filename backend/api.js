@@ -48,7 +48,6 @@ export class Session {
   };
 
   privilegedSession = () => util.privilegedSession(this.context);
-  privilegedWait = () => util.privilegedWait(this.context);
   privilegedExec = (cmdline) =>
     util.privilegedExec(this.context, bash(cmdline));
   privilegedPty = (cmdline) =>
@@ -64,13 +63,6 @@ export class Session {
       this.container = {
         pty: containerPty,
       };
-      containerPty.on("data", (data) =>
-        this.send({
-          event: "serviceLog",
-          service: "container",
-          output: data.toString("utf8"),
-        })
-      );
       containerPty.on("close", (code, signal) =>
         this.send({
           event: "serviceFailed",
@@ -85,7 +77,26 @@ export class Session {
           error: `${err}`,
         })
       );
-      await this.run(this.privilegedWait(this.context));
+      let buffer = "";
+      await new Promise((resolve) => {
+        containerPty.on("data", (data) => {
+          buffer += data;
+          let idx;
+          while ((idx = buffer.indexOf("\r\n")) !== -1) {
+            const line = buffer.slice(0, idx);
+            buffer = buffer.slice(idx + 2);
+            if (line === "riju: container ready") {
+              resolve();
+            } else {
+              this.send({
+                event: "serviceLog",
+                service: "container",
+                output: line + "\n",
+              })
+            }
+          }
+        });
+      });
       if (this.config.setup) {
         await this.run(this.privilegedExec(this.config.setup));
       }

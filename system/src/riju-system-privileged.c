@@ -1,4 +1,5 @@
 #define _GNU_SOURCE
+#include <fcntl.h>
 #include <errno.h>
 #include <grp.h>
 #include <signal.h>
@@ -8,6 +9,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -21,7 +23,6 @@ void die_with_usage()
 {
   die("usage:\n"
       "  riju-system-privileged session UUID LANG\n"
-      "  riju-system-privileged wait UUID\n"
       "  riju-system-privileged exec UUID CMDLINE...\n"
       "  riju-system-privileged pty UUID CMDLINE...");
 }
@@ -43,72 +44,88 @@ char *parseLang(char *lang) {
   return lang;
 }
 
-void session(char *uuid, char *lang)
-{
-  char *image, *container, *hostname;
-  if (asprintf(&image, "riju:lang-%s", lang) < 0)
-    die("asprintf failed");
-  if (asprintf(&container, "riju-session-%s", uuid) < 0)
-    die("asprintf failed");
-  if (asprintf(&hostname, "HOSTNAME=%s", lang) < 0)
-    die("asprintf failed");
-  char *argv[] = {
-    "docker",
-    "run",
-    "--rm", "-it",
-    "-e", "HOME=/home/riju",
-    "-e", hostname,
-    "-e", "LANG=C.UTF-8",
-    "-e", "LC_ALL=C.UTF-8",
-    "-e", "LOGNAME=riju",
-    "-e", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin",
-    "-e", "PWD=/home/riju/src",
-    "-e", "SHELL=/usr/bin/bash",
-    "-e", "TERM=xterm-256color",
-    "-e", "TMPDIR=/tmp",
-    "-e", "USER=riju",
-    "-e", "USERNAME=riju",
-    "--hostname", lang,
-    "--name", container,
-    image, "cat", NULL,
-  };
-  execvp(argv[0], argv);
-  die("execvp failed");
-}
-
 void wait_alarm(int signum)
 {
   (void)signum;
   die("container did not come up within 1 second");
 }
 
-void wait(char *uuid)
+void session(char *uuid, char *lang)
 {
-  char *cmdline;
-  if (asprintf(&cmdline, "docker inspect riju-session-%s >/dev/null 2>&1", uuid) < 0)
+  char *image, *container, *hostname, *volume, *fifo;
+  if (asprintf(&image, "riju:lang-%s", lang) < 0)
     die("asprintf failed");
-  struct timespec ts;
+  if (asprintf(&container, "riju-session-%s", uuid) < 0)
+    die("asprintf failed");
+  if (asprintf(&hostname, "HOSTNAME=%s", lang) < 0)
+    die("asprintf failed");
+  int rv = mkdir("/var/run/riju/sentinels", 0700);
+  if (rv < 0 && errno != EEXIST)
+    die("mkdir failed");
+  char tmpdir[] = "/var/run/riju/sentinels/XXXXXX";
+  if (mkdtemp(tmpdir) == NULL)
+    die("mkdtemp failed");
+  if (asprintf(&volume, "%s:/var/run/riju/sentinel", tmpdir) < 0)
+    die("asprintf failed");
+  if (asprintf(&fifo, "%s/fifo", tmpdir) < 0)
+    die("asprintf failed");
+  if (mknod(fifo, 0700 | S_IFIFO, 0) < 0)
+    die("mknod failed");
+  pid_t pid = fork();
+  if (pid < 0)
+    die("fork failed");
+  else if (pid == 0) {
+    char *argv[] = {
+      "docker",
+      "run",
+      "--rm",
+      "-v", volume,
+      "-e", "HOME=/home/riju",
+      "-e", hostname,
+      "-e", "LANG=C.UTF-8",
+      "-e", "LC_ALL=C.UTF-8",
+      "-e", "LOGNAME=riju",
+      "-e", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin",
+      "-e", "PWD=/home/riju/src",
+      "-e", "SHELL=/usr/bin/bash",
+      "-e", "TERM=xterm-256color",
+      "-e", "TMPDIR=/tmp",
+      "-e", "USER=riju",
+      "-e", "USERNAME=riju",
+      "--user", "root",
+      "--hostname", lang,
+      "--name", container,
+      image, "cat", "/var/run/riju/sentinel/fifo", NULL,
+    };
+    execvp(argv[0], argv);
+    die("execvp failed");
+  }
+  struct timespec ts;  // 10ms
   ts.tv_sec = 0;
   ts.tv_nsec = 1000 * 1000 * 10;
   signal(SIGALRM, wait_alarm);
   alarm(1);
+  int fd;
   while (1) {
-    FILE *proc = popen(cmdline, "r");
-    if (proc == NULL)
-      die("popen failed");
-    char buf[1024];
-    while (fgets(buf, 1024, proc) != NULL);
-    if (ferror(proc))
-      die("fgets failed");
-    int status = pclose(proc);
-    if (status < 0)
-      die("pclose failed");
-    if (WEXITSTATUS(status) == 0)
+    fd = open(fifo, O_WRONLY);
+    if (fd >= 0)
       break;
+    if (errno != ENXIO)
+      die("open failed");
     int rv = nanosleep(&ts, NULL);
-    if (rv != 0 && rv != EINTR)
+    if (rv != 0 && errno != EINTR)
       die("nanosleep failed");
   }
+  signal(SIGALRM, SIG_IGN);
+  if (unlink(fifo) < 0)
+    die("unlink failed");
+  if (rmdir(tmpdir) < 0)
+    die("rmdir failed");
+  printf("riju: container ready\n");  // magic string
+  if (waitpid(pid, NULL, 0) <= 0)
+    die("waitpid failed");
+  if (close(fd) < 0)
+    die("close failed");
 }
 
 void exec(char *uuid, int argc, char **cmdline, bool pty)
@@ -119,6 +136,7 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   char *argvPrefix[] = {
     "docker",
     "exec",
+    "--user", "riju",
     pty ? "-it" : "-i",
     container,
   };
@@ -134,8 +152,8 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
 
 int main(int argc, char **argv)
 {
-  if (setuid(0) != 0)
-    die("setuid failed");
+  if (seteuid(0) != 0)
+    die("seteuid failed");
   if (argc < 2)
     die_with_usage();
   if (!strcmp(argv[1], "session")) {
@@ -144,13 +162,6 @@ int main(int argc, char **argv)
     char *uuid = parseUUID(argv[2]);
     char *lang = parseLang(argv[3]);
     session(uuid, lang);
-    return 0;
-  }
-  if (!strcmp(argv[1], "wait")) {
-    if (argc != 3)
-      die_with_usage();
-    char *uuid = parseUUID(argv[2]);
-    wait(uuid);
     return 0;
   }
   if (!strcmp(argv[1], "exec")) {

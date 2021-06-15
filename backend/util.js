@@ -51,10 +51,6 @@ export function privilegedSession({ uuid, lang }) {
   return [rijuSystemPrivileged, "session", uuid, lang];
 }
 
-export function privilegedWait({ uuid }) {
-  return [rijuSystemPrivileged, "wait", uuid];
-}
-
 export function privilegedExec({ uuid }, args) {
   return [rijuSystemPrivileged, "exec", uuid].concat(args);
 }

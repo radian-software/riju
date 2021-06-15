@@ -11,7 +11,6 @@ import {
   privilegedExec,
   privilegedPty,
   privilegedSession,
-  privilegedWait,
   quote,
   run,
 } from "./util.js";
@@ -38,7 +37,22 @@ async function main() {
   const session = pty.spawn(sessionArgs[0], sessionArgs.slice(1), {
     name: "xterm-color",
   });
-  await run(privilegedWait({ uuid }), log);
+  let buffer = "";
+  await new Promise((resolve) => {
+    session.on("data", (data) => {
+      buffer += data;
+      let idx;
+      while ((idx = buffer.indexOf("\r\n")) !== -1) {
+        const line = buffer.slice(0, idx);
+        buffer = buffer.slice(idx + 2);
+        if (line === "riju: container ready") {
+          resolve();
+        } else {
+          console.error(line);
+        }
+      }
+    });
+  });
   const args = privilegedPty(
     { uuid },
     bash(

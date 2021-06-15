@@ -24,7 +24,7 @@ COPY langs ./langs/
 
 FROM riju:runtime
 
-ENTRYPOINT ["/usr/local/sbin/my_init", "--quiet", "--"]
+ENTRYPOINT ["/usr/local/sbin/my_init", "--quiet", "--skip-runit","--"]
 RUN useradd -p '!' -m -l -s /usr/bin/bash riju
 COPY --chown=riju:riju --from=build /src ./
 RUN chown root:riju system/out/*-privileged && chmod a=,g=rx,u=rwxs system/out/*-privileged
