@@ -15,13 +15,17 @@ data "external" "env" {
   program = ["jq", "-n", "env"]
 }
 
+locals {
+  tags = {
+    Terraform       = "Managed by Terraform"
+    BillingCategory = "Riju"
+  }
+}
+
 provider "aws" {
   region = "us-west-1"
   default_tags {
-    tags = {
-      Terraform       = "Managed by Terraform"
-      BillingCategory = "Riju"
-    }
+    tags = local.tags
   }
 }
 
@@ -252,11 +256,22 @@ resource "aws_autoscaling_group" "server" {
     aws_lb_target_group.server_https.arn,
   ]
 
-  tag {
-    key = "Name"
-    value = "Riju server"
-    propagate_at_launch = false
-  }
+  tags = concat(
+    [
+      {
+        key = "Name"
+        value = "Riju server"
+        propagate_at_launch = false
+      }
+    ],
+    [
+      for key, value in local.tags : {
+        key = key,
+        value = value,
+        propagate_at_launch = true,
+      }
+    ],
+  )
 }
 
 resource "aws_lb" "server" {
