@@ -117,6 +117,12 @@ data "aws_iam_policy_document" "riju" {
   }
 }
 
+resource "aws_acm_certificate" "riju" {
+  domain_name = "riju.codes"
+  subject_alternative_names = ["*.riju.codes"]
+  validation_method = "DNS"
+}
+
 resource "aws_s3_bucket" "riju" {
   bucket = data.external.env.result.S3_BUCKET
 }
