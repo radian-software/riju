@@ -91,6 +91,9 @@ else
 	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) riju:$(I) $(BASH_CMD)
 endif
 
+ecr: # Authenticate to ECR (temporary credentials)
+	id="$$(aws sts get-caller-identity | jq .Account -r)"; aws ecr get-login-password --region us-west-1 | docker login --username AWS --password-stdin "$${id}.dkr.ecr.us-west-1.amazonaws.com"
+
 ### Build packaging scripts
 
 script: # L=<lang> T=<type> : Generate a packaging script
