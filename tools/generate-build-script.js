@@ -337,6 +337,9 @@ latest_release() {
     curl -sSL "https://api.github.com/repos/\$1/releases/latest" | jq -r .tag_name
 }`);
   }
+  if (parts.join("\n\n").includes("ubuntu_name")) {
+    parts.unshift(`ubuntu_name="$(lsb_release -cs)"`);
+  }
   if (install && install.disallowCI) {
     parts.unshift(`\
 if [[ -n "\${CI:-}" ]]; then
@@ -405,6 +408,9 @@ dpkg --add-architecture i386`);
 ${aptRepo.join("\n")}
 EOF`);
     }
+  }
+  if (parts.join("\n\n").includes("ubuntu_name")) {
+    parts.unshift(`ubuntu_name="$(lsb_release -cs)"`);
   }
   parts.unshift(`\
 #!/usr/bin/env bash
