@@ -42,6 +42,7 @@ jq
 less
 make
 man
+moreutils
 nodejs
 packer
 psmisc
