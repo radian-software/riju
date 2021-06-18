@@ -8,9 +8,10 @@ export
 
 BUILD := build/$(T)/$(L)
 DEB := riju-$(T)-$(L).deb
-S3_DEBS := s3://$(S3_BUCKET)
-S3_DEB := $(S3_DEBS)/debs/$(DEB)
-S3_HASH := $(S3_DEBS)/hashes/riju-$(T)-$(L)
+S3 := s3://$(S3_BUCKET)
+S3_DEB := $(S3)/debs/$(DEB)
+S3_HASH := $(S3)/hashes/riju-$(T)-$(L)
+S3_CONFIG := $(S3)/config.json
 
 ifneq ($(CMD),)
 BASH_CMD := bash -c '$(CMD)'
@@ -165,7 +166,7 @@ dev: # Compile, run, and watch all artifacts and server for development
 ## are provided, then only tests matching both are run.
 
 test: # [L=<lang>[,...]] [T=<test>[,...]] : Run test(s) for language or test category
-	node backend/test-runner.js $(L)
+	node backend/test-runner.js
 
 ## Functions such as 'repl', 'run', 'format', etc. are available in
 ## the sandbox, and initial setup has already been done (e.g. 'setup'
@@ -185,7 +186,7 @@ lsp: # L=<lang|cmd> : Run LSP REPL for language or custom command line
 
 ### Fetch artifacts from registries
 
-pull: # I=<image> : Pull last published Riju image from Docker Hub
+pull: # I=<image> : Pull last published Riju image from Docker registry
 	@: $${I} $${DOCKER_REPO}
 	docker pull $(DOCKER_REPO):$(I)
 	docker tag $(DOCKER_REPO):$(I) riju:$(I)
@@ -193,11 +194,15 @@ pull: # I=<image> : Pull last published Riju image from Docker Hub
 download: # L=<lang> T=<type> : Download last published .deb from S3
 	@: $${L} $${T} $${S3_BUCKET}
 	mkdir -p $(BUILD)
-	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB) --no-sign-request
+	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB)
+
+undeploy: # Pull latest deployment config from S3
+	mkdir -p $(BUILD)
+	aws s3 cp $(S3_CONFIG) $(BUILD)/config.json
 
 ### Publish artifacts to registries
 
-push: # I=<image> : Push Riju image to Docker Hub
+push: # I=<image> : Push Riju image to Docker registry
 	@: $${I} $${DOCKER_REPO}
 	docker tag riju:$(I) $(DOCKER_REPO):$(I)
 	docker push $(DOCKER_REPO):$(I)
@@ -207,6 +212,12 @@ upload: # L=<lang> T=<type> : Upload .deb to S3
 	aws s3 rm --recursive $(S3_HASH)
 	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
 	hash="$$(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash | grep .)"; aws s3 cp - "$(S3_HASH)/$${hash}" < /dev/null
+
+config: # Generate deployment config file
+	node tools/generate-deploy-config.js
+
+deploy: # Upload deployment config to S3
+	aws s3 cp $(BUILD)/config.json $(S3_CONFIG)
 
 ### Miscellaneous
 

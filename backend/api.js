@@ -1,5 +1,6 @@
 import { spawn } from "child_process";
 import path from "path";
+import process from "process";
 import WebSocket from "ws";
 
 import pty from "node-pty";
@@ -299,11 +300,7 @@ export class Session {
         template,
       } = this.config;
       if (this.term) {
-        const pid = this.term.pty.pid;
-        const args = this.privilegedExec(
-          `kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`
-        );
-        spawn(args[0], args.slice(1));
+        process.kill(this.term.pty.pid);
         // Signal to terminalOutput message generator using closure.
         this.term.live = false;
         this.term = null;

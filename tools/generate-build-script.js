@@ -25,26 +25,6 @@ function makeLangScript(langConfig, isShared) {
   const dependsCfg = (install && install.depends) || {};
   let prefaceNeedsAptGetUpdate = false;
   let prepareNeedsAptGetUpdate = false;
-  if (
-    install &&
-    ((install.prepare &&
-      ((install.prepare.manual &&
-        install.prepare.manual.includes("apt-get") &&
-        install.prepare.manual.includes(":i386")) ||
-        (install.prepare.apt &&
-          install.prepare.apt.filter((pkg) => pkg.includes(":i386")).length >
-            0))) ||
-      (install.preface &&
-        ((install.preface.manual &&
-          install.preface.manual.includes("apt-get") &&
-          install.preface.manual.includes(":i386")) ||
-          (install.preface.apt &&
-            install.preface.apt.filter((pkg) => pkg.includes(":i386")).length >
-              0))))
-  ) {
-    prefaceParts.push(`\
-dpkg --add-architecture i386`);
-  }
   if (install) {
     const {
       prepare,
@@ -303,6 +283,26 @@ chmod +x "${path}"`);
     prefaceParts.unshift(`\
 sudo --preserve-env=DEBIAN_FRONTEND apt-get update`);
   }
+  if (
+    install &&
+    ((install.prepare &&
+      ((install.prepare.manual &&
+        install.prepare.manual.includes("apt-get") &&
+        install.prepare.manual.includes(":i386")) ||
+        (install.prepare.apt &&
+          install.prepare.apt.filter((pkg) => pkg.includes(":i386")).length >
+            0))) ||
+      (install.preface &&
+        ((install.preface.manual &&
+          install.preface.manual.includes("apt-get") &&
+          install.preface.manual.includes(":i386")) ||
+          (install.preface.apt &&
+            install.preface.apt.filter((pkg) => pkg.includes(":i386")).length >
+              0))))
+  ) {
+    prefaceParts.unshift(`\
+sudo dpkg --add-architecture i386`);
+  }
   if (prepareNeedsAptGetUpdate) {
     parts.unshift(`\
 sudo --preserve-env=DEBIAN_FRONTEND apt-get update`);
@@ -375,7 +375,7 @@ function makeInstallScript(langConfig) {
     const { apt, cert, aptKey, aptRepo } = install;
     if (apt && apt.filter((pkg) => pkg.includes(":i386")).length > 0) {
       parts.push(`\
-dpkg --add-architecture i386`);
+sudo dpkg --add-architecture i386`);
     }
     if (cert && cert.length > 0) {
       parts.push(

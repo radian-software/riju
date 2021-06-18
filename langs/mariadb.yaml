@@ -10,11 +10,13 @@ install:
     - mysql-client
   riju:
     - sqls
+  # MariaDB has Debian package downloads, but only for LTS versions of
+  # Ubuntu, so we have to download the release tarball instead.
   manual: |
     install -d "${pkg}/opt/mariadb"
 
     ver="$(curl -sSL https://downloads.mariadb.org/ | grep 'href="/mariadb/[0-9]' | grep -Eo '[0-9][^/]+' | sort -rV | head -n1)"
-    wget "https://downloads.mariadb.org/f/mariadb-${ver}/bintar-linux-x86_64/mariadb-${ver}-linux-x86_64.tar.gz/from/http%3A//sfo1.mirrors.digitalocean.com/mariadb/?serve" -O mariadb.tar.gz
+    wget "https://downloads.mariadb.org/f/mariadb-${ver}/bintar-linux-systemd-x86_64/mariadb-${ver}-linux-systemd-x86_64.tar.gz/from/http%3A//sfo1.mirrors.digitalocean.com/mariadb/?serve" -O mariadb.tar.gz
     tar -xf mariadb.tar.gz -C "${pkg}/opt/mariadb" --strip-components=1
     chmod a=rx,u=rwx "${pkg}/opt/mariadb/lib/plugin/auth_pam_tool_dir"
     chmod a=rx,u=rwxs "${pkg}/opt/mariadb/lib/plugin/auth_pam_tool_dir/auth_pam_tool"

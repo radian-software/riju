@@ -623,7 +623,6 @@ async function writeLog(lang, type, result, log) {
 async function main() {
   langs = await langsPromise;
   let tests = getTestList();
-  const args = process.argv.slice(2);
   if (process.env.L) {
     tests = tests.filter(({ lang }) => process.env.L.split().includes(lang));
   }
