@@ -13,14 +13,14 @@ install:
     - r-base
 
 repl: |
-  R
+  HOME="$PWD" R
 
 main: ".Rprofile"
 template: |
   print("Hello, world!")
 
 run: |
-  R --no-save
+  HOME="$PWD" R --no-save
 
 scope:
   code: |

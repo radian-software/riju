@@ -14,7 +14,7 @@ install:
     ln -sT /opt/factor/factor "${pkg}/usr/local/bin/factor-lang"
 
 repl: |
-  factor-lang
+  HOME="$PWD" factor-lang
 input: |
   123 234 *
 
@@ -27,7 +27,7 @@ template: |
 createEmpty: ""
 
 run: |
-  factor-lang
+  HOME="$PWD" factor-lang
 
 scope:
   code: |
