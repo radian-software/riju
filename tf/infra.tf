@@ -261,7 +261,7 @@ resource "aws_autoscaling_group" "server" {
 
 resource "aws_lb" "server" {
   name = "riju-server"
-  security_groups = [aws_security_group.alb.name]
+  security_groups = [aws_security_group.alb.id]
   subnets = data.aws_subnet_ids.default.ids
 }
 
