@@ -1,3 +1,4 @@
+import { promises as fs } from "fs";
 import nodePath from "path";
 import process from "process";
 import url from "url";
@@ -413,15 +414,32 @@ set -euxo pipefail`);
 }
 
 export async function generateBuildScript({ lang, type }) {
-  const scriptMaker = {
-    lang: async () => makeLangScript(await readLangConfig(lang)),
-    shared: async () => makeSharedScript(await readSharedDepConfig(lang)),
-    install: async () => makeInstallScript(await readLangConfig(lang)),
-  }[type];
-  if (!scriptMaker) {
+  const funcs = {
+    lang: {
+      cfg: readLangConfig,
+      make: makeLangScript,
+    },
+    shared: {
+      cfg: readSharedDepConfig,
+      make: makeSharedScript,
+    },
+  };
+  if (!funcs[type]) {
     throw new Error(`unsupported script type ${type}`);
   }
-  return scriptMaker();
+  const { cfg, make } = funcs[type];
+  const langConfig = await cfg(lang);
+  const buildScript = await make(langConfig);
+  const installScript = await makeInstallScript(langConfig);
+  await fs.mkdir(`build/${type}/${lang}`, { recursive: true, mode: 0o755 });
+  const buildScriptPath = `build/${type}/${lang}/build.bash`;
+  const installScriptPath = `build/${type}/${lang}/install.bash`;
+  await Promise.all([
+    fs.writeFile(buildScriptPath, buildScript + "\n")
+      .then(() => fs.chmod(buildScriptPath, 0o755)),
+    fs.writeFile(installScriptPath, installScript + "\n")
+      .then(() => fs.chmod(installScriptPath, 0o755)),
+  ]);
 }
 
 // Parse command-line arguments, run main functionality, and exit.
@@ -431,10 +449,10 @@ async function main() {
     .requiredOption("--lang <id>", "language ID")
     .requiredOption(
       "--type <value>",
-      "package category (lang, shared, install)"
+      "package category (lang or shared)"
     );
   program.parse(process.argv);
-  console.log(await generateBuildScript(program.opts()));
+  await generateBuildScript(program.opts());
   process.exit(0);
 }
 

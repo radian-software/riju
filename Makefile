@@ -95,17 +95,7 @@ endif
 
 script: # L=<lang> T=<type> : Generate a packaging script
 	@: $${L} $${T}
-ifeq ($(T),install)
-	@echo >&2 "use 'make script L=$(L) T=lang' instead"
-	@exit 1
-endif
-	mkdir -p $(BUILD)
-	node tools/generate-build-script.js --lang $(L) --type $(T) > $(BUILD)/build.bash
-	chmod +x $(BUILD)/build.bash
-ifeq ($(T),lang)
-	node tools/generate-build-script.js --lang $(L) --type install > $(BUILD)/install.bash
-	chmod +x $(BUILD)/install.bash
-endif
+	node tools/generate-build-script.js --lang $(L) --type $(T)
 
 all-scripts: # Generate packaging scripts for all languages
 	node tools/write-all-build-scripts.js

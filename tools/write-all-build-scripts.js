@@ -12,23 +12,7 @@ import { generateBuildScript } from "./generate-build-script.js";
 
 // Parse command-line arguments, run main functionality, and exit.
 async function main() {
-  for (const { lang, type } of await getPackages()) {
-    const buildScriptPath = `build/${type}/${lang}/build.bash`;
-    const installScriptPath = `build/${type}/${lang}/install.bash`;
-    await fs.mkdir(nodePath.dirname(buildScriptPath), { recursive: true });
-    await fs.writeFile(
-      buildScriptPath,
-      (await generateBuildScript({ lang, type })) + "\n"
-    );
-    await fs.chmod(buildScriptPath, 0o755);
-    if (type === "lang") {
-      await fs.writeFile(
-        installScriptPath,
-        (await generateBuildScript({ lang, type: "install" })) + "\n"
-      );
-      await fs.chmod(installScriptPath, 0o755);
-    }
-  }
+  await Promise.all((await getPackages()).map(generateBuildScript));
   process.exit(0);
 }
 
