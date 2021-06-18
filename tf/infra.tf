@@ -240,6 +240,8 @@ resource "aws_launch_template" "server" {
 }
 
 resource "aws_autoscaling_group" "server" {
+  name = "riju-server"
+
   availability_zones = [
     for subnet in data.aws_subnet.default : subnet.availability_zone
   ]
