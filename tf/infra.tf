@@ -31,6 +31,15 @@ data "aws_vpc" "default" {
   default = true
 }
 
+data "aws_subnet_ids" "default" {
+  vpc_id = data.aws_vpc.default.id
+}
+
+data "aws_subnet" "default" {
+  for_each = data.aws_subnet_ids.default.ids
+  id = each.value
+}
+
 resource "aws_iam_user" "deploy" {
   name = "riju-deploy"
 }
@@ -228,8 +237,7 @@ resource "aws_launch_template" "server" {
 
 resource "aws_autoscaling_group" "server" {
   availability_zones = [
-    "${data.aws_region.current.name}b",
-    "${data.aws_region.current.name}c",
+    for subnet in data.aws_subnet.default : subnet.availability_zone
   ]
   desired_capacity = 1
   min_size = 1
@@ -238,6 +246,11 @@ resource "aws_autoscaling_group" "server" {
   launch_template {
     id = aws_launch_template.server.id
   }
+
+  target_group_arns = [
+    aws_lb_target_group.server_http.arn,
+    aws_lb_target_group.server_https.arn,
+  ]
 
   tag {
     key = "Name"
@@ -249,6 +262,7 @@ resource "aws_autoscaling_group" "server" {
 resource "aws_lb" "server" {
   name = "riju-server"
   security_groups = [aws_security_group.alb.name]
+  subnets = data.aws_subnet_ids.default.ids
 }
 
 resource "aws_lb_target_group" "server_http" {
@@ -258,11 +272,6 @@ resource "aws_lb_target_group" "server_http" {
   vpc_id = data.aws_vpc.default.id
 }
 
-resource "aws_autoscaling_attachment" "server_http" {
-  autoscaling_group_name = aws_autoscaling_group.server.id
-  alb_target_group_arn = aws_lb_target_group.server_http.arn
-}
-
 resource "aws_lb_target_group" "server_https" {
   name = "riju-server-https"
   port = 443
@@ -270,13 +279,8 @@ resource "aws_lb_target_group" "server_https" {
   vpc_id = data.aws_vpc.default.id
 }
 
-resource "aws_autoscaling_attachment" "server_https" {
-  autoscaling_group_name = aws_autoscaling_group.server.id
-  alb_target_group_arn = aws_lb_target_group.server_https.arn
-}
-
 output "alb_dns_name" {
-  value = aws_lb.server
+  value = aws_lb.server.dns_name
 }
 
 output "deploy_aws_access_key_id" {
