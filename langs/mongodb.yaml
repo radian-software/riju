@@ -8,7 +8,7 @@ name: "MongoDB"
 install:
   prepare:
     aptRepo:
-      - "http://archive.ubuntu.com/ubuntu/ focal main universe"
+      - "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ focal main universe"
     manual: |
       for name in mongodb mongodb-clients mongodb-server mongodb-server-core; do
           apt-get download "${name}"

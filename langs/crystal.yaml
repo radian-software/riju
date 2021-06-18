@@ -23,7 +23,7 @@ install:
   aptKey:
     - "https://keybase.io/crystal/pgp_keys.asc"
   aptRepo:
-    - "https://dist.crystal-lang.org/apt crystal main"
+    - "deb [arch=amd64] https://dist.crystal-lang.org/apt crystal main"
   apt:
     - crystal
 

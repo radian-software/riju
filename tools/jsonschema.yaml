@@ -533,9 +533,9 @@ properties:
             type: array
             items:
               type: string
-              pattern: "^https?://"
+              pattern: "^deb"
               examples:
-                - "https://downloads.ceylon-lang.org/apt/ unstable main"
+                - "deb [arch=amd64] https://downloads.ceylon-lang.org/apt/ unstable main"
           apt:
             type: array
             items:

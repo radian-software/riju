@@ -9,7 +9,7 @@ install:
   aptKey:
     - "B4112585D386EB94"
   aptRepo:
-    - "https://dl.hhvm.com/ubuntu ${ubuntu_name} main"
+    - "deb [arch=amd64] https://dl.hhvm.com/ubuntu ${ubuntu_name} main"
   apt:
     - hhvm
 

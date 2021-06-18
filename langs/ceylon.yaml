@@ -26,7 +26,7 @@ install:
     aptKey:
       - "https://downloads.ceylon-lang.org/apt/ceylon-debian-repo.gpg.key"
     aptRepo:
-      - "https://downloads.ceylon-lang.org/apt/ unstable main"
+      - "deb [arch=amd64] https://downloads.ceylon-lang.org/apt/ unstable main"
   <<: *add-ceylon-repo
   apt:
     - $(grep-aptavail -F Package ceylon -s Package -n | sort -rV | head -n1)
