@@ -30,7 +30,6 @@ args = parser.parse_args()
 
 pidfiles = "/var/run/riju/pidfiles"
 pidfile = pidfiles + "/" + str(uuid.uuid4()).replace("-", "")
-print(pidfile)
 
 # We have to use 'kill -9' here, otherwise runuser intercepts the
 # signal and takes its sweet time cleaning up.
@@ -44,7 +43,7 @@ def cleanup(*ignored_args):
         f"""
 set -euo pipefail
 if [[ -f '{pidfile}' ]]; then
-    kill -9 -$(< '{pidfile}')
+    kill -9 -$(< '{pidfile}') 2>/dev/null || true
     rm -f '{pidfile}'
 fi
         """

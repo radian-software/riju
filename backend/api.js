@@ -300,7 +300,11 @@ export class Session {
         template,
       } = this.config;
       if (this.term) {
-        process.kill(this.term.pty.pid);
+        try {
+          process.kill(this.term.pty.pid);
+        } catch (err) {
+          // process might have already exited
+        }
         // Signal to terminalOutput message generator using closure.
         this.term.live = false;
         this.term = null;
