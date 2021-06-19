@@ -134,11 +134,11 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   if (asprintf(&container, "riju-session-%s", uuid) < 0)
     die("asprintf failed");
   char *argvPrefix[] = {
-    "docker",
-    "exec",
+    "./system/res/docker-exec.py",
     "--user", "riju",
     pty ? "-it" : "-i",
     container,
+    "--",
   };
   char **argv = malloc(sizeof(argvPrefix) + (argc + 1) * sizeof(char *));
   if (argv == NULL)

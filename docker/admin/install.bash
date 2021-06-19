@@ -53,6 +53,7 @@ sudo
 tmux
 terraform
 unzip
+uuid-runtime
 vim
 wget
 yarn

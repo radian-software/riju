@@ -59,6 +59,7 @@ strace
 sudo
 tmux
 tree
+uuid-runtime
 vim
 
 "
