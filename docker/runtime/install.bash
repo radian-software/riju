@@ -48,7 +48,9 @@ dctrl-tools
 bind9-dnsutils
 less
 git
+golang
 htop
+httpie
 jq
 make
 man

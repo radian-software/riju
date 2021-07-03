@@ -2,6 +2,11 @@
 
 set -euo pipefail
 
+function verbosely {
+    echo "$@"
+    "$@"
+}
+
 cd supervisor
 mkdir -p out
-go build -o out/riju-supervisor ./src
+verbosely go build -o out/riju-supervisor ./src

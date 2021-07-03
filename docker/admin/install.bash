@@ -39,6 +39,7 @@ g++
 git
 golang
 htop
+httpie
 jq
 less
 make

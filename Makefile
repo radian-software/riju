@@ -162,7 +162,7 @@ server-dev: # Run and restart server for development
 build: frontend system supervisor # Compile all artifacts for production
 
 dev: # Compile, run, and watch all artifacts and server for development
-	$(MAKE_QUIETLY) -j3 frontend-dev system-dev supervisor-dev server-dev
+	$(MAKE_QUIETLY) -j4 frontend-dev system-dev supervisor-dev server-dev
 
 ### Application tools
 
