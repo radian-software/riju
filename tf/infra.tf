@@ -20,6 +20,8 @@ locals {
     Terraform       = "Managed by Terraform"
     BillingCategory = "Riju"
   }
+
+  ami_available = lookup(data.external.env.result, "AMI_NAME", "") != "" ? true : false
 }
 
 provider "aws" {
@@ -151,6 +153,8 @@ resource "aws_ecr_repository" "riju" {
 }
 
 data "aws_ami" "server" {
+  count = local.ami_available ? 1 : 0
+
   owners = ["self"]
 
   filter {
@@ -224,8 +228,10 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_launch_template" "server" {
+  count = local.ami_available ? 1 : 0
+
   name = "riju-server"
-  image_id = data.aws_ami.server.id
+  image_id = data.aws_ami.server[0].id
   instance_type = "t3.small"
   security_group_names = [aws_security_group.server.name]
 
@@ -250,6 +256,8 @@ resource "aws_launch_template" "server" {
 }
 
 resource "aws_autoscaling_group" "server" {
+  count = local.ami_available ? 1 : 0
+
   name = "riju-server"
 
   availability_zones = [
@@ -260,7 +268,7 @@ resource "aws_autoscaling_group" "server" {
   max_size = 3
 
   launch_template {
-    id = aws_launch_template.server.id
+    id = aws_launch_template.server[0].id
   }
 
   target_group_arns = [
