@@ -147,16 +147,22 @@ system: # Compile setuid binary for production
 system-dev: # Compile and watch setuid binary for development
 	watchexec -w system/src -n -- ./system/compile.bash
 
+supervisor: # Compile supervisor binary for production
+	./supervisor/compile.bash
+
+supervisor-dev: # Compile and watch supervisor binary for development
+	watchexec -w supervisor/src -n -- ./supervisor/compile.bash
+
 server: # Run server for production
 	node backend/server.js
 
 server-dev: # Run and restart server for development
 	watchexec -w backend -r -n -- node backend/server.js
 
-build: frontend system # Compile all artifacts for production
+build: frontend system supervisor # Compile all artifacts for production
 
 dev: # Compile, run, and watch all artifacts and server for development
-	$(MAKE_QUIETLY) -j3 frontend-dev system-dev server-dev
+	$(MAKE_QUIETLY) -j3 frontend-dev system-dev supervisor-dev server-dev
 
 ### Application tools
 

@@ -37,6 +37,7 @@ dctrl-tools
 docker-ce-cli
 g++
 git
+golang
 htop
 jq
 less
