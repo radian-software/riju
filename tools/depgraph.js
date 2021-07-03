@@ -247,7 +247,7 @@ async function getDeployArtifact(langs) {
       .concat(langs.map((lang) => `test:lang-${lang}`)),
     publishTarget: true,
     publishToRegistry: async () => {
-      await runCommand(`tools/deploy.bash`);
+      await runCommand(`make deploy`);
     },
   };
 }
