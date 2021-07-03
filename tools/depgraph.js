@@ -222,7 +222,7 @@ async function getLanguageTestArtifact({ lang }) {
       return s3TestHashes[lang] || null;
     },
     getDesiredHash: async (dependencyHashes) => {
-      return await getTestHash(lang, dependencyHashes["image:runtime"]);
+      return await getTestHash(lang, dependencyHashes[`image:lang-${lang}`]);
     },
     buildLocally: async () => {
       await runCommand(`make shell I=runtime CMD="make test L=${lang}"`);

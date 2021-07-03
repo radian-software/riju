@@ -1,7 +1,7 @@
 SHELL := bash
 .SHELLFLAGS := -o pipefail -euc
 
-export PATH := bin:$(PATH)
+export PATH := /src/bin:$(PATH)
 
 -include .env
 export
@@ -72,24 +72,27 @@ else
 LANG_TAG := $(I)
 endif
 
-IMAGE_HASH := -e RIJU_IMAGE_HASH="$$(docker inspect riju:$(LANG_TAG) | jq '.[0].Config.Labels["riju.image-hash"]' -r)"
+IMAGE_HASH := "$$(docker inspect riju:$(LANG_TAG) | jq '.[0].Config.Labels["riju.image-hash"]' -r)"
+WITH_IMAGE_HASH := -e RIJU_IMAGE_HASH=$(IMAGE_HASH)
+
+LANG_IMAGE_HASH := "$$(docker inspect riju:lang-$(L) | jq '.[0].Config.Labels["riju.image-hash"]' -r)"
 
 shell: # I=<shell> [L=<lang>] [E[E]=1] [P1|P2=<port>] : Launch Docker image with shell
 	@: $${I}
 ifneq (,$(filter $(I),admin ci))
 	@mkdir -p $(HOME)/.aws $(HOME)/.docker $(HOME)/.ssh $(HOME)/.terraform.d
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/run/riju/.aws -v $(HOME)/.docker:/var/run/riju/.docker -v $(HOME)/.ssh:/var/run/riju/.ssh -v $(HOME)/.terraform.d:/var/run/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) --network host riju:$(I) $(BASH_CMD)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/run/riju/.aws -v $(HOME)/.docker:/var/run/riju/.docker -v $(HOME)/.ssh:/var/run/riju/.ssh -v $(HOME)/.terraform.d:/var/run/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) --network host riju:$(I) $(BASH_CMD)
 else ifeq ($(I),app)
-	docker run -it --rm --hostname $(I) -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) riju:$(I) $(BASH_CMD)
+	docker run -it --rm --hostname $(I) -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
 else ifneq (,$(filter $(I),base lang))
 ifeq ($(I),lang)
 	@: $${L}
 endif
-	docker run -it --rm --hostname $(LANG_TAG) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) riju:$(LANG_TAG) $(BASH_CMD)
+	docker run -it --rm --hostname $(LANG_TAG) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(LANG_TAG) $(BASH_CMD)
 else ifeq ($(I),runtime)
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) riju:$(I) $(BASH_CMD)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
 else
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(IMAGE_HASH) riju:$(I) $(BASH_CMD)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
 endif
 
 ecr: # Authenticate to ECR (temporary credentials)
@@ -172,7 +175,7 @@ dev: # Compile, run, and watch all artifacts and server for development
 ## are provided, then only tests matching both are run.
 
 test: # [L=<lang>[,...]] [T=<test>[,...]] : Run test(s) for language or test category
-	node backend/test-runner.js
+	RIJU_LANG_IMAGE_HASH=$(LANG_IMAGE_HASH) node backend/test-runner.js
 
 ## Functions such as 'repl', 'run', 'format', etc. are available in
 ## the sandbox, and initial setup has already been done (e.g. 'setup'
@@ -210,6 +213,8 @@ undeploy: # Pull latest deployment config from S3
 
 push: # I=<image> : Push Riju image to Docker registry
 	@: $${I} $${DOCKER_REPO}
+	docker tag riju:$(I) $(DOCKER_REPO):$(I)-$(IMAGE_HASH)
+	docker push $(DOCKER_REPO):$(I)-$(IMAGE_HASH)
 	docker tag riju:$(I) $(DOCKER_REPO):$(I)
 	docker push $(DOCKER_REPO):$(I)
 
