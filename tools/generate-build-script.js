@@ -340,6 +340,9 @@ latest_release() {
   if (parts.join("\n\n").includes("ubuntu_name")) {
     parts.unshift(`ubuntu_name="$(lsb_release -cs)"`);
   }
+  if (parts.join("\n\n").includes("ubuntu_ver")) {
+    parts.unshift(`ubuntu_ver="$(lsb_release -rs)"`);
+  }
   if (install && install.disallowCI) {
     parts.unshift(`\
 if [[ -n "\${CI:-}" ]]; then
@@ -372,7 +375,7 @@ function makeInstallScript(langConfig) {
   let parts = [];
   const { id, install } = langConfig;
   if (install) {
-    const { apt, cert, aptKey, aptRepo } = install;
+    const { apt, cert, aptKey, aptRepo, manualInstall } = install;
     if (apt && apt.filter((pkg) => pkg.includes(":i386")).length > 0) {
       parts.push(`\
 sudo dpkg --add-architecture i386`);
@@ -408,9 +411,15 @@ sudo dpkg --add-architecture i386`);
 ${aptRepo.join("\n")}
 EOF`);
     }
+    if (manualInstall) {
+      parts.push(manualInstall);
+    }
   }
   if (parts.join("\n\n").includes("ubuntu_name")) {
     parts.unshift(`ubuntu_name="$(lsb_release -cs)"`);
+  }
+  if (parts.join("\n\n").includes("ubuntu_ver")) {
+    parts.unshift(`ubuntu_name="$(lsb_release -rs)"`);
   }
   parts.unshift(`\
 #!/usr/bin/env bash

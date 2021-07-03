@@ -9,9 +9,9 @@ install:
   # 3.x of the .NET SDK. Not sure why.
   prepare: &install-dotnet
     preface: |
-      sudo --preserve-env=DEBIAN_FRONTEND apt-get update
       wget "https://packages.microsoft.com/config/ubuntu/${ubuntu_ver}/packages-microsoft-prod.deb"
       sudo --preserve-env=DEBIAN_FRONTEND apt-get install ./packages-microsoft-prod.deb
+      sudo --preserve-env=DEBIAN_FRONTEND apt-get update
     apt:
       - $(grep-aptavail -wF Package "dotnet-sdk-3\.[0-9.]+" -s Package -n | sort -Vr | head -n1)
   <<: *install-dotnet
@@ -33,6 +33,10 @@ install:
     cp -R * "${HOME}/.dotnet" "${HOME}/.nuget" "${pkg}/opt/qsharp/skel/"
     rm "${pkg}/opt/qsharp/skel/main/Program.qs"
     chmod -R a=u,go-w "${pkg}/opt/qsharp/skel"
+  manualInstall: |
+    wget "https://packages.microsoft.com/config/ubuntu/${ubuntu_ver}/packages-microsoft-prod.deb"
+    sudo --preserve-env=DEBIAN_FRONTEND apt-get update
+    sudo --preserve-env=DEBIAN_FRONTEND apt-get install ./packages-microsoft-prod.deb
 
 setup: |
   shopt -s dotglob

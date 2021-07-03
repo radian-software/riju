@@ -627,6 +627,9 @@ properties:
       manual:
         type: string
         minLength: 1
+      manualInstall:
+        type: string
+        minLength: 1
       deb:
         type: array
         items:
