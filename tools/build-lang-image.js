@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { promises as fs } from "fs";
 import http from "http";
 import url from "url";
@@ -26,6 +27,10 @@ async function main() {
   program.option("--debug", "interactive debugging");
   program.parse(process.argv);
   const { lang, debug } = program.opts();
+  const installContents = await fs.readFile(
+    `build/lang/${lang}/install.bash`,
+    "utf-8"
+  );
   const hash = await hashDockerfile(
     "lang",
     {
@@ -42,6 +47,7 @@ async function main() {
             )
           )
         ).sort(),
+        installHash: crypto.createHash("sha1").update(installContents).digest("hex"),
       },
     }
   );
