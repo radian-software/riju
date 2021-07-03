@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 3.45"
     }
+    null = {
+      source = "hashicorp/null"
+      version = "~> 3.1"
+    }
   }
 }
 
@@ -127,6 +131,10 @@ resource "aws_acm_certificate" "riju" {
   tags = {
     Name = "Riju server"
   }
+}
+
+resource "aws_acm_certificate_validation" "riju" {
+  certificate_arn = aws_acm_certificate.riju.arn
 }
 
 resource "aws_s3_bucket" "riju" {
