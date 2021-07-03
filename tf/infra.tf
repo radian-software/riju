@@ -255,8 +255,8 @@ resource "aws_autoscaling_group" "server" {
   availability_zones = [
     for subnet in data.aws_subnet.default : subnet.availability_zone
   ]
-  desired_capacity = 1
-  min_size = 1
+  desired_capacity = 0
+  min_size = 0
   max_size = 3
 
   launch_template {
