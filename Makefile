@@ -224,11 +224,12 @@ upload: # L=<lang> T=<type> : Upload .deb to S3
 	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
 	hash="$$(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash | grep .)"; aws s3 cp - "$(S3_HASH)/$${hash}" < /dev/null
 
-config: # Generate deployment config file
+deploy-config: # Generate deployment config file
 	node tools/generate-deploy-config.js
 
-deploy: # Upload deployment config to S3
+deploy: deploy-config # Upload deployment config to S3 and update ASG instances
 	aws s3 cp $(BUILD)/config.json $(S3_CONFIG)
+	tools/force-update-asg.bash
 
 ### Infrastructure
 

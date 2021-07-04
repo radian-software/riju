@@ -1,10 +1,29 @@
 import { promises as fs } from "fs";
 import url from "url";
 
+import { Command } from "commander";
+
+import { getLangs } from "../lib/yaml.js";
+import { getLocalImageLabel } from "./docker-util.js";
+
 // Get the contents of the JSON file that will be written to S3 in
 // order to deploy Riju.
 async function getDeployConfig() {
-  // TODO
+  const langs = await getLangs();
+  const langImageTags = Object.fromEntries(
+    await Promise.all(
+      langs.map(async (lang) => [
+        lang,
+        `lang-${lang}-` +
+         (await getLocalImageLabel(`riju:lang-${lang}`, "riju.image-hash")),
+      ])
+    )
+  );
+  const appImageTag = await getLocalImageLabel(`riju:app`, "riju.image-hash");
+  return {
+    appImageTag,
+    langImageTags,
+  }
 }
 
 // Parse command-line arguments, run main functionality, and exit.

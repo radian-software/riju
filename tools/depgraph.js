@@ -250,9 +250,22 @@ async function getLanguageTestArtifact({ lang }) {
   };
 }
 
-async function getDeployArtifact(langs) {
+async function getDeployReadyArtifact(langs) {
   return {
-    name: `deploy:prod`,
+    name: `deploy:ready`,
+    dependencies: ["image:app"]
+      .concat(langs.map((lang) => `image:lang-${lang}`))
+      .concat(langs.map((lang) => `test:lang-${lang}`)),
+    publishTarget: true,
+    publishToRegistry: async () => {
+      await runCommand(`make deploy-config`);
+    },
+  };
+}
+
+async function getDeployLiveArtifact(langs) {
+  return {
+    name: `deploy:live`,
     dependencies: ["image:app"]
       .concat(langs.map((lang) => `image:lang-${lang}`))
       .concat(langs.map((lang) => `test:lang-${lang}`)),
@@ -298,7 +311,8 @@ async function getDepGraph() {
     artifacts.push(await getLanguageTestArtifact({ lang: lang }));
   }
   artifacts.push(await getImageArtifact({ tag: "app" }));
-  artifacts.push(await getDeployArtifact(langs));
+  artifacts.push(await getDeployReadyArtifact(langs));
+  artifacts.push(await getDeployLiveArtifact(langs));
   return { informationalDependencies, artifacts };
 }
 

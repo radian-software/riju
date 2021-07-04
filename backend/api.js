@@ -312,9 +312,9 @@ export class Session {
       this.send({ event: "terminalClear" });
       let cmdline;
       if (code) {
-        cmdline = run;
+        cmdline = `set +e; ${run}`;
         if (compile) {
-          cmdline = `( ${compile} ) && ( set +e; ${run} )`;
+          cmdline = `( ${compile} ) && ( ${run} )`;
         }
       } else if (repl) {
         cmdline = repl;

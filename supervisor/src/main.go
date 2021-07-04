@@ -33,8 +33,8 @@ const blueName = "riju-app-blue"
 const greenName = "riju-app-green"
 
 type deploymentConfig struct {
-	LangImageTags map[string]string `json:"langImageTags"`
 	AppImageTag string `json:"appImageTag"`
+	LangImageTags map[string]string `json:"langImageTags"`
 }
 
 type supervisorConfig struct {

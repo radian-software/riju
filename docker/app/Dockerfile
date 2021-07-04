@@ -7,7 +7,7 @@ WORKDIR /src
 COPY Makefile ./
 
 COPY system ./system/
-RUN make system
+RUN make system UNPRIVILEGED=1
 
 COPY package.json yarn.lock ./
 RUN yarn install
