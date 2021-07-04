@@ -230,6 +230,11 @@ config: # Generate deployment config file
 deploy: # Upload deployment config to S3
 	aws s3 cp $(BUILD)/config.json $(S3_CONFIG)
 
+### Infrastructure
+
+packer: supervisor # Build and publish a new AMI
+	tools/packer-build.bash
+
 ### Miscellaneous
 
 ## Run this every time you update .gitignore or .dockerignore.in.
@@ -243,7 +248,7 @@ dockerignore: # Update .dockerignore from .gitignore and .dockerignore.in
 ## opposed to through the Makefile.
 
 env: # Run shell with .env file loaded and $PATH fixed
-	exec bash --rcfile <(cat ~/.bashrc - <<< 'PS1="[.env] $$PS1"')
+	exec bash
 
 tmux: # Start or attach to tmux session
 	MAKELEVEL= tmux attach || MAKELEVEL= tmux new-session -s tmux

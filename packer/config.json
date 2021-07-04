@@ -1,8 +1,6 @@
 {
   "variables": {
-    "admin_password": "{{env `ADMIN_PASSWORD`}}",
-    "admin_ssh_public_key_file": "{{env `ADMIN_SSH_PUBLIC_KEY_FILE`}}",
-    "deploy_ssh_public_key_file": "{{env `DEPLOY_SSH_PUBLIC_KEY_FILE`}}"
+    "admin_password": "{{env `ADMIN_PASSWORD`}}"
   },
   "builders": [
     {
@@ -11,7 +9,7 @@
         "filters": {
           "virtualization-type": "hvm",
           "root-device-type": "ebs",
-          "name": "ubuntu/images/hvm-ssd/ubuntu-groovy-20.10-amd64-server-*"
+          "name": "ubuntu/images/hvm-ssd/ubuntu-*-21.04-amd64-server-*"
         },
         "owners": ["099720109477"],
         "most_recent": true
@@ -23,48 +21,19 @@
   ],
   "provisioners": [
     {
-      "type": "shell",
-      "script": "validate.bash",
-      "environment_vars": [
-        "ADMIN_PASSWORD={{user `admin_password`}}",
-        "ADMIN_SSH_PUBLIC_KEY_FILE={{user `admin_ssh_public_key_file`}}",
-        "DEPLOY_SSH_PUBLIC_KEY_FILE={{user `deploy_ssh_public_key_file`}}"
-      ]
-    },
-    {
-      "type": "file",
-      "source": "riju",
-      "destination": "/tmp/riju"
-    },
-    {
       "type": "file",
       "source": "riju-init-volume",
       "destination": "/tmp/riju-init-volume"
     },
     {
       "type": "file",
-      "source": "riju-deploy",
-      "destination": "/tmp/riju-deploy"
-    },
-    {
-      "type": "file",
-      "source": "riju-install-certbot-hooks",
-      "destination": "/tmp/riju-install-certbot-hooks"
+      "source": "../supervisor/out/riju-supervisor",
+      "destination": "/tmp/riju-supervisor"
     },
     {
       "type": "file",
       "source": "riju.service",
       "destination": "/tmp/riju.service"
-    },
-    {
-      "type": "file",
-      "source": "{{user `admin_ssh_public_key_file`}}",
-      "destination": "/tmp/id_admin.pub"
-    },
-    {
-      "type": "file",
-      "source": "{{user `deploy_ssh_public_key_file`}}",
-      "destination": "/tmp/id_deploy.pub"
     },
     {
       "type": "shell",

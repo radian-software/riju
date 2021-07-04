@@ -262,6 +262,7 @@ func (sv *supervisor) reload() error {
 		"-v", "/var/run/docker.sock:/var/run/docker.sock",
 		"-p", fmt.Sprintf("%s:6119", port),
 		"-e", "RIJU_DEPLOY_CONFIG",
+		"-e", "ANALYTICS=1",
 		"--name", name,
 		fmt.Sprintf("riju:%s", deployCfg.AppImageTag),
 	)

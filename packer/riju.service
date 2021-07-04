@@ -5,7 +5,7 @@ After=docker.service
 
 [Service]
 Type=exec
-ExecStart=riju
+ExecStart=riju-supervisor
 Restart=always
 
 [Install]
