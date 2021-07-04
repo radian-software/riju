@@ -74,6 +74,27 @@ func (sv *supervisor) status(status string) {
 	log.Println("active: " + status)
 }
 
+func (sv *supervisor) scheduleReload() string {
+	uuid := ""
+	sv.reloadLock.Lock()
+	if !sv.reloadInProgress {
+		sv.reloadInProgress = true
+		sv.reloadUUID = uuidlib.New().String()
+		uuid = sv.reloadUUID
+		go sv.reloadWithScheduling()
+	} else {
+		if sv.reloadInProgress {
+			uuid = sv.reloadNextUUID
+		} else {
+			sv.reloadNextUUID = uuidlib.New().String()
+			uuid = sv.reloadNextUUID
+		}
+		sv.reloadNeeded = true
+	}
+	sv.reloadLock.Unlock()
+	return uuid
+}
+
 func (sv *supervisor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.URL.Path, "/api/supervisor") {
 		if r.URL.Path == "/api/supervisor/v1/reload" {
@@ -81,23 +102,7 @@ func (sv *supervisor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
 				return
 			}
-			uuid := ""
-			sv.reloadLock.Lock()
-			if !sv.reloadInProgress {
-				sv.reloadInProgress = true
-				sv.reloadUUID = uuidlib.New().String()
-				uuid = sv.reloadUUID
-				go sv.reloadWithScheduling()
-			} else {
-				if sv.reloadInProgress {
-					uuid = sv.reloadNextUUID
-				} else {
-					sv.reloadNextUUID = uuidlib.New().String()
-					uuid = sv.reloadNextUUID
-				}
-				sv.reloadNeeded = true
-			}
-			sv.reloadLock.Unlock()
+			uuid := sv.scheduleReload()
 			fmt.Fprintln(w, uuid)
 			return
 		}
@@ -179,6 +184,14 @@ func (sv *supervisor) reloadWithScheduling() {
 		sv.reloadUUID = sv.reloadNextUUID
 		sv.reloadNextUUID = ""
 		go sv.reloadWithScheduling()
+	} else {
+		go func() {
+			// Arguably slightly incorrect but it's fine
+			// if we reload slightly more than once per 5
+			// minutes.
+			time.Sleep(5 * time.Minute)
+			sv.scheduleReload()
+		}()
 	}
 	sv.reloadLock.Unlock()
 }
@@ -389,6 +402,7 @@ func main() {
 		awsAccountNumber: *ident.Account,
 		reloadJobs: map[string]*reloadJob{},
 	}
+	go sv.scheduleReload()
 	log.Println("listening on http://0.0.0.0:80")
 	log.Fatalln(http.ListenAndServe("0.0.0.0:80", sv))
 }

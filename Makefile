@@ -229,7 +229,6 @@ deploy-config: # Generate deployment config file
 
 deploy: deploy-config # Upload deployment config to S3 and update ASG instances
 	aws s3 cp $(BUILD)/config.json $(S3_CONFIG)
-	tools/force-update-asg.bash
 
 ### Infrastructure
 
