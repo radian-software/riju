@@ -97,6 +97,19 @@ func (sv *supervisor) scheduleReload() string {
 
 func (sv *supervisor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.URL.Path, "/api/supervisor") {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			http.Error(w, "401 Authorization header missing", http.StatusUnauthorized)
+			return
+		}
+		if !strings.HasPrefix(authHeader, "Bearer ") {
+			http.Error(w, "401 malformed Authorization header", http.StatusUnauthorized)
+			return
+		}
+		if authHeader != "Bearer " + sv.config.AccessToken {
+			http.Error(w, "401 wrong access token", http.StatusUnauthorized)
+			return
+		}
 		if r.URL.Path == "/api/supervisor/v1/reload" {
 			if r.Method != http.MethodPost {
 				http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
@@ -111,8 +124,8 @@ func (sv *supervisor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
 				return
 			}
-			uuids := r.URL.Query()["uuid"]
-			if len(uuids) == 0 {
+			uuid := r.URL.Query().Get("uuid")
+			if uuid == "" {
 				http.Error(
 					w,
 					"400 missing uuid query parameter",
@@ -120,15 +133,6 @@ func (sv *supervisor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				)
 				return
 			}
-			if len(uuids) > 1 {
-				http.Error(
-					w,
-					"400 more than one uuid query parameter",
-					http.StatusBadRequest,
-				)
-				return
-			}
-			uuid := uuids[0]
 			sv.reloadLock.Lock()
 			job := sv.reloadJobs[uuid]
 			if job == nil {
