@@ -22,7 +22,7 @@ endif
 # Get rid of 'Entering directory' / 'Leaving directory' messages.
 MAKE_QUIETLY := MAKELEVEL= make
 
-.PHONY: all $(MAKECMDGOALS)
+.PHONY: all $(MAKECMDGOALS) frontend system supervisor
 
  all: help
 

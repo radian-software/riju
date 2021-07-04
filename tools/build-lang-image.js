@@ -27,10 +27,15 @@ async function main() {
   program.option("--debug", "interactive debugging");
   program.parse(process.argv);
   const { lang, debug } = program.opts();
+  const sharedDeps = await getSharedDepsForLangConfig(await readLangConfig(lang));
   const installContents = await fs.readFile(
     `build/lang/${lang}/install.bash`,
     "utf-8"
   );
+  const sharedInstallContents = await Promise.all(sharedDeps.map(
+    async (name) => fs.readFile(`build/shared/${name}/install.bash`),
+  ));
+  const allInstallContents = [].concat.apply([installContents], sharedInstallContents);
   const hash = await hashDockerfile(
     "lang",
     {
@@ -41,13 +46,15 @@ async function main() {
         langHash: await getDebHash(`build/lang/${lang}/riju-lang-${lang}.deb`),
         sharedHashes: (
           await Promise.all(
-            (await getSharedDepsForLangConfig(await readLangConfig(lang))).map(
+            sharedDeps.map(
               async (name) =>
                 await getDebHash(`build/shared/${name}/riju-shared-${name}.deb`)
             )
           )
         ).sort(),
-        installHash: crypto.createHash("sha1").update(installContents).digest("hex"),
+        installHash: allInstallContents.map(
+          (c) => crypto.createHash("sha1").update(c).digest("hex"),
+        ).join(""),
       },
     }
   );

@@ -312,9 +312,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	stsClient := sts.New(sts.Options{
-		Region: awsCfg.Region,
-	})
+	stsClient := sts.NewFromConfig(awsCfg)
 	ident, err := stsClient.GetCallerIdentity(context.Background(), &sts.GetCallerIdentityInput{})
 	if err != nil {
 		log.Fatalln(err)

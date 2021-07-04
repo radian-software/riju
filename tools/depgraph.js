@@ -124,12 +124,18 @@ async function getImageArtifact({ tag, isBaseImage, isLangImage }) {
           `build/lang/${isLangImage.lang}/install.bash`,
           "utf-8"
         );
+        const sharedInstallContents = await Promise.all(isLangImage.sharedDeps.map(
+          async (name) => fs.readFile(`build/shared/${name}/install.bash`),
+        ));
+        const allInstallContents = [].concat.apply([installContents], sharedInstallContents);
         salt = {
           langHash: dependencyHashes[`deb:lang-${isLangImage.lang}`],
           sharedHashes: isLangImage.sharedDeps.map(
             (name) => dependencyHashes[`deb:shared-${name}`]
           ),
-          installHash: crypto.createHash("sha1").update(installContents).digest("hex"),
+          installHash: allInstallContents.map(
+            (c) => crypto.createHash("sha1").update(c).digest("hex"),
+          ).join(""),
         };
       }
       return await hashDockerfile(name, dependentDockerHashes, { salt });
