@@ -7,6 +7,9 @@ After=docker.service
 Type=exec
 ExecStart=riju-supervisor
 Restart=always
+Environment=AWS_REGION=$AWS_REGION
+Environment=S3_BUCKET=$S3_BUCKET
+Environment=SUPERVISOR_ACCESS_TOKEN=$SUPERVISOR_ACCESS_TOKEN
 
 [Install]
 WantedBy=multi-user.target
