@@ -419,7 +419,7 @@ EOF`);
     parts.unshift(`ubuntu_name="$(lsb_release -cs)"`);
   }
   if (parts.join("\n\n").includes("ubuntu_ver")) {
-    parts.unshift(`ubuntu_name="$(lsb_release -rs)"`);
+    parts.unshift(`ubuntu_ver="$(lsb_release -rs)"`);
   }
   parts.unshift(`\
 #!/usr/bin/env bash

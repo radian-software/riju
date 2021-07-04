@@ -23,16 +23,18 @@ install:
   #
   # We could optimize further but I don't feel like it right now.
   manual: |
-    install -d "${pkg}/opt/qsharp/skel"
+    install -d "${pkg}/opt/qsharp/skel-home"
+    install -d "${pkg}/opt/qsharp/skel-src"
 
     dotnet new -i Microsoft.Quantum.ProjectTemplates
     dotnet new console -lang Q# -o main
     dotnet run --project main
 
     shopt -s dotglob
-    cp -R * "${HOME}/.dotnet" "${HOME}/.nuget" "${pkg}/opt/qsharp/skel/"
-    rm "${pkg}/opt/qsharp/skel/main/Program.qs"
-    chmod -R a=u,go-w "${pkg}/opt/qsharp/skel"
+    cp -R main "${pkg}/opt/qsharp/skel-src/"
+    cp -R "${HOME}/.dotnet" "${HOME}/.nuget" "${pkg}/opt/qsharp/skel-home/"
+    rm "${pkg}/opt/qsharp/skel-src/main/Program.qs"
+    chmod -R a=u,go-w "${pkg}/opt/qsharp"
   manualInstall: |
     wget "https://packages.microsoft.com/config/ubuntu/${ubuntu_ver}/packages-microsoft-prod.deb"
     sudo --preserve-env=DEBIAN_FRONTEND apt-get update
@@ -40,7 +42,8 @@ install:
 
 setup: |
   shopt -s dotglob
-  cp -R /opt/qsharp/skel/* ./
+  cp -R /opt/qsharp/skel-src/* ./
+  cp -R /opt/qsharp/skel-home/* "${HOME}/"
 
 main: "main/Main.qs"
 template: |
