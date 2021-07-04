@@ -220,6 +220,7 @@ push: # I=<image> : Push Riju image to Docker registry
 
 upload: # L=<lang> T=<type> : Upload .deb to S3
 	@: $${L} $${T} $${S3_BUCKET}
+	tools/ensure-deb-compressed.bash
 	aws s3 rm --recursive $(S3_HASH)
 	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
 	hash="$$(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash | grep .)"; aws s3 cp - "$(S3_HASH)/$${hash}" < /dev/null
