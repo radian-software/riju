@@ -4,8 +4,10 @@ set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && echo "${PWD}")"
 
+export PATH="$(sed -E "s_:${root}/bin:_:_; s_(^|:)${root}/bin(:|$)__" <<< "${PATH}")"
+
 set -a
 . "${root}/.env"
 set +a
 
-exec node "${root}/tools/depgraph.js" "$@"
+exec terraform "$@"
