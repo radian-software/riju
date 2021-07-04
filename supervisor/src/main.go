@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -221,6 +222,7 @@ func (sv *supervisor) reload() error {
 		"docker", "image", "ls", "--format",
 		"{{ .Repository }}:{{ .Tag }}",
 	)
+	dockerImageLs.Stderr = os.Stderr
 	out, err := dockerImageLs.Output()
 	if err != nil {
 		return err
@@ -237,6 +239,7 @@ func (sv *supervisor) reload() error {
 		neededTags = append(neededTags, tag)
 	}
 	neededTags = append(neededTags, deployCfg.AppImageTag)
+	sort.Strings(neededTags)
 	for _, tag := range neededTags {
 		if !existingTags[tag] {
 			sv.status("pulling image for " + tag)
@@ -247,6 +250,8 @@ func (sv *supervisor) reload() error {
 				tag,
 			)
 			dockerPull := exec.Command("docker", "pull", fullImage)
+			dockerPull.Stdout = os.Stdout
+			dockerPull.Stderr = os.Stderr
 			if err := dockerPull.Run(); err != nil {
 				return err
 			}
@@ -254,6 +259,8 @@ func (sv *supervisor) reload() error {
 				"docker", "tag", fullImage,
 				fmt.Sprintf("riju:%s", tag),
 			)
+			dockerTag.Stdout = os.Stdout
+			dockerTag.Stderr = os.Stderr
 			if err := dockerTag.Run(); err != nil {
 				return err
 			}
@@ -265,12 +272,15 @@ func (sv *supervisor) reload() error {
 	}
 	var port int
 	var name string
+	var oldName string
 	if sv.isGreen {
 		port = bluePort
 		name = blueName
+		oldName = greenName
 	} else {
 		port = greenPort
 		name = greenName
+		oldName = blueName
 	}
 	sv.status("starting container " + name)
 	dockerRun := exec.Command(
@@ -283,6 +293,8 @@ func (sv *supervisor) reload() error {
 		"--name", name,
 		fmt.Sprintf("riju:%s", deployCfg.AppImageTag),
 	)
+	dockerRun.Stdout = os.Stdout
+	dockerRun.Stderr = os.Stderr
 	dockerRun.Env = append(os.Environ(), fmt.Sprintf("RIJU_DEPLOY_CONFIG=%s", deployCfgStr))
 	if err := dockerRun.Run(); err != nil {
 		return err
@@ -303,6 +315,13 @@ func (sv *supervisor) reload() error {
 		return errors.New("container did not appear to be healthy")
 	}
 	sv.isGreen = !sv.isGreen
+	sv.status("stopping old container")
+	dockerStop := exec.Command("docker", "stop", oldName)
+	dockerStop.Stdout = dockerStop.Stdout
+	dockerStop.Stderr = dockerStop.Stderr
+	if err := dockerStop.Run(); err != nil {
+		return err
+	}
 	sv.status("reload complete")
 	return nil
 }
@@ -339,6 +358,7 @@ func main() {
 		"docker", "container", "ls",
 		"--format", "{{ .Names }}:{{ .CreatedAt }}",
 	)
+	dockerContainerLs.Stderr = os.Stderr
 	out, err := dockerContainerLs.Output()
 	if err != nil {
 		log.Fatalln(err)
@@ -391,6 +411,8 @@ func main() {
 		}
 		log.Printf("stopping %s container as it is newer\n", color)
 		dockerStop := exec.Command("docker", "stop", name)
+		dockerStop.Stdout = os.Stdout
+		dockerStop.Stderr = os.Stderr
 		if err := dockerStop.Run(); err != nil {
 			log.Fatalln(err)
 		}

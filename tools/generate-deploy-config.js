@@ -19,7 +19,7 @@ async function getDeployConfig() {
       ])
     )
   );
-  const appImageTag = await getLocalImageLabel(`riju:app`, "riju.image-hash");
+  const appImageTag = `app-` + await getLocalImageLabel(`riju:app`, "riju.image-hash");
   return {
     appImageTag,
     langImageTags,

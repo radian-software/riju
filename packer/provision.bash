@@ -7,6 +7,11 @@ set -euo pipefail
 : ${S3_BUCKET}
 : ${SUPERVISOR_ACCESS_TOKEN}
 
+# I think there is a race condition related to Ubuntu wanting to do an
+# automated system upgrade at boot, which causes 'apt-get update' to
+# sometimes fail with an obscure error message.
+sleep 5
+
 mkdir /tmp/riju-work
 pushd /tmp/riju-work
 
@@ -50,7 +55,7 @@ sudo hostnamectl set-hostname riju
 
 sudo systemctl enable riju
 
-sudo passwd -l ubuntu
+sudo userdel ubuntu -f
 
 popd
 rm -rf /tmp/riju-work
