@@ -1,0 +1,21 @@
+name: Build and deploy
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build and deploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          DOCKER_REPO: 084011155226.dkr.ecr.us-west-1.amazonaws.com/riju
+          S3_BUCKET: riju
+        run: |
+          make image shell I=ci CMD="tools/ci-bootstrap.bash"

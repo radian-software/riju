@@ -63,7 +63,7 @@ resource "aws_launch_template" "server" {
     device_name = "/dev/sdh"
     ebs {
       volume_type              = "gp3"
-      volume_size              = 125
+      volume_size              = 256
     }
   }
 

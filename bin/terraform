@@ -10,4 +10,6 @@ set -a
 . "${root}/.env"
 set +a
 
+cd "${root}/tf"
+
 exec terraform "$@"
