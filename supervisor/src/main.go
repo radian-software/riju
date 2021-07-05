@@ -378,6 +378,13 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	rijuInitVolume := exec.Command("riju-init-volume")
+	rijuInitVolume.Stdout = rijuInitVolume.Stdout
+	rijuInitVolume.Stderr = rijuInitVolume.Stderr
+	if err := rijuInitVolume.Run(); err != nil {
+		log.Fatalln(err)
+	}
+
 	blueUrl, err := url.Parse(fmt.Sprintf("http://localhost:%d", bluePort))
 	if err != nil {
 		log.Fatalln(err)
