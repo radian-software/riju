@@ -14,8 +14,10 @@ S3_HASH := $(S3)/hashes/riju-$(T)-$(L)
 S3_CONFIG := $(S3)/config.json
 
 ifneq ($(CMD),)
+C_CMD := -c '$(CMD)'
 BASH_CMD := bash -c '$(CMD)'
 else
+C_CMD :=
 BASH_CMD :=
 endif
 
@@ -96,7 +98,8 @@ else
 endif
 
 ecr: # Authenticate to ECR (temporary credentials)
-	id="$$(aws sts get-caller-identity | jq .Account -r)"; aws ecr get-login-password --region us-west-1 | docker login --username AWS --password-stdin "$${id}.dkr.ecr.us-west-1.amazonaws.com"
+	aws ecr get-login-password | docker login --username AWS --password-stdin $(subst /riju,,$(DOCKER_REPO))
+	aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(subst /riju,,$(PUBLIC_DOCKER_REPO))
 
 ### Build packaging scripts
 
@@ -215,6 +218,10 @@ push: # I=<image> : Push Riju image to Docker registry
 	@: $${I} $${DOCKER_REPO}
 	docker tag riju:$(I) $(DOCKER_REPO):$(I)-$(IMAGE_HASH)
 	docker push $(DOCKER_REPO):$(I)-$(IMAGE_HASH)
+ifeq ($(I),ubuntu)
+	docker tag riju:$(I) $(PUBLIC_DOCKER_REPO):$(I)
+	docker push $(PUBLIC_DOCKER_REPO):$(I)
+endif
 	docker tag riju:$(I) $(DOCKER_REPO):$(I)
 	docker push $(DOCKER_REPO):$(I)
 
@@ -248,8 +255,8 @@ dockerignore: # Update .dockerignore from .gitignore and .dockerignore.in
 ## manual commands (Docker, Terraform, Packer, etc.) directly, as
 ## opposed to through the Makefile.
 
-env: # Run shell with .env file loaded and $PATH fixed
-	exec bash
+env: # [CMD=<target>] : Run shell with .env file loaded and $PATH fixed
+	exec bash $(C_CMD)
 
 tmux: # Start or attach to tmux session
 	MAKELEVEL= tmux attach || MAKELEVEL= tmux new-session -s tmux
