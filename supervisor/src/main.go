@@ -421,7 +421,7 @@ func main() {
 		if match := rijuContainerRegexp.FindStringSubmatch(line); match != nil {
 			name := match[1]
 			created, err := time.Parse(
-				"2006-01-02 15:04:05 -0070 MST",
+				"2006-01-02 15:04:05 -0700 MST",
 				match[2],
 			)
 			if err != nil {
