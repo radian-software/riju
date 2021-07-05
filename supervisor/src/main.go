@@ -331,7 +331,7 @@ func (sv *supervisor) reload() error {
 		"docker", "run", "-d",
 		"-v", "/var/run/riju:/var/run/riju",
 		"-v", "/var/run/docker.sock:/var/run/docker.sock",
-		"-p", fmt.Sprintf("%s:6119", port),
+		"-p", fmt.Sprintf("127.0.0.1:%d:6119", port),
 		"-e", "RIJU_DEPLOY_CONFIG",
 		"-e", "ANALYTICS=1",
 		"--name", name,
@@ -344,7 +344,7 @@ func (sv *supervisor) reload() error {
 		return err
 	}
 	sv.status("waiting for container to start up")
-	time.Sleep(5)
+	time.Sleep(5 * time.Second)
 	sv.status("checking that container is healthy")
 	resp, err := http.Get(fmt.Sprintf("http://localhost:%d", port))
 	if err != nil {
@@ -360,10 +360,10 @@ func (sv *supervisor) reload() error {
 	}
 	sv.isGreen = !sv.isGreen
 	sv.status("stopping old container")
-	dockerStop := exec.Command("docker", "stop", oldName)
-	dockerStop.Stdout = dockerStop.Stdout
-	dockerStop.Stderr = dockerStop.Stderr
-	if err := dockerStop.Run(); err != nil {
+	dockerRm := exec.Command("docker", "rm", "-f", oldName)
+	dockerRm.Stdout = dockerRm.Stdout
+	dockerRm.Stderr = dockerRm.Stderr
+	if err := dockerRm.Run(); err != nil {
 		return err
 	}
 	sv.status("reload complete")
@@ -406,7 +406,7 @@ func main() {
 	}
 
 	dockerContainerLs := exec.Command(
-		"docker", "container", "ls",
+		"docker", "container", "ls", "-a",
 		"--format", "{{ .Names }}:{{ .CreatedAt }}",
 	)
 	dockerContainerLs.Stderr = os.Stderr
@@ -461,10 +461,10 @@ func main() {
 			name = greenName
 		}
 		log.Printf("stopping %s container as it is newer\n", color)
-		dockerStop := exec.Command("docker", "stop", name)
-		dockerStop.Stdout = os.Stdout
-		dockerStop.Stderr = os.Stderr
-		if err := dockerStop.Run(); err != nil {
+		dockerRm := exec.Command("docker", "rm", "-f", name)
+		dockerRm.Stdout = os.Stdout
+		dockerRm.Stderr = os.Stderr
+		if err := dockerRm.Run(); err != nil {
 			log.Fatalln(err)
 		}
 	}
