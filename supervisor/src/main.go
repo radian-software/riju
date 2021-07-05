@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -21,6 +23,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	s3manager "github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/ecr"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/caarlos0/env/v6"
@@ -59,6 +62,7 @@ type supervisor struct {
 	awsAccountNumber string
 	awsRegion string
 	s3 *s3.Client
+	ecr *ecr.Client
 
 	reloadLock sync.Mutex
 	reloadInProgress bool
@@ -204,6 +208,46 @@ func (sv *supervisor) reloadWithScheduling() {
 var rijuImageRegexp = regexp.MustCompile(`(?:^|/)riju:([^<>]+)$`)
 
 func (sv *supervisor) reload() error {
+	sv.status("getting access token from ECR")
+	ecrResp, err := sv.ecr.GetAuthorizationToken(
+		context.Background(),
+		&ecr.GetAuthorizationTokenInput{},
+	)
+	if err != nil {
+		return err
+	}
+	if len(ecrResp.AuthorizationData) != 1 {
+		return fmt.Errorf(
+			"got unexpected number (%d) of authorization tokens",
+			len(ecrResp.AuthorizationData),
+		)
+	}
+	authInfo, err := base64.StdEncoding.DecodeString(*ecrResp.AuthorizationData[0].AuthorizationToken)
+	if err != nil {
+		return err
+	}
+	authInfoParts := strings.Split(string(authInfo), ":")
+	if len(authInfoParts) != 2 {
+		return errors.New("got malformed auth info from ECR")
+	}
+	dockerUsername := authInfoParts[0]
+	dockerPassword := authInfoParts[1]
+	sv.status("authenticating Docker client to ECR")
+	dockerLogin := exec.Command(
+		"docker", "login",
+		"--username", dockerUsername,
+		"--password-stdin",
+		fmt.Sprintf(
+			"%s.dkr.ecr.%s.amazonaws.com",
+			sv.awsAccountNumber, sv.awsRegion,
+		),
+	)
+	dockerLogin.Stdin = bytes.NewReader([]byte(dockerPassword))
+	dockerLogin.Stdout = os.Stdout
+	dockerLogin.Stderr = os.Stderr
+	if err := dockerLogin.Run(); err != nil {
+		return err
+	}
 	sv.status("downloading deployment config from S3")
 	dl := s3manager.NewDownloader(sv.s3)
 	buf := s3manager.NewWriteAtBuffer([]byte{})
@@ -424,6 +468,7 @@ func main() {
 		greenProxyHandler: httputil.NewSingleHostReverseProxy(greenUrl),
 		isGreen: isGreen,
 		s3: s3.NewFromConfig(awsCfg),
+		ecr: ecr.NewFromConfig(awsCfg),
 		awsRegion: awsCfg.Region,
 		awsAccountNumber: *ident.Account,
 		reloadJobs: map[string]*reloadJob{},

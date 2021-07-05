@@ -49,6 +49,27 @@ data "aws_iam_policy_document" "server" {
       "arn:aws:s3:::${aws_s3_bucket.riju.bucket}/config.json",
     ]
   }
+
+  statement {
+    actions = [
+      "ecr:GetAuthorizationToken",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    actions = [
+      "ecr:BatchGetImage",
+      "ecr:GetDownloadUrlForLayer",
+    ]
+
+    resources = [
+      aws_ecr_repository.riju.arn,
+    ]
+  }
 }
 
 resource "aws_iam_policy" "server" {
