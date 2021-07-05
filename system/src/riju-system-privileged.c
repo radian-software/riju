@@ -22,7 +22,7 @@ void __attribute__ ((noreturn)) die(char *msg)
 void die_with_usage()
 {
   die("usage:\n"
-      "  riju-system-privileged session UUID LANG\n"
+      "  riju-system-privileged session UUID LANG [IMAGE-HASH]\n"
       "  riju-system-privileged exec UUID CMDLINE...\n"
       "  riju-system-privileged pty UUID CMDLINE...");
 }
@@ -44,16 +44,28 @@ char *parseLang(char *lang) {
   return lang;
 }
 
+char *parseImageHash(char *imageHash)
+{
+  if (strnlen(imageHash, 41) != 40)
+    die("illegal imageHash");
+  for (char *ptr = imageHash; *ptr; ++ptr)
+    if (!((*ptr >= 'a' && *ptr <= 'z') || (*ptr >= '0' && *ptr <= '9')))
+      die("illegal imageHash");
+  return imageHash;
+}
+
 void wait_alarm(int signum)
 {
   (void)signum;
   die("container did not come up within 1 second");
 }
 
-void session(char *uuid, char *lang)
+void session(char *uuid, char *lang, char *imageHash)
 {
   char *image, *container, *hostname, *volume, *fifo;
-  if (asprintf(&image, "riju:lang-%s", lang) < 0)
+  if ((imageHash != NULL ?
+       asprintf(&image, "riju:lang-%s-%s", lang, imageHash) :
+       asprintf(&image, "riju:lang-%s", lang)) < 0)
     die("asprintf failed");
   if (asprintf(&container, "riju-session-%s", uuid) < 0)
     die("asprintf failed");
@@ -157,11 +169,12 @@ int main(int argc, char **argv)
   if (argc < 2)
     die_with_usage();
   if (!strcmp(argv[1], "session")) {
-    if (argc != 4)
+    if (argc < 4 || argc > 5)
       die_with_usage();
     char *uuid = parseUUID(argv[2]);
     char *lang = parseLang(argv[3]);
-    session(uuid, lang);
+    char *imageHash = argc == 5 ? parseImageHash(argv[4]) : NULL;
+    session(uuid, lang, imageHash);
     return 0;
   }
   if (!strcmp(argv[1], "exec")) {
