@@ -7,4 +7,4 @@ set -euo pipefail
 : ${DOCKER_REPO}
 : ${S3_BUCKET}
 
-make image shell I=ci CMD="tools/ci-run.bash"
+make image shell I=ci CMD="tools/ci-run.bash" NI=1
