@@ -16,4 +16,5 @@ template: |
     quit
 
 run: |
-  gtm_dist=/usr/lib/x86_64-linux-gnu/fis-gtm/V6.3-007_x86_64 /usr/lib/x86_64-linux-gnu/fis-gtm/V6.3-007_x86_64/utf8/mumps -r main main.m
+  gtm_dist=(/usr/lib/x86_64-linux-gnu/fis-gtm/V*_x86_64)
+  gtm_dist="${gtm_dist[@]}" "${gtm_dist[@]}/utf8/mumps" -r main main.m

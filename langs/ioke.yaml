@@ -4,6 +4,9 @@ aliases:
 name: "Ioke"
 
 install:
+  prepare:
+    cert:
+      - "https://letsencrypt.org/certs/lets-encrypt-r3.pem"
   apt:
     - default-jdk
   manual: |

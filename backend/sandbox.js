@@ -2,14 +2,16 @@ import { spawn } from "child_process";
 import { promises as fs } from "fs";
 import process from "process";
 
-import { quote } from "shell-quote";
-import { v4 as getUUID } from "uuid";
+import pty from "node-pty";
 
-import { borrowUser } from "./users.js";
+import { readLangConfig } from "../lib/yaml.js";
 import {
-  privilegedSetup,
-  privilegedSpawn,
-  privilegedTeardown,
+  bash,
+  getUUID,
+  privilegedExec,
+  privilegedPty,
+  privilegedSession,
+  quote,
   run,
 } from "./util.js";
 
@@ -28,23 +30,48 @@ async function main() {
   if (!lang) {
     die("environment variable unset: $L");
   }
+  const langConfig = await readLangConfig(lang);
   const uuid = getUUID();
-  const { uid, returnUser } = await borrowUser(log);
-  await run(privilegedSetup({ uid, uuid }), log);
-  const args = privilegedSpawn({ uid, uuid }, [
-    "bash",
-    "-c",
-    `exec env L='${lang}' bash --rcfile <(cat <<< ${quote([sandboxScript])})`,
-  ]);
+  console.log(`Starting session with UUID ${uuid}`);
+  const sessionArgs = privilegedSession({ uuid, lang });
+  const session = pty.spawn(sessionArgs[0], sessionArgs.slice(1), {
+    name: "xterm-color",
+  });
+  let buffer = "";
+  await new Promise((resolve) => {
+    session.on("data", (data) => {
+      buffer += data;
+      let idx;
+      while ((idx = buffer.indexOf("\r\n")) !== -1) {
+        const line = buffer.slice(0, idx);
+        buffer = buffer.slice(idx + 2);
+        if (line === "riju: container ready") {
+          resolve();
+        } else {
+          console.error(line);
+        }
+      }
+    });
+  });
+  const args = privilegedPty(
+    { uuid },
+    bash(
+      `env L='${lang}' LANG_CONFIG=${quote(
+        JSON.stringify(langConfig),
+      )} bash --rcfile <(cat <<< ${quote(sandboxScript)})`
+    )
+  );
   const proc = spawn(args[0], args.slice(1), {
     stdio: "inherit",
   });
-  await new Promise((resolve, reject) => {
-    proc.on("error", reject);
-    proc.on("close", resolve);
-  });
-  await run(privilegedTeardown({ uid, uuid }), log);
-  await returnUser();
+  try {
+    await new Promise((resolve, reject) => {
+      proc.on("error", reject);
+      proc.on("close", resolve);
+    });
+  } finally {
+    session.kill();
+  }
 }
 
 main().catch(die);

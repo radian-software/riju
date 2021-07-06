@@ -17,7 +17,7 @@ install:
     cp -R "$HOME/.red" "${pkg}/opt/red/skel/"
 
 setup: |
-  shopt -s dotglob; cp -R /opt/red/skel/* ./
+  shopt -s dotglob; cp -R /opt/red/skel/* "${HOME}/"
 
 # https://github.com/red/red/issues/543#issuecomment-25404212
 repl: |

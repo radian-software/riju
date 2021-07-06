@@ -5,10 +5,13 @@ if [[ -z "$L" ]]; then
     exit 1
 fi
 
-cfg="$(< "/opt/riju/langs/$L.json")" || exit 1
+if [[ -z "$LANG_CONFIG" ]]; then
+    echo 'environment variable unset: $LANG_CONFIG' >&2
+    exit 1
+fi
 
 function get {
-    jq -r ".$1" <<< "${cfg}"
+    jq -r ".$1" <<< "${LANG_CONFIG}"
 }
 
 function has {

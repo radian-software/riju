@@ -9,8 +9,6 @@ name: "ReasonML"
 
 install:
   prepare:
-    apt:
-      - yarn
     npm:
       - bs-platform
   npm:
@@ -31,7 +29,7 @@ install:
     pushd "${pkg}/opt/reasonml/skel"
     bsb -init .
     cat bsconfig.json | jq '.name = "riju-project"' | sponge bsconfig.json
-    yarn install
+    npm install
     popd
 
 main: "main.re"

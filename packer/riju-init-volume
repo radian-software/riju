@@ -10,7 +10,7 @@ mount_point=/mnt/riju/data
 
 mkdir -p "${mount_point}"
 
-disks="$(lsblk -l -d -b -o name,size | grep nvme)"
+disks="$(lsblk -l -d -b -o name,size | grep -Ev 'loop|NAME')"
 num_disks="$(wc -l <<< "${disks}")"
 
 if [[ "${num_disks}" != 2 ]]; then
@@ -27,6 +27,8 @@ print "volume has ${num_parts} partition(s)"
 if [[ "${num_parts}" != 1 ]]; then
     print "repartitioning so we have exactly one partition"
     sfdisk -X gpt "/dev/${disk}" <<< ";"
+    print "waiting for 1 second so that partitions show up in /dev"
+    sleep 1
 fi
 
 part="$(lsblk -l -o name | (grep "${disk}." || true) | head -n1)"

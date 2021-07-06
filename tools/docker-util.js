@@ -24,26 +24,29 @@ export async function getLocalImageLabel(image, label) {
       await runCommand(`docker inspect "${image}"`, { getStdout: true })
     ).stdout;
   } catch (err) {
-    if (
-      (await runCommand(`docker images -q "${image}"`, { getStdout: true }))
-        .stdout
-    ) {
-      // The image exists locally, something unexpected must have
-      // happened in docker inspect.
-      throw err;
-    } else {
-      // The image doesn't exist locally, that must be why docker
-      // inspect didn't work.
-      return null;
-    }
+    return null;
   }
   const labels = JSON.parse(output)[0].Config.Labels;
   return (labels && labels[label]) || null;
 }
 
+// Return the list of tags in a remote Docker repository.
+export async function getRemoteRepositoryTags(repo) {
+  return JSON.parse(
+    (
+      await runCommand(`skopeo list-tags "docker://${repo}"`, {
+        getStdout: true,
+      })
+    ).stdout
+  ).Tags;
+}
+
 // Return the value of a label on a Docker image that is on a remote
-// registry. If the image or label doesn't exist, return null.
-export async function getRemoteImageLabel(image, label) {
+// registry. If the image or label doesn't exist, return null. You
+// have to pass in a list of tags on the remote repository (see
+// getRemoteRepositoryTags) so that we can distinguish between missing
+// images and network errors.
+export async function getRemoteImageLabel(image, label, tags) {
   const [repo, tag] = image.split(":");
   let output;
   try {
@@ -53,13 +56,6 @@ export async function getRemoteImageLabel(image, label) {
       })
     ).stdout;
   } catch (err) {
-    const tags = JSON.parse(
-      (
-        await runCommand(`skopeo list-tags "docker://${repo}"`, {
-          getStdout: true,
-        })
-      ).stdout
-    ).Tags;
     if (tags.includes(tag)) {
       // Tag exists, something unexpected must have gone wrong when
       // running skopeo inspect.

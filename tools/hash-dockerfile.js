@@ -12,7 +12,7 @@ import _ from "lodash";
 import { getLocalImageDigest, getLocalImageLabel } from "./docker-util.js";
 import { runCommand } from "./util.js";
 
-// Given a string like "runtime" that identifies the relevant
+// Given a string like "base" that identifies the relevant
 // Dockerfile, read it from disk and parse it into a list of commands.
 async function parseDockerfile(name) {
   const contents = await fs.readFile(`docker/${name}/Dockerfile`, "utf-8");
@@ -62,6 +62,24 @@ async function listFiles(path) {
   } else {
     return [];
   }
+}
+
+export async function getBaseImages(name) {
+  const dockerfile = await parseDockerfile(name);
+  const baseImages = [];
+  dockerfile.map(({ name, args, error }) => {
+    if (error) {
+      throw error;
+    }
+    if (name === "FROM") {
+      if (typeof args !== "string") {
+        throw new Error("got unexpected non-string for FROM args");
+      }
+      const image = args.split(" ")[0];
+      baseImages.push(image);
+    }
+  });
+  return baseImages;
 }
 
 // Given a Dockerfile name like "packaging", read all the necessary
@@ -187,8 +205,8 @@ async function main() {
   }
   const [name] = program.args;
   const { debug } = program.opts();
-  if (name === "composite") {
-    throw new Error("use build-composite-image.js instead for this");
+  if (name === "lang") {
+    throw new Error("use build-lang-image.js instead for this");
   }
   if (debug) {
     console.log(

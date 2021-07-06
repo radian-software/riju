@@ -11,7 +11,7 @@ install:
     - zsh-doc
 
 repl: |
-  SHELL=/usr/bin/zsh zsh
+  SHELL=/usr/bin/zsh HOME="$PWD" zsh
 input: |
   expr 123 \* 234
 
@@ -21,7 +21,7 @@ template: |
 createEmpty: ""
 
 run: |
-  SHELL=/usr/bin/zsh zsh
+  SHELL=/usr/bin/zsh HOME="$PWD" zsh
 
 scope:
   code: |

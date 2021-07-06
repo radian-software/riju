@@ -6,6 +6,10 @@ aliases:
 name: "Hack"
 
 install:
+  aptKey:
+    - "B4112585D386EB94"
+  aptRepo:
+    - "deb [arch=amd64] https://dl.hhvm.com/ubuntu ${ubuntu_name} main"
   apt:
     - hhvm
 

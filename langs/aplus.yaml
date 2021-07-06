@@ -1,0 +1,29 @@
+id: "aplus"
+aliases:
+  - "a+"
+  - "ap"
+  - "aplus"
+name: "A+"
+
+install:
+  apt:
+    - aplus-fsf
+    - aplus-fsf-doc
+    - rlwrap
+
+repl: |
+  rlwrap a+
+input: |
+  2 * 16
+output: |
+  65536
+
+main: "main.a+"
+template: |
+  'Hello, world!'
+
+run: |
+  rlwrap a+ main.a+
+
+skip:
+  - scope

@@ -1,18 +1,17 @@
 #define _GNU_SOURCE
+#include <fcntl.h>
 #include <errno.h>
 #include <grp.h>
+#include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
-
-// Keep in sync with backend/src/users.ts
-const int MIN_UID = 2000;
-const int MAX_UID = 65000;
-
-int privileged;
 
 void __attribute__ ((noreturn)) die(char *msg)
 {
@@ -23,155 +22,171 @@ void __attribute__ ((noreturn)) die(char *msg)
 void die_with_usage()
 {
   die("usage:\n"
-      "  riju-system-privileged useradd UID\n"
-      "  riju-system-privileged setup UID UUID\n"
-      "  riju-system-privileged spawn UID UUID CMDLINE...\n"
-      "  riju-system-privileged teardown UID UUID");
-}
-
-int parseUID(char *str)
-{
-  if (!privileged)
-    return -1;
-  char *endptr;
-  long uid = strtol(str, &endptr, 10);
-  if (!*str || *endptr)
-    die("uid must be an integer");
-  if (uid < MIN_UID || uid >= MAX_UID)
-    die("uid is out of range");
-  return uid;
+      "  riju-system-privileged session UUID LANG [IMAGE-HASH]\n"
+      "  riju-system-privileged exec UUID CMDLINE...\n"
+      "  riju-system-privileged pty UUID CMDLINE...");
 }
 
 char *parseUUID(char *uuid)
 {
-  if (!*uuid)
+  if (strnlen(uuid, 33) != 32)
     die("illegal uuid");
   for (char *ptr = uuid; *ptr; ++ptr)
-    if (!((*ptr >= 'a' && *ptr <= 'z') || (*ptr >= '0' && *ptr <= '9') || *ptr == '-'))
+    if (!((*ptr >= 'a' && *ptr <= 'z') || (*ptr >= '0' && *ptr <= '9')))
       die("illegal uuid");
   return uuid;
 }
 
-void useradd(int uid)
-{
-  if (!privileged)
-    die("useradd not allowed without root privileges");
-  char *cmdline;
-  if (asprintf(&cmdline, "groupadd -g %1$d riju%1$d", uid) < 0)
-    die("asprintf failed");
-  int status = system(cmdline);
-  if (status != 0)
-    die("groupadd failed");
-  if (asprintf(&cmdline, "useradd -M -N -l -r -u %1$d -g %1$d -p '!' -s /usr/bin/bash riju%1$d", uid) < 0)
-    die("asprintf failed");
-  status = system(cmdline);
-  if (status != 0)
-    die("useradd failed");
+char *parseLang(char *lang) {
+  size_t len = strnlen(lang, 65);
+  if (len == 0 || len > 64)
+    die("illegal language name");
+  return lang;
 }
 
-void spawn(int uid, char *uuid, char **cmdline)
+char *parseImageHash(char *imageHash)
 {
-  char *cwd;
-  if (asprintf(&cwd, "/tmp/riju/%s", uuid) < 0)
+  if (strnlen(imageHash, 41) != 40)
+    die("illegal imageHash");
+  for (char *ptr = imageHash; *ptr; ++ptr)
+    if (!((*ptr >= 'a' && *ptr <= 'z') || (*ptr >= '0' && *ptr <= '9')))
+      die("illegal imageHash");
+  return imageHash;
+}
+
+void wait_alarm(int signum)
+{
+  (void)signum;
+  die("container did not come up within 1 second");
+}
+
+void session(char *uuid, char *lang, char *imageHash)
+{
+  char *image, *container, *hostname, *volume, *fifo;
+  if ((imageHash != NULL ?
+       asprintf(&image, "riju:lang-%s-%s", lang, imageHash) :
+       asprintf(&image, "riju:lang-%s", lang)) < 0)
     die("asprintf failed");
-  if (chdir(cwd) < 0)
-    die("chdir failed");
-  if (privileged) {
-    if (setgid(uid) < 0)
-      die("setgid failed");
-    if (setgroups(0, NULL) < 0)
-      die("setgroups failed");
-    if (setuid(uid) < 0)
-      die("setuid failed");
+  if (asprintf(&container, "riju-session-%s", uuid) < 0)
+    die("asprintf failed");
+  if (asprintf(&hostname, "HOSTNAME=%s", lang) < 0)
+    die("asprintf failed");
+  int rv = mkdir("/var/run/riju/sentinels", 0700);
+  if (rv < 0 && errno != EEXIST)
+    die("mkdir failed");
+  char tmpdir[] = "/var/run/riju/sentinels/XXXXXX";
+  if (mkdtemp(tmpdir) == NULL)
+    die("mkdtemp failed");
+  if (asprintf(&volume, "%s:/var/run/riju/sentinel", tmpdir) < 0)
+    die("asprintf failed");
+  if (asprintf(&fifo, "%s/fifo", tmpdir) < 0)
+    die("asprintf failed");
+  if (mknod(fifo, 0700 | S_IFIFO, 0) < 0)
+    die("mknod failed");
+  pid_t pid = fork();
+  if (pid < 0)
+    die("fork failed");
+  else if (pid == 0) {
+    char *argv[] = {
+      "docker",
+      "run",
+      "--rm",
+      "-v", volume,
+      "-e", "HOME=/home/riju",
+      "-e", hostname,
+      "-e", "LANG=C.UTF-8",
+      "-e", "LC_ALL=C.UTF-8",
+      "-e", "LOGNAME=riju",
+      "-e", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin",
+      "-e", "PWD=/home/riju/src",
+      "-e", "SHELL=/usr/bin/bash",
+      "-e", "TERM=xterm-256color",
+      "-e", "TMPDIR=/tmp",
+      "-e", "USER=riju",
+      "-e", "USERNAME=riju",
+      "--user", "root",
+      "--hostname", lang,
+      "--name", container,
+      image, "cat", "/var/run/riju/sentinel/fifo", NULL,
+    };
+    execvp(argv[0], argv);
+    die("execvp failed");
   }
-  umask(077);
-  execvp(cmdline[0], cmdline);
+  struct timespec ts;  // 10ms
+  ts.tv_sec = 0;
+  ts.tv_nsec = 1000 * 1000 * 10;
+  signal(SIGALRM, wait_alarm);
+  alarm(1);
+  int fd;
+  while (1) {
+    fd = open(fifo, O_WRONLY);
+    if (fd >= 0)
+      break;
+    if (errno != ENXIO)
+      die("open failed");
+    int rv = nanosleep(&ts, NULL);
+    if (rv != 0 && errno != EINTR)
+      die("nanosleep failed");
+  }
+  signal(SIGALRM, SIG_IGN);
+  if (unlink(fifo) < 0)
+    die("unlink failed");
+  if (rmdir(tmpdir) < 0)
+    die("rmdir failed");
+  printf("riju: container ready\n");  // magic string
+  if (waitpid(pid, NULL, 0) <= 0)
+    die("waitpid failed");
+  if (close(fd) < 0)
+    die("close failed");
+}
+
+void exec(char *uuid, int argc, char **cmdline, bool pty)
+{
+  char *container;
+  if (asprintf(&container, "riju-session-%s", uuid) < 0)
+    die("asprintf failed");
+  char *argvPrefix[] = {
+    "./system/res/docker-exec.py",
+    "--user", "riju",
+    pty ? "-it" : "-i",
+    container,
+    "--",
+  };
+  char **argv = malloc(sizeof(argvPrefix) + (argc + 1) * sizeof(char *));
+  if (argv == NULL)
+    die("malloc failed");
+  memcpy(argv, argvPrefix, sizeof(argvPrefix));
+  memcpy((void *)argv + sizeof(argvPrefix), cmdline, argc * sizeof(char *));
+  argv[sizeof(argvPrefix) + argc * sizeof(char *)] = NULL;
+  execvp(argv[0], argv);
   die("execvp failed");
-}
-
-void setup(int uid, char *uuid)
-{
-  char *cmdline;
-  if (asprintf(&cmdline, privileged
-               ? "install -d -o riju%1$d -g riju%1$d -m 700 /tmp/riju/%2$s"
-               : "install -d -m 700 /tmp/riju/%2$s", uid, uuid) < 0)
-    die("asprintf failed");
-  int status = system(cmdline);
-  if (status != 0)
-    die("install failed");
-}
-
-void teardown(int uid, char *uuid)
-{
-  char *cmdline;
-  int status;
-  char *users;
-  if (uid >= MIN_UID && uid < MAX_UID) {
-    if (asprintf(&users, "%d", uid) < 0)
-      die("asprintf failed");
-  } else {
-    cmdline = "getent passwd | grep -Eo '^riju[0-9]{4}' | paste -s -d, - | tr -d '\n'";
-    FILE *fp = popen(cmdline, "r");
-    if (fp == NULL)
-      die("popen failed");
-    static char buf[(MAX_UID - MIN_UID) * 9];
-    if (fgets(buf, sizeof(buf), fp) == NULL) {
-      if (feof(fp))
-        users = NULL;
-      else {
-        die("fgets failed");
-      }
-    } else
-      users = buf;
-  }
-  if (users != NULL) {
-    if (asprintf(&cmdline, "while pkill -9 --uid %1$s; do sleep 0.01; done", users) < 0)
-      die("asprintf failed");
-    status = system(cmdline);
-    if (status != 0 && status != 256)
-      die("pkill failed");
-  }
-  if (asprintf(&cmdline, "rm -rf /tmp/riju/%s", uuid) < 0)
-    die("asprintf failed");
-  status = system(cmdline);
-  if (status != 0)
-    die("rm failed");
 }
 
 int main(int argc, char **argv)
 {
-  int code = setuid(0);
-  if (code != 0 && code != -EPERM)
-    die("setuid failed");
-  privileged = code == 0;
+  if (seteuid(0) != 0)
+    die("seteuid failed");
   if (argc < 2)
     die_with_usage();
-  if (!strcmp(argv[1], "useradd")) {
-    if (argc != 3)
+  if (!strcmp(argv[1], "session")) {
+    if (argc < 4 || argc > 5)
       die_with_usage();
-    useradd(parseUID(argv[2]));
+    char *uuid = parseUUID(argv[2]);
+    char *lang = parseLang(argv[3]);
+    char *imageHash = argc == 5 ? parseImageHash(argv[4]) : NULL;
+    session(uuid, lang, imageHash);
     return 0;
   }
-  if (!strcmp(argv[1], "spawn")) {
-    if (argc < 5)
+  if (!strcmp(argv[1], "exec")) {
+    if (argc < 4)
       die_with_usage();
-    spawn(parseUID(argv[2]), parseUUID(argv[3]), &argv[4]);
+    exec(parseUUID(argv[2]), argc, &argv[3], false);
     return 0;
   }
-  if (!strcmp(argv[1], "setup")) {
-    if (argc != 4)
+  if (!strcmp(argv[1], "pty")) {
+    if (argc < 4)
       die_with_usage();
-    int uid = parseUID(argv[2]);
-    char *uuid = parseUUID(argv[3]);
-    setup(uid, uuid);
-    return 0;
-  }
-  if (!strcmp(argv[1], "teardown")) {
-    if (argc != 4)
-      die_with_usage();
-    int uid = strcmp(argv[2], "*") ? parseUID(argv[2]) : -1;
-    char *uuid = strcmp(argv[3], "*") ? parseUUID(argv[3]) : "*";
-    teardown(uid, uuid);
+    exec(parseUUID(argv[2]), argc, &argv[3], true);
     return 0;
   }
   die_with_usage();

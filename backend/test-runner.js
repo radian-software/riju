@@ -5,10 +5,11 @@ import _ from "lodash";
 import pQueue from "p-queue";
 const PQueue = pQueue.default;
 import stripAnsi from "strip-ansi";
-import { v4 as getUUID } from "uuid";
 
+import { getTestHash } from "../lib/hash-test.js";
 import * as api from "./api.js";
 import { langsPromise } from "./langs.js";
+import { getUUID } from "./util.js";
 
 let langs = {};
 
@@ -622,16 +623,11 @@ async function writeLog(lang, type, result, log) {
 async function main() {
   langs = await langsPromise;
   let tests = getTestList();
-  const args = process.argv.slice(2);
-  for (const arg of args) {
-    tests = tests.filter(
-      ({ lang, type }) =>
-        arg
-          .split(",")
-          .filter((arg) =>
-            [lang, type].concat(langs[lang].aliases || []).includes(arg)
-          ).length > 0
-    );
+  if (process.env.L) {
+    tests = tests.filter(({ lang }) => process.env.L.split().includes(lang));
+  }
+  if (process.env.T) {
+    tests = tests.filter(({ type }) => process.env.T.split().includes(type));
   }
   if (tests.length === 0) {
     console.error("no tests selected");
@@ -730,6 +726,23 @@ async function main() {
       ([{ type }, _]) => type,
     ]).forEach(([{ lang, type }, err]) =>
       console.error(`  - ${lang}/${type} (${err})`)
+    );
+  }
+  const langsValidated = {};
+  passed.forEach((_, { lang }) => {
+    langsValidated[lang] = true;
+  });
+  failed.forEach((_, { lang }) => {
+    langsValidated[lang] = false;
+  });
+  for (const [lang, validated] of Object.entries(langsValidated)) {
+    if (!validated) {
+      continue;
+    }
+    await fs.mkdir(`build/test-hashes/lang`, { recursive: true });
+    await fs.writeFile(
+      `build/test-hashes/lang/${lang}`,
+      await getTestHash(lang, process.env.RIJU_LANG_IMAGE_HASH)
     );
   }
   process.exit(failed.size > 0 ? 1 : 0);

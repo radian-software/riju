@@ -6,10 +6,7 @@ install:
     - ocaml-nox
   opam:
     - ocamlformat
-    - name: ocaml-lsp-server
-      source: "https://github.com/ocaml/ocaml-lsp.git"
-      binaries:
-        - ocamllsp
+    - ocaml-lsp-server
 
 repl: |
   ocaml

@@ -3,6 +3,7 @@ import path from "path";
 
 import debounce from "debounce";
 
+import { getLangs, readLangConfig } from "../lib/yaml.js";
 import { log } from "./util.js";
 
 // Map from language IDs to language configuration objects. This is
@@ -12,28 +13,17 @@ export let langs = {};
 // Map from language aliases and IDs to canonical language IDs.
 export let aliases = {};
 
-// Read languages from JSON files in /opt/riju/langs, and update the
-// global langs variable in this module. Never throw an error. If
-// there is a problem then just leave the languages as they previously
-// were.
-async function readLangsFromDisk() {
+// Read languages from YAML, and update the global langs variable in
+// this module. Never throw an error. If there is a problem then just
+// leave the languages as they previously were.
+async function updateLangsFromDisk() {
   try {
     const newLangs = {};
     const newAliases = {};
-    for (const filename of await fs.readdir("/opt/riju/langs")) {
-      if (path.parse(filename).ext !== ".json") {
-        continue;
-      }
-      const id = path.parse(filename).name;
-      const langConfig = JSON.parse(
-        await fs.readFile(`/opt/riju/langs/${filename}`, "utf-8")
-      );
-      if (langConfig.id !== id) {
-        log.error(
-          "Language config ${filename} has mismatched language ID ${id}, ignoring"
-        );
-        continue;
-      }
+    for (const langConfig of await Promise.all(
+      (await getLangs()).map(readLangConfig)
+    )) {
+      const { id } = langConfig;
       newLangs[id] = langConfig;
       newAliases[id] = id;
       for (const alias of langConfig.aliases || []) {
@@ -52,6 +42,6 @@ async function readLangsFromDisk() {
   }
 }
 
-export const langsPromise = readLangsFromDisk().then(() => langs);
+export const langsPromise = updateLangsFromDisk().then(() => langs);
 
-fsOrig.watch("/opt/riju/langs", debounce(readLangsFromDisk, 200));
+fsOrig.watch("langs", debounce(updateLangsFromDisk, 200));

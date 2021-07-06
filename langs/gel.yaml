@@ -8,7 +8,7 @@ install:
     - genius
 
 repl: |
-  genius
+  HOME="$PWD" genius
 
 main: ".geniusinit"
 template: |
@@ -16,7 +16,7 @@ template: |
 createEmpty: ""
 
 run: |
-  genius
+  HOME="$PWD" genius
 
 scope:
   code: |

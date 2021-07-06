@@ -10,7 +10,7 @@ install:
     - tcl
 
 repl: |
-  tclsh
+  HOME="$PWD" tclsh
 input: |
   expr 123 * 234
 

@@ -2,7 +2,13 @@
 
 set -euo pipefail
 
-export PATH="$(sed -E 's/:bin:/:/; s/(^|:)bin(:|$)//' <<< "${PATH}")"
+root="$(cd "$(dirname "$0")/.." && echo "${PWD}")"
+
+export PATH="$(sed -E "s_:${root}/bin:_:_; s_(^|:)${root}/bin(:|$)__" <<< "${PATH}")"
+
+set -a
+. "${root}/.env"
+set +a
 
 if [[ "${OSTYPE:-}" != darwin* ]] && [[ "${EUID}" != 0 ]]; then
     exec sudo -E docker "$@"

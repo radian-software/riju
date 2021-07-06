@@ -1,0 +1,24 @@
+id: "aspectcpp"
+aliases:
+  - "aspectc++"
+  - "aspectcplusplus"
+name: "AspectC++"
+
+install:
+  apt:
+    - aspectc++
+    - libstdc++-9-dev
+
+main: "main.cpp"
+template: |
+  #include <iostream>
+
+  int main() {
+    std::cout << "Hello, world!" << std::endl;
+    return 0;
+  }
+
+compile: |
+  CPLUS_INCLUDE_PATH=/usr/include/c++/9 ag++ main.cpp -o main
+run: |
+  ./main

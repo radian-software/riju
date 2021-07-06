@@ -31,7 +31,7 @@ install:
     ln -s /opt/sagemath/sage "${pkg}/usr/local/bin/"
 
 repl: |
-  sage
+  HOME="$PWD" sage
 
 main: ".sage/init.sage"
 template: |
@@ -39,7 +39,7 @@ template: |
 createEmpty: ""
 
 run: |
-  sage
+  HOME="$PWD" sage
 
 scope:
   code: |

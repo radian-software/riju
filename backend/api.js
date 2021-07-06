@@ -1,39 +1,30 @@
 import { spawn } from "child_process";
 import path from "path";
+import process from "process";
 import WebSocket from "ws";
 
 import pty from "node-pty";
 import pQueue from "p-queue";
 const PQueue = pQueue.default;
 import rpc from "vscode-jsonrpc";
-import { v4 as getUUID } from "uuid";
 
 import { langs } from "./langs.js";
-import { borrowUser } from "./users.js";
 import * as util from "./util.js";
-import { bash } from "./util.js";
+import { bash, getUUID } from "./util.js";
 
 const allSessions = new Set();
 
 export class Session {
   get homedir() {
-    return `/tmp/riju/${this.uuid}`;
+    return "/home/riju/src";
   }
 
   get config() {
     return langs[this.lang];
   }
 
-  get uid() {
-    return this.uidInfo.uid;
-  }
-
-  returnUser = async () => {
-    this.uidInfo && (await this.uidInfo.returnUser());
-  };
-
   get context() {
-    return { uid: this.uid, uuid: this.uuid };
+    return { uuid: this.uuid, lang: this.lang };
   }
 
   log = (msg) => this.logPrimitive(`[${this.uuid}] ${msg}`);
@@ -43,7 +34,7 @@ export class Session {
     this.uuid = getUUID();
     this.lang = lang;
     this.tearingDown = false;
-    this.uidInfo = null;
+    this.container = null;
     this.term = null;
     this.lsp = null;
     this.daemon = null;
@@ -57,24 +48,62 @@ export class Session {
     return await util.run(args, this.log, options);
   };
 
-  privilegedSetup = () => util.privilegedSetup(this.context);
-  privilegedSpawn = (args) => util.privilegedSpawn(this.context, args);
-  privilegedUseradd = () => util.privilegedUseradd(this.uid);
-  privilegedTeardown = () => util.privilegedTeardown(this.context);
+  privilegedSession = () => util.privilegedSession(this.context);
+  privilegedExec = (cmdline) =>
+    util.privilegedExec(this.context, bash(cmdline));
+  privilegedPty = (cmdline) =>
+    util.privilegedPty(this.context, bash(cmdline, { stty: true }));
 
   setup = async () => {
     try {
       allSessions.add(this);
-      const { uid, returnUser } = await borrowUser();
-      this.uidInfo = { uid, returnUser };
-      this.log(`Borrowed uid ${this.uid}`);
-      await this.run(this.privilegedSetup());
+      const containerArgs = this.privilegedSession();
+      const containerPty = pty.spawn(containerArgs[0], containerArgs.slice(1), {
+        name: "xterm-color",
+      });
+      this.container = {
+        pty: containerPty,
+      };
+      containerPty.on("close", (code, signal) =>
+        this.send({
+          event: "serviceFailed",
+          service: "container",
+          error: `Exited with status ${signal || code}`,
+        })
+      );
+      containerPty.on("error", (err) =>
+        this.send({
+          event: "serviceFailed",
+          service: "container",
+          error: `${err}`,
+        })
+      );
+      let buffer = "";
+      await new Promise((resolve) => {
+        containerPty.on("data", (data) => {
+          buffer += data;
+          let idx;
+          while ((idx = buffer.indexOf("\r\n")) !== -1) {
+            const line = buffer.slice(0, idx);
+            buffer = buffer.slice(idx + 2);
+            if (line === "riju: container ready") {
+              resolve();
+            } else {
+              this.send({
+                event: "serviceLog",
+                service: "container",
+                output: line + "\n",
+              })
+            }
+          }
+        });
+      });
       if (this.config.setup) {
-        await this.run(this.privilegedSpawn(bash(this.config.setup)));
+        await this.run(this.privilegedExec(this.config.setup));
       }
       await this.runCode();
       if (this.config.daemon) {
-        const daemonArgs = this.privilegedSpawn(bash(this.config.daemon));
+        const daemonArgs = this.privilegedExec(this.config.daemon);
         const daemonProc = spawn(daemonArgs[0], daemonArgs.slice(1));
         this.daemon = {
           proc: daemonProc,
@@ -105,9 +134,9 @@ export class Session {
       }
       if (this.config.lsp) {
         if (this.config.lsp.setup) {
-          await this.run(this.privilegedSpawn(bash(this.config.lsp.setup)));
+          await this.run(this.privilegedExec(this.config.lsp.setup));
         }
-        const lspArgs = this.privilegedSpawn(bash(this.config.lsp.start));
+        const lspArgs = this.privilegedExec(this.config.lsp.start);
         const lspProc = spawn(lspArgs[0], lspArgs.slice(1));
         this.lsp = {
           proc: lspProc,
@@ -251,22 +280,11 @@ export class Session {
 
   writeCode = async (code) => {
     if (this.config.main.includes("/")) {
-      await this.run(
-        this.privilegedSpawn([
-          "mkdir",
-          "-p",
-          path.dirname(`${this.homedir}/${this.config.main}`),
-        ])
-      );
+      const dir = path.dirname(`${this.homedir}/${this.config.main}`);
+      await this.run(this.privilegedExec(`mkdir -p ${dir}`));
     }
-    await this.run(
-      this.privilegedSpawn([
-        "sh",
-        "-c",
-        `cat > ${path.resolve(this.homedir, this.config.main)}`,
-      ]),
-      { input: code }
-    );
+    const file = path.resolve(this.homedir, this.config.main);
+    await this.run(this.privilegedExec(`cat > ${file}`), { input: code });
   };
 
   runCode = async (code) => {
@@ -282,11 +300,11 @@ export class Session {
         template,
       } = this.config;
       if (this.term) {
-        const pid = this.term.pty.pid;
-        const args = this.privilegedSpawn(
-          bash(`kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`)
-        );
-        spawn(args[0], args.slice(1));
+        try {
+          process.kill(this.term.pty.pid);
+        } catch (err) {
+          // process might have already exited
+        }
         // Signal to terminalOutput message generator using closure.
         this.term.live = false;
         this.term = null;
@@ -294,9 +312,9 @@ export class Session {
       this.send({ event: "terminalClear" });
       let cmdline;
       if (code) {
-        cmdline = run;
+        cmdline = `set +e; ${run}`;
         if (compile) {
-          cmdline = `( ${compile} ) && ( set +e; ${run} )`;
+          cmdline = `( ${compile} ) && ( ${run} )`;
         }
       } else if (repl) {
         cmdline = repl;
@@ -310,7 +328,7 @@ export class Session {
         code += suffix + "\n";
       }
       await this.writeCode(code);
-      const termArgs = this.privilegedSpawn(bash(cmdline));
+      const termArgs = this.privilegedPty(cmdline);
       const term = {
         pty: pty.spawn(termArgs[0], termArgs.slice(1), {
           name: "xterm-color",
@@ -349,14 +367,14 @@ export class Session {
       }
       if (this.formatter) {
         const pid = this.formatter.proc.pid;
-        const args = this.privilegedSpawn(
-          bash(`kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`)
+        const args = this.privilegedExec(
+          `kill -SIGTERM ${pid}; sleep 1; kill -SIGKILL ${pid}`
         );
         spawn(args[0], args.slice(1));
         this.formatter.live = false;
         this.formatter = null;
       }
-      const args = this.privilegedSpawn(bash(this.config.format.run));
+      const args = this.privilegedExec(this.config.format.run);
       const formatter = {
         proc: spawn(args[0], args.slice(1)),
         live: true,
@@ -409,7 +427,7 @@ export class Session {
   };
 
   ensure = async (cmd) => {
-    const code = await this.run(this.privilegedSpawn(bash(cmd)), {
+    const code = await this.run(this.privilegedExec(cmd), {
       check: false,
     });
     this.send({ event: "ensured", code });
@@ -422,11 +440,10 @@ export class Session {
       }
       this.log(`Tearing down session`);
       this.tearingDown = true;
-      allSessions.delete(this);
-      if (this.uidInfo) {
-        await this.run(this.privilegedTeardown());
-        await this.returnUser();
+      if (this.container) {
+        this.container.pty.kill();
       }
+      allSessions.delete(this);
       this.ws.terminate();
     } catch (err) {
       this.log(`Error during teardown`);

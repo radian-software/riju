@@ -1,27 +1,30 @@
 SHELL := bash
 .SHELLFLAGS := -o pipefail -euc
 
-export PATH := bin:$(PATH)
+export PATH := $(PWD)/bin:$(PATH)
 
 -include .env
 export
 
 BUILD := build/$(T)/$(L)
 DEB := riju-$(T)-$(L).deb
-S3_DEBS := s3://$(S3_BUCKET)-debs
-S3_DEB := $(S3_DEBS)/debs/$(DEB)
-S3_HASH := $(S3_DEBS)/hashes/riju-$(T)-$(L)
+S3 := s3://$(S3_BUCKET)
+S3_DEB := $(S3)/debs/$(DEB)
+S3_HASH := $(S3)/hashes/riju-$(T)-$(L)
+S3_CONFIG := $(S3)/config.json
 
 ifneq ($(CMD),)
+C_CMD := -c '$(CMD)'
 BASH_CMD := bash -c '$(CMD)'
 else
+C_CMD :=
 BASH_CMD :=
 endif
 
 # Get rid of 'Entering directory' / 'Leaving directory' messages.
 MAKE_QUIETLY := MAKELEVEL= make
 
-.PHONY: all $(MAKECMDGOALS)
+.PHONY: all $(MAKECMDGOALS) frontend system supervisor
 
  all: help
 
@@ -36,10 +39,14 @@ endif
 ## Pass NC=1 to disable the Docker cache. Base images are not pulled;
 ## see 'make pull-base' for that.
 
-image: # I=<image> [NC=1] : Build a Docker image
+image: # I=<image> [L=<lang>] [NC=1] : Build a Docker image
 	@: $${I}
-ifeq ($(I),composite)
-	node tools/build-composite-image.js
+ifeq ($(I),lang)
+	@: $${L}
+	node tools/build-lang-image.js --lang $(L)
+else ifeq ($(I),ubuntu)
+	docker pull ubuntu:rolling
+	hash="$$(docker inspect ubuntu:rolling | jq '.[0].Id' -r | sha1sum | awk '{ print $$1 }')"; echo "FROM ubuntu:rolling" | docker build --label riju.image-hash="$${hash}" -t riju:$(I) -
 else ifneq (,$(filter $(I),admin ci))
 	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) $(NO_CACHE)
 else
@@ -51,7 +58,9 @@ VOLUME_MOUNT ?= $(PWD)
 P1 ?= 6119
 P2 ?= 6120
 
-ifneq (,$(E))
+ifneq (,$(EE))
+SHELL_PORTS := -p 0.0.0.0:$(P1):6119 -p 0.0.0.0:$(P2):6120
+else ifneq (,$(E))
 SHELL_PORTS := -p 127.0.0.1:$(P1):6119 -p 127.0.0.1:$(P2):6120
 else
 SHELL_PORTS :=
@@ -59,47 +68,44 @@ endif
 
 SHELL_ENV := -e Z -e CI -e TEST_PATIENCE -e TEST_CONCURRENCY
 
-shell: # I=<shell> [E=1] [P1|P2=<port>] : Launch Docker image with shell
-	@: $${I}
-ifneq (,$(filter $(I),admin ci))
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/riju/.aws -v $(HOME)/.docker:/var/riju/.docker -v $(HOME)/.ssh:/var/riju/.ssh -v $(HOME)/.terraform.d:/var/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) --network host riju:$(I) $(BASH_CMD)
-else ifneq (,$(filter $(I),compile app))
-	docker run -it --rm --hostname $(I) $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
-else ifneq (,$(filter $(I),runtime composite))
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src --label riju-install-target=yes $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
+ifeq ($(I),lang)
+LANG_TAG := lang-$(L)
 else
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
+LANG_TAG := $(I)
 endif
 
-## This is equivalent to 'make pkg' in a fresh packaging container
-## followed by 'make install' in a persistent runtime container.
+IMAGE_HASH := "$$(docker inspect riju:$(LANG_TAG) | jq '.[0].Config.Labels["riju.image-hash"]' -r)"
+WITH_IMAGE_HASH := -e RIJU_IMAGE_HASH=$(IMAGE_HASH)
 
-repkg: script # L=<lang> T=<type> : Build fresh .deb and install into live container
-	@: $${L} $${T}
-	$(MAKE_QUIETLY) shell I=packaging CMD="make pkg L=$(L) T=$(T)"
-	ctr="$$(docker container ls -f label="riju-install-target=yes" -l -q)"; test "$${ctr}" || (echo "no valid container is live"; exit 1); docker exec "$${ctr}" make install L=$(L) T=$(T)
+LANG_IMAGE_HASH := "$$(docker inspect riju:lang-$(L) | jq '.[0].Config.Labels["riju.image-hash"]' -r)"
 
-## This is equivalent to 'make repkg T=lang', 'make repkg T=config'.
-## For shared dependencies, use 'make repkg T=shared' directly.
-
-repkgs: # L=<lang> : Build and install fresh lang and config .debs
+shell: # I=<shell> [L=<lang>] [E[E]=1] [P1|P2=<port>] : Launch Docker image with shell
+	@: $${I}
+ifneq (,$(filter $(I),admin ci))
+	@mkdir -p $(HOME)/.aws $(HOME)/.docker $(HOME)/.ssh $(HOME)/.terraform.d
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/run/riju/.aws -v $(HOME)/.docker:/var/run/riju/.docker -v $(HOME)/.ssh:/var/run/riju/.ssh -v $(HOME)/.terraform.d:/var/run/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) --network host riju:$(I) $(BASH_CMD)
+else ifeq ($(I),app)
+	docker run -it --rm --hostname $(I) -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
+else ifneq (,$(filter $(I),base lang))
+ifeq ($(I),lang)
 	@: $${L}
-	node tools/make-foreach.js --types repkg L=$(L)
+endif
+	docker run -it --rm --hostname $(LANG_TAG) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(LANG_TAG) $(BASH_CMD)
+else ifeq ($(I),runtime)
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
+else
+	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
+endif
+
+ecr: # Authenticate to ECR (temporary credentials)
+	aws ecr get-login-password | docker login --username AWS --password-stdin $(subst /riju,,$(DOCKER_REPO))
+	aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(subst /riju,,$(PUBLIC_DOCKER_REPO))
 
 ### Build packaging scripts
 
 script: # L=<lang> T=<type> : Generate a packaging script
 	@: $${L} $${T}
-	mkdir -p $(BUILD)
-	node tools/generate-build-script.js --lang $(L) --type $(T) > $(BUILD)/build.bash
-	chmod +x $(BUILD)/build.bash
-
-scripts: # L=<lang> : Generate both lang and config packaging scripts
-	@: $${L}
-	node tools/make-foreach.js --types script L=$(L)
-
-## This is equivalent to 'make script T=lang', 'make script T=config'.
-## For shared dependencies, use 'make script T=shared' directly.
+	node tools/generate-build-script.js --lang $(L) --type $(T)
 
 all-scripts: # Generate packaging scripts for all languages
 	node tools/write-all-build-scripts.js
@@ -108,7 +114,7 @@ all-scripts: # Generate packaging scripts for all languages
 
 pkg-clean: # L=<lang> T=<type> : Set up fresh packaging environment
 	@: $${L} $${T}
-	rm -rf $(BUILD)/src $(BUILD)/pkg
+	sudo rm -rf $(BUILD)/src $(BUILD)/pkg
 	mkdir -p $(BUILD)/src $(BUILD)/pkg
 
 pkg-build: # L=<lang> T=<type> : Run packaging script in packaging environment
@@ -133,28 +139,6 @@ pkg-deb: # L=<lang> T=<type> [Z=gzip|xz] : Build .deb from packaging environment
 
 pkg: pkg-clean pkg-build pkg-deb # L=<lang> T=<type> [Z=gzip|xz] : Build fresh .deb
 
-## This is equivalent to 'make pkg T=lang', 'make pkg T=config'. For
-## shared dependencies, use 'make pkg T=shared' directly.
-#
-## Z is the compression type to use; defaults to none. Higher
-## compression levels (gzip is moderate, xz is high) take much longer
-## but produce much smaller packages.
-
-pkgs: # L=<lang> [Z=gzip|xz] : Build both lang and config .debs
-	@: $${L}
-	node tools/make-foreach.js --types pkg L=$(L)
-
-### Install packages
-
-install: # L=<lang> T=<type> : Install built .deb
-	@: $${L} $${T}
-	if [[ -z "$$(ls -A /var/lib/apt/lists)" ]]; then sudo apt update; fi
-	DEBIAN_FRONTEND=noninteractive sudo -E apt reinstall -y ./$(BUILD)/$(DEB)
-
-installs: # L=<lang> : Install both lang and config .debs
-	@: $${L}
-	node tools/make-foreach.js --types install L=$(L)
-
 ### Build and run application code
 
 frontend: # Compile frontend assets for production
@@ -169,25 +153,32 @@ system: # Compile setuid binary for production
 system-dev: # Compile and watch setuid binary for development
 	watchexec -w system/src -n -- ./system/compile.bash
 
+supervisor: # Compile supervisor binary for production
+	./supervisor/compile.bash
+
+supervisor-dev: # Compile and watch supervisor binary for development
+	watchexec -w supervisor/src -n -- ./supervisor/compile.bash
+
 server: # Run server for production
 	node backend/server.js
 
 server-dev: # Run and restart server for development
 	watchexec -w backend -r -n -- node backend/server.js
 
-build: frontend system # Compile all artifacts for production
+build: frontend system supervisor # Compile all artifacts for production
 
 dev: # Compile, run, and watch all artifacts and server for development
-	$(MAKE_QUIETLY) -j3 frontend-dev system-dev server-dev
+	$(MAKE_QUIETLY) -j4 frontend-dev system-dev supervisor-dev server-dev
 
 ### Application tools
 
-## L can be a language identifier or a test type (run, repl, lsp,
-## format, etc.). Multiple identifiers can be separated by spaces to
-## form a conjunction (AND), or by commas to form a disjunction (OR).
+## L is a language identifier or a comma-separated list of them, to
+## filter tests by language. T is a test type (run, repl, lsp, format,
+## etc.) or a set of them to filter tests that way. If both filters
+## are provided, then only tests matching both are run.
 
-test: # L=<filter> : Run test(s) for language or test category
-	node backend/test-runner.js $(L)
+test: # [L=<lang>[,...]] [T=<test>[,...]] : Run test(s) for language or test category
+	RIJU_LANG_IMAGE_HASH=$(LANG_IMAGE_HASH) node backend/test-runner.js
 
 ## Functions such as 'repl', 'run', 'format', etc. are available in
 ## the sandbox, and initial setup has already been done (e.g. 'setup'
@@ -207,10 +198,7 @@ lsp: # L=<lang|cmd> : Run LSP REPL for language or custom command line
 
 ### Fetch artifacts from registries
 
-pull-base: # Pull latest base image(s) from Docker Hub
-	docker pull ubuntu:rolling
-
-pull: # I=<image> : Pull last published Riju image from Docker Hub
+pull: # I=<image> : Pull last published Riju image from Docker registry
 	@: $${I} $${DOCKER_REPO}
 	docker pull $(DOCKER_REPO):$(I)
 	docker tag $(DOCKER_REPO):$(I) riju:$(I)
@@ -218,51 +206,62 @@ pull: # I=<image> : Pull last published Riju image from Docker Hub
 download: # L=<lang> T=<type> : Download last published .deb from S3
 	@: $${L} $${T} $${S3_BUCKET}
 	mkdir -p $(BUILD)
-	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB) --no-sign-request
+	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB)
 
-plan: # Display plan to pull/rebuild outdated or missing artifacts
-	node tools/plan-publish.js
-
-sync: # Pull/rebuild outdated or missing artifacts
-	node tools/plan-publish.js --execute
+undeploy: # Pull latest deployment config from S3
+	mkdir -p $(BUILD)
+	aws s3 cp $(S3_CONFIG) $(BUILD)/config.json
 
 ### Publish artifacts to registries
 
-push: # I=<image> : Push Riju image to Docker Hub
+push: # I=<image> : Push Riju image to Docker registry
 	@: $${I} $${DOCKER_REPO}
+	docker tag riju:$(I) $(DOCKER_REPO):$(I)-$(IMAGE_HASH)
+	docker push $(DOCKER_REPO):$(I)-$(IMAGE_HASH)
+ifeq ($(I),ubuntu)
+	docker tag riju:$(I) $(PUBLIC_DOCKER_REPO):$(I)
+	docker push $(PUBLIC_DOCKER_REPO):$(I)
+endif
 	docker tag riju:$(I) $(DOCKER_REPO):$(I)
 	docker push $(DOCKER_REPO):$(I)
 
 upload: # L=<lang> T=<type> : Upload .deb to S3
 	@: $${L} $${T} $${S3_BUCKET}
+	tools/ensure-deb-compressed.bash
 	aws s3 rm --recursive $(S3_HASH)
 	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
 	hash="$$(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash | grep .)"; aws s3 cp - "$(S3_HASH)/$${hash}" < /dev/null
 
-## You should probably only run this from CI.
+deploy-config: # Generate deployment config file
+	node tools/generate-deploy-config.js
 
-publish: # Full synchronization and prod deployment
-	tools/publish.bash
+deploy: deploy-config # Upload deployment config to S3 and update ASG instances
+	aws s3 cp $(BUILD)/config.json $(S3_CONFIG)
+
+### Infrastructure
+
+packer: supervisor # Build and publish a new AMI
+	tools/packer-build.bash
 
 ### Miscellaneous
 
-## Run this every time you update .gitignore.
+## Run this every time you update .gitignore or .dockerignore.in.
 
-dockerignore: # Update .dockerignore from .gitignore
+dockerignore: # Update .dockerignore from .gitignore and .dockerignore.in
 	echo "# This file is generated by 'make dockerignore', do not edit." > .dockerignore
-	cat .gitignore | sed 's#^#**/#' >> .dockerignore
+	cat .gitignore | sed 's/#.*//' | grep . | sed 's#^#**/#' >> .dockerignore
 
 ## You need to be inside a 'make env' shell whenever you are running
 ## manual commands (Docker, Terraform, Packer, etc.) directly, as
 ## opposed to through the Makefile.
 
-env: # Run shell with .env file loaded and $PATH fixed
-	exec bash --rcfile <(cat ~/.bashrc - <<< 'PS1="[.env] $$PS1"')
+env: # [CMD=<target>] : Run shell with .env file loaded and $PATH fixed
+	exec bash $(C_CMD)
 
 tmux: # Start or attach to tmux session
 	MAKELEVEL= tmux attach || MAKELEVEL= tmux new-session -s tmux
 
-usage:
+ usage:
 	@cat Makefile | \
 		grep -E '^[^.:[:space:]]+:|[#]##' | \
 		sed -E 's/:[^#]*#([^:]+)$$/: #:\1/' | \

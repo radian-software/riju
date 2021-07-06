@@ -2,25 +2,37 @@
 
 Riju is a very fast online playground for every programming language.
 In less than a second, you can start playing with a Python interpreter
-or compiling INTERCAL code.
+or compiling [INTERCAL](https://en.wikipedia.org/wiki/INTERCAL) code.
 
-Check out the [live application](https://riju.codes/)!
+Check it out at the <https://riju.codes>!
 
-**You should not write any sensitive code on Riju, as NO GUARANTEES
-are made about the security or privacy of your data. (No warranty etc
-etc.)**
+## Is it free?
 
-This project is a work in progress, and I don't intend on thoroughly
-documenting it until it has reached feature-completeness.
+Riju is free and always will be free for everyone.
 
-## Documentation
+However, if Riju gets popular enough, I won't be able to afford paying
+for the hosting myself. To help me keep Riju online, you can donate
+via Patreon. All donations are used solely to cover hosting costs, and
+any surplus is donated to the [Electronic Frontier
+Foundation](https://www.eff.org/).
 
-* [Criteria for language inclusion](doc/what-languages.md)
-* [How to add your own language to Riju](doc/tutorial.md)
-* [Deep dive on Riju build system](doc/build.md)
-* [Deploying your own instance of Riju](doc/infrastructure.md)
+## Is it safe?
 
-If you'd like to request a new language, head to the [language support
-meta-issue](https://github.com/raxod502/riju/issues/24) and add a
-comment. Of course, if you actually want it to be added anytime soon,
-you should submit a pull request :)
+Riju does not collect your personal information.
+
+* Your code is deleted from the server as soon as you close Riju.
+* Your terminal input and output is never saved or logged anywhere.
+* Riju uses [Fathom Analytics](https://usefathom.com/) to measure
+  traffic. Fathom collects very limited data and does not sell it to
+  third parties, unlike Google Analytics.
+* Riju does not serve advertisements.
+
+All of the above notwithstanding, any service that allows people to
+run code online is inherently risky. For this reason, I can't make any
+guarantees about the security or privacy of your data.
+
+Please see [Reporting a security issue](SECURITY.md).
+
+## Can I help?
+
+Please see [Contributing guide](CONTRIBUTING.md).

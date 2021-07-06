@@ -20,6 +20,14 @@ info:
   usage: []
 
 install:
+  prepare: &add-ceylon-repo
+    cert:
+      - "https://cacerts.digicert.com/DigiCertTLSRSASHA2562020CA1.crt.pem"
+    aptKey:
+      - "https://downloads.ceylon-lang.org/apt/ceylon-debian-repo.gpg.key"
+    aptRepo:
+      - "deb [arch=amd64] https://downloads.ceylon-lang.org/apt/ unstable main"
+  <<: *add-ceylon-repo
   apt:
     - $(grep-aptavail -F Package ceylon -s Package -n | sort -rV | head -n1)
     - openjdk-8-jdk-headless

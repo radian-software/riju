@@ -25,7 +25,7 @@ info:
 install:
   apt:
     - wine
-    - wine32
+    - wine32:i386
 
 repl: |
   wine cmd

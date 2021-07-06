@@ -1,7 +1,7 @@
 import process from "process";
 import url from "url";
 
-import { getPackages } from "./config.js";
+import { getPackages } from "../lib/yaml.js";
 import { runCommand } from "./util.js";
 
 // Parse command-line arguments, run main functionality, and exit.
@@ -18,11 +18,6 @@ async function main() {
         await runCommand(
           `MAKELEVEL= make ${targets.join(" ")} L=${lang} T=${type}`
         );
-      }
-      break;
-    case "--types":
-      for (const type of ["lang", "config"]) {
-        await runCommand(`MAKELEVEL= make ${targets.join(" ")} T=${type}`);
       }
       break;
     default:

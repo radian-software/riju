@@ -37,11 +37,14 @@ dctrl-tools
 docker-ce-cli
 g++
 git
+golang
 htop
+httpie
 jq
 less
 make
 man
+moreutils
 nodejs
 packer
 psmisc
@@ -52,6 +55,7 @@ sudo
 tmux
 terraform
 unzip
+uuid-runtime
 vim
 wget
 yarn
