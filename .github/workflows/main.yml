@@ -17,5 +17,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           DOCKER_REPO: 084011155226.dkr.ecr.us-west-1.amazonaws.com/riju
           S3_BUCKET: riju
-        run: |
-          make image shell I=ci CMD="tools/ci-bootstrap.bash"
+        run: tools/ci-bootstrap.bash
