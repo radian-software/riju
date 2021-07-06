@@ -36,6 +36,12 @@ else
 NO_CACHE :=
 endif
 
+ifeq ($(NI),)
+IT_ARG := -it
+else
+IT_ARG :=
+endif
+
 ## Pass NC=1 to disable the Docker cache. Base images are not pulled;
 ## see 'make pull-base' for that.
 
@@ -83,18 +89,18 @@ shell: # I=<shell> [L=<lang>] [E[E]=1] [P1|P2=<port>] : Launch Docker image with
 	@: $${I}
 ifneq (,$(filter $(I),admin ci))
 	@mkdir -p $(HOME)/.aws $(HOME)/.docker $(HOME)/.ssh $(HOME)/.terraform.d
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/run/riju/.aws -v $(HOME)/.docker:/var/run/riju/.docker -v $(HOME)/.ssh:/var/run/riju/.ssh -v $(HOME)/.terraform.d:/var/run/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) --network host riju:$(I) $(BASH_CMD)
+	docker run $(IT_ARG) --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/run/riju/.aws -v $(HOME)/.docker:/var/run/riju/.docker -v $(HOME)/.ssh:/var/run/riju/.ssh -v $(HOME)/.terraform.d:/var/run/riju/.terraform.d -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DEPLOY_SSH_PRIVATE_KEY -e DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) --network host riju:$(I) $(BASH_CMD)
 else ifeq ($(I),app)
-	docker run -it --rm --hostname $(I) -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
+	docker run $(IT_ARG) --rm --hostname $(I) -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
 else ifneq (,$(filter $(I),base lang))
 ifeq ($(I),lang)
 	@: $${L}
 endif
-	docker run -it --rm --hostname $(LANG_TAG) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(LANG_TAG) $(BASH_CMD)
+	docker run $(IT_ARG) --rm --hostname $(LANG_TAG) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(LANG_TAG) $(BASH_CMD)
 else ifeq ($(I),runtime)
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
+	docker run $(IT_ARG) --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/run/riju:/var/run/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
 else
-	docker run -it --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
+	docker run $(IT_ARG) --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
 endif
 
 ecr: # Authenticate to ECR (temporary credentials)
