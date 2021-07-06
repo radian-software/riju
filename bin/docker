@@ -6,9 +6,11 @@ root="$(cd "$(dirname "$0")/.." && echo "${PWD}")"
 
 export PATH="$(sed -E "s_:${root}/bin:_:_; s_(^|:)${root}/bin(:|$)__" <<< "${PATH}")"
 
-set -a
-. "${root}/.env"
-set +a
+if [[ -f "${root}.env" ]]; then
+    set -a
+    . "${root}/.env"
+    set +a
+fi
 
 if [[ "${OSTYPE:-}" != darwin* ]] && [[ "${EUID}" != 0 ]]; then
     exec sudo -E docker "$@"
