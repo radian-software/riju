@@ -107,14 +107,16 @@ void session(char *uuid, char *lang, char *imageHash)
       "--user", "root",
       "--hostname", lang,
       "--name", container,
-      image, "cat", "/var/run/riju/sentinel/fifo", NULL,
+      image, "bash", "-c",
+      "cat /var/run/riju/sentinel/fifo | while read -t2; do :; done",
+      NULL,
     };
     execvp(argv[0], argv);
     die("execvp failed");
   }
-  struct timespec ts;  // 10ms
-  ts.tv_sec = 0;
-  ts.tv_nsec = 1000 * 1000 * 10;
+  struct timespec ts_10ms;  // 10ms
+  ts_10ms.tv_sec = 0;
+  ts_10ms.tv_nsec = 1000 * 1000 * 10;
   signal(SIGALRM, wait_alarm);
   alarm(1);
   int fd;
@@ -124,7 +126,7 @@ void session(char *uuid, char *lang, char *imageHash)
       break;
     if (errno != ENXIO)
       die("open failed");
-    int rv = nanosleep(&ts, NULL);
+    int rv = nanosleep(&ts_10ms, NULL);
     if (rv != 0 && errno != EINTR)
       die("nanosleep failed");
   }
@@ -133,6 +135,22 @@ void session(char *uuid, char *lang, char *imageHash)
     die("unlink failed");
   if (rmdir(tmpdir) < 0)
     die("rmdir failed");
+  pid = fork();
+  if (pid < 0)
+    die("fork failed");
+  else if (pid == 0) {
+    struct timespec ts_1s;  // 10ms
+    ts_1s.tv_sec = 1;
+    ts_1s.tv_nsec = 0;
+    while (1) {
+      static const char ok[] = "ok\n";
+      if (write(fd, ok, sizeof(ok) / sizeof(char)) < 0)
+        die("write failed");
+      int rv = nanosleep(&ts_1s, NULL);
+      if (rv != 0 && errno != EINTR)
+        die("nanosleep failed");
+    }
+  }
   printf("riju: container ready\n");  // magic string
   if (waitpid(pid, NULL, 0) <= 0)
     die("waitpid failed");
