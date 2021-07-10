@@ -501,15 +501,15 @@ func main() {
 			name = blueName
 		}
 		dockerInspect := exec.Command(
-			"docker", "inspect", name,
+			"docker", "inspect", name, "-f",
 			`{{ index .Config.Labels "riju.deploy-config-hash" }}`,
 		)
 		dockerInspect.Stderr = os.Stderr
 		out, err := dockerInspect.Output()
 		if err != nil {
-			log.Fatalln(err)
-		}
-		if hash := strings.TrimSpace(string(out)); hash != "" {
+			log.Println("got error while checking existing config hash:", err)
+			deployCfgHash = "unknown"
+		} else if hash := strings.TrimSpace(string(out)); hash != "" {
 			deployCfgHash = hash
 		} else {
 			deployCfgHash = "unknown"
