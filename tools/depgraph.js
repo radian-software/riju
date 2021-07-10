@@ -355,9 +355,14 @@ async function getUserInput(prompt) {
     prompt: prompt,
   });
   rl.prompt();
-  const resp = await new Promise((resolve) => {
+  const resp = await new Promise((resolve, reject) => {
     rl.on("line", (line) => {
       resolve(line);
+    });
+    rl.on("close", () => {
+      console.log();
+      console.log();
+      reject(new Error("cancelled"));
     });
   });
   rl.close();
