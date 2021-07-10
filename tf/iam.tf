@@ -21,7 +21,21 @@ data "aws_iam_policy_document" "deploy" {
 
   statement {
     actions = [
+      "ecr:DescribeRegistry",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    actions = [
       "ecr:BatchGetImage",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:DescribeImages",
+      "ecr:DescribeRepositories",
+      "ecr:GetDownloadUrlForLayer",
       "ecr:ListImages",
     ]
 
