@@ -14,7 +14,7 @@ resource "aws_backup_plan" "riju" {
       delete_after = 7
     }
 
-    recovery_point_tags {
+    recovery_point_tags = {
       BillingCategory = "Riju"
     }
   }

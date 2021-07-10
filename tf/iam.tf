@@ -21,6 +21,16 @@ data "aws_iam_policy_document" "deploy" {
 
   statement {
     actions = [
+      "ecr:ListImages",
+    ]
+
+    resources = [
+      aws_ecr_repository.riju.arn,
+    ]
+  }
+
+  statement {
+    actions = [
       "s3:ListBucket",
     ]
 
