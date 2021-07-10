@@ -21,6 +21,7 @@ data "aws_iam_policy_document" "deploy" {
 
   statement {
     actions = [
+      "ecr:BatchGetImage",
       "ecr:ListImages",
     ]
 
