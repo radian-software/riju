@@ -48,6 +48,8 @@ fi
 
 apt-get install -y "./riju-lang-${LANG}.deb"
 
+rm -rf /var/lib/apt/lists/*
+
 popd
 rm -rf /tmp/riju-work
 
