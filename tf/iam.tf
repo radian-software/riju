@@ -33,10 +33,14 @@ data "aws_iam_policy_document" "deploy" {
     actions = [
       "ecr:BatchGetImage",
       "ecr:BatchCheckLayerAvailability",
+      "ecr:CompleteLayerUpload",
       "ecr:DescribeImages",
       "ecr:DescribeRepositories",
       "ecr:GetDownloadUrlForLayer",
+      "ecr:InitiateLayerUpload",
       "ecr:ListImages",
+      "ecr:PutImage",
+      "ecr:UploadLayerPart",
     ]
 
     resources = [

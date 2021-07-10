@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/sha1"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -58,6 +59,7 @@ type supervisor struct {
 	blueProxyHandler http.Handler
 	greenProxyHandler http.Handler
 	isGreen bool  // blue-green deployment
+	deployConfigHash string
 
 	awsAccountNumber string
 	awsRegion string
@@ -314,6 +316,18 @@ func (sv *supervisor) reload() error {
 	if err != nil {
 		return err
 	}
+	h := sha1.New()
+	h.Write([]byte(deployCfgStr))
+	deployCfgHash := fmt.Sprintf("%x", h.Sum(nil))
+	if deployCfgHash == sv.deployConfigHash {
+		sv.status(fmt.Sprintf("config hash remains at %s", deployCfgHash))
+		return nil
+	} else {
+		sv.status(fmt.Sprintf(
+			"config hash updated %s => %s",
+			sv.deployConfigHash, deployCfgHash,
+		))
+	}
 	var port int
 	var name string
 	var oldName string
@@ -334,6 +348,7 @@ func (sv *supervisor) reload() error {
 		"-p", fmt.Sprintf("127.0.0.1:%d:6119", port),
 		"-e", "RIJU_DEPLOY_CONFIG",
 		"-e", "ANALYTICS=1",
+		"--label", fmt.Sprintf("riju.deploy-config-hash=%s", deployCfgHash),
 		"--name", name,
 		fmt.Sprintf("riju:%s", deployCfg.AppImageTag),
 	)
@@ -366,6 +381,8 @@ func (sv *supervisor) reload() error {
 	if err := dockerRm.Run(); err != nil {
 		return err
 	}
+	sv.status("saving updated config hash")
+	sv.deployConfigHash = deployCfgHash
 	sv.status("reload complete")
 	return nil
 }
@@ -439,15 +456,19 @@ func main() {
 	}
 
 	var isGreen bool
+	var isRunning bool
 	if blueRunningSince == nil && greenRunningSince == nil {
 		log.Println("did not detect any existing containers")
 		isGreen = false
+		isRunning = true
 	} else if blueRunningSince != nil && greenRunningSince == nil {
 		log.Println("detected existing blue container")
 		isGreen = false
+		isRunning = true
 	} else if greenRunningSince != nil && blueRunningSince == nil {
 		log.Println("detected existing green container")
 		isGreen = true
+		isRunning = true
 	} else {
 		log.Println("detected existing blue and green containers")
 		isGreen = greenRunningSince.Before(*blueRunningSince)
@@ -467,6 +488,32 @@ func main() {
 		if err := dockerRm.Run(); err != nil {
 			log.Fatalln(err)
 		}
+		isRunning = true
+	}
+
+	deployCfgHash := "none"
+
+	if isRunning {
+		var name string
+		if isGreen {
+			name = greenName
+		} else {
+			name = blueName
+		}
+		dockerInspect := exec.Command(
+			"docker", "inspect", name,
+			`{{ index .Config.Labels "riju.deploy-config-hash" }}`,
+		)
+		dockerInspect.Stderr = os.Stderr
+		out, err := dockerInspect.Output()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if hash := strings.TrimSpace(string(out)); hash != "" {
+			deployCfgHash = hash
+		} else {
+			deployCfgHash = "unknown"
+		}
 	}
 
 	sv := &supervisor{
@@ -474,6 +521,7 @@ func main() {
 		blueProxyHandler: httputil.NewSingleHostReverseProxy(blueUrl),
 		greenProxyHandler: httputil.NewSingleHostReverseProxy(greenUrl),
 		isGreen: isGreen,
+		deployConfigHash: deployCfgHash,
 		s3: s3.NewFromConfig(awsCfg),
 		ecr: ecr.NewFromConfig(awsCfg),
 		awsRegion: awsCfg.Region,
