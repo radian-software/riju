@@ -31,11 +31,11 @@ resource "aws_security_group" "dev_server" {
 resource "aws_instance" "dev_server" {
   count = local.ssh_key_available ? 1 : 0
 
-  ami = data.aws_ami.ubuntu[0].id
+  ami = data.aws_ami.ubuntu[count.index].id
   instance_type = "t3.2xlarge"
   ebs_optimized = true
 
-  security_groups = [aws_security_group.dev_server[0].name]
+  security_groups = [aws_security_group.dev_server[count.index].name]
 
   iam_instance_profile = aws_iam_instance_profile.dev_server.name
   key_name = data.external.env.result.SSH_KEY_NAME
@@ -69,6 +69,6 @@ resource "aws_eip" "dev_server" {
 
 resource "aws_eip_association" "dev_server" {
   count = local.ssh_key_available ? 1 : 0
-  instance_id = aws_instance.dev_server[0].id
-  allocation_id = aws_eip.dev_server[0].id
+  instance_id = aws_instance.dev_server[count.index].id
+  allocation_id = aws_eip.dev_server[count.index].id
 }

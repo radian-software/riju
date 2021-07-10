@@ -28,6 +28,6 @@ resource "aws_backup_selection" "riju" {
   plan_id = aws_backup_plan.riju.id
 
   resources = [
-    aws_instance.dev_server[0].arn,
+    aws_instance.dev_server[count.index].arn,
   ]
 }
