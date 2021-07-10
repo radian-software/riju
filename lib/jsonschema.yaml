@@ -844,6 +844,19 @@ properties:
       the regular expression.)
     type: integer
     minimum: 1
+  helloStatus:
+    title: "Expected exit status for 'run' test"
+    description: |
+      By default, the 'run' command is expected to exit with status 0
+      when run on the 'template' code (after printing "Hello,
+      world!"). In the case that the exit status is something else, it
+      can be overridden.
+
+      This only has an effect if 'repl' is *not* specified.
+    type: integer
+    minimum: 0
+    maximum: 255
+    default: 0
   runReplInput:
     title: "REPL input for 'runrepl' test specifically"
     description: |

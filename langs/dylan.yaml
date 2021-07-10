@@ -53,6 +53,6 @@ template: |
   main(application-name(), application-arguments());
 
 compile: |
-  dylan-compiler -build main.lid
+  dylan-compiler -build main.lid && echo
 run: |
   _build/bin/main

@@ -165,15 +165,21 @@ class Test {
       this.handleUpdate = () => {
         if (this.timedOut) {
           reject(new Error(`timeout while waiting for ${desc}`));
-        } else {
-          while (this.handledMessages < this.messages.length) {
-            const msg = this.messages[this.handledMessages];
-            const result = handler(msg);
-            if (![undefined, null, false].includes(result)) {
-              resolve(result);
-            }
-            this.handledMessages += 1;
+          return;
+        }
+        while (this.handledMessages < this.messages.length) {
+          const msg = this.messages[this.handledMessages];
+          let result;
+          try {
+            result = handler(msg);
+          } catch (err) {
+            reject(err);
+            return;
           }
+          if (![undefined, null, false].includes(result)) {
+            resolve(result);
+          }
+          this.handledMessages += 1;
         }
       };
       this.handleUpdate();
@@ -222,8 +228,8 @@ class Test {
     await this.waitForOutput(pattern, this.config.helloMaxLength);
     if (!this.config.repl) {
       await this.wait("termination", (msg) => {
-        if (msg.event === "serviceFailed") {
-          if (msg.code !== 0) {
+        if (msg.event === "serviceFailed" && msg.service === "terminal") {
+          if (msg.code !== (this.config.helloStatus || 0)) {
             throw new Error(`run failed with code ${msg.code}`);
           }
           return true;

@@ -64,3 +64,4 @@ compile: |
   limbo -o riju/main.dis riju/main.b
 run: |
   emu -r . riju/main.dis
+helloStatus: 137

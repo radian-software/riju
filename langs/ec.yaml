@@ -58,3 +58,4 @@ compile: |
   clang main.c main.main.c -lecereCOM -o main
 run: |
   ./main
+helloStatus: 139

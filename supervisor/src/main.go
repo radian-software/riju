@@ -388,7 +388,7 @@ func (sv *supervisor) reload() error {
 	return nil
 }
 
-var rijuContainerRegexp = regexp.MustCompile(`^([^|]+):([^|]+)\|([^|]+)$`)
+var rijuContainerRegexp = regexp.MustCompile(`^([^|]+)\|([^|]+)\|([^|]+)$`)
 
 func main() {
 	supervisorCfg := supervisorConfig{}

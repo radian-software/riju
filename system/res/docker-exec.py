@@ -64,7 +64,7 @@ runuser_args = []
 if args.user:
     runuser_args = ["runuser", "-u", args.user, "--"]
 
-subprocess.run([
+sys.exit(subprocess.run([
     "docker",
     "exec",
     *exec_args,
@@ -81,4 +81,4 @@ exec "$@"
     "--",
     *runuser_args,
     *args.arg,
-])
+]).returncode)
