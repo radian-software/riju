@@ -1,4 +1,4 @@
-import { spawn, spawnSync } from "child_process";
+import { spawn } from "child_process";
 import os from "os";
 import process from "process";
 
@@ -40,6 +40,7 @@ export async function run(args, log, options) {
   options = options || {};
   const input = options.input;
   const check = options.check === undefined ? true : options.check;
+  const suppressOutput = options.suppressOutput || false;
   delete options.input;
   delete options.check;
   const proc = spawn(args[0], args.slice(1), options);
@@ -57,11 +58,11 @@ export async function run(args, log, options) {
     proc.on("error", reject);
     proc.on("close", (code, signal) => {
       output = output.trim();
-      if (output) {
+      if (output && !suppressOutput) {
         log(`Output from ${args[0]}:\n` + output);
       }
       if (code === 0 || !check) {
-        resolve(code);
+        resolve({ code, output });
       } else {
         reject(`command ${args[0]} failed with error code ${signal || code}`);
       }

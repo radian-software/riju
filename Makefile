@@ -83,8 +83,6 @@ endif
 IMAGE_HASH := "$$(docker inspect riju:$(LANG_TAG) | jq '.[0].Config.Labels["riju.image-hash"]' -r)"
 WITH_IMAGE_HASH := -e RIJU_IMAGE_HASH=$(IMAGE_HASH)
 
-LANG_IMAGE_HASH := "$$(docker inspect riju:lang-$(L) | jq '.[0].Config.Labels["riju.image-hash"]' -r)"
-
 shell: # I=<shell> [L=<lang>] [E[E]=1] [P1|P2=<port>] : Launch Docker image with shell
 	@: $${I}
 ifneq (,$(filter $(I),admin ci))
@@ -184,7 +182,7 @@ dev: # Compile, run, and watch all artifacts and server for development
 ## are provided, then only tests matching both are run.
 
 test: # [L=<lang>[,...]] [T=<test>[,...]] : Run test(s) for language or test category
-	RIJU_LANG_IMAGE_HASH=$(LANG_IMAGE_HASH) node backend/test-runner.js
+	node backend/test-runner.js
 
 ## Functions such as 'repl', 'run', 'format', etc. are available in
 ## the sandbox, and initial setup has already been done (e.g. 'setup'

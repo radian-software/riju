@@ -9,7 +9,8 @@ import stripAnsi from "strip-ansi";
 import { getTestHash } from "../lib/hash-test.js";
 import * as api from "./api.js";
 import { langsPromise } from "./langs.js";
-import { getUUID } from "./util.js";
+import { shutdown } from "./shutdown.js";
+import { getUUID, run } from "./util.js";
 
 let langs = {};
 
@@ -637,18 +638,31 @@ async function writeLog(lang, type, result, log) {
 }
 
 async function main() {
+  if (process.env.HOSTNAME !== "runtime") {
+    throw new Error("tests should be run in runtime container");
+  }
   langs = await langsPromise;
   let tests = getTestList();
   if (process.env.L) {
-    tests = tests.filter(({ lang }) => process.env.L.split().includes(lang));
+    tests = tests.filter(({ lang }) => process.env.L.split(",").includes(lang));
   }
   if (process.env.T) {
-    tests = tests.filter(({ type }) => process.env.T.split().includes(type));
+    tests = tests.filter(({ type }) => process.env.T.split(",").includes(type));
   }
   if (tests.length === 0) {
     console.error("no tests selected");
     process.exit(1);
   }
+  const langHashes = Object.fromEntries(
+    await Promise.all(
+      _.uniq(tests.map(({ lang }) => lang)).map(async (lang) => {
+        const output = (await run(["docker", "inspect", `riju:lang-${lang}`], console.error, {
+          suppressOutput: true,
+        })).output;
+        return [lang, JSON.parse(output)[0].Config.Labels["riju.image-hash"]];
+      })
+    )
+  );
   console.error(`Running ${tests.length} test${tests.length !== 1 ? "s" : ""}`);
   const lintSeen = new Set();
   let lintPassed = new Set();
@@ -758,10 +772,13 @@ async function main() {
     await fs.mkdir(`build/test-hashes/lang`, { recursive: true });
     await fs.writeFile(
       `build/test-hashes/lang/${lang}`,
-      await getTestHash(lang, process.env.RIJU_LANG_IMAGE_HASH)
+      await getTestHash(lang, langHashes[lang]),
     );
   }
   process.exit(failed.size > 0 ? 1 : 0);
 }
 
-main().catch(console.error);
+main().catch((err) => {
+  console.error(err);
+  shutdown();
+});

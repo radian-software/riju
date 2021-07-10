@@ -432,9 +432,9 @@ export class Session {
   };
 
   ensure = async (cmd) => {
-    const code = await this.run(this.privilegedExec(cmd), {
+    const code = (await this.run(this.privilegedExec(cmd), {
       check: false,
-    });
+    })).code;
     this.send({ event: "ensured", code });
   };
 
