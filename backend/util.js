@@ -21,7 +21,6 @@ function computeImageHashes() {
     }
     imageHashes[lang] = imageHash;
   }
-  console.log(imageHashes);
   return imageHashes;
 }
 

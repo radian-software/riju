@@ -350,6 +350,7 @@ func (sv *supervisor) reload() error {
 		"-e", "ANALYTICS=1",
 		"--label", fmt.Sprintf("riju.deploy-config-hash=%s", deployCfgHash),
 		"--name", name,
+		"--restart=unless-stopped",
 		fmt.Sprintf("riju:%s", deployCfg.AppImageTag),
 	)
 	dockerRun.Stdout = os.Stdout
@@ -387,7 +388,7 @@ func (sv *supervisor) reload() error {
 	return nil
 }
 
-var rijuContainerRegexp = regexp.MustCompile(`^([^:]+):(.+)$`)
+var rijuContainerRegexp = regexp.MustCompile(`^([^|]+):([^|]+)\|([^|]+)$`)
 
 func main() {
 	supervisorCfg := supervisorConfig{}
@@ -424,7 +425,7 @@ func main() {
 
 	dockerContainerLs := exec.Command(
 		"docker", "container", "ls", "-a",
-		"--format", "{{ .Names }}:{{ .CreatedAt }}",
+		"--format", "{{ .Names }}|{{ .CreatedAt }}|{{ .State }}",
 	)
 	dockerContainerLs.Stderr = os.Stderr
 	out, err := dockerContainerLs.Output()
@@ -444,6 +445,17 @@ func main() {
 			if err != nil {
 				continue
 			}
+			running := match[3] == "running"
+			if !running {
+				log.Printf("deleting container %s as it is stopped\n", name)
+				dockerRm := exec.Command("docker", "rm", "-f", name)
+				dockerRm.Stdout = os.Stdout
+				dockerRm.Stderr = os.Stderr
+				if err := dockerRm.Run(); err != nil {
+					log.Fatalln(err)
+				}
+				continue
+			}
 			if name == blueName {
 				blueRunningSince = &created
 				continue
@@ -460,7 +472,7 @@ func main() {
 	if blueRunningSince == nil && greenRunningSince == nil {
 		log.Println("did not detect any existing containers")
 		isGreen = false
-		isRunning = true
+		isRunning = false
 	} else if blueRunningSince != nil && greenRunningSince == nil {
 		log.Println("detected existing blue container")
 		isGreen = false
@@ -501,7 +513,7 @@ func main() {
 			name = blueName
 		}
 		dockerInspect := exec.Command(
-			"docker", "inspect", name, "-f",
+			"docker", "container", "inspect", name, "-f",
 			`{{ index .Config.Labels "riju.deploy-config-hash" }}`,
 		)
 		dockerInspect.Stderr = os.Stderr

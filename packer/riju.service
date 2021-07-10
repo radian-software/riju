@@ -2,11 +2,14 @@
 Description=Riju online coding sandbox
 Requires=docker.service
 After=docker.service
+StartLimitBurst=5
+StartLimitIntervalSec=300
 
 [Service]
 Type=exec
 ExecStart=riju-supervisor
 Restart=always
+RestartSec=5
 Environment=AWS_REGION=$AWS_REGION
 Environment=S3_BUCKET=$S3_BUCKET
 Environment=SUPERVISOR_ACCESS_TOKEN=$SUPERVISOR_ACCESS_TOKEN
