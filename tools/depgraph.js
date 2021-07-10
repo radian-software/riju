@@ -355,14 +355,18 @@ async function getUserInput(prompt) {
     prompt: prompt,
   });
   rl.prompt();
+  let resolved = false;
   const resp = await new Promise((resolve, reject) => {
     rl.on("line", (line) => {
+      resolved = true;
       resolve(line);
     });
     rl.on("close", () => {
-      console.log();
-      console.log();
-      reject(new Error("cancelled"));
+      if (!resolved) {
+        console.log();
+        console.log();
+        reject(new Error("cancelled"));
+      }
     });
   });
   rl.close();
@@ -494,7 +498,7 @@ async function executeDepGraph({
       hashes.published[name] === hashes.desired[name] &&
       hashes.local[name] !== hashes.desired[name]
     ) {
-      statuses[name] = "downloadFromRegistry";
+      statuses[name] = "retrieveFromRegistry";
     } else {
       statuses[name] = "buildLocally";
     }
@@ -534,10 +538,10 @@ async function executeDepGraph({
           });
         }
       } else {
-        if (statuses === "downloadFromRegistry") {
+        if (statuses === "retrieveFromRegistry") {
           plan.push({
             artifact: dep,
-            action: "downloadFromRegistry",
+            action: "retrieveFromRegistry",
           });
         }
       }
@@ -567,7 +571,7 @@ async function executeDepGraph({
   }
   const shortnames = {
     buildLocally: "rebuild",
-    downloadFromRegistry: "download",
+    retrieveFromRegistry: "download",
     publishToRegistry: "publish",
   };
   const totals = {};
@@ -584,7 +588,7 @@ async function executeDepGraph({
     plan.map(({ artifact, action }) => {
       const desc = {
         buildLocally: "          rebuild",
-        downloadFromRegistry: "download",
+        retrieveFromRegistry: "download",
         publishToRegistry: "                   publish",
       }[action];
       if (!desc) {
