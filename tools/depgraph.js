@@ -266,9 +266,7 @@ async function getDeployReadyArtifact(langs) {
 async function getDeployLiveArtifact(langs) {
   return {
     name: `deploy:live`,
-    dependencies: ["image:app"]
-      .concat(langs.map((lang) => `image:lang-${lang}`))
-      .concat(langs.map((lang) => `test:lang-${lang}`)),
+    dependencies: ["deploy:ready"],
     publishTarget: true,
     publishToRegistry: async () => {
       await runCommand(`make deploy`);
