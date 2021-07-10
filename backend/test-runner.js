@@ -220,6 +220,16 @@ class Test {
       sendInput(this.send, this.config.helloInput);
     }
     await this.waitForOutput(pattern, this.config.helloMaxLength);
+    if (!this.config.repl) {
+      await this.wait("termination", (msg) => {
+        if (msg.event === "serviceFailed") {
+          if (msg.code !== 0) {
+            throw new Error(`run failed with code ${msg.code}`);
+          }
+          return true;
+        }
+      });
+    }
   };
   testRepl = async () => {
     const input = this.config.input || "123 * 234";

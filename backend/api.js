@@ -69,6 +69,7 @@ export class Session {
           event: "serviceFailed",
           service: "container",
           error: `Exited with status ${signal || code}`,
+          code: signal || code,
         })
       );
       containerPty.on("error", (err) =>
@@ -121,6 +122,7 @@ export class Session {
               event: "serviceFailed",
               service: "daemon",
               error: `Exited with status ${signal || code}`,
+              code: signal || code,
             })
           );
           daemonProc.on("error", (err) =>
@@ -158,6 +160,7 @@ export class Session {
             event: "serviceFailed",
             service: "lsp",
             error: `Exited with status ${signal || code}`,
+            code: signal || code,
           })
         );
         lspProc.on("error", (err) =>
@@ -349,6 +352,7 @@ export class Session {
             event: "serviceFailed",
             service: "terminal",
             error: `Exited with status ${signal || code}`,
+            code: signal || code,
           });
         }
       });
@@ -407,6 +411,7 @@ export class Session {
             event: "serviceFailed",
             service: "formatter",
             error: `Exited with status ${signal || code}`,
+            code: signal || code,
           });
         }
       });
