@@ -37,6 +37,9 @@ resource "aws_instance" "dev_server" {
 
   security_groups = [aws_security_group.dev_server[0].name]
 
+  iam_instance_profile = aws_iam_instance_profile.dev_server.name
+  key_name = data.external.env.result.SSH_KEY_NAME
+
   root_block_device {
     volume_size = 256
 
@@ -55,4 +58,17 @@ resource "aws_instance" "dev_server" {
       security_groups,  # legacy
     ]
   }
+}
+
+resource "aws_eip" "dev_server" {
+  count = local.ssh_key_available ? 1 : 0
+  tags = {
+    Name = "Riju dev server"
+  }
+}
+
+resource "aws_eip_association" "dev_server" {
+  count = local.ssh_key_available ? 1 : 0
+  instance_id = aws_instance.dev_server[0].id
+  allocation_id = aws_eip.dev_server[0].id
 }
