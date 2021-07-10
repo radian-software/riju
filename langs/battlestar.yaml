@@ -35,8 +35,7 @@ install:
 
 main: "main.bts"
 template: |
-  const message = "Hello, world!
-  "
+  const message = "Hello, world!\n"
 
   fun main
       syscall(1, 1, message, len(message))
