@@ -6,6 +6,7 @@ on:
   pull_request:
     branches:
       - master
+concurrency: deploy
 jobs:
   deploy:
     runs-on: ubuntu-latest
