@@ -21,6 +21,8 @@ resource "aws_backup_plan" "riju" {
 }
 
 resource "aws_backup_selection" "riju" {
+  count = local.ssh_key_available ? 1 : 0
+
   iam_role_arn = aws_iam_role.backup.arn
   name = "riju"
   plan_id = aws_backup_plan.riju.id
