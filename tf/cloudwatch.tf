@@ -3,13 +3,13 @@ resource "aws_cloudwatch_metric_alarm" "server_cpu" {
 
   alarm_name = "riju-server-cpu-high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods = "5"
+  evaluation_periods = "30"
   metric_name = "CPUUtilization"
   namespace = "AWS/EC2"
   period = "60"
   statistic = "Maximum"
-  threshold = "80"
-  alarm_description = "CPU usage on Riju server is above 80%"
+  threshold = "90"
+  alarm_description = "CPU usage on Riju server is above 90% for 30 minutes"
   ok_actions = [aws_sns_topic.riju.arn]
   alarm_actions = [aws_sns_topic.riju.arn]
   insufficient_data_actions = [aws_sns_topic.riju.arn]
@@ -23,13 +23,13 @@ resource "aws_cloudwatch_metric_alarm" "server_memory" {
 
   alarm_name = "riju-server-memory-high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods = "5"
+  evaluation_periods = "30"
   metric_name = "mem_used_percent"
   namespace = "CWAgent"
   period = "60"
   statistic = "Maximum"
   threshold = "80"
-  alarm_description = "Memory usage on Riju server is above 80%"
+  alarm_description = "Memory usage on Riju server is above 80% for 30 minutes"
   ok_actions = [aws_sns_topic.riju.arn]
   alarm_actions = [aws_sns_topic.riju.arn]
   insufficient_data_actions = [aws_sns_topic.riju.arn]
@@ -43,13 +43,13 @@ resource "aws_cloudwatch_metric_alarm" "server_data_volume_disk_space" {
 
   alarm_name = "riju-server-data-volume-disk-usage-high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods = "5"
+  evaluation_periods = "30"
   metric_name = "disk_used_percent"
   namespace = "CWAgent"
   period = "60"
-  statistic = "Minimum"
-  threshold = "80"
-  alarm_description = "Disk space usage for data volume on Riju server is above 80%"
+  statistic = "Maximum"
+  threshold = "90"
+  alarm_description = "Disk space usage for data volume on Riju server is above 90% for 30 minutes"
   ok_actions = [aws_sns_topic.riju.arn]
   alarm_actions = [aws_sns_topic.riju.arn]
   insufficient_data_actions = [aws_sns_topic.riju.arn]
@@ -64,13 +64,13 @@ resource "aws_cloudwatch_metric_alarm" "server_root_volume_disk_space" {
 
   alarm_name = "riju-server-root-volume-disk-usage-high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods = "5"
+  evaluation_periods = "60"
   metric_name = "disk_used_percent"
   namespace = "CWAgent"
   period = "60"
-  statistic = "Minimum"
-  threshold = "80"
-  alarm_description = "Disk space usage for root volume on Riju server is above 80%"
+  statistic = "Maximum"
+  threshold = "90"
+  alarm_description = "Disk space usage for root volume on Riju server is above 90% for 30 minutes"
   ok_actions = [aws_sns_topic.riju.arn]
   alarm_actions = [aws_sns_topic.riju.arn]
   insufficient_data_actions = [aws_sns_topic.riju.arn]
