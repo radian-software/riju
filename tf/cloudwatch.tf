@@ -4,7 +4,7 @@ resource "aws_cloudwatch_metric_alarm" "server_cpu" {
   alarm_name = "riju-server-cpu-high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods = "30"
-  metric_name = "cpu_time_active"
+  metric_name = "cpu_usage_active"
   namespace = "CWAgent"
   period = "60"
   statistic = "Maximum"

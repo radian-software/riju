@@ -17,7 +17,7 @@
     "metrics_collected": {
       "cpu": {
         "measurement": [
-          "time_active"
+          "usage_active"
         ],
         "metrics_collection_interval": 60
       },
