@@ -1,22 +1,12 @@
 # Tutorial: debug language installation
 
 Except for the simplest cases, it's often helpful to debug lanugage
-installation interactively. Open a new tab in the admin shell
-(`control-b c`) and start the packaging image:
+installation interactively. Open a new tab in the admin shell and
+start the packaging shell:
 
 ```
 $ make shell I=packaging
 ```
-
-You'll probably want another instance of tmux:
-
-```
-$ make tmux
-```
-
-Now you should have at least three tabs in the top-level tmux: one
-with the admin shell, one with the runtime shell, and one with the
-packaging shell.
 
 ## Targeted debugging commands
 
@@ -58,22 +48,10 @@ building the `.deb`:
 $ make pkg-deb T=lang L=mylanguage
 ```
 
-Then switch to the runtime shell. If you still only have one tab open
-inside the nested tmux session, open a new one (`control-b control-b
-c`). You can install the `.deb`:
-
-```
-$ make install T=lang L=mylanguage
-```
-
-At this point your language should be runnable so you can test it out.
-It's best to test inside an isolated sandbox with the same set of
-environment variables as will appear on Riju, though; you can start
-such a shell as follows:
-
-```
-$ make sandbox L=mylanguage
-```
+Then switch back to the admin shell and run `dep
+image:lang-mylanguage`, as usual. This should use the Debian package
+you just built. Now you can test either in the Riju interface or via
+`make sandbox L=mylanguage` from the admin shell.
 
 You may find that the language fails to run as expected due to
 packaging errors. If so, you can return to the packaging shell and

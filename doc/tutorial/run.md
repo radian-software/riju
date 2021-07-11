@@ -54,4 +54,115 @@ the `java` command appending the `.class` part implicitly.
 
 ## Languages with REPLs
 
-## Variable scope
+If your language has the ability to run an interactive session, you
+can expose that functionality via the `repl` key. Here is the desired
+behavior for languages with REPLs:
+
+* The `repl` command will start an interactive session *without* any
+  user code loaded
+* The `run` command will execute the user code in `main`, like before,
+  and will *then* start an interactive session, preferably in the same
+  environment (so variables are still in scope, for example)
+
+Here is an example for Python (`-u` is to prevent output buffering):
+
+```yaml
+repl: |
+  python3 -u
+
+main: "main.py"
+template: |
+  print("Hello, world!")
+
+run: |
+  python3 -u -i main.py
+```
+
+## Preserving variable scope
+
+In the Python example above, passing `-i main.py` to `python3` starts
+an interactive session where `main.py` is executed, and then any
+variables defined in `main.py` can be inspected at the REPL. This is
+the desired state of operation. Many interactive languages provide
+some command-line option(s) to achieve a similar effect, although they
+may be a bit obscure. For example, in Node.js, you have to pass the
+program as a string:
+
+```yaml
+repl: |
+  node
+
+main: "main.js"
+template: |
+  console.log("Hello, world!");
+
+run: |
+  node -e "$(< main.js)" -i
+```
+
+Or you may be able to abuse a "startup" or "rc" file that is loaded at
+startup in a special way. For example, Haskell's interpreter evaluates
+`.ghci` specially at startup:
+
+```yaml
+repl: |
+  rm -f .ghci
+  ghci
+
+main: "Main.hs"
+template: |
+  module Main where
+
+  main :: IO ()
+  main = putStrLn "Hello, world!"
+
+run: |
+  (echo ':load Main' && echo 'main') > .ghci && ghci
+```
+
+In the case of shells, we often want to put the code itself into the
+startup file:
+
+```yaml
+repl: |
+  SHELL=/usr/bin/zsh HOME="$PWD" zsh
+input: |
+  expr 123 \* 234
+
+main: ".zshrc"
+template: |
+  echo "Hello, world!"
+createEmpty: ""
+
+run: |
+  SHELL=/usr/bin/zsh HOME="$PWD" zsh
+```
+
+In the above example, we passed `createEmpty: ""`. To explain, the
+default behavior is for user code to be written into `main`
+immediately, even before the user has clicked Run. This is so that
+certain language servers will work correctly. However, in cases where
+we're abusing a startup file, it may not be appropriate. After all,
+`zsh` will load `.zshrc` no matter what (note that `repl` and `run`
+are identical here). By passing `createEmpty: ""`, we make it so that
+Riju will write the provided string (i.e. `""`) into `main` before
+executing `repl`. This ensures that user code is *not* run when
+starting a REPL, but only when actually running.
+
+Sometimes it's simply not possible to preserve variable scope from
+user code when starting an interactive session. In that case, we just
+start the interactive session separately. It's important to start the
+interactive session regardless of whether or not the user code had an
+error (so use `;` instead of `&&`):
+
+```yaml
+repl: |
+  zoem
+
+main: "main.azm"
+template: |
+  \inform{Hello, world!}
+
+run: |
+  zoem -I main.azm; zoem
+```
