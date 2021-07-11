@@ -11,7 +11,7 @@ resource "aws_backup_plan" "riju" {
     schedule = "cron(0 5 ? * * *)"
 
     lifecycle {
-      delete_after = 7
+      delete_after = 3
     }
 
     recovery_point_tags = {

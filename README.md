@@ -8,12 +8,14 @@ Check it out at the <https://riju.codes>!
 
 ## Is it free?
 
-Riju is free and always will be free for everyone.
+Riju will always be free for everyone. I pay for the hosting costs
+myself.
 
-However, if Riju gets popular enough, I won't be able to afford paying
-for the hosting myself. To help me keep Riju online, you can donate
-via Patreon. All donations are used solely to cover hosting costs, and
-any surplus is donated to the [Electronic Frontier
+A number of people have asked me if they can donate to help keep Riju
+online. In response, I have set up [a Patreon
+page](https://www.patreon.com/riju) where you can contribute. All
+donations will be used solely to cover hosting costs, and any surplus
+will be donated to the [Electronic Frontier
 Foundation](https://www.eff.org/).
 
 ## Is it safe?
@@ -31,8 +33,8 @@ All of the above notwithstanding, any service that allows people to
 run code online is inherently risky. For this reason, I can't make any
 guarantees about the security or privacy of your data.
 
-Please see [Reporting a security issue](SECURITY.md).
+See also [Reporting a security issue](SECURITY.md).
 
 ## Can I help?
 
-Please see [Contributing guide](CONTRIBUTING.md).
+Absolutely, please see [Contributing guide](CONTRIBUTING.md).

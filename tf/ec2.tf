@@ -42,6 +42,7 @@ resource "aws_instance" "dev_server" {
 
   root_block_device {
     volume_size = 256
+    volume_type = "gp3"
 
     tags = merge(local.tags, {
       Name = "Riju dev server"

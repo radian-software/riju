@@ -529,14 +529,14 @@ async function executeDepGraph({
   for (const target of priorityTargets) {
     for (const dep of artifacts[target].dependencies) {
       if (artifacts[target].publishTarget) {
-        if (statuses === "publishToRegistry") {
+        if (statuses[dep] === "publishToRegistry") {
           plan.push({
             artifact: dep,
             action: "publishToRegistry",
           });
         }
       } else {
-        if (statuses === "retrieveFromRegistry") {
+        if (statuses[dep] === "retrieveFromRegistry") {
           plan.push({
             artifact: dep,
             action: "retrieveFromRegistry",
