@@ -57,7 +57,7 @@ char *parseImageHash(char *imageHash)
 void wait_alarm(int signum)
 {
   (void)signum;
-  die("container did not come up within 1 second");
+  die("container did not come up within 10 seconds");
 }
 
 void session(char *uuid, char *lang, char *imageHash)
@@ -118,7 +118,7 @@ void session(char *uuid, char *lang, char *imageHash)
   ts_10ms.tv_sec = 0;
   ts_10ms.tv_nsec = 1000 * 1000 * 10;
   signal(SIGALRM, wait_alarm);
-  alarm(1);
+  alarm(10);
   int fd;
   while (1) {
     fd = open(fifo, O_WRONLY);
