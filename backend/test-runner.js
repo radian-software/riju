@@ -637,6 +637,13 @@ async function writeLog(lang, type, result, log) {
   );
 }
 
+async function getImageHash(tag) {
+  const output = (await run(["docker", "inspect", `riju:${tag}`], console.error, {
+    suppressOutput: true,
+  })).output;
+  return JSON.parse(output)[0].Config.Labels["riju.image-hash"];
+}
+
 async function main() {
   if (process.env.HOSTNAME !== "runtime") {
     throw new Error("tests should be run in runtime container");
@@ -656,13 +663,11 @@ async function main() {
   const langHashes = Object.fromEntries(
     await Promise.all(
       _.uniq(tests.map(({ lang }) => lang)).map(async (lang) => {
-        const output = (await run(["docker", "inspect", `riju:lang-${lang}`], console.error, {
-          suppressOutput: true,
-        })).output;
-        return [lang, JSON.parse(output)[0].Config.Labels["riju.image-hash"]];
+        return [lang, await getImageHash(`lang-${lang}`)];
       })
     )
   );
+  const runtimeHash = await getImageHash("runtime");
   console.error(`Running ${tests.length} test${tests.length !== 1 ? "s" : ""}`);
   const lintSeen = new Set();
   let lintPassed = new Set();
@@ -772,7 +777,7 @@ async function main() {
     await fs.mkdir(`build/test-hashes/lang`, { recursive: true });
     await fs.writeFile(
       `build/test-hashes/lang/${lang}`,
-      await getTestHash(lang, langHashes[lang]),
+      await getTestHash(lang, runtimeHash, langHashes[lang]),
     );
   }
   process.exit(failed.size > 0 ? 1 : 0);

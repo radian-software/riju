@@ -228,7 +228,11 @@ async function getLanguageTestArtifact({ lang }) {
       return s3TestHashes[lang] || null;
     },
     getDesiredHash: async (dependencyHashes) => {
-      return await getTestHash(lang, dependencyHashes[`image:lang-${lang}`]);
+      return await getTestHash(
+        lang,
+        dependencyHashes[`image:runtime`],
+        dependencyHashes[`image:lang-${lang}`],
+      );
     },
     buildLocally: async () => {
       await runCommand(`make shell I=runtime CMD="make test L=${lang}"`);
@@ -531,6 +535,9 @@ async function executeDepGraph({
   const seen = new Set();
   for (const target of priorityTargets) {
     for (const dep of artifacts[target].dependencies) {
+      if (seen.has(dep)) {
+        continue;
+      }
       if (artifacts[target].publishTarget) {
         if (statuses[dep] === "publishToRegistry") {
           plan.push({
@@ -545,9 +552,6 @@ async function executeDepGraph({
             action: "retrieveFromRegistry",
           });
         }
-      }
-      if (seen.has(dep)) {
-        continue;
       }
       seen.add(dep);
     }
