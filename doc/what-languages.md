@@ -62,9 +62,8 @@ Here are some explicit *non-requirements*:
 * *Language must be well-known.* Nope, I'll be happy to add your pet
   project; after all, [Kalyn](https://github.com/raxod502/kalyn) and
   [Ink](https://github.com/thesephist/ink) are already supported.
-* *Language must be useful.* I would have no objection to adding
-  everything on the esolangs wiki, if there are interpreters/compilers
-  available.
+* *Language must be useful.* I have no objection to adding everything
+  on the esolangs wiki, if there are interpreters/compilers available.
 * *Language must be easy to install and run.* Well, it would be nice,
   but I've seen some s\*\*\* when adding languages to Riju so it will
   take a lot to surprise me at this point.

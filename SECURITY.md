@@ -8,4 +8,7 @@ way to:
 * View or interfere with another user's session.
 * Tamper with the Riju server.
 
-I will do my best to correct the vulnerability as soon as possible.
+Although I work on Riju in my free time, I take security seriously, so
+I will do my best to get back to you in less than a week, and to
+correct the vulnerability as soon as possible (I will let you know the
+likely timeline by email).

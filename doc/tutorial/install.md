@@ -1,6 +1,6 @@
 # Tutorial: install your language
 
-Presumably, your language isn't installed by default in Ubuntu. If
+Most likely, your language isn't installed by default in Ubuntu. If
 not, you'll need to add an `install:` block to your language
 configuration describing how to install it.
 
@@ -95,7 +95,8 @@ paths for the targets of symlinks (`/opt/swift/bin/swiftc`) but
 This is because while we are putting all files into `${pkg}` during
 build, the eventual place they will be installed by the package is
 into the root filesystem, so any references to paths *within* files
-(including symlink targets) must not mention `${pkg}`.
+(including symlink targets) must not mention `${pkg}`. This is a
+standard feature of all Linux packaging tools.
 
 ```yaml
 install:

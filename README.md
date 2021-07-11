@@ -27,7 +27,8 @@ Riju does not collect your personal information.
 * Riju uses [Fathom Analytics](https://usefathom.com/) to measure
   traffic. Fathom collects very limited data and does not sell it to
   third parties, unlike Google Analytics.
-* Riju does not serve advertisements.
+* Riju does not serve advertisements or share data with any third
+  party aside from Fathom Analytics.
 
 All of the above notwithstanding, any service that allows people to
 run code online is inherently risky. For this reason, I can't make any

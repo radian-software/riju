@@ -24,8 +24,8 @@ start the admin shell:
 $ make image shell I=admin
 ```
 
-All future operations can be done inside the admin shell, where all
-dependencies are installed automatically.
+All future operations can be done inside the admin shell, where Riju's
+dependencies are already installed.
 
 ## Start tmux
 
@@ -48,60 +48,32 @@ keybindings are:
   use `control-b` twice to do a command on the inner one instead of
   the outer one
 
-## Configure local project
+## Start Riju server
 
-Using your regular text editor (the Riju repository is synchronized
-inside and outside of the container, so you can use whatever editor
-you would like, it doesn't have to be something in the terminal),
-create a file `.env` in the Riju repository with the following
-contents:
+Use `dep`, the Riju build tool, to compile the Docker image that the
+Riju server will run inside:
 
 ```
-DOCKER_REPO=raxod502/riju
-S3_BUCKET=riju
+$ dep image:runtime
 ```
 
-This tells Riju to pull assets from the official registries that I
-maintain, so that you don't have to build them yourself.
-
-## Set up Docker images
-
-Download the two Docker images needed for testing a new language:
+Start Riju in development mode:
 
 ```
-$ make pull I=packaging
-$ make pull I=runtime
-```
-
-Create a new tab in tmux (`control-b c`) and start the runtime image
-with ports exposed:
-
-```
-$ make shell I=runtime E=1
-```
-
-Inside that shell, start another instance of tmux:
-
-```
-$ make tmux
-```
-
-Now within that tmux, start Riju in development mode:
-
-```
-$ make dev
+$ make shell I=runtime E=1 CMD="make dev"
 ```
 
 You should now be able to navigate to <http://localhost:6119> and see
 that Riju is running, although it does not have any languages
 installed.
 
-Finally, switch back to the admin shell (`control-b p`). We are ready
-to start creating your new language.
+We are now ready to start creating your new language.
 
 ## Create a language configuration
 
-Create a file `langs/mylanguage.yaml` with the following contents:
+Create a file `langs/mylanguage.yaml` with the following contents
+(replacing `mylanguage` and `My Language` with appropriate values,
+like `objectivecpp` and `Objective-C++`):
 
 ```yaml
 id: "mylanguage"
@@ -115,15 +87,21 @@ run: |
   echo "Hello, world!"
 ```
 
-Now from the admin shell, run `make repkgs L=mylanguage`. Once that
-completes, you should see your language at <http://localhost:6119>.
-Furthermore, you can switch to the runtime image (`control-b n`) and
-run `make sandbox L=mylanguage` to test your language at the command
-line (e.g. type `run` to print `Hello, world!`). Each time you modify
-the language configuration, run `make repkgs L=mylanguage` to
-reinstall the language.
+Open a new tmux pane in the admin shell (`control-b c`) and build the
+Docker image for your language:
 
-Follow these steps to augment your language configuration:
+```
+$ dep image:lang-mylanguage
+```
+
+Once that completes, you should see your language at
+<http://localhost:6119>. Furthermore, you can run `make sandbox
+L=mylanguage` to test your language at the command line (e.g. type
+`run` to print `Hello, world!`). Each time you modify the language
+configuration, run `dep image:lang-mylanguage` to update the language.
+
+Follow these steps to get from "Hello, world" to running your actual
+language:
 
 * [Install your language](tutorial/install.md)
 * [Provide run commands](tutorial/run.md)
