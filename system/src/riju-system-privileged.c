@@ -111,7 +111,7 @@ void session(char *uuid, char *lang, char *imageHash)
       "--memory", "100m",
       "--memory-swap", "900m",
       image, "bash", "-c",
-      "cat /var/run/riju/sentinel/fifo | ( while read -t2; do :; done; pkill -g0 )",
+      "cat /var/run/riju/sentinel/fifo | ( sleep 10; while read -t2; do :; done; pkill -g0 )",
       NULL,
     };
     execvp(argv[0], argv);
