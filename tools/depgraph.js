@@ -244,7 +244,10 @@ async function getLanguageTestArtifact({ lang }) {
       const hash = (await fs.readFile(hashPath, "utf-8")).trim();
       const S3_BUCKET = getS3Bucket();
       await runCommand(
-        `aws s3 cp ${hashPath} s3://${S3_BUCKET}/test-hashes/lang/${lang}/${hash}`
+        `aws s3 rm --recursive s3://${S3_BUCKET}/test-hashes/lang/${lang}`,
+      );
+      await runCommand(
+        `aws s3 cp ${hashPath} s3://${S3_BUCKET}/test-hashes/lang/${lang}/${hash}`,
       );
     },
   };
