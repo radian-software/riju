@@ -413,14 +413,16 @@ func (sv *supervisor) reload() error {
 	for tag := range unneededTagsSet {
 		unneededTags = append(unneededTags, tag)
 	}
-	dockerImageRmArgs := append([]string{"image", "rm", "-f"}, unneededTags...)
-	dockerImageRm := exec.Command("docker", dockerImageRmArgs...)
-	dockerImageRm.Stdout = os.Stdout
-	dockerImageRm.Stderr = os.Stderr
-	if err := dockerImageRm.Run(); err != nil {
-		return err
+	if len(unneededTags) > 0 {
+		dockerImageRmArgs := append([]string{"image", "rm", "-f"}, unneededTags...)
+		dockerImageRm := exec.Command("docker", dockerImageRmArgs...)
+		dockerImageRm.Stdout = os.Stdout
+		dockerImageRm.Stderr = os.Stderr
+		if err := dockerImageRm.Run(); err != nil {
+			return err
+		}
 	}
-	dockerPrune := exec.Command("docker", "system", "prune")
+	dockerPrune := exec.Command("docker", "system", "prune", "-f")
 	dockerPrune.Stdout = os.Stdout
 	dockerPrune.Stderr = os.Stderr
 	if err := dockerPrune.Run(); err != nil {
