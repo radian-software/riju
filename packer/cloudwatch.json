@@ -15,6 +15,12 @@
       ["AutoScalingGroupName", "path"]
     ],
     "metrics_collected": {
+      "cpu": {
+        "measurement": [
+          "time_active"
+        ],
+        "metrics_collection_interval": 60
+      },
       "disk": {
         "measurement": [
           "used_percent"

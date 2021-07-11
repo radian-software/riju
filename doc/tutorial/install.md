@@ -183,6 +183,108 @@ install:
           dataSourceName: db.sqlite3
 ```
 
+## Dealing with versioned APT packages
+
+For some reason, some APT packages have version numbers in their
+names. For example, you can't `sudo apt install lua`; you have to
+`sudo apt install lua5.4`. The best way to deal with these situations
+is to use various `grep-aptavail` hacks to identify the latest
+available version programmatically. Check the man page as well as uses
+of `grep-aptavail` in Riju to understand the options.
+
+```yaml
+install:
+  apt:
+    - $(grep-aptavail -XF Provides lua -a -XF Version "$(grep-aptavail -XF Provides lua -s Version -n | sort -Vr | head -n1)" -s Package -n | head -n1)
+```
+
+## Custom APT repos
+
+Some languages are distributed in third-party APT repositories. You
+can identify this by looking for installation directions that say to
+run `add-apt-repository` or add a file to `/etc/apt/sources.list.d`.
+Frequently you're also asked to import a custom signing key using
+`apt-key`.
+
+Riju provides shorthands for these operations. The `aptKey` option can
+be either a URL or a hexadecimal string (both forms appear in commands
+you're asked to run). The `aptRepo` option is a line that can be added
+to `/etc/apt/sources.list.d`, which can be copied out of the suggested
+installation command.
+
+Assuming these keys are specified, then all the packages in the custom
+APT repo(s) will be available for selection under the `apt` option, in
+addition to standard Ubuntu packages.
+
+```yaml
+install:
+  aptKey:
+    - "https://keybase.io/crystal/pgp_keys.asc"
+  aptRepo:
+    - "deb [arch=amd64] https://dist.crystal-lang.org/apt crystal main"
+  apt:
+    - crystal
+```
+
+## Getting the name of the current Ubuntu release
+
+Sometimes you need to download from a URL or add an APT repository
+whose name depends on the version (e.g. `21.04`) or name (e.g.
+`hirsute`) of the current Ubuntu release. These parameters are
+automatically available in the `${ubuntu_ver}` and `${ubuntu_name}`
+variables, which can be used in most option values:
+
+```yaml
+install:
+  aptKey:
+    - "B4112585D386EB94"
+  aptRepo:
+    - "deb [arch=amd64] https://dl.hhvm.com/ubuntu ${ubuntu_name} main"
+  apt:
+    - hhvm
+```
+
+## Dealing with broken certificate chains
+
+Consider the following errors from `curl` and `wget` respectively:
+
+```
+curl: (60) SSL certificate problem: unable to get local issuer certificate
+ERROR: cannot verify ioke.org's certificate, issued by ‘CN=R3,O=Let's Encrypt,C=US’:
+  Unable to locally verify the issuer's authority.
+```
+
+These are often because of a server misconfiguration. Servers are
+supposed to send all intermediate certificates in their certificate
+chain, but sometimes they fail to do this. In that case, you need to
+manually download the missing intermediate certificate from its
+issuer, and install it.
+
+You can get the information about which certificate is required from
+[SSL Labs](https://www.ssllabs.com/ssltest/analyze.html). Then, by
+Googling the name of the missing certificate that SSL Labs has found,
+you can typically find it as a download from the certificate issuer.
+
+Riju has a `cert` option which takes URLs of certificates to download
+and install (note the use of `prepare` here because we need the
+certificate when building the package, not just when installing it):
+
+```yaml
+install:
+  prepare:
+    cert:
+      - "https://letsencrypt.org/certs/lets-encrypt-r3.pem"
+  apt:
+    - default-jdk
+  manual: |
+    install -d "${pkg}/opt/ioke"
+    install -d "${pkg}/usr/local/bin"
+
+    wget https://ioke.org/dist/ioke-ikj-latest.tar.gz -O ioke.tar.gz
+    tar -xf ioke.tar.gz -C "${pkg}/opt/ioke" --strip-components=1
+    ln -s /opt/ioke/bin/ioke "${pkg}/usr/local/bin/ioke"
+```
+
 ## Setting up skeleton files
 
 Sometimes your language may require some configuration files in
@@ -201,33 +303,41 @@ By convention, we name such directories `skel`.
 
 ```yaml
 install:
-  prepare:
+  prepare: &install-dotnet
+    preface: |
+      wget "https://packages.microsoft.com/config/ubuntu/${ubuntu_ver}/packages-microsoft-prod.deb"
+      sudo --preserve-env=DEBIAN_FRONTEND apt-get install ./packages-microsoft-prod.deb
+      sudo --preserve-env=DEBIAN_FRONTEND apt-get update
     apt:
       - $(grep-aptavail -wF Package "dotnet-sdk-3\.[0-9.]+" -s Package -n | sort -Vr | head -n1)
+  <<: *install-dotnet
   manual: |
-    install -d "${pkg}/opt/qsharp/skel"
+    install -d "${pkg}/opt/qsharp/skel-home"
+    install -d "${pkg}/opt/qsharp/skel-src"
 
     dotnet new -i Microsoft.Quantum.ProjectTemplates
     dotnet new console -lang Q# -o main
     dotnet run --project main
 
     shopt -s dotglob
-    cp -R * "${HOME}/.dotnet" "${HOME}/.nuget" "${pkg}/opt/qsharp/skel/"
-    rm "${pkg}/opt/qsharp/skel/main/Program.qs"
-    chmod -R a=u,go-w "${pkg}/opt/qsharp/skel"
+    cp -R main "${pkg}/opt/qsharp/skel-src/"
+    cp -R "${HOME}/.dotnet" "${HOME}/.nuget" "${pkg}/opt/qsharp/skel-home/"
+    rm "${pkg}/opt/qsharp/skel-src/main/Program.qs"
+    chmod -R a=u,go-w "${pkg}/opt/qsharp"
+
+setup: |
+  shopt -s dotglob
+  cp -R /opt/qsharp/skel-src/* ./
+  cp -R /opt/qsharp/skel-home/* "${HOME}/"
 ```
 
-## Dealing with versioned APT packages
+## What about...?
 
-For some reason, some APT packages have version numbers in their
-names. For example, you can't `sudo apt install lua`; you have to
-`sudo apt install lua5.4`. The best way to deal with these situations
-is to use various `grep-aptavail` hacks to identify the latest
-available version programmatically. Check the man page as well as uses
-of `grep-aptavail` in Riju to understand the options.
-
-```yaml
-install:
-  apt:
-    - $(grep-aptavail -XF Provides lua -a -XF Version "$(grep-aptavail -XF Provides lua -s Version -n | sort -Vr | head -n1)" -s Package -n | head -n1)
-```
+Refer to [`jsonschema.yaml`](../../lib/jsonschema.yaml) for the
+complete reference about what keys are accepted in `install`. See
+[`generate-build-script.js`](../../tools/generate-build-scripts.js)
+for how these are interpreted programmatically, and see the generated
+`build.bash` and `install.bash` scripts (in `build/lang/<name>/`) for
+examples of the outputs. And of course, check some of the other
+languages, since probably what you want to do has come up before at
+some point.
