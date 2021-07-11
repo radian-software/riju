@@ -43,6 +43,11 @@ build {
   sources = ["source.amazon-ebs.ubuntu"]
 
   provisioner "file" {
+    destination = "/tmp/cloudwatch.json"
+    source = "cloudwatch.json"
+  }
+
+  provisioner "file" {
     destination = "/tmp/riju-init-volume"
     source      = "riju-init-volume"
   }

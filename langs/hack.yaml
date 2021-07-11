@@ -1,5 +1,3 @@
-# Disabled due to https://github.com/facebook/hhvm/issues/8796
-
 id: "hack"
 aliases:
   - "hhvm"

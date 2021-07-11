@@ -208,6 +208,7 @@ func (sv *supervisor) reloadWithScheduling() {
 }
 
 var rijuImageRegexp = regexp.MustCompile(`(?:^|/)riju:([^<>]+)$`)
+var rijuImageTagRegexp = regexp.MustCompile(`^([^|]+)\|([^|]+)$`)
 
 func (sv *supervisor) reload() error {
 	sv.status("getting access token from ECR")
@@ -377,13 +378,54 @@ func (sv *supervisor) reload() error {
 	sv.isGreen = !sv.isGreen
 	sv.status("stopping old container")
 	dockerRm := exec.Command("docker", "rm", "-f", oldName)
-	dockerRm.Stdout = dockerRm.Stdout
-	dockerRm.Stderr = dockerRm.Stderr
+	dockerRm.Stdout = os.Stdout
+	dockerRm.Stderr = os.Stderr
 	if err := dockerRm.Run(); err != nil {
 		return err
 	}
 	sv.status("saving updated config hash")
 	sv.deployConfigHash = deployCfgHash
+	sv.status("pruning unneeded Docker images")
+	dockerImageLs = exec.Command(
+		"docker", "image", "ls", "--format",
+		"{{ .ID }}|{{ .Tag }}",
+	)
+	dockerImageLs.Stderr = os.Stderr
+	out, err = dockerImageLs.Output()
+	if err != nil {
+		return err
+	}
+	neededTagsSet := map[string]bool{}
+	for _, tag := range neededTags {
+		neededTagsSet[tag] = true
+	}
+	unneededTagsSet := map[string]bool{}
+	for _, line := range strings.Split(string(out), "\n") {
+		if match := rijuImageTagRegexp.FindStringSubmatch(line); match != nil {
+			id := match[1]
+			tag := match[2]
+			if !neededTagsSet[tag] {
+				unneededTagsSet[id] = true
+			}
+		}
+	}
+	unneededTags := []string{}
+	for tag := range unneededTagsSet {
+		unneededTags = append(unneededTags, tag)
+	}
+	dockerImageRmArgs := append([]string{"image", "rm", "-f"}, unneededTags...)
+	dockerImageRm := exec.Command("docker", dockerImageRmArgs...)
+	dockerImageRm.Stdout = os.Stdout
+	dockerImageRm.Stderr = os.Stderr
+	if err := dockerImageRm.Run(); err != nil {
+		return err
+	}
+	dockerPrune := exec.Command("docker", "system", "prune")
+	dockerPrune.Stdout = os.Stdout
+	dockerPrune.Stderr = os.Stderr
+	if err := dockerPrune.Run(); err != nil {
+		return err
+	}
 	sv.status("reload complete")
 	return nil
 }

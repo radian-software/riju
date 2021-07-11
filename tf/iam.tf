@@ -1,3 +1,11 @@
+data "aws_iam_policy" "cloudwatch" {
+  name = "CloudWatchAgentServerPolicy"
+}
+
+data "aws_iam_policy" "ssm" {
+  name = "AmazonSSMManagedInstanceCore"
+}
+
 resource "aws_iam_user" "deploy" {
   name = "riju-deploy"
 }
@@ -169,6 +177,16 @@ resource "aws_iam_role" "server" {
 resource "aws_iam_role_policy_attachment" "server" {
   role = aws_iam_role.server.name
   policy_arn = aws_iam_policy.server.arn
+}
+
+resource "aws_iam_role_policy_attachment" "server_cloudwatch" {
+  role = aws_iam_role.server.name
+  policy_arn = data.aws_iam_policy.cloudwatch.arn
+}
+
+resource "aws_iam_role_policy_attachment" "server_ssm" {
+  role = aws_iam_role.server.name
+  policy_arn = data.aws_iam_policy.ssm.arn
 }
 
 resource "aws_iam_instance_profile" "server" {

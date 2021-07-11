@@ -64,14 +64,15 @@ export class Session {
       this.container = {
         pty: containerPty,
       };
-      containerPty.on("close", (code, signal) =>
+      containerPty.on("close", async (code, signal) => {
         this.send({
           event: "serviceFailed",
           service: "container",
           error: `Exited with status ${signal || code}`,
           code: signal || code,
-        })
-      );
+        });
+        await this.teardown();
+      });
       containerPty.on("error", (err) =>
         this.send({
           event: "serviceFailed",

@@ -32,6 +32,7 @@ async function main() {
   program.parse(process.argv);
   await fs.mkdir("build", { recursive: true });
   await fs.writeFile("build/config.json", JSON.stringify(await getDeployConfig(), null, 2) + "\n");
+  console.log("wrote build/config.json");
   process.exit(0);
 }
 
