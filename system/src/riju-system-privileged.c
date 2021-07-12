@@ -110,6 +110,7 @@ void session(char *uuid, char *lang, char *imageHash)
       "--cpus", "1",
       "--memory", "1g",
       "--memory-swap", "3g",
+      "--pids-limit", "512",
       image, "bash", "-c",
       "cat /var/run/riju/sentinel/fifo | ( sleep 10; while read -t2; do :; done; pkill -g0 )",
       NULL,

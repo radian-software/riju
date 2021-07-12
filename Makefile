@@ -24,6 +24,8 @@ endif
 # Get rid of 'Entering directory' / 'Leaving directory' messages.
 MAKE_QUIETLY := MAKELEVEL= make
 
+REQUIRE_PACKAGING := @if [[ $${HOSTNAME} != packaging ]]; then echo >&2 "packages should be built in packaging container"; exit 1; fi
+
 .PHONY: all $(MAKECMDGOALS) frontend system supervisor
 
  all: help
@@ -42,8 +44,7 @@ else
 IT_ARG :=
 endif
 
-## Pass NC=1 to disable the Docker cache. Base images are not pulled;
-## see 'make pull-base' for that.
+## Pass NC=1 to disable the Docker cache.
 
 image: # I=<image> [L=<lang>] [NC=1] : Build a Docker image
 	@: $${I}
@@ -83,7 +84,7 @@ endif
 IMAGE_HASH := "$$(docker inspect riju:$(LANG_TAG) | jq '.[0].Config.Labels["riju.image-hash"]' -r)"
 WITH_IMAGE_HASH := -e RIJU_IMAGE_HASH=$(IMAGE_HASH)
 
-shell: # I=<shell> [L=<lang>] [E[E]=1] [P1|P2=<port>] : Launch Docker image with shell
+shell: # I=<shell> [L=<lang>] [E[E]=1] [P1|P2=<port>] [CMD="<arg>..."] : Launch Docker image with shell
 	@: $${I}
 ifneq (,$(filter $(I),admin ci))
 	@mkdir -p $(HOME)/.aws $(HOME)/.docker $(HOME)/.ssh $(HOME)/.terraform.d
@@ -118,15 +119,18 @@ all-scripts: # Generate packaging scripts for all languages
 
 pkg-clean: # L=<lang> T=<type> : Set up fresh packaging environment
 	@: $${L} $${T}
+	$(REQUIRE_PACKAGING)
 	sudo rm -rf $(BUILD)/src $(BUILD)/pkg
 	mkdir -p $(BUILD)/src $(BUILD)/pkg
 
 pkg-build: # L=<lang> T=<type> : Run packaging script in packaging environment
 	@: $${L} $${T}
+	$(REQUIRE_PACKAGING)
 	cd $(BUILD)/src && pkg="$(PWD)/$(BUILD)/pkg" src="$(PWD)/$(BUILD)/src" $(or $(BASH_CMD),../build.bash)
 
 pkg-debug: # L=<lang> T=<type> : Launch shell in packaging environment
 	@: $${L} $${T}
+	$(REQUIRE_PACKAGING)
 	$(MAKE_QUIETLY) pkg-build L=$(L) T=$(T) CMD=bash
 
 Z ?= none
@@ -137,6 +141,7 @@ Z ?= none
 
 pkg-deb: # L=<lang> T=<type> [Z=gzip|xz] : Build .deb from packaging environment
 	@: $${L} $${T}
+	$(REQUIRE_PACKAGING)
 	fakeroot dpkg-deb --build -Z$(Z) $(BUILD)/pkg $(BUILD)/$(DEB)
 
 ## This is equivalent to the sequence 'pkg-clean', 'pkg-build', 'pkg-deb'.
@@ -197,7 +202,7 @@ sandbox: # L=<lang> : Run isolated shell with per-language setup
 ## directly in the current working directory.
 
 lsp: # L=<lang|cmd> : Run LSP REPL for language or custom command line
-	@: $${C}
+	@: $${L}
 	node backend/lsp-repl.js $(L)
 
 ### Fetch artifacts from registries

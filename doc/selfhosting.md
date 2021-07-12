@@ -1,4 +1,4 @@
-# Riju infrastructure
+# How to self-host Riju
 
 You can host your own instance of Riju! This requires a bit of manual
 setup, but everything that *can* be automated, *has* been automated.
