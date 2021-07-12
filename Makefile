@@ -72,7 +72,7 @@ else
 SHELL_PORTS :=
 endif
 
-SHELL_ENV := -e Z -e CI -e TEST_PATIENCE -e TEST_CONCURRENCY
+SHELL_ENV := -e Z -e CI -e TEST_PATIENCE -e TEST_CONCURRENCY -e TEST_TIMEOUT_SECS -e FATHOM_SITE_ID
 
 ifeq ($(I),lang)
 LANG_TAG := lang-$(L)
@@ -202,6 +202,12 @@ lsp: # L=<lang|cmd> : Run LSP REPL for language or custom command line
 
 ### Fetch artifacts from registries
 
+PUBLIC_DOCKER_REPO_PULL ?= public.ecr.aws/raxod502/riju
+
+sync-ubuntu: # Pull Riju Ubuntu image from public Docker registry
+	docker pull $(PUBLIC_DOCKER_REPO_PULL):ubuntu
+	docker tag $(PUBLIC_DOCKER_REPO_PULL):ubuntu riju:ubuntu
+
 pull: # I=<image> : Pull last published Riju image from Docker registry
 	@: $${I} $${DOCKER_REPO}
 	docker pull $(DOCKER_REPO):$(I)
@@ -239,8 +245,10 @@ upload: # L=<lang> T=<type> : Upload .deb to S3
 deploy-config: # Generate deployment config file
 	node tools/generate-deploy-config.js
 
-deploy: deploy-config # Upload deployment config to S3 and update ASG instances
+deploy-latest: # Upload deployment config to S3 and update ASG instances
 	aws s3 cp $(BUILD)/config.json $(S3_CONFIG)
+
+deploy: deploy-config deploy-latest # Shorthand for deploy-config followed by deploy-latest
 
 ### Infrastructure
 

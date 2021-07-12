@@ -3,13 +3,30 @@
 You can host your own instance of Riju! This requires a bit of manual
 setup, but everything that *can* be automated, *has* been automated.
 
+**Warning: AWS is expensive and you are responsible for your own
+spending. If you would be perturbed by accidentally burning a few
+hundred dollars on unexpected compute, you probably shouldn't follow
+these instructions.**
+
 ## Sign up for accounts
 
 * [AWS](https://aws.amazon.com/)
-* [Docker Hub](https://hub.docker.com/)
+* [CloudFlare](https://www.cloudflare.com/)
+* [Fathom Analytics](https://usefathom.com/) (if you want analytics)
 * [GitHub](https://github.com/)
+* [Namecheap](https://www.namecheap.com/)
+* [PagerDuty](https://www.pagerduty.com/) (if you want alerts)
 
 ## Configure accounts
+### GitHub
+
+Fork the Riju repository under your account.
+
+### PagerDuty
+
+Set up notification rules as desired. Configure the AWS CloudWatch
+integration and obtain an integration URL.
+
 ### AWS
 
 You need to generate an access key with sufficient permission to apply
@@ -23,24 +40,35 @@ don't already know your way around IAM is:
 * Attach the "AdministratorAccess" policy
 * Copy and save the access key ID and secret access key
 
-You also need to create an S3 bucket to store Terraform's state. Go to
-[S3 in
-us-west-1](https://s3.console.aws.amazon.com/s3/home?region=us-west-1#)
-and create a new bucket called `riju-yourname-tf`.
+You also need to create an S3 bucket to store Terraform state. [Go to
+S3](https://s3.console.aws.amazon.com/s3/home?region=us-west-1),
+select your favorite AWS region, and create a new bucket called
+`riju-yourname-tf`.
 
-### Docker Hub
+Finally, if you don't have a personal SSH key, generate one with
+`ssh-keygen`, and upload the public key (e.g. `~/.ssh/id_rsa.pub`) as
+an [EC2 Key
+Pair](https://us-west-1.console.aws.amazon.com/ec2/v2/home?region=us-west-1#KeyPairs:).
+Remember the name you use for the key pair.
 
-Create a new repository to use for Riju.
+### Namecheap
 
-### GitHub
+Buy a domain name at which to host.
 
-Fork the Riju repository under your account.
+### CloudFlare
+
+Enter your domain name and go through the setup and DNS verification.
+Update the nameserver settings on Namecheap's side, and enable all the
+fun CloudFlare options you'd like.
+
+### Fathom Analytics
+
+Enter your domain name and get a site ID.
 
 ## Install dependencies
 
 * [Docker](https://www.docker.com/)
 * [Git](https://git-scm.com/)
-* [SSH](https://www.openssh.com/)
 
 ## Set up Riju locally
 
@@ -59,164 +87,168 @@ and refer to a [tmux
 cheatsheet](https://danielmiessler.com/study/tmux/) if you are
 unfamiliar with tmux usage.
 
-## Configure your instance
-### AWS
+## Authenticate with AWS
 
-Sign in locally to the AWS CLI by running
+Run `aws configure` and enter your IAM access credentials and your
+preferred AWS region.
 
-    $ aws configure
+## Create local configuration (part 1 of 3)
 
-and entering the access key that you generated on AWS. The default
-region is unimportant, although you may want to set it to `us-west-1`
-because this is where Riju is configured to be deployed and having
-that be consistent with your default command-line environment may
-reduce confusion.
-
-### Password
-
-You need an administrator password that will be used for `sudo` access
-on the production instance of Riju. You can generate one using `pwgen
--s 20 1`.
-
-### SSH keys
-
-You need two keys. One is used for administrator login on the
-production instance, and the other is used to trigger deployments. You
-can use your personal SSH key, if you already have one, for the admin
-key. However, you should definitely generate a new key for
-deployments. To generate an SSH key, use the `ssh-keygen` utility.
-
-Place both keys in `~/.ssh`. This directory is automatically mounted
-into the admin shell at `/home/riju/.ssh`.
-
-### Additional configuration
-
-You also need to have:
-
-* The name of the Docker Hub repository that you created earlier (e.g.
-  `raxod502/riju`).
-* The base name of the S3 bucket(s) for Riju that will be created in
-  your AWS account. The official buckets use prefix `riju`, but since
-  S3 buckets must be globally unique you should use `riju-yourname`.
-
-With configuration in hand, create a file `.env` in the Riju directory
-with the following contents, adjusting the values to match your
-configuration:
+Create a file `.env` in the Riju directory with the following
+contents, referring to the following sub-sections for how to fill in
+the values properly:
 
 ```
+# Packer
 ADMIN_PASSWORD=50M9QDBtkQLV6zFAwhVg
-ADMIN_SSH_PUBLIC_KEY_FILE=/home/riju/.ssh/id_rsa.pub
-DEPLOY_SSH_PUBLIC_KEY_FILE=/home/riju/.ssh/id_rsa_riju_deploy.pub
-DOCKER_REPO=raxod502/riju
-S3_BUCKET=riju-yourname
+FATHOM_SITE_ID=
+SUPERVISOR_ACCESS_TOKEN=5ta2qzMFS417dG9gbfcMgjsbDnGMI4
 ```
 
-## Create infrastructure
+### ADMIN\_PASSWORD
 
-Run `make env` in the admin shell to start a subshell with environment
-variables set from `.env`. Your first step will be to create an
-[AMI](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html)
-for Riju.
+This will be the `sudo` password for Riju server nodes. Generate one
+randomly with `pwgen -s 20 1`.
 
-```
-$ cd packer
-$ packer build config.json
-```
+### FATHOM\_SITE\_ID
 
-This will take several minutes. Note the name of the AMI that is
-printed, and add a corresponding line to `.env`:
+This is the site ID from your Fathom Analytics account. If you don't
+need analytics, just leave this unset.
 
-```
-AMI_NAME=riju-1609531301
-```
+### SUPERVISOR\_ACCESS\_TOKEN
 
-Next, we will create the rest of the infrastructure.
+This is a static shared secret used for the Riju server's supervisor
+API. Generate one randomly with `pwgen -s 30 1`.
 
-```
-$ cd ../tf
-$ terraform init -backend-config="bucket=riju-yourname-tf"
-$ terraform apply
-```
+## Build AMI
 
-This will print out the IP address of your newly provisioned server,
-as well as permission-limited AWS credentials for use in CI. Add a
-line to `.env` with the IP address:
+You'll want to run `make env` to load in the new variables from
+`.env`. Now run `make packer`. This will take up to 10 minutes to
+build a timestamped AMI with a name like `riju-20210711223158`.
+
+## Create local configuration (part 2 of 3)
+
+Add to `.env` the following contents:
 
 ```
-DOMAIN=54.183.183.91
+# Terraform
+AMI_NAME=riju-20210711223158
+AWS_REGION=us-west-1
+S3_BUCKET=yourname-riju
+SSH_KEY_NAME=something
 ```
 
-## Bootstrap server
+### AMI\_NAME
 
-Your newly provisioned server also isn't running anything yet.
-You'll want to bootstrap it with the official image to make sure
-everything is in working order:
+This is the AMI name from the Packer build.
+
+### AWS\_REGION
+
+This is the region in which most Terraform infrastructure will be
+created. It should be the same as the default region you configured
+for the AWS CLI. It doesn't have to be the same as the region in which
+your Terraform state bucket is configured, although it simplifies
+matters to keep them in the same region.
+
+The main utility of having this as an explicit environment variable is
+that Terraform respects it and won't always ask you what region to
+use.
+
+### S3\_BUCKET
+
+This is the name of the S3 bucket that will be used to store Riju
+build artifacts (aside from Docker images). It needs to be globally
+unique, so `yourname-riju` is a good choice.
+
+### SSH\_KEY\_NAME
+
+This is the name of the EC2 Key Pair you created in the AWS console.
+You'll use it to connect to the development server.
+
+## Set up Terraform infrastructure
+
+Run `make env` again to load in the new variables from `.env`.
+
+Now run `terraform init` and fill in the appropriate region and bucket
+name for the Terraform state bucket you created in the AWS console.
+
+At this point you can run `terraform apply` to create all the needed
+infrastructure. Caution! At this point you probably want to go to the
+EC2 console and stop the dev server. It is very expensive and will
+rack up a few hundred dollars a month of compute. You should only have
+it running when you're actively working on Riju.
+
+## Finish AWS configuration
+
+Go back to the AWS console and take care of a few loose ends:
+
+* If you want, register a [custom public registry alias for
+  ECR](https://us-west-1.console.aws.amazon.com/ecr/registries?region=us-west-1).
+  This will make your public registry URL easier to remember.
+* In the "View push commands" modal dialogs, take note of the
+  repository URLs for your public and private Riju ECR repositories.
+* If you want alerts, [create an SNS
+  subscription](https://us-west-1.console.aws.amazon.com/sns/v3/home?region=us-west-1#/subscriptions)
+  from the Riju SNS topic to the PagerDuty integration URL.
+
+## Create local configuration (part 3 of 3)
+
+Add to `.env` the following contents:
 
 ```
-$ ./tools/deploy.bash raxod502/riju:app
+# Build
+DOCKER_REPO=800516322591.dkr.ecr.us-west-1.amazonaws.com/riju
+PUBLIC_DOCKER_REPO=public.ecr.aws/yourname/riju
 ```
 
-This may take a while. After it's finished, however, you should be
-able to navigate to the IP address of your server in a browser and see
-Riju up and running.
+### DOCKER\_REPO
 
-## Bootstrap S3
+This is the URL for your private ECR repository.
 
-You probably don't want to build all of Riju's languages from scratch
-when deploying a modified version, since that would take a long time.
-You can avoid it by copying the latest built languages from Riju's
-production S3 bucket. This will be fastest if you SSH into your
-production server, which lives in AWS:
+### PUBLIC\_DOCKER\_REPO
+
+This is the URL for your public ECR repository.
+
+## Configure DNS
+
+Obtain the DNS record for Riju's ALB from `terraform output` and
+install it as a proxied CNAME record in CloudFlare DNS for your apex
+domain. After DNS propagates, you should now be able to receive a 502
+from Riju with no body content.
+
+## Set up dev server
+
+The dev server is provisioned with a fresh Ubuntu AMI. You probably
+want to clone your repository up there, enable SSH agent forwarding,
+etc. Doing a full build on your laptop is feasible, but unless you
+have symmetric gigabit ethernet you're not going to get all the build
+artifacts uploaded in less than a week.
+
+## Build and deploy
+
+Invoke Depgraph:
 
 ```
-$ ssh admin@your-ip-address
-$  export AWS_ACCESS_KEY_ID=...
-$  export AWS_SECRET_ACCESS_KEY=...
-$ aws s3 cp --recursive --source-region us-west-1 s3://riju-debs s3://riju-yourname-debs
+$ dep deploy:live --publish
 ```
+
+After innumerable hours of build time (and probably some debugging to
+fix languages that have broken since the last full build), Riju
+should(tm) be live on your domain. You can connect to the live server
+using EC2 Instance Connect by retrieving its instance ID from the AWS
+console and running `mssh admin@i-theinstanceid`. Then you can check
+(using the previously configured admin password) `sudo journalctl -efu
+riju` to see the supervisor logs.
 
 ## Set up CI
 
-Go to [CircleCI](https://app.circleci.com/dashboard) and enable builds
-for your fork of Riju. In the project settings, configure the
-following environment variables:
+In your GitHub repo settings, create the secrets `AWS_ACCESS_KEY_ID`
+and `AWS_SECRET_ACCESS_KEY` with the values from `terraform output
+-json`. GitHub Actions should be good to go! However, I would
+recommend doing builds from the EC2 dev server when you need to
+rebuild a lot of artifacts.
 
-* `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`: the AWS access
-  credentials generated by Terraform
-* `DEPLOY_SSH_PRIVATE_KEY`: base64-encoded SSH private key, e.g. from
-  `base64 -w0 ~/.ssh/id_rsa_riju_deploy`
-* `DOCKER_REPO`: same as in `.env`
-* `DOCKER_USERNAME` and `DOCKER_PASSWORD`: your credentials for Docker
-  Hub
-* `DOMAIN`: same as in `.env`
-* `S3_BUCKET`: same as in `.env`
-
-You should now be able to trigger a build and see the production
-instance updated automatically with a newly built image.
-
-## Enable TLS
-
-By default Riju will serve HTTP traffic if a TLS certificate is not
-available. You can fix this. First, you'll need a domain name (or
-subdomain on an existing domain). If you don't have one, you can buy
-one at e.g. [Namecheap](https://www.namecheap.com/).
-
-In your domain registrar's configuration interface, go to the
-manual/advanced DNS settings and create an A record for your domain
-pointing at your server's IP address. (To point the top-level domain
-at Riju, set the host to `@`; to point a subdomain
-`foo.yourdomain.io`, set the host to `foo`.)
-
-Now SSH into the production server and run:
-
-```
-$ sudo systemctl stop riju
-$ sudo certbot certonly --standalone
-$ riju-install-certbot-hooks
-$ sudo systemctl start riju
-```
-
-Alternatively, if you have an existing Certbot certificate you'd like
-to transfer to the new server, you can copy over the entire
-`/etc/letsencrypt` direction exactly as it stands, and run
-`riju-install-certbot-hooks`.
+You'll also want to go to `.github/workflows/main.yml` and update the
+environment variables `AWS_REGION`, `DOCKER_REPO`,
+`PUBLIC_DOCKER_REPO`, and `S3_BUCKET` as appropriate for your own
+deployment (see the `.env` file you created earlier).

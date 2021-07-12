@@ -23,8 +23,8 @@
      window.rijuConfig = <%- JSON.stringify(config) %>;
     </script>
     <script src="/js/app.js"></script>
-    <% if (analyticsEnabled) { %>
-      <script src="https://cdn.usefathom.com/script.js" site="JOBZEHJE" defer></script>
+    <% if (fathomSiteId) { %>
+      <script src="https://cdn.usefathom.com/script.js" data-site="<%= fathomSiteId %>" defer></script>
     <% } %>
   </body>
 </html>

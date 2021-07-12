@@ -19,7 +19,7 @@ function parseIntOr(thing, def) {
   return Number.isNaN(num) ? def : num;
 }
 
-const TIMEOUT = parseIntOr(process.env.TEST_TIMEOUT_SECS, 15);
+const TIMEOUT = parseIntOr(process.env.TEST_TIMEOUT_SECS, 30);
 const PATIENCE = parseIntOr(process.env.TEST_PATIENCE, 1);
 const CONCURRENCY = parseIntOr(process.env.TEST_CONCURRENCY, 2);
 

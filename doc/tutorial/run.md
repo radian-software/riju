@@ -166,3 +166,26 @@ template: |
 run: |
   zoem -I main.azm; zoem
 ```
+
+## Required input
+
+Sometimes languages really don't want to provide a way to run code
+noninteractively. In this case, you can include instructions about how
+the user can manually run the code:
+
+```
+repl: |
+  hhvm -a
+input: |
+  print 123 * 234
+
+main: "main.hack"
+template: |
+  <<__EntryPoint>>
+  function main(): void {
+    echo "Hello, world!\n";
+  }
+
+run: |
+  echo "Type 'r' at the debugger prompt to run the code" && hhvm -a main.hack
+```

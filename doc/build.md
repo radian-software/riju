@@ -4,6 +4,39 @@ Riju's build system is complex and takes some time to explain. Bear
 with me. (If you just want to add or modify a language, you can read
 the [tutorial](tutorial.md) instead.)
 
+## Depgraph
+
+The high level interface to Riju's build system is a tool called
+Depgraph, which knows about all the build artifacts and has advanced
+mechanisms for determining which of them need to rebuild based on
+content hashes. Normally you can just use Depgraph to build the
+artifacts you need. However, in some cases you may want to interact
+with the lower level for more precise operations. This is done via
+Makefile. (Furthermore, there are a few one-off artifacts such as the
+admin image which are not part of the main build system, which means
+that they are managed directly by Makefile.)
+
+### Available build artifacts
+
+
+
+### Usage of Depgraph
+
+```
+$ dep --help
+Usage: dep <target>...
+
+Options:
+  --list         list available artifacts; ignore other arguments
+  --manual       operate explicitly on manual artifacts
+  --hold-manual  prefer local versions of manual artifacts
+  --all          do not skip unneeded intermediate artifacts
+  --local-only   do not fetch artifacts from remote registries
+  --publish      publish artifacts to remote registries
+  --yes          execute plan without confirmation
+  -h, --help     display help for command
+```
+
 To get a quick overview, run `make help`.
 
 ## Build artifacts

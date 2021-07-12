@@ -48,6 +48,15 @@ keybindings are:
   use `control-b` twice to do a command on the inner one instead of
   the outer one
 
+## Fetch base Ubuntu image
+
+Make sure you're using the same version of Ubuntu as the mainline
+Riju:
+
+```
+$ make sync-ubuntu
+```
+
 ## Start Riju server
 
 Use `dep`, the Riju build tool, to compile the Docker image that the
@@ -105,7 +114,7 @@ language:
 
 * [Install your language](tutorial/install.md)
 * [Provide run commands](tutorial/run.md)
-* [Configure tests](tutorial/tests.md)
-* [Provide metadata](tutorial/metadata.md)
 * [Add code formatter](tutorial/formatter.md)
 * [Add language server](tutorial/lsp.md)
+* [Configure tests](tutorial/tests.md)
+* [Provide metadata](tutorial/metadata.md)

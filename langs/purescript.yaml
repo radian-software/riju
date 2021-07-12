@@ -17,29 +17,38 @@ install:
     - purescript
     - spago
   manual: |
-    install -d "${pkg}/opt/purescript"
+    install -d "${pkg}/opt/purescript/skel-home"
+    install -d "${pkg}/opt/purescript/skel-src"
 
-    mkdir skel
-    pushd skel
     spago init -C
     rm -rf .gitignore test
     sed -i 's#, "test/\*\*/\*\.purs"##' spago.dhall
-    cat <<"EOF" > src/Main.spago
+
+    cat <<"EOF" > src/Main.purs
+    module Main where
+
     import Prelude
 
     import Effect (Effect)
+    import Effect.Console (log)
 
     main :: Effect Unit
-    main = pure unit
+    main = log "Hello, world!"
     EOF
+
     spago build
     spago repl < /dev/null
+
     rm -rf src
-    popd
-    cp -R skel "${pkg}/opt/purescript/"
+
+    shopt -s dotglob
+    cp -R --preserve=timestamps * "${pkg}/opt/purescript/skel-src/"
+    cp -R --preserve=timestamps "${HOME}/.cache" "${pkg}/opt/purescript/skel-home/"
 
 setup: |
-  shopt -s dotglob; cp -R /opt/purescript/skel/* "$PWD/"
+  shopt -s dotglob
+  cp -R --preserve=timestamps /opt/purescript/skel-home/* "${HOME}/"
+  cp -R --preserve=timestamps /opt/purescript/skel-src/* "${PWD}/"
 
 repl: |
   spago repl

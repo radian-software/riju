@@ -20,7 +20,7 @@ install:
 repl: |
   abc
 input: |
-  DELAY: 1
+  DELAY: 2
   WRITE 123 * 234
 
 main: "main.abc"

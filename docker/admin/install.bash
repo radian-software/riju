@@ -48,6 +48,7 @@ moreutils
 nodejs
 packer
 psmisc
+python3-pip
 pwgen
 skopeo
 ssh
@@ -64,6 +65,8 @@ yarn
 
 apt-get update
 apt-get install -y $(sed 's/#.*//' <<< "${packages}")
+
+pip3 install ec2instanceconnectcli
 
 wget -nv https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -O awscli.zip
 unzip -q awscli.zip

@@ -1,7 +1,6 @@
 terraform {
   backend "s3" {
     key    = "state"
-    region = "us-west-1"
   }
   required_providers {
     aws = {
@@ -30,7 +29,6 @@ locals {
 }
 
 provider "aws" {
-  region = "us-west-1"
   default_tags {
     tags = local.tags
   }

@@ -276,7 +276,7 @@ async function getDeployLiveArtifact(langs) {
     dependencies: ["deploy:ready"],
     publishTarget: true,
     publishToRegistry: async () => {
-      await runCommand(`make deploy`);
+      await runCommand(`make deploy-latest`);
     },
   };
 }
@@ -679,7 +679,7 @@ async function main() {
   if (program.args.length === 0) {
     program.help({ error: true });
   }
-  await runCommand("make all-scripts");
+  await runCommand("make all-scripts system");
   await executeDepGraph({
     depgraph,
     manual,
