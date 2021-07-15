@@ -1,0 +1,53 @@
+id: "coconut"
+aliases:
+  - "coco"
+  - "coconutlang"
+  - "coconut-lang"
+name: "Coconut"
+monacoLang: python
+
+info:
+  year: 2014
+  desc: "Simple, elegant, Pythonic functional programming"
+  ext:
+    - coco
+  web:
+    home: "https://coconut-lang.org/"
+    source: "https://github.com/evhub/coconut"
+  category: general
+  mode: interpreted
+  platform: python
+  syntax:
+    - haskell
+    - python
+    - whitespace
+  typing: dynamic
+  paradigm:
+    - functional
+    - imperative
+    - oo
+  usage: []
+
+install:
+  pip:
+    - coconut
+
+repl: |
+  coconut
+input: |
+  DELAY: 3
+  123 * 234
+
+main: "main.coco"
+template: |
+  print("Hello, world!")
+
+run: |
+  coconut -i main.coco
+
+scope:
+  code: |
+    x = 123 * 234
+  input: |
+    DELAY: 3
+    x
