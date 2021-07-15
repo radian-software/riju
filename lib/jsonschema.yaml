@@ -438,6 +438,7 @@ properties:
                   - apl
               - const: haskell
               - const: lisp
+              - const: lua
               - const: pascal
               - const: python
               - const: text
