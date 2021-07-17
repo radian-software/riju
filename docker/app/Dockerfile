@@ -30,5 +30,4 @@ COPY --chown=riju:riju --from=build /src ./
 RUN chown root:riju system/out/*-privileged && chmod a=,g=rx,u=rwxs system/out/*-privileged
 
 USER riju
-CMD ["make", "server"]
-ENV RIJU_ASSUME_SINGLE_PROCESS 1
+CMD make server 2>&1 | ts
