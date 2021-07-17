@@ -8,5 +8,9 @@ function verbosely {
 }
 
 cd supervisor
-mkdir -p out
+mkdir -p build/go out
+
+export GOCACHE="$PWD/build/go/cache"
+export GOMODCACHE="$PWD/build/go/mod"
+
 verbosely go build -o out/riju-supervisor ./src
