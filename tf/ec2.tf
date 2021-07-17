@@ -57,6 +57,7 @@ resource "aws_instance" "dev_server" {
   lifecycle {
     ignore_changes = [
       ami,
+      instance_state,
       security_groups, # legacy
     ]
   }

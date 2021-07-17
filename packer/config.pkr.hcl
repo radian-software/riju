@@ -38,9 +38,19 @@ source "amazon-ebs" "ubuntu" {
   source_ami    = "${data.amazon-ami.ubuntu.id}"
   ssh_username  = "ubuntu"
 
-  tags {
-    BillingCategory = "Riju"
-    BillingCategory = "Riju:AMI"
+  tag {
+    key = "BillingCategory"
+    value = "Riju"
+  }
+
+  tag {
+    key = "BillingSubcategory"
+    value = "Riju:AMI"
+  }
+
+  tag {
+    key = "Name"
+    value = "riju-${local.timestamp}"
   }
 }
 

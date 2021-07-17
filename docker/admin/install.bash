@@ -49,7 +49,6 @@ man
 moreutils
 nodejs
 packer
-prettier
 psmisc
 python3-pip
 pwgen
