@@ -26,7 +26,7 @@ install:
 
       const args = process.argv.slice(2);
       if (args.length > 1) {
-        console.error("usage: repl.js [FILE]");
+        console.error("usage: cat-lang [FILE]");
         process.exit(1);
       }
 
