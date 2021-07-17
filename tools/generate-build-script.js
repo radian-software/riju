@@ -41,16 +41,8 @@ function makeLangScript(langConfig, isShared) {
       deb,
     } = install;
     if (prepare) {
-      const {
-        preface,
-        cert,
-        aptKey,
-        aptRepo,
-        apt,
-        npm,
-        opam,
-        manual,
-      } = prepare;
+      const { preface, cert, aptKey, aptRepo, apt, npm, opam, manual } =
+        prepare;
       if (preface) {
         prefaceParts.push(preface);
       }
@@ -450,9 +442,11 @@ export async function generateBuildScript({ lang, type }) {
   const buildScriptPath = `build/${type}/${lang}/build.bash`;
   const installScriptPath = `build/${type}/${lang}/install.bash`;
   await Promise.all([
-    fs.writeFile(buildScriptPath, buildScript + "\n")
+    fs
+      .writeFile(buildScriptPath, buildScript + "\n")
       .then(() => fs.chmod(buildScriptPath, 0o755)),
-    fs.writeFile(installScriptPath, installScript + "\n")
+    fs
+      .writeFile(installScriptPath, installScript + "\n")
       .then(() => fs.chmod(installScriptPath, 0o755)),
   ]);
 }
@@ -462,10 +456,7 @@ async function main() {
   const program = new Command();
   program
     .requiredOption("--lang <id>", "language ID")
-    .requiredOption(
-      "--type <value>",
-      "package category (lang or shared)"
-    );
+    .requiredOption("--type <value>", "package category (lang or shared)");
   program.parse(process.argv);
   await generateBuildScript(program.opts());
   process.exit(0);

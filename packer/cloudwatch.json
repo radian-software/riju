@@ -16,24 +16,16 @@
     ],
     "metrics_collected": {
       "cpu": {
-        "measurement": [
-          "usage_active"
-        ],
+        "measurement": ["usage_active"],
         "metrics_collection_interval": 60
       },
       "disk": {
-        "measurement": [
-          "used_percent"
-        ],
+        "measurement": ["used_percent"],
         "metrics_collection_interval": 60,
-        "resources": [
-          "*"
-        ]
+        "resources": ["*"]
       },
       "mem": {
-        "measurement": [
-          "mem_used_percent"
-        ],
+        "measurement": ["mem_used_percent"],
         "metrics_collection_interval": 60
       }
     }

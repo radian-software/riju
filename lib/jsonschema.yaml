@@ -6,7 +6,6 @@ type: object
 additionalProperties: false
 required: [id, name, main, template, run]
 properties:
-
   id:
     title: "Canonical language ID"
     description: |

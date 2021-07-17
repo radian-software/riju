@@ -31,14 +31,14 @@ resource "aws_security_group" "dev_server" {
 resource "aws_instance" "dev_server" {
   count = local.ssh_key_available ? 1 : 0
 
-  ami = data.aws_ami.ubuntu[count.index].id
+  ami           = data.aws_ami.ubuntu[count.index].id
   instance_type = "t3.2xlarge"
   ebs_optimized = true
 
   security_groups = [aws_security_group.dev_server[count.index].name]
 
   iam_instance_profile = aws_iam_instance_profile.dev_server.name
-  key_name = data.external.env.result.SSH_KEY_NAME
+  key_name             = data.external.env.result.SSH_KEY_NAME
 
   root_block_device {
     volume_size = 256
@@ -56,7 +56,7 @@ resource "aws_instance" "dev_server" {
   lifecycle {
     ignore_changes = [
       ami,
-      security_groups,  # legacy
+      security_groups, # legacy
     ]
   }
 }
@@ -69,7 +69,7 @@ resource "aws_eip" "dev_server" {
 }
 
 resource "aws_eip_association" "dev_server" {
-  count = local.ssh_key_available ? 1 : 0
-  instance_id = aws_instance.dev_server[count.index].id
+  count         = local.ssh_key_available ? 1 : 0
+  instance_id   = aws_instance.dev_server[count.index].id
   allocation_id = aws_eip.dev_server[count.index].id
 }

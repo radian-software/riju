@@ -57,7 +57,7 @@ async function main() {
     { uuid },
     bash(
       `env L='${lang}' LANG_CONFIG=${quote(
-        JSON.stringify(langConfig),
+        JSON.stringify(langConfig)
       )} bash --rcfile <(cat <<< ${quote(sandboxScript)})`
     )
   );

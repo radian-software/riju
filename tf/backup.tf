@@ -6,9 +6,9 @@ resource "aws_backup_plan" "riju" {
   name = "riju"
 
   rule {
-    rule_name = "riju"
+    rule_name         = "riju"
     target_vault_name = aws_backup_vault.riju.name
-    schedule = "cron(0 5 ? * * *)"
+    schedule          = "cron(0 5 ? * * *)"
 
     lifecycle {
       delete_after = 3
@@ -24,8 +24,8 @@ resource "aws_backup_selection" "riju" {
   count = local.ssh_key_available ? 1 : 0
 
   iam_role_arn = aws_iam_role.backup.arn
-  name = "riju"
-  plan_id = aws_backup_plan.riju.id
+  name         = "riju"
+  plan_id      = aws_backup_plan.riju.id
 
   resources = [
     aws_instance.dev_server[count.index].arn,

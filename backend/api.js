@@ -95,7 +95,7 @@ export class Session {
                 event: "serviceLog",
                 service: "container",
                 output: line + "\n",
-              })
+              });
             }
           }
         });
@@ -293,16 +293,8 @@ export class Session {
 
   runCode = async (code) => {
     try {
-      const {
-        name,
-        repl,
-        main,
-        suffix,
-        createEmpty,
-        compile,
-        run,
-        template,
-      } = this.config;
+      const { name, repl, main, suffix, createEmpty, compile, run, template } =
+        this.config;
       if (this.term) {
         try {
           process.kill(this.term.pty.pid);
@@ -433,9 +425,11 @@ export class Session {
   };
 
   ensure = async (cmd) => {
-    const code = (await this.run(this.privilegedExec(cmd), {
-      check: false,
-    })).code;
+    const code = (
+      await this.run(this.privilegedExec(cmd), {
+        check: false,
+      })
+    ).code;
     this.send({ event: "ensured", code });
   };
 

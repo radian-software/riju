@@ -38,13 +38,13 @@ const blueName = "riju-app-blue"
 const greenName = "riju-app-green"
 
 type deploymentConfig struct {
-	AppImageTag string `json:"appImageTag"`
+	AppImageTag   string            `json:"appImageTag"`
 	LangImageTags map[string]string `json:"langImageTags"`
 }
 
 type supervisorConfig struct {
 	AccessToken string `env:"SUPERVISOR_ACCESS_TOKEN,notEmpty"`
-	S3Bucket string `env:"S3_BUCKET,notEmpty"`
+	S3Bucket    string `env:"S3_BUCKET,notEmpty"`
 }
 
 type reloadJob struct {
@@ -56,22 +56,22 @@ type reloadJob struct {
 type supervisor struct {
 	config supervisorConfig
 
-	blueProxyHandler http.Handler
+	blueProxyHandler  http.Handler
 	greenProxyHandler http.Handler
-	isGreen bool  // blue-green deployment
-	deployConfigHash string
+	isGreen           bool // blue-green deployment
+	deployConfigHash  string
 
 	awsAccountNumber string
-	awsRegion string
-	s3 *s3.Client
-	ecr *ecr.Client
+	awsRegion        string
+	s3               *s3.Client
+	ecr              *ecr.Client
 
-	reloadLock sync.Mutex
+	reloadLock       sync.Mutex
 	reloadInProgress bool
-	reloadNeeded bool
-	reloadUUID string
-	reloadNextUUID string
-	reloadJobs map[string]*reloadJob
+	reloadNeeded     bool
+	reloadUUID       string
+	reloadNextUUID   string
+	reloadJobs       map[string]*reloadJob
 }
 
 func (sv *supervisor) status(status string) {
@@ -113,7 +113,7 @@ func (sv *supervisor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "401 malformed Authorization header", http.StatusUnauthorized)
 			return
 		}
-		if authHeader != "Bearer " + sv.config.AccessToken {
+		if authHeader != "Bearer "+sv.config.AccessToken {
 			http.Error(w, "401 wrong access token", http.StatusUnauthorized)
 			return
 		}
@@ -149,11 +149,11 @@ func (sv *supervisor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					http.Error(w, "404 no such job", http.StatusNotFound)
 				}
 			} else if job.active {
-				fmt.Fprintln(w, "active: " + job.status)
+				fmt.Fprintln(w, "active: "+job.status)
 			} else if job.failed {
-				fmt.Fprintln(w, "failed: " + job.status)
+				fmt.Fprintln(w, "failed: "+job.status)
 			} else {
-				fmt.Fprintln(w, "succeeded: " + job.status)
+				fmt.Fprintln(w, "succeeded: "+job.status)
 			}
 			sv.reloadLock.Unlock()
 			return
@@ -256,7 +256,7 @@ func (sv *supervisor) reload() error {
 	buf := s3manager.NewWriteAtBuffer([]byte{})
 	if _, err := dl.Download(context.Background(), buf, &s3.GetObjectInput{
 		Bucket: &sv.config.S3Bucket,
-		Key: aws.String("config.json"),
+		Key:    aws.String("config.json"),
 	}); err != nil {
 		return err
 	}
@@ -575,16 +575,16 @@ func main() {
 	}
 
 	sv := &supervisor{
-		config: supervisorCfg,
-		blueProxyHandler: httputil.NewSingleHostReverseProxy(blueUrl),
+		config:            supervisorCfg,
+		blueProxyHandler:  httputil.NewSingleHostReverseProxy(blueUrl),
 		greenProxyHandler: httputil.NewSingleHostReverseProxy(greenUrl),
-		isGreen: isGreen,
-		deployConfigHash: deployCfgHash,
-		s3: s3.NewFromConfig(awsCfg),
-		ecr: ecr.NewFromConfig(awsCfg),
-		awsRegion: awsCfg.Region,
-		awsAccountNumber: *ident.Account,
-		reloadJobs: map[string]*reloadJob{},
+		isGreen:           isGreen,
+		deployConfigHash:  deployCfgHash,
+		s3:                s3.NewFromConfig(awsCfg),
+		ecr:               ecr.NewFromConfig(awsCfg),
+		awsRegion:         awsCfg.Region,
+		awsAccountNumber:  *ident.Account,
+		reloadJobs:        map[string]*reloadJob{},
 	}
 	go sv.scheduleReload()
 	log.Println("listening on http://0.0.0.0:80")

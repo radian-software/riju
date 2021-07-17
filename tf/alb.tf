@@ -27,30 +27,30 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_lb" "server" {
-  name = "riju-server"
+  name            = "riju-server"
   security_groups = [aws_security_group.alb.id]
-  subnets = data.aws_subnet_ids.default.ids
-  idle_timeout = 3600
+  subnets         = data.aws_subnet_ids.default.ids
+  idle_timeout    = 3600
 }
 
 resource "aws_lb_target_group" "server" {
-  name = "riju-server-http"
-  port = 80
+  name     = "riju-server-http"
+  port     = 80
   protocol = "HTTP"
-  vpc_id = data.aws_vpc.default.id
+  vpc_id   = data.aws_vpc.default.id
 }
 
 resource "aws_lb_listener" "server_http" {
   load_balancer_arn = aws_lb.server.arn
-  port = "80"
-  protocol = "HTTP"
+  port              = "80"
+  protocol          = "HTTP"
 
   default_action {
     type = "redirect"
 
     redirect {
-      port = "443"
-      protocol = "HTTPS"
+      port        = "443"
+      protocol    = "HTTPS"
       status_code = "HTTP_301"
     }
   }
@@ -58,13 +58,13 @@ resource "aws_lb_listener" "server_http" {
 
 resource "aws_lb_listener" "server_https" {
   load_balancer_arn = aws_lb.server.arn
-  port = "443"
-  protocol = "HTTPS"
-  ssl_policy = "ELBSecurityPolicy-2016-08"
-  certificate_arn = aws_acm_certificate.riju.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate.riju.arn
 
   default_action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.server.arn
   }
 }
@@ -73,5 +73,5 @@ resource "aws_autoscaling_attachment" "server" {
   count = local.ami_available ? 1 : 0
 
   autoscaling_group_name = aws_autoscaling_group.server[count.index].name
-  alb_target_group_arn = aws_lb_target_group.server.arn
+  alb_target_group_arn   = aws_lb_target_group.server.arn
 }

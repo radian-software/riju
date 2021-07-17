@@ -15,15 +15,16 @@ async function getDeployConfig() {
       langs.map(async (lang) => [
         lang,
         `lang-${lang}-` +
-         (await getLocalImageLabel(`riju:lang-${lang}`, "riju.image-hash")),
+          (await getLocalImageLabel(`riju:lang-${lang}`, "riju.image-hash")),
       ])
     )
   );
-  const appImageTag = `app-` + await getLocalImageLabel(`riju:app`, "riju.image-hash");
+  const appImageTag =
+    `app-` + (await getLocalImageLabel(`riju:app`, "riju.image-hash"));
   return {
     appImageTag,
     langImageTags,
-  }
+  };
 }
 
 // Parse command-line arguments, run main functionality, and exit.
@@ -31,7 +32,10 @@ async function main() {
   const program = new Command();
   program.parse(process.argv);
   await fs.mkdir("build", { recursive: true });
-  await fs.writeFile("build/config.json", JSON.stringify(await getDeployConfig(), null, 2) + "\n");
+  await fs.writeFile(
+    "build/config.json",
+    JSON.stringify(await getDeployConfig(), null, 2) + "\n"
+  );
   console.log("wrote build/config.json");
   process.exit(0);
 }

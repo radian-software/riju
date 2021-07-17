@@ -32,7 +32,9 @@ packages="
 
 apt-file
 bind9-dnsutils
+black
 clang
+clang-format
 dctrl-tools
 docker-ce-cli
 g++
@@ -47,6 +49,7 @@ man
 moreutils
 nodejs
 packer
+prettier
 psmisc
 python3-pip
 pwgen
@@ -67,6 +70,8 @@ apt-get update
 apt-get install -y $(sed 's/#.*//' <<< "${packages}")
 
 pip3 install ec2instanceconnectcli
+
+npm install -g prettier
 
 wget -nv https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -O awscli.zip
 unzip -q awscli.zip

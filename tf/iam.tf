@@ -104,13 +104,13 @@ resource "aws_iam_user_policy_attachment" "deploy" {
 }
 
 resource "aws_iam_role" "deploy" {
-  name = "riju-deploy"
-  description = "Role used by CI and deployment"
+  name               = "riju-deploy"
+  description        = "Role used by CI and deployment"
   assume_role_policy = data.aws_iam_policy_document.deploy_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "deploy" {
-  role = aws_iam_role.deploy.name
+  role       = aws_iam_role.deploy.name
   policy_arn = aws_iam_policy.deploy.arn
 }
 
@@ -148,9 +148,9 @@ data "aws_iam_policy_document" "server" {
 }
 
 resource "aws_iam_policy" "server" {
-  name = "riju-server"
+  name        = "riju-server"
   description = "Policy granting supervisor process on Riju server ability to download from S3"
-  policy = data.aws_iam_policy_document.server.json
+  policy      = data.aws_iam_policy_document.server.json
 }
 
 data "aws_iam_policy_document" "server_assume_role" {
@@ -169,23 +169,23 @@ data "aws_iam_policy_document" "server_assume_role" {
 }
 
 resource "aws_iam_role" "server" {
-  name = "riju-server"
-  description = "Role used by supervisor process on Riju server"
+  name               = "riju-server"
+  description        = "Role used by supervisor process on Riju server"
   assume_role_policy = data.aws_iam_policy_document.server_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "server" {
-  role = aws_iam_role.server.name
+  role       = aws_iam_role.server.name
   policy_arn = aws_iam_policy.server.arn
 }
 
 resource "aws_iam_role_policy_attachment" "server_cloudwatch" {
-  role = aws_iam_role.server.name
+  role       = aws_iam_role.server.name
   policy_arn = data.aws_iam_policy.cloudwatch.arn
 }
 
 resource "aws_iam_role_policy_attachment" "server_ssm" {
-  role = aws_iam_role.server.name
+  role       = aws_iam_role.server.name
   policy_arn = data.aws_iam_policy.ssm.arn
 }
 
@@ -207,9 +207,9 @@ data "aws_iam_policy_document" "dev_server" {
 }
 
 resource "aws_iam_policy" "dev_server" {
-  name = "riju-dev-server"
+  name        = "riju-dev-server"
   description = "Policy granting AWS administrative access from dev server"
-  policy = data.aws_iam_policy_document.dev_server.json
+  policy      = data.aws_iam_policy_document.dev_server.json
 }
 
 data "aws_iam_policy_document" "dev_server_assume_role" {
@@ -228,13 +228,13 @@ data "aws_iam_policy_document" "dev_server_assume_role" {
 }
 
 resource "aws_iam_role" "dev_server" {
-  name = "riju-dev-server"
-  description = "Role used by Riju dev server"
+  name               = "riju-dev-server"
+  description        = "Role used by Riju dev server"
   assume_role_policy = data.aws_iam_policy_document.dev_server_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "dev_server" {
-  role = aws_iam_role.dev_server.name
+  role       = aws_iam_role.dev_server.name
   policy_arn = aws_iam_policy.dev_server.arn
 }
 
@@ -259,8 +259,8 @@ data "aws_iam_policy_document" "backup_assume_role" {
 }
 
 resource "aws_iam_role" "backup" {
-  name = "riju-backup"
-  description = "Role used by AWS Backup for Riju"
+  name               = "riju-backup"
+  description        = "Role used by AWS Backup for Riju"
   assume_role_policy = data.aws_iam_policy_document.backup_assume_role.json
 }
 
@@ -273,11 +273,11 @@ data "aws_iam_policy" "backup_restores" {
 }
 
 resource "aws_iam_role_policy_attachment" "backup" {
-  role = aws_iam_role.backup.name
+  role       = aws_iam_role.backup.name
   policy_arn = data.aws_iam_policy.backup.arn
 }
 
 resource "aws_iam_role_policy_attachment" "backup_restores" {
-  role = aws_iam_role.backup.name
+  role       = aws_iam_role.backup.name
   policy_arn = data.aws_iam_policy.backup_restores.arn
 }

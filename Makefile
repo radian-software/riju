@@ -255,6 +255,25 @@ deploy-latest: # Upload deployment config to S3 and update ASG instances
 
 deploy: deploy-config deploy-latest # Shorthand for deploy-config followed by deploy-latest
 
+### Code formatting
+
+fmt-c: # Format C code
+	git ls-files | grep -E '\.c$$' | xargs clang-format -i
+
+fmt-go: # Format Go code
+	git ls-files | grep -E '\.go$' | xargs gofmt -l -w
+
+fmt-python: # Format Python code
+	git ls-files | grep -E '\.py$$' | xargs black -q
+
+fmt-terraform: # Format Terraform code
+	terraform fmt "$(PWD)/tf"
+
+fmt-web: # Format CSS, JSON, and YAML code
+	git ls-files | grep -E '\.(|css|c?js|json|ya?ml)$$' | grep -Ev '^(langs|shared)/' | xargs prettier --write --loglevel=warn
+
+fmt: fmt-c fmt-go fmt-python fmt-terraform fmt-web # Format all code
+
 ### Infrastructure
 
 packer: supervisor # Build and publish a new AMI

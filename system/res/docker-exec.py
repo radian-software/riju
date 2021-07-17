@@ -6,6 +6,7 @@ import subprocess
 import sys
 import uuid
 
+
 class Parser(argparse.ArgumentParser):
     def format_help(self):
         return """
@@ -18,6 +19,7 @@ Options:
   -t, --tty           Allocate a pseudo-TTY
   -u, --user string   Username or UID (format: <name|uid>:[<group|gid>])
 """
+
 
 parser = Parser()
 parser.add_argument("-i", "--interactive", action="store_true")
@@ -34,20 +36,23 @@ pidfile = pidfiles + "/" + str(uuid.uuid4()).replace("-", "")
 # We have to use 'kill -9' here, otherwise runuser intercepts the
 # signal and takes its sweet time cleaning up.
 def cleanup(*ignored_args):
-    subprocess.run([
-        "docker",
-        "exec",
-        args.container,
-        "bash",
-        "-c",
-        f"""
+    subprocess.run(
+        [
+            "docker",
+            "exec",
+            args.container,
+            "bash",
+            "-c",
+            f"""
 set -euo pipefail
 if [[ -f '{pidfile}' ]]; then
     kill -9 -$(< '{pidfile}') 2>/dev/null || true
     rm -f '{pidfile}'
 fi
-        """
-    ])
+        """,
+        ]
+    )
+
 
 signal.signal(signal.SIGINT, cleanup)
 signal.signal(signal.SIGTERM, cleanup)
@@ -64,21 +69,25 @@ runuser_args = []
 if args.user:
     runuser_args = ["runuser", "-u", args.user, "--"]
 
-sys.exit(subprocess.run([
-    "docker",
-    "exec",
-    *exec_args,
-    args.container,
-    "bash",
-    "-c",
-    f"""
+sys.exit(
+    subprocess.run(
+        [
+            "docker",
+            "exec",
+            *exec_args,
+            args.container,
+            "bash",
+            "-c",
+            f"""
 set -euo pipefail
 umask 077
 mkdir -p '{pidfiles}'
 echo "$$" > '{pidfile}'
 exec "$@"
     """,
-    "--",
-    *runuser_args,
-    *args.arg,
-]).returncode)
+            "--",
+            *runuser_args,
+            *args.arg,
+        ]
+    ).returncode
+)

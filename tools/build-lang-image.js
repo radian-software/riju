@@ -27,15 +27,22 @@ async function main() {
   program.option("--debug", "interactive debugging");
   program.parse(process.argv);
   const { lang, debug } = program.opts();
-  const sharedDeps = await getSharedDepsForLangConfig(await readLangConfig(lang));
+  const sharedDeps = await getSharedDepsForLangConfig(
+    await readLangConfig(lang)
+  );
   const installContents = await fs.readFile(
     `build/lang/${lang}/install.bash`,
     "utf-8"
   );
-  const sharedInstallContents = await Promise.all(sharedDeps.map(
-    async (name) => fs.readFile(`build/shared/${name}/install.bash`),
-  ));
-  const allInstallContents = [].concat.apply([installContents], sharedInstallContents);
+  const sharedInstallContents = await Promise.all(
+    sharedDeps.map(async (name) =>
+      fs.readFile(`build/shared/${name}/install.bash`)
+    )
+  );
+  const allInstallContents = [].concat.apply(
+    [installContents],
+    sharedInstallContents
+  );
   const hash = await hashDockerfile(
     "lang",
     {
@@ -52,9 +59,9 @@ async function main() {
             )
           )
         ).sort(),
-        installHash: allInstallContents.map(
-          (c) => crypto.createHash("sha1").update(c).digest("hex"),
-        ).join(""),
+        installHash: allInstallContents
+          .map((c) => crypto.createHash("sha1").update(c).digest("hex"))
+          .join(""),
       },
     }
   );

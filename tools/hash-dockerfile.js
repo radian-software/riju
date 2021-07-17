@@ -139,9 +139,9 @@ async function encodeDockerfile(name, dependentHashes, opts) {
           }
           step.context = await Promise.all(
             sources.map(async (source) =>
-              (await listFiles(source)).filter(
-                (entry) => !ignore.ignores(entry.path)
-              )
+              (
+                await listFiles(source)
+              ).filter((entry) => !ignore.ignores(entry.path))
             )
           );
           break;

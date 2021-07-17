@@ -44,4 +44,7 @@ async function updateLangsFromDisk() {
 
 export const langsPromise = updateLangsFromDisk().then(() => langs);
 
-export const langWatcher = fsOrig.watch("langs", debounce(updateLangsFromDisk, 200));
+export const langWatcher = fsOrig.watch(
+  "langs",
+  debounce(updateLangsFromDisk, 200)
+);

@@ -318,32 +318,8 @@ class Test {
                 dynamicRegistration: true,
                 symbolKind: {
                   valueSet: [
-                    1,
-                    2,
-                    3,
-                    4,
-                    5,
-                    6,
-                    7,
-                    8,
-                    9,
-                    10,
-                    11,
-                    12,
-                    13,
-                    14,
-                    15,
-                    16,
-                    17,
-                    18,
-                    19,
-                    20,
-                    21,
-                    22,
-                    23,
-                    24,
-                    25,
-                    26,
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+                    18, 19, 20, 21, 22, 23, 24, 25, 26,
                   ],
                 },
               },
@@ -376,31 +352,8 @@ class Test {
                 },
                 completionItemKind: {
                   valueSet: [
-                    1,
-                    2,
-                    3,
-                    4,
-                    5,
-                    6,
-                    7,
-                    8,
-                    9,
-                    10,
-                    11,
-                    12,
-                    13,
-                    14,
-                    15,
-                    16,
-                    17,
-                    18,
-                    19,
-                    20,
-                    21,
-                    22,
-                    23,
-                    24,
-                    25,
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+                    18, 19, 20, 21, 22, 23, 24, 25,
                   ],
                 },
               },
@@ -423,32 +376,8 @@ class Test {
                 dynamicRegistration: true,
                 symbolKind: {
                   valueSet: [
-                    1,
-                    2,
-                    3,
-                    4,
-                    5,
-                    6,
-                    7,
-                    8,
-                    9,
-                    10,
-                    11,
-                    12,
-                    13,
-                    14,
-                    15,
-                    16,
-                    17,
-                    18,
-                    19,
-                    20,
-                    21,
-                    22,
-                    23,
-                    24,
-                    25,
-                    26,
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+                    18, 19, 20, 21, 22, 23, 24, 25, 26,
                   ],
                 },
                 hierarchicalDocumentSymbolSupport: true,
@@ -638,9 +567,11 @@ async function writeLog(lang, type, result, log) {
 }
 
 async function getImageHash(tag) {
-  const output = (await run(["docker", "inspect", `riju:${tag}`], console.error, {
-    suppressOutput: true,
-  })).output;
+  const output = (
+    await run(["docker", "inspect", `riju:${tag}`], console.error, {
+      suppressOutput: true,
+    })
+  ).output;
   return JSON.parse(output)[0].Config.Labels["riju.image-hash"];
 }
 
@@ -777,7 +708,7 @@ async function main() {
     await fs.mkdir(`build/test-hashes/lang`, { recursive: true });
     await fs.writeFile(
       `build/test-hashes/lang/${lang}`,
-      await getTestHash(lang, runtimeHash, langHashes[lang]),
+      await getTestHash(lang, runtimeHash, langHashes[lang])
     );
   }
   process.exit(failed.size > 0 ? 1 : 0);

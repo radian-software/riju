@@ -6,12 +6,11 @@ import { v4 as getUUIDOrig } from "uuid";
 
 function computeImageHashes() {
   let deployConfig = process.env.RIJU_DEPLOY_CONFIG;
-  if (!deployConfig)
-    return {};
+  if (!deployConfig) return {};
   deployConfig = JSON.parse(deployConfig);
   const imageHashes = {};
   for (const [lang, tag] of Object.entries(deployConfig.langImageTags)) {
-    const prefix = `lang-${lang}-`
+    const prefix = `lang-${lang}-`;
     if (!tag.startsWith(prefix)) {
       throw new Error(`malformed tag ${tag}`);
     }

@@ -124,18 +124,23 @@ async function getImageArtifact({ tag, isBaseImage, isLangImage }) {
           `build/lang/${isLangImage.lang}/install.bash`,
           "utf-8"
         );
-        const sharedInstallContents = await Promise.all(isLangImage.sharedDeps.map(
-          async (name) => fs.readFile(`build/shared/${name}/install.bash`),
-        ));
-        const allInstallContents = [].concat.apply([installContents], sharedInstallContents);
+        const sharedInstallContents = await Promise.all(
+          isLangImage.sharedDeps.map(async (name) =>
+            fs.readFile(`build/shared/${name}/install.bash`)
+          )
+        );
+        const allInstallContents = [].concat.apply(
+          [installContents],
+          sharedInstallContents
+        );
         salt = {
           langHash: dependencyHashes[`deb:lang-${isLangImage.lang}`],
           sharedHashes: isLangImage.sharedDeps.map(
             (name) => dependencyHashes[`deb:shared-${name}`]
           ),
-          installHash: allInstallContents.map(
-            (c) => crypto.createHash("sha1").update(c).digest("hex"),
-          ).join(""),
+          installHash: allInstallContents
+            .map((c) => crypto.createHash("sha1").update(c).digest("hex"))
+            .join(""),
         };
       }
       return await hashDockerfile(name, dependentDockerHashes, { salt });
@@ -231,7 +236,7 @@ async function getLanguageTestArtifact({ lang }) {
       return await getTestHash(
         lang,
         dependencyHashes[`image:runtime`],
-        dependencyHashes[`image:lang-${lang}`],
+        dependencyHashes[`image:lang-${lang}`]
       );
     },
     buildLocally: async () => {
@@ -248,10 +253,10 @@ async function getLanguageTestArtifact({ lang }) {
       const hash = (await fs.readFile(hashPath, "utf-8")).trim();
       const S3_BUCKET = getS3Bucket();
       await runCommand(
-        `aws s3 rm --recursive s3://${S3_BUCKET}/test-hashes/lang/${lang}`,
+        `aws s3 rm --recursive s3://${S3_BUCKET}/test-hashes/lang/${lang}`
       );
       await runCommand(
-        `aws s3 cp ${hashPath} s3://${S3_BUCKET}/test-hashes/lang/${lang}/${hash}`,
+        `aws s3 cp ${hashPath} s3://${S3_BUCKET}/test-hashes/lang/${lang}/${hash}`
       );
     },
   };
@@ -658,15 +663,8 @@ async function main() {
   program.option("--publish", "publish artifacts to remote registries");
   program.option("--yes", "execute plan without confirmation");
   program.parse(process.argv);
-  const {
-    list,
-    manual,
-    holdManual,
-    all,
-    localOnly,
-    publish,
-    yes,
-  } = program.opts();
+  const { list, manual, holdManual, all, localOnly, publish, yes } =
+    program.opts();
   const depgraph = await getDepGraph();
   if (list) {
     for (const { name } of depgraph.artifacts) {
