@@ -44,7 +44,7 @@ install:
         eval(yopta(program));
       }
 
-      repl.start({prompt: yopta> ", eval: (cmd, context, filename, callback) => callback(null, eval(yopta(cmd)))});
+      repl.start({prompt: "yopta> ", eval: (cmd, context, filename, callback) => callback(null, eval(yopta(cmd)))});
 
 repl: |
   yopta
