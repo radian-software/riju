@@ -16,6 +16,10 @@ resource "aws_cloudwatch_metric_alarm" "server_cpu" {
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.server[count.index].name
   }
+
+  tags = {
+    BillingSubcategory = "Riju:CloudWatch:Alarm"
+  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "server_memory" {
@@ -35,6 +39,10 @@ resource "aws_cloudwatch_metric_alarm" "server_memory" {
   insufficient_data_actions = [aws_sns_topic.riju.arn]
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.server[count.index].name
+  }
+
+  tags = {
+    BillingSubcategory = "Riju:CloudWatch:Alarm"
   }
 }
 
@@ -57,6 +65,10 @@ resource "aws_cloudwatch_metric_alarm" "server_data_volume_disk_space" {
     AutoScalingGroupName = aws_autoscaling_group.server[count.index].name
     path                 = "/mnt/riju/data"
   }
+
+  tags = {
+    BillingSubcategory = "Riju:CloudWatch:Alarm"
+  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "server_root_volume_disk_space" {
@@ -77,6 +89,10 @@ resource "aws_cloudwatch_metric_alarm" "server_root_volume_disk_space" {
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.server[count.index].name
     path                 = "/"
+  }
+
+  tags = {
+    BillingSubcategory = "Riju:CloudWatch:Alarm"
   }
 }
 

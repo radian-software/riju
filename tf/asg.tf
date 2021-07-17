@@ -99,6 +99,13 @@ resource "aws_autoscaling_group" "server" {
         propagate_at_launch = true,
       }
     ],
+    [
+      {
+        key                 = "BillingSubcategory"
+        value               = "Riju:EC2:Webserver"
+        propagate_at_launch = true
+      }
+    ]
   )
 
   lifecycle {

@@ -15,7 +15,8 @@ resource "aws_backup_plan" "riju" {
     }
 
     recovery_point_tags = {
-      BillingCategory = "Riju"
+      BillingCategory    = "Riju"
+      BillingSubcategory = "Riju:Backup:DevServer"
     }
   }
 }

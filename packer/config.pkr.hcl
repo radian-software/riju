@@ -37,6 +37,11 @@ source "amazon-ebs" "ubuntu" {
   instance_type = "t3.micro"
   source_ami    = "${data.amazon-ami.ubuntu.id}"
   ssh_username  = "ubuntu"
+
+  tags {
+    BillingCategory = "Riju"
+    BillingCategory = "Riju:AMI"
+  }
 }
 
 build {

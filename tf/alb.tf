@@ -31,6 +31,10 @@ resource "aws_lb" "server" {
   security_groups = [aws_security_group.alb.id]
   subnets         = data.aws_subnet_ids.default.ids
   idle_timeout    = 3600
+
+  tags = {
+    BillingSubcategory = "Riju:ALB"
+  }
 }
 
 resource "aws_lb_target_group" "server" {

@@ -50,7 +50,8 @@ resource "aws_instance" "dev_server" {
   }
 
   tags = {
-    Name = "Riju dev server"
+    Name               = "Riju dev server"
+    BillingSubcategory = "Riju:EC2:DevServer"
   }
 
   lifecycle {
@@ -63,8 +64,10 @@ resource "aws_instance" "dev_server" {
 
 resource "aws_eip" "dev_server" {
   count = local.ssh_key_available ? 1 : 0
+
   tags = {
-    Name = "Riju dev server"
+    Name               = "Riju dev server"
+    BillingSubcategory = "Riju:EIP"
   }
 }
 

@@ -4,7 +4,8 @@ resource "aws_acm_certificate" "riju" {
   validation_method         = "DNS"
 
   tags = {
-    Name = "Riju server"
+    Name               = "Riju server"
+    BillingSubcategory = "Riju:ACM"
   }
 }
 

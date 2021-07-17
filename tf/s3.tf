@@ -1,5 +1,9 @@
 resource "aws_s3_bucket" "riju" {
   bucket = data.external.env.result.S3_BUCKET
+
+  tags = {
+    BillingSubcategory = "Riju:S3"
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "riju" {
