@@ -4,23 +4,32 @@ import url from "url";
 import { Command } from "commander";
 
 import { getLangs } from "../lib/yaml.js";
-import { getLocalImageLabel } from "./docker-util.js";
+import { getDockerRepo, getRemoteImageLabel } from "./docker-util.js";
 
 // Get the contents of the JSON file that will be written to S3 in
 // order to deploy Riju.
 async function getDeployConfig() {
+  const DOCKER_REPO = getDockerRepo();
   const langs = await getLangs();
   const langImageTags = Object.fromEntries(
     await Promise.all(
-      langs.map(async (lang) => [
-        lang,
-        `lang-${lang}-` +
-          (await getLocalImageLabel(`riju:lang-${lang}`, "riju.image-hash")),
-      ])
+      langs.map(async (lang) => {
+        const hash = await getRemoteImageLabel(
+          `${DOCKER_REPO}:lang-${lang}`,
+          "riju.image-hash"
+        );
+        if (!hash) {
+          throw new Error(`image is not published to ${DOCKER_REPO}: riju:lang-${lang}`);
+        }
+        return [lang, `lang-${lang}-` + hash];
+      })
     )
   );
-  const appImageTag =
-    `app-` + (await getLocalImageLabel(`riju:app`, "riju.image-hash"));
+  const hash = await getRemoteImageLabel(`${DOCKER_REPO}:app`, "riju.image-hash");
+  if (!hash) {
+    throw new Error(`image is not published to ${DOCKER_REPO}: riju:app`);
+  }
+  const appImageTag = `app-` + hash;
   return {
     appImageTag,
     langImageTags,
