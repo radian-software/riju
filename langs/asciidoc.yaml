@@ -22,7 +22,7 @@ info:
 
 install:
   apt:
-    - asciidoc
+    - asciidoctor
   riju:
     - prettier
 
@@ -31,6 +31,6 @@ template: |
   Hello, world!
 
 compile: |
-  asciidoc -s main.adoc
+  asciidoctor -s main.adoc
 run: |
   prettier --no-config main.html
