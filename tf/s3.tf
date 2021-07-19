@@ -2,7 +2,7 @@ resource "aws_s3_bucket" "riju" {
   bucket = data.external.env.result.S3_BUCKET
 
   tags = {
-    BillingSubcategory = "Riju:S3"
+    BillingSubcategory = "Riju:S3:Data"
   }
 }
 
