@@ -93,7 +93,7 @@ Options:
   --manual       operate explicitly on manual artifacts
   --hold-manual  prefer local versions of manual artifacts
   --all          do not skip unneeded intermediate artifacts
-  --local-only   do not fetch artifacts from remote registries
+  --registry     interface with remote registry for caching
   --publish      publish artifacts to remote registries
   --yes          execute plan without confirmation
   -h, --help     display help for command
@@ -105,10 +105,12 @@ those artifacts. Depgraph is like Terraform in that it will compute a
 plan and then ask you to confirm before proceeding.
 
 By default Depgraph will generate artifacts locally only, although it
-will download remote artifacts if appropriate versions exist in the
-registry. Pass `--publish` to also cache generated artifacts in the
-remote registries. Of course `--publish` is required to build
-`deploy:live`.
+can be instructed to also interact with a remote registry if you've
+set up the infrastructure appropriately. Pass `--registry` to enable
+this mode, in which case Depgraph will download remote artifacts when
+appropriate versions exist in the registry. Pass `--publish` along
+with `--registry` to also cache generated artifacts in the remote
+registries. Of course `--publish` is required to build `deploy:live`.
 
 For dealing with `image:ubuntu` specifically, you probably just want
 to fetch Riju's version (available in a public ECR repository) using

@@ -69,7 +69,6 @@ function getInformationalDependencies() {
 }
 
 async function getImageArtifact({ tag, isBaseImage, isLangImage }) {
-  const DOCKER_REPO = getDockerRepo();
   const name = isLangImage ? "lang" : tag;
   let baseImageTags = [];
   let dependencies = [];
@@ -100,6 +99,7 @@ async function getImageArtifact({ tag, isBaseImage, isLangImage }) {
       return await getLocalImageLabel(`riju:${tag}`, "riju.image-hash");
     },
     getPublishedHash: async ({ dockerRepoTags }) => {
+      const DOCKER_REPO = getDockerRepo();
       if (!dockerRepoTags.includes(tag)) {
         return null;
       }
@@ -158,6 +158,7 @@ async function getImageArtifact({ tag, isBaseImage, isLangImage }) {
     publishToRegistry: async () => {
       await runCommand(`make push I=${tag}`);
     },
+    syncCommand: isBaseImage,
   };
 }
 
@@ -292,7 +293,7 @@ async function getDepGraph() {
   artifacts.push(
     await getImageArtifact({
       tag: "ubuntu",
-      isBaseImage: true,
+      isBaseImage: "make sync-ubuntu",
     })
   );
   artifacts.push(await getImageArtifact({ tag: "packaging" }));
@@ -388,7 +389,7 @@ async function executeDepGraph({
   manual,
   holdManual,
   all,
-  localOnly,
+  registry,
   publish,
   yes,
   targets,
@@ -412,7 +413,7 @@ async function executeDepGraph({
     )) {
       if (
         !(
-          localOnly &&
+          !registry &&
           ["getPublishedHash", "retrieveFromRegistry"].includes(method)
         )
       )
@@ -442,16 +443,16 @@ async function executeDepGraph({
       promises.desired[target] = Promise.resolve(null);
     } else {
       promises.local[target] = artifacts[target].getLocalHash(info);
-      promises.published[target] = localOnly
-        ? Promise.resolve(null)
-        : artifacts[target].getPublishedHash(info);
+      promises.published[target] = registry
+        ? artifacts[target].getPublishedHash(info)
+        : Promise.resolve(null);
       promises.desired[target] = (async () => {
         const dependencyHashes = {};
         for (const dependency of artifacts[target].dependencies) {
           dependencyHashes[dependency] = await promises.desired[dependency];
           if (!dependencyHashes[dependency]) {
             throw new Error(
-              `manual dependency must be built explicitly: dep ${dependency} --manual [--publish]`
+              `manual artifact must be retrieved explicitly: run '${artifacts[dependency].syncCommand}' (or dep '${dependency} --manual' to update)`
             );
           }
         }
@@ -470,7 +471,7 @@ async function executeDepGraph({
           }
         }
         throw new Error(
-          `manual artifact must be built explicitly: dep ${target} --manual [--publish]`
+          `manual artifact must be retrieved explicitly: run '${artifacts[target].syncCommand}' (or dep '${target} --manual' to update)`
         );
       })();
     }
@@ -656,14 +657,11 @@ async function main() {
   program.option("--manual", "operate explicitly on manual artifacts");
   program.option("--hold-manual", "prefer local versions of manual artifacts");
   program.option("--all", "do not skip unneeded intermediate artifacts");
-  program.option(
-    "--local-only",
-    "do not fetch artifacts from remote registries"
-  );
+  program.option("--registry", "interface with remote registry for caching");
   program.option("--publish", "publish artifacts to remote registries");
   program.option("--yes", "execute plan without confirmation");
   program.parse(process.argv);
-  const { list, manual, holdManual, all, localOnly, publish, yes } =
+  const { list, manual, holdManual, all, registry, publish, yes } =
     program.opts();
   const depgraph = await getDepGraph();
   if (list) {
@@ -683,7 +681,7 @@ async function main() {
     manual,
     holdManual,
     all,
-    localOnly,
+    registry,
     publish,
     yes,
     targets: program.args,
