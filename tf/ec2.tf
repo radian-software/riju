@@ -41,11 +41,11 @@ resource "aws_instance" "dev_server" {
   key_name             = data.external.env.result.SSH_KEY_NAME
 
   root_block_device {
-    volume_size = 256
+    volume_size = 8
     volume_type = "gp3"
 
     tags = merge(local.tags, {
-      Name               = "Riju dev server"
+      Name               = "Riju dev server root"
       BillingSubcategory = "Riju:EBS:DevServer"
     })
   }
@@ -62,6 +62,28 @@ resource "aws_instance" "dev_server" {
       security_groups, # legacy
     ]
   }
+}
+
+resource "aws_ebs_volume" "dev_server_data" {
+  count = local.ssh_key_available ? 1 : 0
+
+  size = 256
+  type = "sc1"
+
+  availability_zone = aws_instance.dev_server[count.index].availability_zone
+
+  tags = {
+    Name               = "Riju dev server data"
+    BillingSubcategory = "Riju:EBS:DevServer"
+  }
+}
+
+resource "aws_volume_attachment" "dev_server_data" {
+  count = local.ssh_key_available ? 1 : 0
+
+  device_name = "/dev/sdh"
+  volume_id   = aws_ebs_volume.dev_server_data[count.index].id
+  instance_id = aws_instance.dev_server[count.index].id
 }
 
 resource "aws_eip" "dev_server" {
