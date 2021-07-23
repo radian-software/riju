@@ -135,7 +135,6 @@ Add to `.env` the following contents:
 AMI_NAME=riju-20210711223158
 AWS_REGION=us-west-1
 S3_BUCKET=yourname-riju
-SSH_KEY_NAME=something
 ```
 
 ### AMI\_NAME

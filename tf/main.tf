@@ -24,8 +24,7 @@ locals {
     BillingCategory = "Riju"
   }
 
-  ami_available     = lookup(data.external.env.result, "AMI_NAME", "") != "" ? true : false
-  ssh_key_available = lookup(data.external.env.result, "SSH_KEY_NAME", "") != "" ? true : false
+  ami_available = lookup(data.external.env.result, "AMI_NAME", "") != "" ? true : false
 }
 
 provider "aws" {
