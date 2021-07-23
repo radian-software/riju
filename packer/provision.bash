@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euxo pipefail
+set -euo pipefail
 
 : ${ADMIN_PASSWORD}
 : ${AWS_REGION}

@@ -39,7 +39,7 @@ resource "aws_launch_template" "server" {
 
   name          = "riju-server"
   image_id      = data.aws_ami.server[count.index].id
-  instance_type = "t3.medium"
+  instance_type = "t3.small"
 
   security_group_names = [aws_security_group.server.name]
   iam_instance_profile {
@@ -62,9 +62,18 @@ resource "aws_launch_template" "server" {
 
   tag_specifications {
     resource_type = "instance"
-    tags = {
-      Name = "Riju server"
-    }
+    tags = merge(local.tags, {
+      Name               = "Riju server"
+      BillingSubcategory = "Riju:EC2:Webserver"
+    })
+  }
+
+  tag_specifications {
+    resource_type = "volume"
+    tags = merge(local.tags, {
+      Name               = "Riju server"
+      BillingSubcategory = "Riju:EBS:Webserver"
+    })
   }
 }
 
@@ -90,20 +99,6 @@ resource "aws_autoscaling_group" "server" {
         key                 = "Name"
         value               = "Riju server"
         propagate_at_launch = false
-      }
-    ],
-    [
-      for key, value in local.tags : {
-        key                 = key,
-        value               = value,
-        propagate_at_launch = true,
-      }
-    ],
-    [
-      {
-        key                 = "BillingSubcategory"
-        value               = "Riju:EC2:Webserver"
-        propagate_at_launch = true
       }
     ]
   )

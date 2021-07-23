@@ -45,7 +45,8 @@ resource "aws_instance" "dev_server" {
     volume_type = "gp3"
 
     tags = merge(local.tags, {
-      Name = "Riju dev server"
+      Name               = "Riju dev server"
+      BillingSubcategory = "Riju:EBS:DevServer"
     })
   }
 
