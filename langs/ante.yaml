@@ -28,9 +28,6 @@ install:
     cp target/release/ante "${pkg}/usr/local/bin/"
     cp -R stdlib "${pkg}/opt/ante/"
     popd
-  # Disallow this from running in CI because compiling LLVM takes 5+
-  # hours on the standard CircleCI runner.
-  disallowCI: true
 
 setup: |
   mkdir -p "$HOME/.config/ante"

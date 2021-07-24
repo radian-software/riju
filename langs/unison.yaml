@@ -21,10 +21,6 @@ install:
     "${pkg}/usr/local/bin/unison" -codebase . init
     LESS="+q" "${pkg}/usr/local/bin/unison" -codebase . <<< 'pull https://github.com/unisonweb/base:.trunk .base'
     popd
-  # Doing the pull operation seems to hang forever in CI, and then
-  # eventually the job gets killed. I think it might be using too much
-  # memory.
-  disallowCI: true
 
 setup: |
   shopt -s dotglob
