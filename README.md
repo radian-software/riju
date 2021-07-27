@@ -4,7 +4,9 @@ Riju is a very fast online playground for every programming language.
 In less than a second, you can start playing with a Python interpreter
 or compiling [INTERCAL](https://en.wikipedia.org/wiki/INTERCAL) code.
 
-Check it out at the <https://riju.codes>!
+Check it out at <https://riju.codes>!
+
+Service uptime available at <https://riju.statuspage.io/>.
 
 ## Is it free?
 
