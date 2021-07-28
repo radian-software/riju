@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+: ${ADMIN_PASSWORD}
+: ${S3_BUCKET}
+: ${SUPERVISOR_ACCESS_TOKEN}
+
 export AWS_REGION="${AWS_REGION:-$(aws configure get region)}"
 
 if [[ -z "${AWS_REGION}" ]]; then
@@ -9,5 +13,4 @@ if [[ -z "${AWS_REGION}" ]]; then
     exit 1
 fi
 
-cd packer
-packer build config.pkr.hcl
+packer build web.pkr.hcl

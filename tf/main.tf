@@ -23,8 +23,6 @@ locals {
     Terraform       = "Managed by Terraform"
     BillingCategory = "Riju"
   }
-
-  ami_available = lookup(data.external.env.result, "AMI_NAME", "") != "" ? true : false
 }
 
 provider "aws" {

@@ -33,7 +33,7 @@ locals {
 }
 
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "riju-${local.timestamp}"
+  ami_name      = "riju-web-${local.timestamp}"
   instance_type = "t3.micro"
   source_ami    = "${data.amazon-ami.ubuntu.id}"
   ssh_username  = "ubuntu"
@@ -50,7 +50,7 @@ source "amazon-ebs" "ubuntu" {
 
   tag {
     key = "Name"
-    value = "riju-${local.timestamp}"
+    value = "riju-web-${local.timestamp}"
   }
 }
 
@@ -84,6 +84,6 @@ build {
       "S3_BUCKET=${var.s3_bucket}",
       "SUPERVISOR_ACCESS_TOKEN=${var.supervisor_access_token}",
     ]
-    script           = "provision.bash"
+    script           = "provision-web.bash"
   }
 }

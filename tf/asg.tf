@@ -35,10 +35,8 @@ resource "aws_security_group" "server" {
 }
 
 resource "aws_launch_template" "server" {
-  count = local.ami_available ? 1 : 0
-
   name          = "riju-server"
-  image_id      = data.aws_ami.server[count.index].id
+  image_id      = data.aws_ami.server.id
   instance_type = "t3.small"
 
   security_group_names = [aws_security_group.server.name]
@@ -78,8 +76,6 @@ resource "aws_launch_template" "server" {
 }
 
 resource "aws_autoscaling_group" "server" {
-  count = local.ami_available ? 1 : 0
-
   name = "riju-server"
 
   availability_zones = [
@@ -90,7 +86,7 @@ resource "aws_autoscaling_group" "server" {
   max_size         = 3
 
   launch_template {
-    id = aws_launch_template.server[count.index].id
+    id = aws_launch_template.server.id
   }
 
   tags = concat(

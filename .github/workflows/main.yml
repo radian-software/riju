@@ -17,7 +17,4 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_REGION: us-west-1
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          DOCKER_REPO: 084011155226.dkr.ecr.us-west-1.amazonaws.com/riju
-          PUBLIC_DOCKER_REPO: public.ecr.aws/raxod502/riju
-          S3_BUCKET: riju
-        run: tools/ci-bootstrap.bash
+        run: tools/ci-ec2.bash

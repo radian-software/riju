@@ -17,6 +17,16 @@ resource "aws_iam_access_key" "deploy" {
 data "aws_iam_policy_document" "deploy" {
   statement {
     actions = [
+      "ec2:RunInstances",
+    ]
+
+    resources = [
+      data.aws_ami.ci.arn,
+    ]
+  }
+
+  statement {
+    actions = [
       "ecr:GetAuthorizationToken",
       "ecr-public:GetAuthorizationToken",
       "sts:GetServiceBearerToken",
@@ -114,6 +124,11 @@ resource "aws_iam_role_policy_attachment" "deploy" {
   policy_arn = aws_iam_policy.deploy.arn
 }
 
+resource "aws_iam_instance_profile" "deploy" {
+  name = "riju-deploy"
+  role = aws_iam_role.deploy.name
+}
+
 data "aws_iam_policy_document" "server" {
   statement {
     actions = [
@@ -192,55 +207,6 @@ resource "aws_iam_role_policy_attachment" "server_ssm" {
 resource "aws_iam_instance_profile" "server" {
   name = "riju-server"
   role = aws_iam_role.server.name
-}
-
-data "aws_iam_policy_document" "dev_server" {
-  statement {
-    actions = [
-      "*",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
-resource "aws_iam_policy" "dev_server" {
-  name        = "riju-dev-server"
-  description = "Policy granting AWS administrative access from dev server"
-  policy      = data.aws_iam_policy_document.dev_server.json
-}
-
-data "aws_iam_policy_document" "dev_server_assume_role" {
-  statement {
-    actions = [
-      "sts:AssumeRole",
-    ]
-
-    principals {
-      type = "Service"
-      identifiers = [
-        "ec2.amazonaws.com",
-      ]
-    }
-  }
-}
-
-resource "aws_iam_role" "dev_server" {
-  name               = "riju-dev-server"
-  description        = "Role used by Riju dev server"
-  assume_role_policy = data.aws_iam_policy_document.dev_server_assume_role.json
-}
-
-resource "aws_iam_role_policy_attachment" "dev_server" {
-  role       = aws_iam_role.dev_server.name
-  policy_arn = aws_iam_policy.dev_server.arn
-}
-
-resource "aws_iam_instance_profile" "dev_server" {
-  name = "riju-dev-server"
-  role = aws_iam_role.dev_server.name
 }
 
 data "aws_iam_policy_document" "backup_assume_role" {

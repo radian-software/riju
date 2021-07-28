@@ -6,7 +6,7 @@ function print {
     echo >&2 "riju-init-volume: $@"
 }
 
-mount_point=/mnt/riju/data
+mount_point=/mnt/riju
 
 mkdir -p "${mount_point}"
 
@@ -55,7 +55,7 @@ mount -a
 
 print "filesystem mounted at ${mount_point}"
 
-docker_args="-g ${mount_point}"
+docker_args="-g ${mount_point}/docker"
 
 if ! cat /lib/systemd/system/docker.service | grep -q -- "${docker_args}"; then
     print "adding '${docker_args}' to docker.service"

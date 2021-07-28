@@ -74,8 +74,6 @@ resource "aws_lb_listener" "server_https" {
 }
 
 resource "aws_autoscaling_attachment" "server" {
-  count = local.ami_available ? 1 : 0
-
-  autoscaling_group_name = aws_autoscaling_group.server[count.index].name
+  autoscaling_group_name = aws_autoscaling_group.server.name
   alb_target_group_arn   = aws_lb_target_group.server.arn
 }
