@@ -55,3 +55,7 @@ data "aws_subnet" "default" {
   for_each = data.aws_subnet_ids.default.ids
   id       = each.value
 }
+
+locals {
+  primary_az = sort([for subnet in data.aws_subnet.default : subnet.availability_zone])[0]
+}

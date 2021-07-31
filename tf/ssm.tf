@@ -1,3 +1,10 @@
+resource "aws_ssm_parameter" "web_ami_id" {
+  name      = "riju-web-ami-id"
+  type      = "String"
+  value     = data.aws_ami.server.id
+  data_type = "aws:ec2:image"
+}
+
 resource "aws_ssm_parameter" "ci_ami_id" {
   name      = "riju-ci-ami-id"
   type      = "String"
@@ -21,4 +28,10 @@ resource "aws_ssm_parameter" "s3_bucket" {
   name  = "riju-s3-bucket-name"
   type  = "String"
   value = aws_s3_bucket.riju.bucket
+}
+
+resource "aws_ssm_parameter" "asg_desired_capacity" {
+  name  = "riju-asg-desired-capacity"
+  type  = "String"
+  value = aws_autoscaling_group.server.desired_capacity
 }

@@ -8,6 +8,11 @@ variable "aws_region" {
   default = "${env("AWS_REGION")}"
 }
 
+variable "fathom_site_id" {
+  type    = string
+  default = "${env("FATHOM_SITE_ID")}"
+}
+
 variable "s3_bucket" {
   type = string
   default = "${env("S3_BUCKET")}"
@@ -81,6 +86,7 @@ build {
     environment_vars = [
       "ADMIN_PASSWORD=${var.admin_password}",
       "AWS_REGION=${var.aws_region}",
+      "FATHOM_SITE_ID=${var.fathom_site_id}",
       "S3_BUCKET=${var.s3_bucket}",
       "SUPERVISOR_ACCESS_TOKEN=${var.supervisor_access_token}",
     ]

@@ -78,12 +78,10 @@ resource "aws_launch_template" "server" {
 resource "aws_autoscaling_group" "server" {
   name = "riju-server"
 
-  availability_zones = [
-    for subnet in data.aws_subnet.default : subnet.availability_zone
-  ]
-  desired_capacity = 1
-  min_size         = 1
-  max_size         = 3
+  availability_zones = [local.primary_az]
+  desired_capacity   = 1
+  min_size           = 1
+  max_size           = 3
 
   launch_template {
     id = aws_launch_template.server.id
