@@ -545,7 +545,7 @@ async function executeDepGraph({
         continue;
       }
       if (artifacts[target].publishTarget) {
-        if (statuses[dep] === "publishToRegistry") {
+        if (statuses[dep] === "publishToRegistry" && publish) {
           plan.push({
             artifact: dep,
             action: "publishToRegistry",

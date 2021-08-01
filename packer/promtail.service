@@ -1,0 +1,13 @@
+[Unit]
+Description=Promtail
+StartLimitBurst=5
+StartLimitIntervalSec=300
+
+[Service]
+Type=exec
+ExecStart=promtail -config.file /etc/promtail/config.yaml
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

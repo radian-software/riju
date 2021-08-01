@@ -1,0 +1,63 @@
+server:
+  http_listen_address: 0.0.0.0
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+client:
+  url: https://72217:$GRAFANA_API_KEY@logs-prod-us-central1.grafana.net/api/prom/push
+
+scrape_configs:
+  - job_name: kernel
+    static_configs:
+      - labels:
+          source: kernel
+          __path__: /var/log/kern.log
+  - job_name: systemd
+    journal:
+      labels:
+        source: systemd
+    relabel_configs:
+      - source_labels:
+          - __journal__systemd_unit
+        regex: "(docker|riju)\\.service"
+        action: keep
+      - source_labels:
+          - __journal__systemd_unit
+        regex: "docker\\.service"
+        target_label: source
+        replacement: "dockerd"
+      - source_labels:
+          - __journal__systemd_unit
+        regex: "riju\\.service"
+        target_label: source
+        replacement: "supervisor"
+      - source_labels:
+          - source
+        regex: "systemd"
+        action: drop
+  - job_name: server
+    static_configs:
+      - labels:
+          source: server
+          __path__: /mnt/riju/docker/containers/*/*.log
+    pipeline_stages:
+      - json:
+          expressions:
+            log: log
+            stream: stream
+            tag: attrs.tag
+            time: time
+      - output:
+          source: log
+      - timestamp:
+          source: time
+          format: RFC3339Nano
+      - labels:
+          container: tag
+          stream: stream
+      - match:
+          selector: '{container!~"riju-app-(blue|green)"}'
+          action: drop

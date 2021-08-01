@@ -13,6 +13,11 @@ variable "fathom_site_id" {
   default = "${env("FATHOM_SITE_ID")}"
 }
 
+variable "grafana_api_key" {
+  type    = string
+  default = "${env("GRAFANA_API_KEY")}"
+}
+
 variable "s3_bucket" {
   type = string
   default = "${env("S3_BUCKET")}"
@@ -68,6 +73,31 @@ build {
   }
 
   provisioner "file" {
+    destination = "/tmp/docker.json"
+    source = "docker.json"
+  }
+
+  provisioner "file" {
+    destination = "/tmp/promtail.service"
+    source = "promtail.service"
+  }
+
+  provisioner "file" {
+    destination = "/tmp/promtail.yaml"
+    source = "promtail.yaml"
+  }
+
+  provisioner "file" {
+    destination = "/tmp/riju.service"
+    source      = "riju.service"
+  }
+
+  provisioner "file" {
+    destination = "/tmp/riju.slice"
+    source = "riju.slice"
+  }
+
+  provisioner "file" {
     destination = "/tmp/riju-init-volume"
     source      = "riju-init-volume"
   }
@@ -77,16 +107,12 @@ build {
     source      = "../supervisor/out/riju-supervisor"
   }
 
-  provisioner "file" {
-    destination = "/tmp/riju.service"
-    source      = "riju.service"
-  }
-
   provisioner "shell" {
     environment_vars = [
       "ADMIN_PASSWORD=${var.admin_password}",
       "AWS_REGION=${var.aws_region}",
       "FATHOM_SITE_ID=${var.fathom_site_id}",
+      "GRAFANA_API_KEY=${var.grafana_api_key}",
       "S3_BUCKET=${var.s3_bucket}",
       "SUPERVISOR_ACCESS_TOKEN=${var.supervisor_access_token}",
     ]

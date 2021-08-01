@@ -352,8 +352,7 @@ func (sv *supervisor) reload() error {
 		"--label", fmt.Sprintf("riju.deploy-config-hash=%s", deployCfgHash),
 		"--name", name,
 		"--restart", "unless-stopped",
-		"--oom-kill-disable",
-		"--cpu-shares", "2048",
+		"--log-opt", "tag={{.Name}}",
 		fmt.Sprintf("riju:%s", deployCfg.AppImageTag),
 	)
 	dockerRun.Stdout = os.Stdout

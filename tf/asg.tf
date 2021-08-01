@@ -80,12 +80,17 @@ resource "aws_autoscaling_group" "server" {
 
   availability_zones = [local.primary_az]
   desired_capacity   = 1
-  min_size           = 1
+  min_size           = 0
   max_size           = 3
 
   launch_template {
     id = aws_launch_template.server.id
   }
+
+  termination_policies = [
+    "OldestLaunchTemplate",
+    "OldestInstance",
+  ]
 
   tags = concat(
     [
@@ -98,6 +103,10 @@ resource "aws_autoscaling_group" "server" {
   )
 
   lifecycle {
-    ignore_changes = [target_group_arns]
+    ignore_changes = [
+      desired_capacity,
+      target_group_arns,
+    ]
   }
+
 }

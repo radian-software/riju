@@ -224,8 +224,8 @@ download: # L=<lang> T=<type> : Download last published .deb from S3
 	aws s3 cp $(S3_DEB) $(BUILD)/$(DEB)
 
 undeploy: # Pull latest deployment config from S3
-	mkdir -p $(BUILD)
-	aws s3 cp $(S3_CONFIG) $(BUILD)/config.json
+	mkdir -p build
+	aws s3 cp $(S3_CONFIG) build/config.json
 
 ### Publish artifacts to registries
 
@@ -251,7 +251,7 @@ deploy-config: # Generate deployment config file
 	node tools/generate-deploy-config.js
 
 deploy-latest: # Upload deployment config to S3 and update ASG instances
-	aws s3 cp $(BUILD)/config.json $(S3_CONFIG)
+	aws s3 cp build/config.json $(S3_CONFIG)
 
 deploy: deploy-config deploy-latest # Shorthand for deploy-config followed by deploy-latest
 

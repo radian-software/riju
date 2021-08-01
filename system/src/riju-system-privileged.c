@@ -83,6 +83,8 @@ void session(char *uuid, char *lang, char *imageHash)
     die("asprintf failed");
   if (mknod(fifo, 0700 | S_IFIFO, 0) < 0)
     die("mknod failed");
+  char sentinel[] = "cat /var/run/riju/sentinel/fifo | ( sleep 10; while "
+                    "read -t2; do :; done; pkill -g0 )";
   pid_t pid = fork();
   if (pid < 0)
     die("fork failed");
@@ -128,14 +130,15 @@ void session(char *uuid, char *lang, char *imageHash)
         "--memory",
         "1g",
         "--memory-swap",
-        "3g",
+        "8g",
         "--pids-limit",
-        "512",
+        "2048",
+        "--cgroup-parent",
+        "riju.slice",
         image,
         "bash",
         "-c",
-        "cat /var/run/riju/sentinel/fifo | ( sleep 10; while read -t2; do :; "
-        "done; pkill -g0 )",
+        sentinel,
         NULL,
     };
     execvp(argv[0], argv);

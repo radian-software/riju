@@ -1,0 +1,14 @@
+[Unit]
+Description=Resource limits for Riju user containers
+Before=slices.target
+
+[Slice]
+CPUAccounting=true
+CPUQuota=100%
+MemoryAccounting=true
+MemoryMax=1G
+MemorySwapMax=8G
+TasksAccounting=true
+TasksMax=2048
+IPAccounting=true
+IPAddressDeny=169.254.169.254
