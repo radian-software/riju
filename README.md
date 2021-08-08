@@ -50,3 +50,8 @@ being nice include:
 ## Can I help?
 
 Absolutely, please see [Contributing guide](CONTRIBUTING.md).
+
+## Similar projects
+
+* [TryItOnline](https://tio.run/)
+* [RyuGod](https://www.ryugod.com/)
