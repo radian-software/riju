@@ -160,7 +160,7 @@ system: # Compile setuid binary for production
 	./system/compile.bash
 
 system-dev: # Compile and watch setuid binary for development
-	watchexec -w system/src -n -- ./system/compile.bash
+	watchexec -w system/res -w system/src -n -- ./system/compile.bash
 
 supervisor: # Compile supervisor binary for production
 	./supervisor/compile.bash

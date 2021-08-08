@@ -8,16 +8,21 @@ if [[ ! -d system/src ]]; then
 fi
 
 function verbosely {
-    echo "$@"
+    echo >&2 "$@"
     "$@"
 }
 
 mkdir -p system/out
 rm -f system/out/*
+
+pushd system/res >/dev/null
+verbosely xxd -i sentinel.bash > ../src/sentinel.h
+popd >/dev/null
+
 for src in system/src/*.c; do
     out="${src/src/out}"
     out="${out/.c}"
-    verbosely clang -Wall -Wextra -Werror -std=c11 "${src}" -o "${out}"
+    verbosely clang -Isystem/res -Wall -Wextra -Werror -std=c11 "${src}" -o "${out}"
     if [[ "${out}" == *-privileged && -z "${UNPRIVILEGED:-}" ]]; then
         verbosely sudo chown root:riju "${out}"
         verbosely sudo chmod a=,g=rx,u=rwxs "${out}"

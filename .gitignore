@@ -4,8 +4,6 @@
 .lsp-repl-history
 .terraform
 build
-# Separate directory for things that are ignored by Git but not by
-# Docker.
-build-docker
 node_modules
 out
+sentinel.h
