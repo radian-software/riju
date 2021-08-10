@@ -59,8 +59,8 @@ Absolutely, please see [Contributing guide](CONTRIBUTING.md).
 ## Acknowledgements
 
 * A big thank you to [Mike Diarmid](https://github.com/Salakar) of
-  [Invertase](https://github.com/invertase) for being early sponsors
-  of the project by helping out with hosting costs! Thanks to Mike's
+  [Invertase](https://github.com/invertase) for being an early sponsor
+  of the project and helping out with hosting costs! Thanks to Mike's
   generous support I have the runway to get Riju stable enough for
   everyone to use.
 * Thank you to the maintainers of
