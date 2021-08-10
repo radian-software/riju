@@ -258,6 +258,8 @@ void session(char *uuid, char *lang, char *imageHash)
 
 void exec(char *uuid, int argc, char **cmdline, bool pty)
 {
+  if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
+    die("setvbuf failed");
   char *share, *ctlFIFO, *inputFIFO, *outputFIFO, *ctlCmd, *dataFIFO;
   if (asprintf(&share, "/var/run/riju/shares/%s", uuid) < 0)
     die("asprintf failed");
