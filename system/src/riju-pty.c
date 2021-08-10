@@ -82,7 +82,6 @@ int main(int argc, char **argv)
         ptr += len_written;
       }
     }
-    write(pty_master_fd, "\004", 1);
   } else {
     if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
       die("setvbuf failed");
