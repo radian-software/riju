@@ -1,6 +1,7 @@
 #define _GNU_SOURCE
 
 #include <fcntl.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,10 +36,10 @@ int main(int argc, char **argv)
   char *pty_slave_name = ptsname(pty_master_fd);
   if (pty_slave_name == NULL)
     die("ptsname failed");
-  pid_t pid = fork();
-  if (pid < 0)
+  pid_t exec_pid = fork();
+  if (exec_pid < 0)
     die("fork failed");
-  else if (pid == 0) {
+  else if (exec_pid == 0) {
     close(pty_master_fd);
     int pty_slave_fd = open(pty_slave_name, O_RDWR);
     if (pty_slave_fd < 0)
@@ -56,7 +57,7 @@ int main(int argc, char **argv)
   }
   char buf[1024];
   int len, len_written;
-  pid = fork();
+  int pid = fork();
   if (pid < 0)
     die("fork failed");
   else if (pid == 0) {
@@ -75,7 +76,21 @@ int main(int argc, char **argv)
     while ((len = read(STDIN_FILENO, buf, 1024)) > 0) {
       char *ptr = buf;
       while (len > 0) {
-        len_written = write(pty_master_fd, ptr, len);
+        if (*ptr == '\x03') {
+          if (kill(exec_pid, SIGINT) < 0)
+            die("kill failed");
+          len -= 1;
+          ptr += 1;
+          continue;
+        }
+        int limit = len;
+        for (int idx = 0; idx < len; ++idx) {
+          if (buf[idx] == '\x03') {
+            limit = idx;
+            break;
+          }
+        }
+        len_written = write(pty_master_fd, ptr, limit);
         if (len_written < 0)
           die("write failed");
         len -= len_written;
