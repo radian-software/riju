@@ -3,8 +3,10 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <termios.h>
 #include <unistd.h>
 
 void __attribute__((noreturn)) die(char *msg)
@@ -14,6 +16,10 @@ void __attribute__((noreturn)) die(char *msg)
 }
 
 void die_with_usage() { die("usage: riju-pty CMDLINE..."); }
+
+struct termios orig_termios;
+
+void restore_termios() { tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios); }
 
 int main(int argc, char **argv)
 {
@@ -54,6 +60,18 @@ int main(int argc, char **argv)
   if (pid < 0)
     die("fork failed");
   else if (pid == 0) {
+    if (tcgetattr(STDIN_FILENO, &orig_termios) < 0)
+      die("tcgetattr failed");
+    if (atexit(restore_termios) != 0)
+      die("atexit failed");
+    struct termios raw = orig_termios;
+    // https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
+    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+    raw.c_oflag &= ~(OPOST);
+    raw.c_cflag |= (CS8);
+    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) < 0)
+      die("tcsetattr failed");
     while ((len = read(STDIN_FILENO, buf, 1024)) > 0) {
       char *ptr = buf;
       while (len > 0) {
@@ -64,6 +82,7 @@ int main(int argc, char **argv)
         ptr += len_written;
       }
     }
+    write(pty_master_fd, "\004", 1);
   } else {
     if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
       die("setvbuf failed");
