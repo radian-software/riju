@@ -55,3 +55,16 @@ Absolutely, please see [Contributing guide](CONTRIBUTING.md).
 
 * [TryItOnline](https://tio.run/)
 * [RyuGod](https://www.ryugod.com/)
+
+## Acknowledgements
+
+* A big thank you to [Mike Diarmid](https://github.com/Salakar) of
+  [Invertase](https://github.com/invertase) for being early sponsors
+  of the project by helping out with hosting costs! Thanks to Mike's
+  generous support I have the runway to get Riju stable enough for
+  everyone to use.
+* Thank you to the maintainers of
+  [Monaco](https://github.com/microsoft/monaco-editor),
+  [node-pty](https://github.com/microsoft/node-pty), and
+  [Xterm.js](https://github.com/xtermjs/xterm.js/)! Without any one of
+  these open-source libraries, the core of Riju could not exist.
