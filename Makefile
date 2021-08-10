@@ -1,7 +1,7 @@
 SHELL := bash
 .SHELLFLAGS := -o pipefail -euc
 
-export PATH := $(PWD)/bin:$(PATH)
+export PATH := $(PWD)/bin:$(PWD)/system/out:$(PATH)
 
 -include .env
 export
