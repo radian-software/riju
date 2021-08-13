@@ -93,6 +93,8 @@ int main(int argc, char **argv)
     execvp(argv[0], &argv[0]);
     die("execvp failed");
   }
+  if (setpgrp() < 0)
+    die("setpgrp failed");
   int pid = no_pty ? 1 : fork();
   if (pid < 0)
     die("fork failed");
