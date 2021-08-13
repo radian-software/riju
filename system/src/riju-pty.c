@@ -104,16 +104,10 @@ int main(int argc, char **argv)
           len -= 1;
           ptr += 1;
           continue;
-        case 26:
-          if (kill(exec_pid, SIGTSTP) < 0)
-            die("kill failed");
-          len -= 1;
-          ptr += 1;
-          continue;
         }
         int limit = len;
         for (int idx = 0; idx < len; ++idx) {
-          if (buf[idx] == 3 || buf[idx] == 26) {
+          if (buf[idx] == 3) {
             limit = idx;
             break;
           }
