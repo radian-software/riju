@@ -58,7 +58,7 @@ char *quoteArgs(int argc, char **cmdline)
   char *buf = malloc(1024);
   if (buf == NULL)
     die("malloc failed");
-  ssize_t len_allocated = 2048;
+  ssize_t len_allocated = 1024;
   ssize_t len_total = 0;
   ssize_t len_read;
   while ((len_read = read(fd[0], buf + len_total, 1024)) > 0) {
@@ -387,13 +387,13 @@ int main(int argc, char **argv)
   if (!strcmp(argv[1], "exec")) {
     if (argc < 4)
       die_with_usage();
-    exec(parseUUID(argv[2]), argc, &argv[3], false);
+    exec(parseUUID(argv[2]), argc - 3, &argv[3], false);
     return 0;
   }
   if (!strcmp(argv[1], "pty")) {
     if (argc < 4)
       die_with_usage();
-    exec(parseUUID(argv[2]), argc, &argv[3], true);
+    exec(parseUUID(argv[2]), argc - 3, &argv[3], true);
     return 0;
   }
   die_with_usage();
