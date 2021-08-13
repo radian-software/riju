@@ -15,7 +15,6 @@ while read -t2 -a cmd; do
                     fi
                     uuid="${cmd[1]}"
                     args=("${cmd[@]:2}")
-                    echo >&2 "${cmd[0]} ${args[0]} with UUID ${uuid}"
                     input="/var/cache/riju/share/cmd-${uuid}-input"
                     output="/var/cache/riju/share/cmd-${uuid}-output"
                     mkfifo "${input}" "${output}"

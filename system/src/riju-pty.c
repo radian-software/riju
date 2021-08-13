@@ -100,10 +100,12 @@ int main(int argc, char **argv)
     int wstatus;
     if (waitpid(exec_pid, &wstatus, 0) != exec_pid)
       die("waitpid failed");
-    if (signal(SIGTERM, SIG_IGN) == SIG_ERR)
-      die("signal failed");
-    if (kill(0, SIGTERM) < 0)
-      die("kill failed");
+    if (!no_pty) {
+      if (signal(SIGTERM, SIG_IGN) == SIG_ERR)
+        die("signal failed");
+      if (kill(0, SIGTERM) < 0)
+        die("kill failed");
+    }
     return WEXITSTATUS(wstatus);
   }
   char buf[1024];
