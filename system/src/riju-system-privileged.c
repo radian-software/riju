@@ -65,6 +65,7 @@ char *quoteArgs(int argc, char **cmdline)
     len_total += len_read;
     if (len_allocated - len_total < 1024) {
       char *new_buf = malloc(len_allocated + 1024);
+      len_allocated += 1024;
       if (new_buf == NULL)
         die("malloc failed");
       memcpy(new_buf, buf, len_total);
