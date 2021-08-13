@@ -18,7 +18,7 @@ void __attribute__((noreturn)) die(char *msg)
   exit(1);
 }
 
-void die_with_usage() { die("usage: riju-pty CMDLINE..."); }
+void die_with_usage() { die("usage: riju-pty [-f] CMDLINE..."); }
 
 struct termios orig_termios;
 
@@ -30,18 +30,29 @@ void restore_tty()
 
 int main(int argc, char **argv)
 {
-  if (argc <= 1)
+  argc -= 1;
+  argv += 1;
+  int no_pty = argc >= 1 && strcmp(argv[0], "-f") == 0;
+  if (no_pty) {
+    argc -= 1;
+    argv += 1;
+  }
+  if (argc <= 0)
     die_with_usage();
-  int pty_master_fd = posix_openpt(O_RDWR);
-  if (pty_master_fd < 0)
-    die("posix_openpt failed");
-  if (grantpt(pty_master_fd) < 0)
-    die("grantpt failed");
-  if (unlockpt(pty_master_fd) < 0)
-    die("unlockpt failed");
-  char *pty_slave_name = ptsname(pty_master_fd);
-  if (pty_slave_name == NULL)
-    die("ptsname failed");
+  int pty_master_fd;
+  char *pty_slave_name;
+  if (!no_pty) {
+    pty_master_fd = posix_openpt(O_RDWR);
+    if (pty_master_fd < 0)
+      die("posix_openpt failed");
+    if (grantpt(pty_master_fd) < 0)
+      die("grantpt failed");
+    if (unlockpt(pty_master_fd) < 0)
+      die("unlockpt failed");
+    pty_slave_name = ptsname(pty_master_fd);
+    if (pty_slave_name == NULL)
+      die("ptsname failed");
+  }
   if (isatty(STDIN_FILENO)) {
     if (tcgetattr(STDIN_FILENO, &orig_termios) < 0)
       die("tcgetattr failed");
@@ -63,24 +74,26 @@ int main(int argc, char **argv)
   if (exec_pid < 0)
     die("fork failed");
   else if (exec_pid == 0) {
-    close(pty_master_fd);
-    if (setsid() < 0)
-      die("setsid failed");
-    int pty_slave_fd = open(pty_slave_name, O_RDWR);
-    if (pty_slave_fd < 0)
-      die("open failed");
-    if (dup2(pty_slave_fd, STDIN_FILENO) < 0)
-      die("dup2 failed");
-    if (dup2(pty_slave_fd, STDOUT_FILENO) < 0)
-      die("dup2 failed");
-    if (dup2(pty_slave_fd, STDERR_FILENO) < 0)
-      die("dup2 failed");
-    if (close(pty_slave_fd) < 0)
-      die("close failed");
-    execvp(argv[1], &argv[1]);
+    if (!no_pty) {
+      close(pty_master_fd);
+      if (setsid() < 0)
+        die("setsid failed");
+      int pty_slave_fd = open(pty_slave_name, O_RDWR);
+      if (pty_slave_fd < 0)
+        die("open failed");
+      if (dup2(pty_slave_fd, STDIN_FILENO) < 0)
+        die("dup2 failed");
+      if (dup2(pty_slave_fd, STDOUT_FILENO) < 0)
+        die("dup2 failed");
+      if (dup2(pty_slave_fd, STDERR_FILENO) < 0)
+        die("dup2 failed");
+      if (close(pty_slave_fd) < 0)
+        die("close failed");
+    }
+    execvp(argv[0], &argv[0]);
     die("execvp failed");
   }
-  int pid = fork();
+  int pid = no_pty ? 1 : fork();
   if (pid < 0)
     die("fork failed");
   else if (pid > 0) {
@@ -124,8 +137,9 @@ int main(int argc, char **argv)
         ptr += len_written;
       }
     }
-    if (len < 0)
-      die("read failed");
+    if (len < 0) {
+      // ignore read failure
+    }
   } else {
     if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
       die("setvbuf failed");
@@ -136,8 +150,9 @@ int main(int argc, char **argv)
       if (feof(stdout))
         break;
     }
-    if (len < 0)
-      die("read failed");
+    if (len < 0) {
+      // ignore read failure
+    }
   }
   return 0;
 }
