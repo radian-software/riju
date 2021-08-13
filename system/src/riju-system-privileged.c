@@ -134,6 +134,8 @@ void wait_alarm(int signum)
 
 void session(char *uuid, char *lang, char *imageHash)
 {
+  if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
+    die("setvbuf failed");
   char *image, *container, *hostname, *share, *volume, *fifo, *rijuPtyPath;
   if ((imageHash != NULL ? asprintf(&image, "riju:lang-%s-%s", lang, imageHash)
                          : asprintf(&image, "riju:lang-%s", lang)) < 0)

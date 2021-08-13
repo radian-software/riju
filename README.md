@@ -67,4 +67,5 @@ Absolutely, please see [Contributing guide](CONTRIBUTING.md).
   [Monaco](https://github.com/microsoft/monaco-editor),
   [node-pty](https://github.com/microsoft/node-pty), and
   [Xterm.js](https://github.com/xtermjs/xterm.js/)! Without any one of
-  these open-source libraries, the core of Riju could not exist.
+  these open-source libraries, version 1.0 of Riju could not have come
+  to life!

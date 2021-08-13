@@ -22,7 +22,7 @@ void die_with_usage() { die("usage: riju-pty CMDLINE..."); }
 
 struct termios orig_termios;
 
-void cleanup()
+void restore_tty()
 {
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) < 0)
     die("tcsetattr failed");
@@ -42,18 +42,23 @@ int main(int argc, char **argv)
   char *pty_slave_name = ptsname(pty_master_fd);
   if (pty_slave_name == NULL)
     die("ptsname failed");
-  if (tcgetattr(STDIN_FILENO, &orig_termios) < 0)
-    die("tcgetattr failed");
-  struct termios raw = orig_termios;
-  // https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
-  raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-  raw.c_oflag &= ~(OPOST);
-  raw.c_cflag |= (CS8);
-  raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
-  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) < 0)
-    die("tcsetattr failed");
-  if (atexit(cleanup) < 0)
-    die("atexit failed");
+  if (isatty(STDIN_FILENO)) {
+    if (tcgetattr(STDIN_FILENO, &orig_termios) < 0)
+      die("tcgetattr failed");
+    struct termios raw = orig_termios;
+    // https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
+    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+    raw.c_oflag &= ~(OPOST);
+    raw.c_cflag |= (CS8);
+    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) < 0)
+      die("tcsetattr failed");
+    if (atexit(restore_tty) < 0)
+      die("atexit failed");
+  } else {
+    if (errno != ENOTTY)
+      die("isatty failed");
+  }
   pid_t exec_pid = fork();
   if (exec_pid < 0)
     die("fork failed");

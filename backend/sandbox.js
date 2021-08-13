@@ -2,8 +2,6 @@ import { spawn } from "child_process";
 import { promises as fs } from "fs";
 import process from "process";
 
-import pty from "node-pty";
-
 import { readLangConfig } from "../lib/yaml.js";
 import {
   bash,
@@ -34,15 +32,15 @@ async function main() {
   const uuid = getUUID();
   console.log(`Starting session with UUID ${uuid}`);
   const sessionArgs = privilegedSession({ uuid, lang });
-  const session = pty.spawn(sessionArgs[0], sessionArgs.slice(1), {
-    name: "xterm-color",
+  const session = spawn(sessionArgs[0], sessionArgs.slice(1), {
+    stdio: ["ignore", "pipe", "inherit"],
   });
   let buffer = "";
   await new Promise((resolve) => {
-    session.on("data", (data) => {
-      buffer += data;
+    session.stdout.on("data", (data) => {
+      buffer += data.toString();
       let idx;
-      while ((idx = buffer.indexOf("\r\n")) !== -1) {
+      while ((idx = buffer.indexOf("\n")) !== -1) {
         const line = buffer.slice(0, idx);
         buffer = buffer.slice(idx + 2);
         if (line === "riju: container ready") {
