@@ -134,7 +134,7 @@ void wait_alarm(int signum)
 
 void session(char *uuid, char *lang, char *imageHash)
 {
-  char *image, *container, *hostname, *share, *volume, *fifo;
+  char *image, *container, *hostname, *share, *volume, *fifo, *rijuPtyPath;
   if ((imageHash != NULL ? asprintf(&image, "riju:lang-%s-%s", lang, imageHash)
                          : asprintf(&image, "riju:lang-%s", lang)) < 0)
     die("asprintf failed");
@@ -142,15 +142,41 @@ void session(char *uuid, char *lang, char *imageHash)
     die("asprintf failed");
   if (asprintf(&hostname, "HOSTNAME=%s", lang) < 0)
     die("asprintf failed");
-  if (asprintf(&share, "/var/run/riju/shares/%s", uuid) < 0)
+  if (asprintf(&share, "/var/cache/riju/shares/%s", uuid) < 0)
     die("asprintf failed");
-  int rv = mkdir("/var/run/riju/shares", 0700);
+  int rv = mkdir("/var/cache/riju/shares", 0700);
   if (rv < 0 && errno != EEXIST)
     die("mkdir failed");
   rv = mkdir(share, 0700);
-  if (rv < 0 && errno != EEXIST)
+  if (rv < 0)
     die("mkdir failed");
-  if (asprintf(&volume, "%s:/var/run/riju/share", share) < 0)
+  if (asprintf(&rijuPtyPath, "%s/riju-pty", share) < 0)
+    die("asprintf failed");
+  int fdFrom = open("/src/system/out/riju-pty", O_RDONLY);
+  if (fdFrom < 0)
+    die("open failed");
+  int fdTo = open(rijuPtyPath, O_WRONLY | O_CREAT | O_EXCL, 0700);
+  if (fdTo < 0)
+    die("open failed");
+  char buf[1024];
+  int len, len_written;
+  while ((len = read(fdFrom, buf, 1024)) > 0) {
+    char *ptr = buf;
+    while (len > 0) {
+      len_written = write(fdTo, ptr, len);
+      if (len_written < 0)
+        die("write failed");
+      len -= len_written;
+      ptr += len_written;
+    }
+  }
+  if (close(fdFrom) < 0)
+    die("close failed");
+  if (close(fdTo) < 0)
+    die("close failed");
+  if (len < 0)
+    die("read failed");
+  if (asprintf(&volume, "%s:/var/cache/riju/share", share) < 0)
     die("asprintf failed");
   if (asprintf(&fifo, "%s/control", share) < 0)
     die("asprintf failed");
@@ -261,7 +287,7 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
     die("setvbuf failed");
   char *share, *ctlFIFO, *inputFIFO, *outputFIFO, *ctlCmd, *dataFIFO;
-  if (asprintf(&share, "/var/run/riju/shares/%s", uuid) < 0)
+  if (asprintf(&share, "/var/cache/riju/shares/%s", uuid) < 0)
     die("asprintf failed");
   if (asprintf(&ctlFIFO, "%s/control", share) < 0)
     die("asprintf failed");

@@ -37,6 +37,7 @@ clang
 clang-format
 dctrl-tools
 docker-ce-cli
+file
 g++
 git
 golang

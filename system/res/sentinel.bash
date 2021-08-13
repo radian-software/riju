@@ -10,13 +10,16 @@ while read -t2 -a cmd; do
                 if (( "${#cmd[@]}" < 3 )); then
                     echo >&2 "usage: (exec|pty) UUID ARG..."
                 else
+                    if [[ "${cmd[0]}" == pty ]]; then
+                        maybe_pty=/var/cache/riju/share/riju-pty
+                    fi
                     uuid="${cmd[1]}"
                     args=("${cmd[@]:2}")
                     echo >&2 "${cmd[0]} ${args[0]} with UUID ${uuid}"
-                    input="/var/run/riju/share/cmd-${uuid}-input"
-                    output="/var/run/riju/share/cmd-${uuid}-output"
+                    input="/var/cache/riju/share/cmd-${uuid}-input"
+                    output="/var/cache/riju/share/cmd-${uuid}-output"
                     mkfifo "${input}" "${output}"
-                    runuser -u riju -- bash -c 'exec "$@"' sentinel "${args[@]}" < "${input}" &> "${output}" &
+                    ${maybe_pty:-} runuser -u riju -- bash -c 'exec "$@"' sentinel "${args[@]}" < "${input}" &> "${output}" &
                 fi
                 ;;
             *)
@@ -24,4 +27,4 @@ while read -t2 -a cmd; do
                 ;;
         esac
     fi
-done < /var/run/riju/share/control
+done < /var/cache/riju/share/control

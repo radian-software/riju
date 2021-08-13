@@ -119,6 +119,8 @@ int main(int argc, char **argv)
         ptr += len_written;
       }
     }
+    if (len < 0)
+      die("read failed");
   } else {
     if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
       die("setvbuf failed");
@@ -129,6 +131,8 @@ int main(int argc, char **argv)
       if (feof(stdout))
         break;
     }
+    if (len < 0)
+      die("read failed");
   }
   return 0;
 }
