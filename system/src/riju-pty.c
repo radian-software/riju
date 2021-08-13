@@ -59,6 +59,8 @@ int main(int argc, char **argv)
     die("fork failed");
   else if (exec_pid == 0) {
     close(pty_master_fd);
+    if (setsid() < 0)
+      die("setsid failed");
     int pty_slave_fd = open(pty_slave_name, O_RDWR);
     if (pty_slave_fd < 0)
       die("open failed");
