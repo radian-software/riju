@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 
+#include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
@@ -7,12 +8,13 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <termios.h>
 #include <unistd.h>
 
 void __attribute__((noreturn)) die(char *msg)
 {
-  fprintf(stderr, "%s\n", msg);
+  fprintf(stderr, "%s (errno %d)\n", msg, errno);
   exit(1);
 }
 
@@ -20,7 +22,11 @@ void die_with_usage() { die("usage: riju-pty CMDLINE..."); }
 
 struct termios orig_termios;
 
-void restore_termios() { tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios); }
+void cleanup()
+{
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) < 0)
+    die("tcsetattr failed");
+}
 
 int main(int argc, char **argv)
 {
@@ -36,6 +42,18 @@ int main(int argc, char **argv)
   char *pty_slave_name = ptsname(pty_master_fd);
   if (pty_slave_name == NULL)
     die("ptsname failed");
+  if (tcgetattr(STDIN_FILENO, &orig_termios) < 0)
+    die("tcgetattr failed");
+  struct termios raw = orig_termios;
+  // https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
+  raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+  raw.c_oflag &= ~(OPOST);
+  raw.c_cflag |= (CS8);
+  raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) < 0)
+    die("tcsetattr failed");
+  if (atexit(cleanup) < 0)
+    die("atexit failed");
   pid_t exec_pid = fork();
   if (exec_pid < 0)
     die("fork failed");
@@ -55,29 +73,37 @@ int main(int argc, char **argv)
     execvp(argv[1], &argv[1]);
     die("execvp failed");
   }
-  char buf[1024];
-  int len, len_written;
   int pid = fork();
   if (pid < 0)
     die("fork failed");
+  else if (pid > 0) {
+    int wstatus;
+    if (waitpid(exec_pid, &wstatus, 0) != exec_pid)
+      die("waitpid failed");
+    if (signal(SIGTERM, SIG_IGN) == SIG_ERR)
+      die("signal failed");
+    if (kill(0, SIGTERM) < 0)
+      die("kill failed");
+    return WEXITSTATUS(wstatus);
+  }
+  char buf[1024];
+  int len, len_written;
+  pid = fork();
+  if (pid < 0)
+    die("fork failed");
   else if (pid == 0) {
-    if (tcgetattr(STDIN_FILENO, &orig_termios) < 0)
-      die("tcgetattr failed");
-    if (atexit(restore_termios) != 0)
-      die("atexit failed");
-    struct termios raw = orig_termios;
-    // https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
-    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-    raw.c_oflag &= ~(OPOST);
-    raw.c_cflag |= (CS8);
-    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
-    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) < 0)
-      die("tcsetattr failed");
     while ((len = read(STDIN_FILENO, buf, 1024)) > 0) {
       char *ptr = buf;
       while (len > 0) {
-        if (*ptr == '\x03') {
+        switch (*ptr) {
+        case 3:
           if (kill(exec_pid, SIGINT) < 0)
+            die("kill failed");
+          len -= 1;
+          ptr += 1;
+          continue;
+        case 26:
+          if (kill(exec_pid, SIGTSTP) < 0)
             die("kill failed");
           len -= 1;
           ptr += 1;
@@ -85,7 +111,7 @@ int main(int argc, char **argv)
         }
         int limit = len;
         for (int idx = 0; idx < len; ++idx) {
-          if (buf[idx] == '\x03') {
+          if (buf[idx] == 3 || buf[idx] == 26) {
             limit = idx;
             break;
           }

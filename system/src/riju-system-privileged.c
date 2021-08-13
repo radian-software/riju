@@ -18,7 +18,7 @@
 
 void __attribute__((noreturn)) die(char *msg)
 {
-  fprintf(stderr, "%s\n", msg);
+  fprintf(stderr, "%s (errno %d)\n", msg, errno);
   exit(1);
 }
 
