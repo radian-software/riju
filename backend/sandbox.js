@@ -51,12 +51,15 @@ async function main() {
       }
     });
   });
-  const args = privilegedPty(
-    { uuid },
-    bash(
-      `env L='${lang}' LANG_CONFIG=${quote(
-        JSON.stringify(langConfig)
-      )} bash --rcfile <(cat <<< ${quote(sandboxScript)})`
+  const args = [].concat.apply(
+    ["riju-pty", "-f"],
+    privilegedPty(
+      { uuid },
+      bash(
+        `env L='${lang}' LANG_CONFIG=${quote(
+          JSON.stringify(langConfig)
+        )} bash --rcfile <(cat <<< ${quote(sandboxScript)})`
+      )
     )
   );
   const proc = spawn(args[0], args.slice(1), {

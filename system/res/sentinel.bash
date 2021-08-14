@@ -2,7 +2,20 @@
 
 set -euo pipefail
 
-while read -t2 -a cmd; do
+while read -t2 -r cmdline; do
+    cmd=(${cmdline})
+    for (( i=0; i<${#cmd[@]}; i++ )); do
+        arg="${cmd[$i]}"
+
+        arg="${arg}x"
+        arg="$(sed 's/+s/ /g' <<< "${arg}")"
+        arg="$(sed 's/+n/\n/g' <<< "${arg}")"
+        arg="$(sed 's/+t/\t/g' <<< "${arg}")"
+        arg="$(sed 's/+p/+/g' <<< "${arg}")"
+        arg="${arg%x}"
+
+        cmd[$i]="${arg}"
+    done
     if (( "${#cmd[@]}" > 0 )); then
         case "${cmd[0]}" in
             ping) ;;

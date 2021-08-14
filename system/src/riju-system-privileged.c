@@ -1,4 +1,5 @@
 #define _GNU_SOURCE
+#include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <grp.h>
@@ -34,49 +35,37 @@ void die_with_usage()
 
 char *quoteArgs(int argc, char **cmdline)
 {
-  char **printfArgs = malloc(sizeof(char *) * (argc + 3));
-  printfArgs[0] = "printf";
-  printfArgs[1] = "%q ";
-  memcpy(printfArgs + 2, cmdline, sizeof(char *) * argc);
-  printfArgs[argc + 2] = NULL;
-  int fd[2];
-  if (pipe(fd) < 0)
-    die("pipe failed");
-  pid_t pid = fork();
-  if (pid < 0)
-    die("fork failed");
-  else if (pid == 0) {
-    if (dup2(fd[1], STDOUT_FILENO) < 0)
-      die("dup2 failed");
-    if (close(fd[0]) < 0 || close(fd[1]) < 0)
-      die("close failed");
-    execvp(printfArgs[0], printfArgs);
-    die("execvp failed");
-  }
-  if (close(fd[1]) < 0)
-    die("close failed");
-  char *buf = malloc(1024);
-  if (buf == NULL)
-    die("malloc failed");
-  ssize_t len_allocated = 1024;
-  ssize_t len_total = 0;
-  ssize_t len_read;
-  while ((len_read = read(fd[0], buf + len_total, 1024)) > 0) {
-    len_total += len_read;
-    if (len_allocated - len_total < 1024) {
-      char *new_buf = malloc(len_allocated + 1024);
-      len_allocated += 1024;
-      if (new_buf == NULL)
-        die("malloc failed");
-      memcpy(new_buf, buf, len_total);
-      free(buf);
-      buf = new_buf;
+  int orig_len = 0;
+  for (int i = 0; i < argc; ++i)
+    orig_len += strlen(cmdline[i]);
+  int quoted_len = orig_len * 2 + argc;
+  char *quoted = malloc(sizeof(char) * quoted_len);
+  char *quoted_ptr = quoted;
+  for (int i = 0; i < argc; ++i) {
+    for (char *ptr = cmdline[i]; *ptr != '\0'; ++ptr) {
+      if (*ptr == ' ') {
+        *(quoted_ptr++) = '+';
+        *(quoted_ptr++) = 's';
+      } else if (*ptr == '\n') {
+        *(quoted_ptr++) = '+';
+        *(quoted_ptr++) = 'n';
+      } else if (*ptr == '\t') {
+        *(quoted_ptr++) = '+';
+        *(quoted_ptr++) = 't';
+      } else if (*ptr == '+') {
+        *(quoted_ptr++) = '+';
+        *(quoted_ptr++) = 'p';
+      } else if (isprint(*ptr)) {
+        *(quoted_ptr++) = *ptr;
+      } else {
+        die("riju-system-privileged got non-printable char");
+      }
     }
+    if (i < argc - 1)
+      *(quoted_ptr++) = ' ';
   }
-  if (len_read < 0)
-    die("read failed");
-  buf[len_total] = '\0';
-  return buf;
+  *(quoted_ptr++) = '\0';
+  return quoted;
 }
 
 char *getUUID()
