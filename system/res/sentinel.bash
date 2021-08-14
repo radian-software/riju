@@ -30,8 +30,13 @@ while read -t2 -r cmdline; do
                     args=("${cmd[@]:2}")
                     input="/var/cache/riju/share/cmd-${uuid}-input"
                     output="/var/cache/riju/share/cmd-${uuid}-output"
-                    mkfifo "${input}" "${output}"
-                    ${maybe_pty:-} runuser -u riju -- bash -c 'exec "$@"' sentinel "${args[@]}" < "${input}" &> "${output}" &
+                    status="/var/cache/riju/share/cmd-${uuid}-status"
+                    mkfifo "${input}" "${output}" "${status}"
+                    (
+                        set +e
+                        ${maybe_pty:-} runuser -u riju -- bash -c 'exec "$@"' sentinel "${args[@]}" < "${input}" &> "${output}"
+                        echo "$?" > "${status}"
+                    ) &
                 fi
                 ;;
             *)

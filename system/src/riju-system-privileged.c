@@ -122,6 +122,16 @@ void wait_alarm(int signum)
   die(timeout_msg);
 }
 
+void wait_alarm_group(int signum)
+{
+  (void)signum;
+  if (signal(SIGTERM, SIG_IGN) == SIG_ERR)
+    die("signal failed");
+  if (kill(0, SIGTERM) < 0)
+    die("kill failed");
+  die(timeout_msg);
+}
+
 void session(char *uuid, char *lang, char *imageHash)
 {
   if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
@@ -278,7 +288,8 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
 {
   if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
     die("setvbuf failed");
-  char *share, *ctlFIFO, *inputFIFO, *outputFIFO, *ctlCmd, *dataFIFO;
+  char *share, *ctlFIFO, *inputFIFO, *outputFIFO, *statusFIFO, *ctlCmd,
+      *dataFIFO;
   if (asprintf(&share, "/var/cache/riju/shares/%s", uuid) < 0)
     die("asprintf failed");
   if (asprintf(&ctlFIFO, "%s/control", share) < 0)
@@ -287,6 +298,8 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   if (asprintf(&inputFIFO, "%s/cmd-%s-input", share, procUUID) < 0)
     die("asprintf failed");
   if (asprintf(&outputFIFO, "%s/cmd-%s-output", share, procUUID) < 0)
+    die("asprintf failed");
+  if (asprintf(&statusFIFO, "%s/cmd-%s-status", share, procUUID) < 0)
     die("asprintf failed");
   int fd = open(ctlFIFO, O_WRONLY);
   if (fd < 0)
@@ -304,25 +317,33 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   if (len_written < 0)
     die("write failed");
   close(fd);
+  if (setpgrp() < 0)
+    die("setpgrp failed");
+  timeout_msg = "sentinel did not set up FIFOs within 1 second";
   struct timespec ts_10ms;
   ts_10ms.tv_sec = 0;
   ts_10ms.tv_nsec = 1000 * 1000 * 10;
-  int mode;
   pid_t pid = fork();
   if (pid < 0)
     die("fork failed");
   else if (pid == 0) {
     dataFIFO = inputFIFO;
-    timeout_msg = "sentinel did not set up input FIFO within 1 second";
-    mode = O_WRONLY;
   } else {
-    dataFIFO = outputFIFO;
-    timeout_msg = "sentinel did not set up output FIFO within 1 second";
-    mode = O_RDONLY;
+    pid = fork();
+    if (pid < 0)
+      die("fork failed");
+    else if (pid == 0) {
+      dataFIFO = outputFIFO;
+    } else {
+      dataFIFO = statusFIFO;
+    }
   }
-  signal(SIGALRM, wait_alarm);
-  alarm(1);
+  if (dataFIFO != statusFIFO) {
+    signal(SIGALRM, wait_alarm_group);
+    alarm(1);
+  }
   while (1) {
+    int mode = dataFIFO == inputFIFO ? O_WRONLY : O_RDONLY;
     fd = open(dataFIFO, mode);
     if (fd >= 0)
       break;
@@ -334,7 +355,7 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   }
   signal(SIGALRM, SIG_IGN);
   char buf[1024];
-  if (pid == 0) {
+  if (dataFIFO == inputFIFO) {
     while ((len = read(STDIN_FILENO, buf, 1024)) > 0) {
       char *ptr = buf;
       while (len > 0) {
@@ -345,7 +366,9 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
         ptr += len_written;
       }
     }
-  } else {
+    if (len < 0)
+      die("read failed");
+  } else if (dataFIFO == outputFIFO) {
     while ((len = read(fd, buf, 1024)) > 0) {
       fwrite(buf, 1, len, stdout);
       if (ferror(stdout))
@@ -353,9 +376,28 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
       if (feof(stdout))
         break;
     }
+    if (len < 0)
+      die("read failed");
+  } else {
+    char line[1024];
+    char *ptr = line;
+    int len;
+    while ((len = read(fd, ptr, 1023 - (ptr - line))) > 0) {
+      ptr += len;
+    }
+    if (len < 0)
+      die("read failed");
+    *ptr = '\0';
+    char *endptr;
+    long status = strtol(line, &endptr, 10);
+    if (*endptr != '\n')
+      die("strtol failed");
+    if (signal(SIGTERM, SIG_IGN) == SIG_ERR)
+      die("signal failed");
+    if (kill(0, SIGTERM) < 0)
+      die("kill failed");
+    exit(status);
   }
-  if (len < 0)
-    die("read failed");
 }
 
 int main(int argc, char **argv)
