@@ -3,9 +3,11 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -22,8 +24,12 @@ void die_with_usage() { die("usage: riju-pty [-f] CMDLINE..."); }
 
 struct termios orig_termios;
 
+bool do_restore_tty = true;
+
 void restore_tty()
 {
+  if (!do_restore_tty)
+    return;
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) < 0)
     die("tcsetattr failed");
 }
@@ -57,11 +63,7 @@ int main(int argc, char **argv)
     if (tcgetattr(STDIN_FILENO, &orig_termios) < 0)
       die("tcgetattr failed");
     struct termios raw = orig_termios;
-    // https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
-    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-    raw.c_oflag &= ~(OPOST);
-    raw.c_cflag |= (CS8);
-    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+    cfmakeraw(&raw);
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) < 0)
       die("tcsetattr failed");
     if (atexit(restore_tty) < 0)
@@ -70,10 +72,15 @@ int main(int argc, char **argv)
     if (errno != ENOTTY)
       die("isatty failed");
   }
+  pid_t orig_ppid = getpid();
   pid_t exec_pid = fork();
   if (exec_pid < 0)
     die("fork failed");
   else if (exec_pid == 0) {
+    if (prctl(PR_SET_PDEATHSIG, SIGTERM) < 0)
+      die("prctl failed");
+    if (getppid() != orig_ppid)
+      exit(EXIT_FAILURE);
     if (!no_pty) {
       close(pty_master_fd);
       if (setsid() < 0)
@@ -93,9 +100,7 @@ int main(int argc, char **argv)
     execvp(argv[0], &argv[0]);
     die("execvp failed");
   }
-  if (setpgrp() < 0)
-    die("setpgrp failed");
-  int pid = no_pty ? 1 : fork();
+  pid_t pid = no_pty ? 1 : fork();
   if (pid < 0)
     die("fork failed");
   else if (pid > 0) {
@@ -103,19 +108,29 @@ int main(int argc, char **argv)
     if (waitpid(exec_pid, &wstatus, 0) != exec_pid)
       die("waitpid failed");
     if (!no_pty) {
-      if (signal(SIGTERM, SIG_IGN) == SIG_ERR)
-        die("signal failed");
-      if (kill(0, SIGTERM) < 0)
+      if (kill(-pid, SIGTERM) < 0)
         die("kill failed");
     }
     return WEXITSTATUS(wstatus);
   }
+  if (prctl(PR_SET_PDEATHSIG, SIGTERM) < 0)
+    die("prctl failed");
+  if (getppid() != orig_ppid)
+    exit(EXIT_FAILURE);
+  do_restore_tty = false;
+  if (setpgrp() < 0)
+    die("setpgrp failed");
   char buf[1024];
   int len, len_written;
+  orig_ppid = getpid();
   pid = fork();
   if (pid < 0)
     die("fork failed");
   else if (pid == 0) {
+    if (prctl(PR_SET_PDEATHSIG, SIGTERM) < 0)
+      die("prctl failed");
+    if (getppid() != orig_ppid)
+      exit(EXIT_FAILURE);
     while ((len = read(STDIN_FILENO, buf, 1024)) > 0) {
       char *ptr = buf;
       while (len > 0) {

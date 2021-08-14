@@ -1,3 +1,4 @@
+#include <linux/prctl.h>
 #define _GNU_SOURCE
 #include <ctype.h>
 #include <errno.h>
@@ -8,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/prctl.h>
 #include <sys/random.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -174,10 +176,15 @@ void session(char *uuid, char *lang, char *imageHash)
     die("asprintf failed");
   if (mknod(fifo, 0600 | S_IFIFO, 0) < 0)
     die("mknod failed");
+  pid_t orig_ppid = getpid();
   pid_t pid = fork();
   if (pid < 0)
     die("fork failed");
   else if (pid == 0) {
+    if (prctl(PR_SET_PDEATHSIG, SIGTERM) < 0)
+      die("prctl failed");
+    if (getppid() != orig_ppid)
+      exit(EXIT_FAILURE);
     char *argv[] = {
         "docker",
         "run",
@@ -253,27 +260,18 @@ void session(char *uuid, char *lang, char *imageHash)
   }
   if (signal(SIGALRM, SIG_IGN) == SIG_ERR)
     die("signal failed");
-  pid = fork();
-  if (pid < 0)
-    die("fork failed");
-  else if (pid == 0) {
-    struct timespec ts_1s;
-    ts_1s.tv_sec = 1;
-    ts_1s.tv_nsec = 0;
-    while (1) {
-      static const char ok[] = "ping\n";
-      if (write(fd, ok, sizeof(ok) / sizeof(char)) != sizeof(ok) / sizeof(char))
-        die("write failed");
-      int rv = nanosleep(&ts_1s, NULL);
-      if (rv != 0 && errno != EINTR)
-        die("nanosleep failed");
-    }
-  }
   printf("riju: container ready\n"); // magic string
-  if (waitpid(pid, NULL, 0) <= 0)
-    die("waitpid failed");
-  if (close(fd) < 0)
-    die("close failed");
+  struct timespec ts_1s;
+  ts_1s.tv_sec = 1;
+  ts_1s.tv_nsec = 0;
+  while (1) {
+    static const char ok[] = "ping\n";
+    if (write(fd, ok, sizeof(ok) / sizeof(char)) != sizeof(ok) / sizeof(char))
+      die("write failed");
+    int rv = nanosleep(&ts_1s, NULL);
+    if (rv != 0 && errno != EINTR)
+      die("nanosleep failed");
+  }
 }
 
 void exec(char *uuid, int argc, char **cmdline, bool pty)
@@ -313,16 +311,25 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   struct timespec ts_10ms;
   ts_10ms.tv_sec = 0;
   ts_10ms.tv_nsec = 1000 * 1000 * 10;
-  pid_t input_pid = fork(), output_pid;
-  if (input_pid < 0)
+  pid_t orig_ppid = getpid();
+  pid_t pid = fork();
+  if (pid < 0)
     die("fork failed");
-  else if (input_pid == 0) {
+  else if (pid == 0) {
+    if (prctl(PR_SET_PDEATHSIG, SIGTERM) < 0)
+      die("prctl failed");
+    if (getppid() != orig_ppid)
+      exit(EXIT_FAILURE);
     dataFIFO = inputFIFO;
   } else {
-    output_pid = fork();
-    if (output_pid < 0)
+    pid = fork();
+    if (pid < 0)
       die("fork failed");
-    else if (output_pid == 0) {
+    else if (pid == 0) {
+      if (prctl(PR_SET_PDEATHSIG, SIGTERM) < 0)
+        die("prctl failed");
+      if (getppid() != orig_ppid)
+        exit(EXIT_FAILURE);
       dataFIFO = outputFIFO;
     } else {
       dataFIFO = statusFIFO;
@@ -392,10 +399,6 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
     long status = strtol(line, &endptr, 10);
     if (*endptr != '\n')
       die("strtol failed");
-    if (kill(input_pid, SIGTERM) < 0)
-      die("kill failed");
-    if (kill(output_pid, SIGTERM) < 0)
-      die("kill failed");
     exit(status);
   }
 }
