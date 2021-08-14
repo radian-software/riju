@@ -122,16 +122,6 @@ void wait_alarm(int signum)
   die(timeout_msg);
 }
 
-void wait_alarm_group(int signum)
-{
-  (void)signum;
-  if (signal(SIGTERM, SIG_IGN) == SIG_ERR)
-    die("signal failed");
-  if (kill(0, SIGTERM) < 0)
-    die("kill failed");
-  die(timeout_msg);
-}
-
 void session(char *uuid, char *lang, char *imageHash)
 {
   if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
@@ -323,23 +313,23 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   struct timespec ts_10ms;
   ts_10ms.tv_sec = 0;
   ts_10ms.tv_nsec = 1000 * 1000 * 10;
-  pid_t pid = fork();
-  if (pid < 0)
+  pid_t input_pid = fork(), output_pid;
+  if (input_pid < 0)
     die("fork failed");
-  else if (pid == 0) {
+  else if (input_pid == 0) {
     dataFIFO = inputFIFO;
   } else {
-    pid = fork();
-    if (pid < 0)
+    output_pid = fork();
+    if (output_pid < 0)
       die("fork failed");
-    else if (pid == 0) {
+    else if (output_pid == 0) {
       dataFIFO = outputFIFO;
     } else {
       dataFIFO = statusFIFO;
     }
   }
   if (dataFIFO != statusFIFO) {
-    if (signal(SIGALRM, wait_alarm_group) == SIG_ERR)
+    if (signal(SIGALRM, wait_alarm) == SIG_ERR)
       die("signal failed");
     alarm(1);
   }
@@ -402,9 +392,9 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
     long status = strtol(line, &endptr, 10);
     if (*endptr != '\n')
       die("strtol failed");
-    if (signal(SIGTERM, SIG_IGN) == SIG_ERR)
-      die("signal failed");
-    if (kill(0, SIGTERM) < 0)
+    if (kill(input_pid, SIGTERM) < 0)
+      die("kill failed");
+    if (kill(output_pid, SIGTERM) < 0)
       die("kill failed");
     exit(status);
   }
