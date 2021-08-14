@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+umask 077
+
 while read -t2 -r cmdline; do
     cmd=(${cmdline})
     for (( i=0; i<${#cmd[@]}; i++ )); do
@@ -34,7 +36,7 @@ while read -t2 -r cmdline; do
                     mkfifo "${input}" "${output}" "${status}"
                     (
                         set +e
-                        ${maybe_pty:-} runuser -u riju -- bash -c 'exec "$@"' sentinel "${args[@]}" < "${input}" &> "${output}"
+                        runuser -u riju -- bash -c "exec ${maybe_pty:-} \"\$@\"" -- "${args[@]}" < "${input}" &> "${output}"
                         echo "$?" > "${status}"
                     ) &
                 fi

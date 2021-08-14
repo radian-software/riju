@@ -139,7 +139,7 @@ void session(char *uuid, char *lang, char *imageHash)
   int rv = mkdir("/var/cache/riju/shares", 0700);
   if (rv < 0 && errno != EEXIST)
     die("mkdir failed");
-  rv = mkdir(share, 0700);
+  rv = mkdir(share, 0755);
   if (rv < 0)
     die("mkdir failed");
   if (asprintf(&rijuPtyPath, "%s/riju-pty", share) < 0)
@@ -147,7 +147,7 @@ void session(char *uuid, char *lang, char *imageHash)
   int fdFrom = open("/src/system/out/riju-pty", O_RDONLY);
   if (fdFrom < 0)
     die("open failed");
-  int fdTo = open(rijuPtyPath, O_WRONLY | O_CREAT | O_EXCL, 0700);
+  int fdTo = open(rijuPtyPath, O_WRONLY | O_CREAT | O_EXCL, 0755);
   if (fdTo < 0)
     die("open failed");
   char buf[1024];
@@ -172,7 +172,7 @@ void session(char *uuid, char *lang, char *imageHash)
     die("asprintf failed");
   if (asprintf(&fifo, "%s/control", share) < 0)
     die("asprintf failed");
-  if (mknod(fifo, 0700 | S_IFIFO, 0) < 0)
+  if (mknod(fifo, 0600 | S_IFIFO, 0) < 0)
     die("mknod failed");
   pid_t pid = fork();
   if (pid < 0)
