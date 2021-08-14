@@ -42,7 +42,7 @@ async function main() {
       let idx;
       while ((idx = buffer.indexOf("\n")) !== -1) {
         const line = buffer.slice(0, idx);
-        buffer = buffer.slice(idx + 2);
+        buffer = buffer.slice(idx + 1);
         if (line === "riju: container ready") {
           resolve();
         } else {
