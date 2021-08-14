@@ -247,7 +247,8 @@ void session(char *uuid, char *lang, char *imageHash)
   ts_10ms.tv_sec = 0;
   ts_10ms.tv_nsec = 1000 * 1000 * 10;
   timeout_msg = "container did not come up within 10 seconds";
-  signal(SIGALRM, wait_alarm);
+  if (signal(SIGALRM, wait_alarm) == SIG_ERR)
+    die("signal failed");
   alarm(10);
   int fd;
   while (1) {
@@ -260,7 +261,8 @@ void session(char *uuid, char *lang, char *imageHash)
     if (rv != 0 && errno != EINTR)
       die("nanosleep failed");
   }
-  signal(SIGALRM, SIG_IGN);
+  if (signal(SIGALRM, SIG_IGN) == SIG_ERR)
+    die("signal failed");
   pid = fork();
   if (pid < 0)
     die("fork failed");
@@ -339,7 +341,8 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
     }
   }
   if (dataFIFO != statusFIFO) {
-    signal(SIGALRM, wait_alarm_group);
+    if (signal(SIGALRM, wait_alarm_group) == SIG_ERR)
+      die("signal failed");
     alarm(1);
   }
   while (1) {
@@ -353,9 +356,12 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
     if (rv != 0 && errno != EINTR)
       die("nanosleep failed");
   }
-  signal(SIGALRM, SIG_IGN);
+  if (signal(SIGALRM, SIG_IGN) == SIG_ERR)
+    die("signal failed");
   char buf[1024];
   if (dataFIFO == inputFIFO) {
+    if (close(STDOUT_FILENO) < 0)
+      die("close failed");
     while ((len = read(STDIN_FILENO, buf, 1024)) > 0) {
       char *ptr = buf;
       while (len > 0) {
@@ -369,6 +375,8 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
     if (len < 0)
       die("read failed");
   } else if (dataFIFO == outputFIFO) {
+    if (close(STDIN_FILENO) < 0)
+      die("close failed");
     while ((len = read(fd, buf, 1024)) > 0) {
       fwrite(buf, 1, len, stdout);
       if (ferror(stdout))
@@ -379,6 +387,10 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
     if (len < 0)
       die("read failed");
   } else {
+    if (close(STDIN_FILENO) < 0)
+      die("close failed");
+    if (close(STDOUT_FILENO) < 0)
+      die("close failed");
     char line[1024];
     char *ptr = line;
     int len;
