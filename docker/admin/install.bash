@@ -55,6 +55,7 @@ python3-pip
 pwgen
 skopeo
 ssh
+strace
 sudo
 tmux
 terraform
