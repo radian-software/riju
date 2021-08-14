@@ -319,8 +319,6 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   if (len_written < 0)
     die("write failed");
   close(fd);
-  if (setpgrp() < 0)
-    die("setpgrp failed");
   timeout_msg = "sentinel did not set up FIFOs within 1 second";
   struct timespec ts_10ms;
   ts_10ms.tv_sec = 0;
