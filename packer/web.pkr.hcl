@@ -49,7 +49,7 @@ locals {
 
 source "amazon-ebs" "ubuntu" {
   ami_name      = "riju-web-${local.timestamp}"
-  instance_type = "t3.micro"
+  instance_type = "t3.small"
   source_ami    = "${data.amazon-ami.ubuntu.id}"
   ssh_username  = "ubuntu"
 
