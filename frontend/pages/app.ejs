@@ -1,30 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="overflow: hidden">
   <head>
     <meta charset="utf-8" />
     <title><%= config.name %> - Riju</title>
     <link
       rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css"
+      integrity="sha512-IgmDkwzs96t4SrChW29No3NXBIBv8baW490zk5aXvhCD8vuZM3yUSkbyTBcXohkySecyzIrUwiF/qV0cuPcL3Q=="
       crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="/css/app.css" />
-  </head>
-  <body>
-    <div id="app">
-      <div id="editor" class="column"></div>
-      <div id="terminal" class="column"></div>
-      <button type="button" class="btn btn-success" id="runButton">Run</button>
-      <button type="button" class="btn btn-info" id="formatButton">Prettify</button>
-      <a href="/" class="btn btn-secondary" id="backButton">Switch to a different language</a>
-    </div>
     <script>
      window.rijuConfig = <%- JSON.stringify(config) %>;
     </script>
-    <script src="/js/app.js"></script>
+    <script src="/js/app.js" defer></script>
     <% if (fathomSiteId) { %>
       <script src="https://cdn.usefathom.com/script.js" data-site="<%= fathomSiteId %>" defer></script>
     <% } %>
+  </head>
+  <body>
+    <div class="columns" style="height: 100vh; margin: 0">
+      <div class="column" style="padding: 0">
+        <div id="header" style="border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: lightgray">
+          <a href="/" class="button is-small is-info">
+            <span class="icon is-small">
+              <i class="fas fa-home"></i>
+            </span>
+          </a>
+          <span style="display: inline-block; vertical-align: middle; margin-left: 6px; padding-top: 2px">
+            <b>Riju :: <%= config.name %></b>
+          </span>
+          <span style="display: inline-block; vertical-align: middle; height: 100%"></span>
+          <button id="runButton" type="button" class="button is-small is-success is-pulled-right">
+            <span>Run</span>
+            <span class="icon is-small">
+              <i class="fas fa-play"></i>
+            </span>
+          </button>
+          <button id="formatButton" type="button" class="button is-small is-info is-pulled-right is-hidden">
+            <span>Prettify</span>
+            <span class="icon is-small">
+              <i class="fas fa-code"></i>
+            </span>
+          </button>
+          <button id="lspButton" type="button" class="button is-small is-warning is-pulled-right is-hidden">
+            <span>Autocomplete OFF</span>
+            <span class="icon is-small">
+              <i class="fas fa-bolt"></i>
+            </span>
+          </button>
+        </div>
+        <div style="height: 100%">
+          <div id="editor" style="height: 100%; padding: 12px; padding-left: 0"></div>
+        </div>
+      </div>
+      <div class="column" id="terminal" style="background: black; padding: 0">
+      </div>
+    </div>
+    <div class="modal" id="modal">
+      <div class="modal-background will-close-modal"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title" id="modal-title"></p>
+          <button class="delete will-close-modal" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+          <pre id="modal-data"></pre>
+        </section>
+      </div>
+    </div>
   </body>
 </html>

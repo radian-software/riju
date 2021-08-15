@@ -1,45 +1,7 @@
-body {
-  margin: 0;
-  height: 100vh;
+.xterm {
+  padding: 12px;
 }
 
-#app {
-  height: 100%;
-}
-
-.column {
-  width: 50%;
-  height: 100%;
-  float: left;
-}
-
-#editor {
-  overflow: hidden;
-}
-
-#terminal {
-  background: black;
-}
-
-#runButton {
-  position: absolute;
-  top: 25px;
-  right: calc(50% + 25px);
-}
-
-#formatButton {
-  position: absolute;
-  bottom: 25px;
-  right: calc(50% + 25px);
-  visibility: hidden;
-}
-
-#formatButton.visible {
-  visibility: visible;
-}
-
-#backButton {
-  position: absolute;
-  left: 25px;
-  bottom: 25px;
+#header .button {
+  border-radius: 0;
 }

@@ -21,6 +21,21 @@ import "xterm/css/xterm.css";
 const DEBUG = window.location.hash === "#debug";
 const config = window.rijuConfig;
 
+const formatButton = document.getElementById("formatButton");
+
+function closeModal() {
+  document.querySelector("html").classList.remove("is-clipped");
+  document.getElementById("modal").classList.remove("is-active");
+}
+
+function showError({ message, data }) {
+  document.getElementById("modal-title").innerText = message;
+  document.getElementById("modal-data").innerText =
+    data || "(no output on stderr)";
+  document.getElementById("modal").classList.add("is-active");
+  document.querySelector("html").classList.add("is-clipped");
+}
+
 class RijuMessageReader extends AbstractMessageReader {
   constructor(socket) {
     super();
@@ -101,6 +116,9 @@ class RijuMessageWriter extends AbstractMessageWriter {
 }
 
 async function main() {
+  let serviceLogBuffers = {};
+  let serviceLogLines = {};
+
   const term = new Terminal();
   const fitAddon = new FitAddon();
   term.loadAddon(fitAddon);
@@ -126,9 +144,10 @@ async function main() {
   }
 
   function tryConnect() {
+    serviceLogBuffers = {};
+    serviceLogLines = {};
     let clientDisposable = null;
     let servicesDisposable = null;
-    const serviceLogBuffers = {};
     console.log("Connecting to server...");
     socket = new WebSocket(
       (document.location.protocol === "http:" ? "ws://" : "wss://") +
@@ -169,6 +188,8 @@ async function main() {
           term.write(message.output);
           return;
         case "formattedCode":
+          formatButton.disabled = false;
+          formatButton.classList.remove("is-loading");
           if (
             typeof message.code !== "string" ||
             typeof message.originalCode !== "string"
@@ -235,19 +256,32 @@ async function main() {
             console.error("Unexpected message from server:", message);
             return;
           }
-          if (DEBUG) {
-            let buffer = serviceLogBuffers[message.service] || "";
-            buffer += message.output;
-            while (buffer.includes("\n")) {
-              const idx = buffer.indexOf("\n");
-              const line = buffer.slice(0, idx);
-              buffer = buffer.slice(idx + 1);
+          let buffer = serviceLogBuffers[message.service] || "";
+          let lines = serviceLogLines[message.service] || [];
+          buffer += message.output;
+          while (buffer.includes("\n")) {
+            const idx = buffer.indexOf("\n");
+            const line = buffer.slice(0, idx);
+            buffer = buffer.slice(idx + 1);
+            lines.push(line);
+            if (DEBUG) {
               console.log(`${message.service.toUpperCase()} || ${line}`);
             }
-            serviceLogBuffers[message.service] = buffer;
           }
+          serviceLogBuffers[message.service] = buffer;
+          serviceLogLines[message.service] = lines;
           return;
-        case "serviceCrashed":
+        case "serviceFailed":
+          if (typeof message.service !== "string") {
+            console.error("Unexpected message from server:", message);
+            return;
+          }
+          formatButton.disabled = false;
+          formatButton.classList.remove("is-loading");
+          showError({
+            message: "Could not prettify code!",
+            data: serviceLogLines["formatter"].join("\n"),
+          });
           return;
         default:
           console.error("Unexpected message from server:", message);
@@ -288,6 +322,15 @@ async function main() {
     minimap: { enabled: false },
     scrollbar: { verticalScrollbarSize: 0 },
   });
+  editor.addAction({
+    id: "runCode",
+    label: "Run",
+    keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
+    contextMenuGroupId: "2_execution",
+    run: () => {
+      sendMessage({ event: "runCode", code: editor.getValue() });
+    },
+  });
   window.addEventListener("resize", () => editor.layout());
   editor.getModel().setValue(config.template + "\n");
   monaco.editor.setModelLanguage(
@@ -299,10 +342,24 @@ async function main() {
     sendMessage({ event: "runCode", code: editor.getValue() });
   });
   if (config.format) {
-    document.getElementById("formatButton").classList.add("visible");
-    document.getElementById("formatButton").addEventListener("click", () => {
+    formatButton.classList.remove("is-hidden");
+    formatButton.addEventListener("click", () => {
+      formatButton.classList.add("is-loading");
+      formatButton.disabled = true;
+      serviceLogBuffers["formatter"] = "";
+      serviceLogLines["formatter"] = [];
       sendMessage({ event: "formatCode", code: editor.getValue() });
     });
+  }
+  if (config.lsp) {
+    document.getElementById("lspButton").classList.remove("is-hidden");
+    document.getElementById("lspButton").addEventListener("click", () => {
+      // Do stuff here
+    });
+  }
+
+  for (const elt of document.querySelectorAll(".will-close-modal")) {
+    elt.addEventListener("click", closeModal);
   }
 }
 
