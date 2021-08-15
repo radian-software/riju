@@ -52,6 +52,7 @@ export class Session {
     util.privilegedExec(this.context, bash(cmdline));
   privilegedPty = (cmdline) =>
     util.privilegedPty(this.context, bash(cmdline, { stty: true }));
+  privilegedTeardown = (cmdline) => util.privilegedTeardown(this.context);
 
   setup = async () => {
     try {
@@ -449,7 +450,7 @@ export class Session {
       if (this.container) {
         this.container.proc.kill();
       }
-      await this.run(this.privilegedTeardown({ uuid }));
+      await this.run(this.privilegedTeardown());
       allSessions.delete(this);
       this.ws.terminate();
     } catch (err) {

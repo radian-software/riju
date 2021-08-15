@@ -418,10 +418,12 @@ void teardown(char *uuid)
     if (asprintf(&cmdline, "rm -rf /var/cache/riju/shares/%s", uuid) < 0)
       die("asprintf failed");
   } else {
-    cmdline = "comm -23 <(sudo ls /var/cache/riju/shares | sort) <(docker ps "
-              "-f label=riju.category=user-session --format \"{{ .Labels }}\" "
-              "| grep -Eo 'riju\\.user-session=[a-z0-9]+' | sed -E "
-              "'s/^[^=]+=//') | (cd /var/cache/riju/shares; xargs rm -rf)";
+    cmdline =
+        "comm -23 <(sudo ls /var/cache/riju/shares | sort) <(docker ps "
+        "-f label=riju.category=user-session --format \"{{ .Labels }}\" "
+        "| grep -Eo 'riju\\.user-session=[a-z0-9]+' | sed -E "
+        "'s/^[^=]+=//' | sort) | (cd /var/cache/riju/shares 2>/dev/null && "
+        "xargs rm -rf || :)";
   }
   char *argv[] = {"bash", "-c", cmdline, NULL};
   execvp(argv[0], argv);
