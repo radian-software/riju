@@ -32,13 +32,14 @@ while read -t2 -r cmdline; do
                     fi
                     uuid="${cmd[1]}"
                     args=("${cmd[@]:2}")
-                    input="/var/cache/riju/share/cmd-${uuid}-input"
-                    output="/var/cache/riju/share/cmd-${uuid}-output"
+                    stdin="/var/cache/riju/share/cmd-${uuid}-stdin"
+                    stdout="/var/cache/riju/share/cmd-${uuid}-stdout"
+                    stderr="/var/cache/riju/share/cmd-${uuid}-stderr"
                     status="/var/cache/riju/share/cmd-${uuid}-status"
-                    mkfifo "${input}" "${output}" "${status}"
+                    mkfifo "${stdin}" "${stdout}" "${stderr}" "${status}"
                     (
                         set +e
-                        runuser -u riju -- bash -c "exec ${maybe_pty:-} \"\$@\"" -- "${args[@]}" < "${input}" &> "${output}"
+                        runuser -u riju -- bash -c "exec ${maybe_pty:-} \"\$@\"" -- "${args[@]}" < "${stdin}" > "${stdout}" 2> "${stderr}"
                         echo "$?" > "${status}"
                     ) &
                 fi

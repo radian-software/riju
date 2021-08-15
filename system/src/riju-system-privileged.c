@@ -286,16 +286,18 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
 {
   if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
     die("setvbuf failed");
-  char *share, *ctlFIFO, *inputFIFO, *outputFIFO, *statusFIFO, *ctlCmd,
-      *dataFIFO;
+  char *share, *ctlFIFO, *stdinFIFO, *stdoutFIFO, *stderrFIFO, *statusFIFO,
+      *ctlCmd, *dataFIFO;
   if (asprintf(&share, "/var/cache/riju/shares/%s", uuid) < 0)
     die("asprintf failed");
   if (asprintf(&ctlFIFO, "%s/control", share) < 0)
     die("asprintf failed");
   char *procUUID = getUUID();
-  if (asprintf(&inputFIFO, "%s/cmd-%s-input", share, procUUID) < 0)
+  if (asprintf(&stdinFIFO, "%s/cmd-%s-stdin", share, procUUID) < 0)
     die("asprintf failed");
-  if (asprintf(&outputFIFO, "%s/cmd-%s-output", share, procUUID) < 0)
+  if (asprintf(&stdoutFIFO, "%s/cmd-%s-stdout", share, procUUID) < 0)
+    die("asprintf failed");
+  if (asprintf(&stderrFIFO, "%s/cmd-%s-stderr", share, procUUID) < 0)
     die("asprintf failed");
   if (asprintf(&statusFIFO, "%s/cmd-%s-status", share, procUUID) < 0)
     die("asprintf failed");
@@ -328,7 +330,7 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
       die("prctl failed");
     if (getppid() != orig_ppid)
       exit(EXIT_FAILURE);
-    dataFIFO = inputFIFO;
+    dataFIFO = stdinFIFO;
   } else {
     pid = fork();
     if (pid < 0)
@@ -338,9 +340,20 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
         die("prctl failed");
       if (getppid() != orig_ppid)
         exit(EXIT_FAILURE);
-      dataFIFO = outputFIFO;
+      dataFIFO = stdoutFIFO;
     } else {
-      dataFIFO = statusFIFO;
+      pid = fork();
+      if (pid < 0)
+        die("fork failed");
+      else if (pid == 0) {
+        if (prctl(PR_SET_PDEATHSIG, SIGTERM) < 0)
+          die("prctl failed");
+        if (getppid() != orig_ppid)
+          exit(EXIT_FAILURE);
+        dataFIFO = stderrFIFO;
+      } else {
+        dataFIFO = statusFIFO;
+      }
     }
   }
   if (dataFIFO != statusFIFO) {
@@ -349,7 +362,7 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
     alarm(1);
   }
   while (1) {
-    int mode = dataFIFO == inputFIFO ? O_WRONLY : O_RDONLY;
+    int mode = dataFIFO == stdinFIFO ? O_WRONLY : O_RDONLY;
     fd = open(dataFIFO, mode);
     if (fd >= 0)
       break;
@@ -362,7 +375,7 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   if (signal(SIGALRM, SIG_IGN) == SIG_ERR)
     die("signal failed");
   char buf[1024];
-  if (dataFIFO == inputFIFO) {
+  if (dataFIFO == stdinFIFO) {
     if (close(STDOUT_FILENO) < 0)
       die("close failed");
     while ((len = read(STDIN_FILENO, buf, 1024)) > 0) {
@@ -377,12 +390,13 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
     }
     if (len < 0)
       die("read failed");
-  } else if (dataFIFO == outputFIFO) {
+  } else if (dataFIFO == stdoutFIFO || dataFIFO == stderrFIFO) {
+    FILE *output = dataFIFO == stdoutFIFO ? stdout : stderr;
     if (close(STDIN_FILENO) < 0)
       die("close failed");
     while ((len = read(fd, buf, 1024)) > 0) {
-      fwrite(buf, 1, len, stdout);
-      if (ferror(stdout))
+      fwrite(buf, 1, len, output);
+      if (ferror(output))
         die("fwrite failed");
       if (feof(stdout))
         break;
