@@ -311,7 +311,7 @@ async function main() {
             case "lsp":
               lspButton.disabled = false;
               lspButton.classList.remove("is-loading");
-              lspButton.classList.remove("is-light");
+              lspButton.classList.add("is-light");
               lspButtonState.innerText = "CRASHED";
               break;
             case "terminal":
@@ -338,6 +338,10 @@ async function main() {
         servicesDisposable.dispose();
         servicesDisposable = null;
       }
+      lspButton.disabled = false;
+      lspButton.classList.remove("is-loading");
+      lspButton.classList.add("is-light");
+      lspButtonState.innerText = "DISCONNECTED";
       scheduleConnect();
     });
   }
