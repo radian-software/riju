@@ -413,6 +413,8 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
 
 void teardown(char *uuid)
 {
+  if (setuid(0) != 0)
+    die("setuid failed");
   char *cmdline;
   if (uuid != NULL) {
     if (asprintf(&cmdline, "rm -rf /var/cache/riju/shares/%s", uuid) < 0)
@@ -433,8 +435,8 @@ void teardown(char *uuid)
 int main(int argc, char **argv)
 {
   init();
-  if (setuid(0) != 0)
-    die("setuid failed");
+  if (seteuid(0) != 0)
+    die("seteuid failed");
   if (argc < 2)
     die_with_usage();
   if (!strcmp(argv[1], "session")) {
