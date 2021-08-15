@@ -22,6 +22,8 @@ const DEBUG = window.location.hash === "#debug";
 const config = window.rijuConfig;
 
 const formatButton = document.getElementById("formatButton");
+const lspButton = document.getElementById("lspButton");
+const lspButtonState = document.getElementById("lspButtonState");
 
 function closeModal() {
   document.querySelector("html").classList.remove("is-clipped");
@@ -201,7 +203,25 @@ async function main() {
             editor.setValue(message.code);
           }
           return;
+        case "lspStopped":
+          lspButton.disabled = false;
+          lspButton.classList.remove("is-loading");
+          lspButton.classList.add("is-light");
+          lspButtonState.innerText = "OFF";
+          if (clientDisposable) {
+            clientDisposable.dispose();
+            clientDisposable = null;
+          }
+          if (servicesDisposable) {
+            servicesDisposable.dispose();
+            servicesDisposable = null;
+          }
+          break;
         case "lspStarted":
+          lspButton.disabled = false;
+          lspButton.classList.remove("is-loading");
+          lspButton.classList.remove("is-light");
+          lspButtonState.innerText = "ON";
           if (typeof message.root !== "string") {
             console.error("Unexpected message from server:", message);
             return;
@@ -272,16 +292,32 @@ async function main() {
           serviceLogLines[message.service] = lines;
           return;
         case "serviceFailed":
-          if (typeof message.service !== "string") {
+          if (
+            typeof message.service !== "string" ||
+            typeof message.error !== "string"
+          ) {
             console.error("Unexpected message from server:", message);
             return;
           }
-          formatButton.disabled = false;
-          formatButton.classList.remove("is-loading");
-          showError({
-            message: "Could not prettify code!",
-            data: serviceLogLines["formatter"].join("\n"),
-          });
+          switch (message.service) {
+            case "formatter":
+              formatButton.disabled = false;
+              formatButton.classList.remove("is-loading");
+              showError({
+                message: "Could not prettify code!",
+                data: serviceLogLines["formatter"].join("\n"),
+              });
+              break;
+            case "lsp":
+              lspButton.disabled = false;
+              lspButton.classList.remove("is-loading");
+              lspButton.classList.remove("is-light");
+              lspButtonState.innerText = "CRASHED";
+              break;
+            case "terminal":
+              term.write(`\r\n[${message.error}]`);
+              break;
+          }
           return;
         default:
           console.error("Unexpected message from server:", message);
@@ -352,9 +388,18 @@ async function main() {
     });
   }
   if (config.lsp) {
-    document.getElementById("lspButton").classList.remove("is-hidden");
-    document.getElementById("lspButton").addEventListener("click", () => {
-      // Do stuff here
+    lspButton.classList.remove("is-hidden");
+    lspButton.addEventListener("click", () => {
+      lspButton.classList.add("is-loading");
+      lspButton.disabled = true;
+      lspButton.classList.remove("is-light");
+      if (lspButtonState.innerText === "ON") {
+        sendMessage({ event: "lspStop" });
+      } else {
+        serviceLogBuffers["lsp"] = "";
+        serviceLogLines["lsp"] = [];
+        sendMessage({ event: "lspStart" });
+      }
     });
   }
 
