@@ -27,6 +27,8 @@ while read -t2 -r cmdline; do
                 else
                     if [[ "${cmd[0]}" == pty ]]; then
                         maybe_pty=/var/cache/riju/share/riju-pty
+                    else
+                        maybe_pty=
                     fi
                     uuid="${cmd[1]}"
                     args=("${cmd[@]:2}")
