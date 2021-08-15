@@ -322,7 +322,6 @@ func (sv *supervisor) reload() error {
 	deployCfgHash := fmt.Sprintf("%x", h.Sum(nil))
 	if deployCfgHash == sv.deployConfigHash {
 		sv.status(fmt.Sprintf("config hash remains at %s", deployCfgHash))
-		return nil
 	} else {
 		sv.status(fmt.Sprintf(
 			"config hash updated %s => %s",

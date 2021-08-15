@@ -2,6 +2,7 @@ import { spawn } from "child_process";
 import os from "os";
 import process from "process";
 
+import * as Sentry from "@sentry/node";
 import { v4 as getUUIDOrig } from "uuid";
 
 let sentryEnabled = false;
