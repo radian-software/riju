@@ -3,7 +3,6 @@ import path from "path";
 import process from "process";
 import WebSocket from "ws";
 
-import pty from "node-pty";
 import pQueue from "p-queue";
 const PQueue = pQueue.default;
 import rpc from "vscode-jsonrpc";
@@ -58,13 +57,11 @@ export class Session {
     try {
       allSessions.add(this);
       const containerArgs = this.privilegedSession();
-      const containerPty = pty.spawn(containerArgs[0], containerArgs.slice(1), {
-        name: "xterm-color",
-      });
+      const containerProc = spawn(containerArgs[0], containerArgs.slice(1));
       this.container = {
-        pty: containerPty,
+        proc: containerProc,
       };
-      containerPty.on("close", async (code, signal) => {
+      containerProc.on("close", async (code, signal) => {
         this.send({
           event: "serviceFailed",
           service: "container",
@@ -73,21 +70,28 @@ export class Session {
         });
         await this.teardown();
       });
-      containerPty.on("error", (err) =>
+      containerProc.on("error", (err) =>
         this.send({
           event: "serviceFailed",
           service: "container",
           error: `${err}`,
         })
       );
+      containerProc.stderr.on("data", (data) =>
+        this.send({
+          event: "serviceLog",
+          service: "container",
+          output: data.toString("utf8"),
+        })
+      );
       let buffer = "";
       await new Promise((resolve) => {
-        containerPty.on("data", (data) => {
-          buffer += data;
+        containerProc.stdout.on("data", (data) => {
+          buffer += data.toString();
           let idx;
-          while ((idx = buffer.indexOf("\r\n")) !== -1) {
+          while ((idx = buffer.indexOf("\n")) !== -1) {
             const line = buffer.slice(0, idx);
-            buffer = buffer.slice(idx + 2);
+            buffer = buffer.slice(idx + 1);
             if (line === "riju: container ready") {
               resolve();
             } else {
@@ -237,7 +241,7 @@ export class Session {
             this.log("terminalInput ignored because term is null");
             break;
           }
-          this.term.pty.write(msg.input);
+          this.term.pty.stdin.write(msg.input);
           break;
         case "runCode":
           if (typeof msg.code !== "string") {
@@ -326,17 +330,24 @@ export class Session {
       await this.writeCode(code);
       const termArgs = this.privilegedPty(cmdline);
       const term = {
-        pty: pty.spawn(termArgs[0], termArgs.slice(1), {
-          name: "xterm-color",
-        }),
+        pty: spawn(termArgs[0], termArgs.slice(1)),
         live: true,
       };
       this.term = term;
-      this.term.pty.on("data", (data) => {
+      this.term.pty.stdout.on("data", (data) => {
         // Capture term in closure so that we don't keep sending output
         // from the old pty even after it's been killed (see ghci).
         if (term.live) {
-          this.send({ event: "terminalOutput", output: data });
+          this.send({ event: "terminalOutput", output: data.toString() });
+        }
+      });
+      this.term.pty.stderr.on("data", (data) => {
+        if (term.live) {
+          this.send({
+            event: "serviceLog",
+            service: "pty",
+            output: data.toString("utf8"),
+          });
         }
       });
       this.term.pty.on("exit", (code, signal) => {
@@ -441,7 +452,7 @@ export class Session {
       this.log(`Tearing down session`);
       this.tearingDown = true;
       if (this.container) {
-        this.container.pty.kill();
+        this.container.proc.kill();
       }
       allSessions.delete(this);
       this.ws.terminate();
