@@ -6,15 +6,15 @@ RUN /tmp/install-build.bash
 WORKDIR /src
 COPY Makefile ./
 
-COPY system ./system/
-RUN make system UNPRIVILEGED=1
-
 COPY package.json yarn.lock ./
 RUN yarn install
 
 COPY webpack.config.cjs ./
 COPY frontend/src ./frontend/src/
 RUN make frontend
+
+COPY system ./system/
+RUN make system UNPRIVILEGED=1
 
 COPY frontend/pages ./frontend/pages/
 COPY frontend/styles ./frontend/styles/
