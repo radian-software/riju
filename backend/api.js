@@ -9,7 +9,7 @@ import rpc from "vscode-jsonrpc";
 
 import { langs } from "./langs.js";
 import * as util from "./util.js";
-import { bash, getUUID } from "./util.js";
+import { bash, getUUID, logError } from "./util.js";
 
 const allSessions = new Set();
 
@@ -180,12 +180,11 @@ export class Session {
         await this.teardown();
       });
       this.ws.on("error", async (err) => {
-        this.log(`Websocket error: ${err}`);
+        logError(err);
         await this.teardown();
       });
     } catch (err) {
-      this.log(`Error while setting up environment`);
-      console.log(err);
+      logError(err);
       this.sendError(err);
       await this.teardown();
     }
@@ -198,8 +197,7 @@ export class Session {
       }
       this.ws.send(JSON.stringify(msg));
     } catch (err) {
-      this.log(`Failed to send websocket message: ${err}`);
-      console.log(err);
+      logError(err);
       await this.teardown();
     }
   };
@@ -280,8 +278,7 @@ export class Session {
           break;
       }
     } catch (err) {
-      this.log(`Error while handling message from client`);
-      console.log(err);
+      logError(err);
       this.sendError(err);
     }
   };
@@ -361,8 +358,7 @@ export class Session {
         }
       });
     } catch (err) {
-      this.log(`Error while running user code`);
-      console.log(err);
+      logError(err);
       this.sendError(err);
     }
   };
@@ -429,8 +425,7 @@ export class Session {
       });
       this.formatter = formatter;
     } catch (err) {
-      this.log(`Error while running code formatter`);
-      console.log(err);
+      logError(err);
       this.sendError(err);
     }
   };
@@ -454,11 +449,11 @@ export class Session {
       if (this.container) {
         this.container.proc.kill();
       }
+      await this.run(this.privilegedTeardown({ uuid }));
       allSessions.delete(this);
       this.ws.terminate();
     } catch (err) {
-      this.log(`Error during teardown`);
-      console.log(err);
+      logError(err);
     }
   };
 }

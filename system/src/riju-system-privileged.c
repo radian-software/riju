@@ -32,7 +32,8 @@ void die_with_usage()
   die("usage:\n"
       "  riju-system-privileged session UUID LANG [IMAGE-HASH]\n"
       "  riju-system-privileged exec UUID CMDLINE...\n"
-      "  riju-system-privileged pty UUID CMDLINE...");
+      "  riju-system-privileged pty UUID CMDLINE...\n"
+      "  riju-system-privileged teardown [UUID]");
 }
 
 char *quoteArgs(int argc, char **cmdline)
@@ -128,7 +129,10 @@ void session(char *uuid, char *lang, char *imageHash)
 {
   if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
     die("setvbuf failed");
-  char *image, *container, *hostname, *share, *volume, *fifo, *rijuPtyPath;
+  char *image, *container, *hostname, *share, *volume, *fifo, *rijuPtyPath,
+      *sessionLabel;
+  if (asprintf(&sessionLabel, "riju.user-session=%s", uuid) < 0)
+    die("asprintf failed");
   if ((imageHash != NULL ? asprintf(&image, "riju:lang-%s-%s", lang, imageHash)
                          : asprintf(&image, "riju:lang-%s", lang)) < 0)
     die("asprintf failed");
@@ -231,6 +235,10 @@ void session(char *uuid, char *lang, char *imageHash)
         "2048",
         "--cgroup-parent",
         "riju.slice",
+        "--label",
+        "riju.category=user-session",
+        "--label",
+        sessionLabel,
         image,
         "bash",
         "-c",
@@ -403,11 +411,28 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   }
 }
 
+void teardown(char *uuid)
+{
+  char *cmdline;
+  if (uuid != NULL) {
+    if (asprintf(&cmdline, "rm -rf /var/cache/riju/shares/%s", uuid) < 0)
+      die("asprintf failed");
+  } else {
+    cmdline = "comm -23 <(sudo ls /var/cache/riju/shares | sort) <(docker ps "
+              "-f label=riju.category=user-session --format \"{{ .Labels }}\" "
+              "| grep -Eo 'riju\\.user-session=[a-z0-9]+' | sed -E "
+              "'s/^[^=]+=//') | (cd /var/cache/riju/shares; xargs rm -rf)";
+  }
+  char *argv[] = {"bash", "-c", cmdline, NULL};
+  execvp(argv[0], argv);
+  die("execvp failed");
+}
+
 int main(int argc, char **argv)
 {
   init();
-  if (seteuid(0) != 0)
-    die("seteuid failed");
+  if (setuid(0) != 0)
+    die("setuid failed");
   if (argc < 2)
     die_with_usage();
   if (!strcmp(argv[1], "session")) {
@@ -429,6 +454,12 @@ int main(int argc, char **argv)
     if (argc < 4)
       die_with_usage();
     exec(parseUUID(argv[2]), argc - 3, &argv[3], true);
+    return 0;
+  }
+  if (!strcmp(argv[1], "teardown")) {
+    if (argc < 2)
+      die_with_usage();
+    teardown(argc >= 3 ? parseUUID(argv[2]) : NULL);
     return 0;
   }
   die_with_usage();

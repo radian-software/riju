@@ -349,6 +349,7 @@ func (sv *supervisor) reload() error {
 		"-p", fmt.Sprintf("127.0.0.1:%d:6119", port),
 		"-e", "FATHOM_SITE_ID",
 		"-e", "RIJU_DEPLOY_CONFIG",
+		"-e", "SENTRY_DSN",
 		"--label", fmt.Sprintf("riju.deploy-config-hash=%s", deployCfgHash),
 		"--name", name,
 		"--restart", "unless-stopped",

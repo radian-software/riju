@@ -4,6 +4,22 @@ import process from "process";
 
 import { v4 as getUUIDOrig } from "uuid";
 
+let sentryEnabled = false;
+
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+  });
+  sentryEnabled = true;
+}
+
+export function logError(err) {
+  console.error(err);
+  if (sentryEnabled) {
+    Sentry.captureException(err);
+  }
+}
+
 function computeImageHashes() {
   let deployConfig = process.env.RIJU_DEPLOY_CONFIG;
   if (!deployConfig) return {};
@@ -83,6 +99,16 @@ export function privilegedExec({ uuid }, args) {
 
 export function privilegedPty({ uuid }, args) {
   return [rijuSystemPrivileged, "pty", uuid].concat(args);
+}
+
+export function privilegedTeardown(options) {
+  options = options || {};
+  const { uuid } = options;
+  const cmdline = [rijuSystemPrivileged, "teardown"];
+  if (uuid) {
+    cmdline.push(uuid);
+  }
+  return cmdline;
 }
 
 export function bash(cmdline, opts) {

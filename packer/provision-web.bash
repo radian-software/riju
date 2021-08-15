@@ -61,6 +61,7 @@ sudo sed -Ei 's/^#?PermitEmptyPasswords .*/PermitEmptyPasswords no/' /etc/ssh/ss
 sudo sed -Ei "s/\\\$AWS_REGION/${AWS_REGION}/" /etc/systemd/system/riju.service
 sudo sed -Ei "s/\\\$FATHOM_SITE_ID/${FATHOM_SITE_ID:-}/" /etc/systemd/system/riju.service
 sudo sed -Ei "s/\\\$S3_BUCKET/${S3_BUCKET}/" /etc/systemd/system/riju.service
+sudo sed -Ei "s/\\\$SENTRY_DSN/${SENTRY_DSN:-}/" /etc/systemd/system/riju.service
 sudo sed -Ei "s/\\\$SUPERVISOR_ACCESS_TOKEN/${SUPERVISOR_ACCESS_TOKEN}/" /etc/systemd/system/riju.service
 
 sudo passwd -l root

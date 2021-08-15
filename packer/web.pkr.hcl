@@ -23,6 +23,11 @@ variable "s3_bucket" {
   default = "${env("S3_BUCKET")}"
 }
 
+variable "sentry_dsn" {
+  type = string
+  default = "${env("SENTRY_DSN_PACKER")}"
+}
+
 variable "supervisor_access_token" {
   type = string
   default = "${env("SUPERVISOR_ACCESS_TOKEN")}"
@@ -114,6 +119,7 @@ build {
       "FATHOM_SITE_ID=${var.fathom_site_id}",
       "GRAFANA_API_KEY=${var.grafana_api_key}",
       "S3_BUCKET=${var.s3_bucket}",
+      "SENTRY_DSN=${var.sentry_dsn}",
       "SUPERVISOR_ACCESS_TOKEN=${var.supervisor_access_token}",
     ]
     script           = "provision-web.bash"

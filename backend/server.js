@@ -8,7 +8,8 @@ import _ from "lodash";
 
 import * as api from "./api.js";
 import { aliases, langs } from "./langs.js";
-import { log } from "./util.js";
+import * as util from "./util.js";
+import { log, privilegedTeardown } from "./util.js";
 
 const host = process.env.HOST || "localhost";
 const port = parseInt(process.env.PORT || "") || 6119;
@@ -95,6 +96,10 @@ function addWebsocket(baseApp, httpsServer) {
   });
   return app;
 }
+
+util.run(privilegedTeardown(), console.error).catch((err) => {
+  console.error(err);
+});
 
 if (useTLS) {
   const httpsServer = https.createServer(
