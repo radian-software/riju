@@ -23,7 +23,7 @@ deb https://dl.yarnpkg.com/debian/ stable main
 EOF
 
 apt-get update
-apt-get install -y clang g++ make nodejs sudo yarn
+apt-get install -y clang g++ make nodejs sudo yarn xxd
 
 rm -rf /var/lib/apt/lists/*
 
