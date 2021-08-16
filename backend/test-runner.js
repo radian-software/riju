@@ -288,6 +288,9 @@ class Test {
       ? template.indexOf(after) + after.length
       : template.length;
     const code = template.slice(0, idx) + insertedCode + template.slice(idx);
+    this.send({
+      event: "lspStart",
+    });
     const root = await this.wait("lspStarted message", (msg) => {
       if (msg.event === "lspStarted") {
         return msg.root;
