@@ -46,4 +46,4 @@ scope:
   code: |
     (def x (* 123 234))
 
-timeoutFactor: 4
+timeoutFactor: 8
