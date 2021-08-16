@@ -1,7 +1,6 @@
 import { spawn } from "child_process";
 import path from "path";
 import process from "process";
-import WebSocket from "ws";
 
 import pQueue from "p-queue";
 const PQueue = pQueue.default;
@@ -52,7 +51,7 @@ export class Session {
     util.privilegedExec(this.context, bash(cmdline));
   privilegedPty = (cmdline) =>
     util.privilegedPty(this.context, bash(cmdline, { stty: true }));
-  privilegedTeardown = (cmdline) => util.privilegedTeardown(this.context);
+  privilegedTeardown = (_cmdline) => util.privilegedTeardown(this.context);
 
   setup = async () => {
     try {
@@ -268,7 +267,7 @@ export class Session {
 
   runCode = async (code) => {
     try {
-      const { name, repl, main, suffix, createEmpty, compile, run, template } =
+      const { name, repl, suffix, createEmpty, compile, run, template } =
         this.config;
       if (this.term) {
         try {

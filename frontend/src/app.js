@@ -5,14 +5,9 @@ import {
   MonacoServices,
   Services,
 } from "monaco-languageclient";
-import { Disposable } from "vscode";
 import { createMessageConnection } from "vscode-jsonrpc";
-import {
-  AbstractMessageReader,
-  DataCallback,
-} from "vscode-jsonrpc/lib/messageReader.js";
+import { AbstractMessageReader } from "vscode-jsonrpc/lib/messageReader.js";
 import { AbstractMessageWriter } from "vscode-jsonrpc/lib/messageWriter.js";
-import { Message } from "vscode-jsonrpc/lib/messages.js";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 
