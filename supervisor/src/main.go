@@ -117,6 +117,14 @@ func (sv *supervisor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "401 wrong access token", http.StatusUnauthorized)
 			return
 		}
+		if r.URL.Path == "/api/supervisor/v1/taint" {
+			if r.Method != http.MethodPost {
+				http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
+				return
+			}
+			sv.deployConfigHash = "tainted"
+			return
+		}
 		if r.URL.Path == "/api/supervisor/v1/reload" {
 			if r.Method != http.MethodPost {
 				http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
@@ -322,6 +330,7 @@ func (sv *supervisor) reload() error {
 	deployCfgHash := fmt.Sprintf("%x", h.Sum(nil))
 	if deployCfgHash == sv.deployConfigHash {
 		sv.status(fmt.Sprintf("config hash remains at %s", deployCfgHash))
+		return nil
 	} else {
 		sv.status(fmt.Sprintf(
 			"config hash updated %s => %s",
