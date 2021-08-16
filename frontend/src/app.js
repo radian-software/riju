@@ -122,6 +122,16 @@ async function main() {
   let serviceLogBuffers = {};
   let serviceLogLines = {};
 
+  let lastActivityTimestamp = new Date();
+  let idleDueToInactivity = false;
+
+  function recordActivity() {
+    lastActivityTimestamp = new Date();
+    if (idleDueToInactivity) {
+      scheduleConnect();
+    }
+  }
+
   const term = new Terminal();
   const fitAddon = new FitAddon();
   term.loadAddon(fitAddon);
@@ -359,6 +369,11 @@ async function main() {
   }
 
   function scheduleConnect() {
+    idleDueToInactivity = new Date() - lastActivityTimestamp > 10 * 60 * 1000;
+    if (idleDueToInactivity) {
+      connectionStatus.innerText = "idle";
+      return;
+    }
     const delay = retryDelayMs * Math.random();
     console.log(`Trying to reconnect in ${Math.floor(delay)}ms`);
     setTimeout(tryConnect, delay);
@@ -368,7 +383,10 @@ async function main() {
   let socket = null;
   tryConnect();
 
-  term.onData((data) => sendMessage({ event: "terminalInput", input: data }));
+  term.onData((data) => {
+    sendMessage({ event: "terminalInput", input: data });
+    recordActivity();
+  });
 
   const editor = monaco.editor.create(document.getElementById("editor"), {
     minimap: { enabled: false },
@@ -383,6 +401,7 @@ async function main() {
       sendMessage({ event: "runCode", code: editor.getValue() });
     },
   });
+  editor.getModel().onDidChangeContent(() => recordActivity());
   window.addEventListener("resize", () => editor.layout());
   editor.getModel().setValue(config.template + "\n");
   monaco.editor.setModelLanguage(
