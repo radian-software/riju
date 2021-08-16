@@ -7,7 +7,7 @@ import ws from "express-ws";
 import _ from "lodash";
 
 import * as api from "./api.js";
-import { aliases, langs } from "./langs.js";
+import { aliases, langsPromise } from "./langs.js";
 import * as util from "./util.js";
 import { log, privilegedTeardown } from "./util.js";
 
@@ -17,6 +17,7 @@ const tlsPort = parseInt(process.env.TLS_PORT || "") || 6120;
 const useTLS = process.env.TLS ? true : false;
 const fathomSiteId = process.env.FATHOM_SITE_ID || "";
 
+const langs = await langsPromise;
 const app = express();
 
 app.set("query parser", (qs) => new URLSearchParams(qs));

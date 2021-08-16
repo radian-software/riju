@@ -24,6 +24,7 @@ const config = window.rijuConfig;
 const formatButton = document.getElementById("formatButton");
 const lspButton = document.getElementById("lspButton");
 const lspButtonState = document.getElementById("lspButtonState");
+const connectionStatus = document.getElementById("connectionStatus");
 
 function closeModal() {
   document.querySelector("html").classList.remove("is-clipped");
@@ -150,6 +151,7 @@ async function main() {
     serviceLogLines = {};
     let clientDisposable = null;
     let servicesDisposable = null;
+    connectionStatus.innerText = "connecting...";
     console.log("Connecting to server...");
     socket = new WebSocket(
       (document.location.protocol === "http:" ? "ws://" : "wss://") +
@@ -157,6 +159,7 @@ async function main() {
         `/api/v1/ws?lang=${encodeURIComponent(config.id)}`
     );
     socket.addEventListener("open", () => {
+      connectionStatus.innerText = "connected";
       console.log("Successfully connected to server");
     });
     socket.addEventListener("message", (event) => {
@@ -345,10 +348,12 @@ async function main() {
         servicesDisposable.dispose();
         servicesDisposable = null;
       }
-      lspButton.disabled = false;
-      lspButton.classList.remove("is-loading");
-      lspButton.classList.add("is-light");
-      lspButtonState.innerText = "DISCONNECTED";
+      if (lspButtonState.innerText === "ON") {
+        lspButton.disabled = false;
+        lspButton.classList.remove("is-loading");
+        lspButton.classList.add("is-light");
+        lspButtonState.innerText = "DISCONNECTED";
+      }
       scheduleConnect();
     });
   }
