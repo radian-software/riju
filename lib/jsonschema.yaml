@@ -961,6 +961,18 @@ properties:
         type: string
         minLength: 1
 
+  timeoutFactor:
+    title: "Per-language multiplier for test timeouts"
+    description: |
+      Some languages are slow. To account for this, Riju's test
+      timeouts are fairly forgiving. However, some languages are not
+      just slow but absolutely GLACIAL. To deal with these, you can
+      specify 'timeoutFactor' as an integer multiplier for the test
+      timeout (default or user-supplied) that would otherwise be used
+      for the language.
+    type: integer
+    minimum: 1
+    default: 1
   skip:
     type: array
     items:

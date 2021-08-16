@@ -123,7 +123,7 @@ class Test {
       timeout = setTimeout(() => {
         this.timedOut = true;
         this.handleUpdate();
-      }, TIMEOUT * 1000 * PATIENCE);
+      }, TIMEOUT * 1000 * PATIENCE * (this.config.timeoutFactor || 1));
       await session.setup();
       switch (this.type) {
         case "ensure":

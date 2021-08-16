@@ -45,3 +45,5 @@ run: |
 scope:
   code: |
     (def x (* 123 234))
+
+timeoutFactor: 4
