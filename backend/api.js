@@ -56,6 +56,7 @@ export class Session {
 
   setup = async () => {
     try {
+      setTimeout(this.teardown, 3600 * 1000); // max session length of 1hr
       allSessions.add(this);
       const containerArgs = this.privilegedSession();
       const containerProc = spawn(containerArgs[0], containerArgs.slice(1));
