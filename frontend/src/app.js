@@ -230,13 +230,20 @@ async function main() {
             rootUri: `file://${message.root}`,
           });
           servicesDisposable = Services.install(services);
-          editor.setModel(
-            monaco.editor.createModel(
-              editor.getModel().getValue(),
-              undefined,
-              monaco.Uri.parse(`file://${message.root}/${config.main}`)
-            )
-          );
+          const newURI = `file://${message.root}/${config.main}`;
+          const oldModel = editor.getModel();
+          if (oldModel.uri.toString() !== newURI) {
+            // This code is likely to be buggy as it will probably
+            // never run and has thus never been tested.
+            editor.setModel(
+              monaco.editor.createModel(
+                oldModel.getValue(),
+                undefined,
+                monaco.Uri.parse(newURI)
+              )
+            );
+            oldModel.dispose();
+          }
           const connection = createMessageConnection(
             new RijuMessageReader(socket),
             new RijuMessageWriter(socket)
