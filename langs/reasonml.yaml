@@ -32,6 +32,9 @@ install:
     npm install
     popd
 
+setup: |
+  cp -a /opt/reasonml/skel/* ./
+
 main: "main.re"
 template: |
   print_string("Hello, world!\n");
@@ -48,8 +51,6 @@ format:
     print_string("Hello, world!\n")
 
 lsp:
-  setup: |
-    cp -a /opt/reasonml/skel/* ./
   start: |
     reason-language-server
   code: "TODO"

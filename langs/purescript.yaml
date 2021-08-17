@@ -68,3 +68,5 @@ template: |
 
 run: |
   if spago build -n; then spago run -n; (echo 'import Prelude'; echo 'import Main') > .purs-repl; spago repl; else echo 'import Prelude' > .purs-repl; spago repl -d; fi
+
+timeoutFactor: 2
