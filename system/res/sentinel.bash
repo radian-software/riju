@@ -36,12 +36,20 @@ while read -t2 -r cmdline; do
                     stdout="/var/cache/riju/share/cmd-${uuid}-stdout"
                     stderr="/var/cache/riju/share/cmd-${uuid}-stderr"
                     status="/var/cache/riju/share/cmd-${uuid}-status"
-                    mkfifo "${stdin}" "${stdout}" "${stderr}" "${status}"
+                    live="/var/cache/riju/share/cmd-${uuid}-live"
+                    mkfifo "${stdin}" "${stdout}" "${stderr}" "${status}" "${live}"
                     (
                         set +e
-                        runuser -u riju -- bash -c "exec ${maybe_pty:-} \"\$@\"" -- "${args[@]}" < "${stdin}" > "${stdout}" 2> "${stderr}"
-                        echo "$?" > "${status}"
+                        (
+                            runuser -u riju -- bash -c "exec ${maybe_pty:-} \"\$@\"" -- "${args[@]}" < "${stdin}" > "${stdout}" 2> "${stderr}"
+                            echo "$?"
+                        ) > "${status}"
                     ) &
+                    bg=$!
+                    while kill -0 "$bg" 2>/dev/null; do
+                        sleep 1
+                        echo "ping" 2>/dev/null || break
+                    done > "${live}" &
                 fi
                 ;;
             *)

@@ -119,10 +119,17 @@ char *parseImageHash(char *imageHash)
 
 char *timeout_msg;
 
-void wait_alarm(int signum)
+void sigalrm_die(int signum)
 {
   (void)signum;
   die(timeout_msg);
+}
+
+void sigalrm_kill_parent(int signum)
+{
+  (void)signum;
+  kill(getppid(), SIGTERM);
+  exit(EXIT_FAILURE);
 }
 
 void session(char *uuid, char *lang, char *imageHash)
@@ -252,7 +259,7 @@ void session(char *uuid, char *lang, char *imageHash)
   ts_10ms.tv_sec = 0;
   ts_10ms.tv_nsec = 1000 * 1000 * 10;
   timeout_msg = "container did not come up within 10 seconds";
-  if (signal(SIGALRM, wait_alarm) == SIG_ERR)
+  if (signal(SIGALRM, sigalrm_die) == SIG_ERR)
     die("signal failed");
   alarm(10);
   int fd;
@@ -287,7 +294,7 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
     die("setvbuf failed");
   char *share, *ctlFIFO, *stdinFIFO, *stdoutFIFO, *stderrFIFO, *statusFIFO,
-      *ctlCmd, *dataFIFO;
+      *liveFIFO, *ctlCmd, *dataFIFO;
   if (asprintf(&share, "/var/cache/riju/shares/%s", uuid) < 0)
     die("asprintf failed");
   if (asprintf(&ctlFIFO, "%s/control", share) < 0)
@@ -300,6 +307,8 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   if (asprintf(&stderrFIFO, "%s/cmd-%s-stderr", share, procUUID) < 0)
     die("asprintf failed");
   if (asprintf(&statusFIFO, "%s/cmd-%s-status", share, procUUID) < 0)
+    die("asprintf failed");
+  if (asprintf(&liveFIFO, "%s/cmd-%s-live", share, procUUID) < 0)
     die("asprintf failed");
   int fd = open(ctlFIFO, O_WRONLY);
   if (fd < 0)
@@ -352,15 +361,24 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
           exit(EXIT_FAILURE);
         dataFIFO = stderrFIFO;
       } else {
-        dataFIFO = statusFIFO;
+        pid = fork();
+        if (pid < 0)
+          die("fork failed");
+        else if (pid == 0) {
+          if (prctl(PR_SET_PDEATHSIG, SIGTERM) < 0)
+            die("prctl failed");
+          if (getppid() != orig_ppid)
+            exit(EXIT_FAILURE);
+          dataFIFO = liveFIFO;
+        } else {
+          dataFIFO = statusFIFO;
+        }
       }
     }
   }
-  if (dataFIFO != statusFIFO) {
-    if (signal(SIGALRM, wait_alarm) == SIG_ERR)
-      die("signal failed");
-    alarm(1);
-  }
+  if (signal(SIGALRM, sigalrm_die) == SIG_ERR)
+    die("signal failed");
+  alarm(1);
   while (1) {
     int mode = dataFIFO == stdinFIFO ? O_WRONLY : O_RDONLY;
     fd = open(dataFIFO, mode);
@@ -403,7 +421,7 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
     }
     if (len < 0)
       die("read failed");
-  } else {
+  } else if (dataFIFO == statusFIFO) {
     if (close(STDIN_FILENO) < 0)
       die("close failed");
     if (close(STDOUT_FILENO) < 0)
@@ -422,6 +440,20 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
     if (*endptr != '\n')
       die("strtol failed");
     exit(status);
+  } else if (dataFIFO == liveFIFO) {
+    char line[1024];
+    int len;
+    timeout_msg = "container died";
+    if (signal(SIGALRM, sigalrm_kill_parent) < 0)
+      die("signal failed");
+    if (alarm(2) < 0)
+      die("alarm failed");
+    while ((len = read(fd, line, 1024)) > 0) {
+      if (alarm(2) < 0)
+        die("alarm failed");
+    }
+    if (len < 0)
+      die("read failed");
   }
 }
 
