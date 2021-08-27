@@ -417,69 +417,81 @@ export class Session {
   };
 
   stopLSP = async () => {
-    if (this.lsp) {
-      this.lsp.stopping = true;
-      this.lsp.proc.kill();
-      this.lsp = null;
+    try {
+      if (this.lsp) {
+        this.lsp.stopping = true;
+        this.lsp.proc.kill();
+        this.lsp = null;
+      }
+    } catch (err) {
+      logError(err);
     }
   };
 
   startLSP = async () => {
-    if (this.config.lsp) {
-      await this.stopLSP();
-      if (this.config.lsp.setup) {
-        await this.run(this.privilegedExec(this.config.lsp.setup));
+    try {
+      if (this.config.lsp) {
+        await this.stopLSP();
+        if (this.config.lsp.setup) {
+          await this.run(this.privilegedExec(this.config.lsp.setup));
+        }
+        const lspArgs = this.privilegedExec(this.config.lsp.start);
+        const lspProc = spawn(lspArgs[0], lspArgs.slice(1));
+        const lsp = {
+          proc: lspProc,
+          reader: new rpc.StreamMessageReader(lspProc.stdout),
+          writer: new rpc.StreamMessageWriter(lspProc.stdin),
+          live: true,
+          stopping: false,
+        };
+        this.lsp = lsp;
+        this.lsp.reader.listen((data) => {
+          this.send({ event: "lspOutput", output: data });
+        });
+        lspProc.stderr.on("data", (data) => {
+          if (lsp.live) {
+            this.send({
+              event: "serviceLog",
+              service: "lsp",
+              output: data.toString("utf8"),
+            });
+          }
+        });
+        lspProc.on("close", (code, signal) => {
+          if (lsp.stopping) {
+            this.send({
+              event: "lspStopped",
+            });
+          } else {
+            this.send({
+              event: "serviceFailed",
+              service: "lsp",
+              error: `Exited with status ${signal || code}`,
+              code: signal || code,
+            });
+          }
+        });
+        lspProc.on("error", (err) =>
+          this.send({ event: "serviceFailed", service: "lsp", error: `${err}` })
+        );
+        this.send({ event: "lspStarted", root: this.homedir });
       }
-      const lspArgs = this.privilegedExec(this.config.lsp.start);
-      const lspProc = spawn(lspArgs[0], lspArgs.slice(1));
-      const lsp = {
-        proc: lspProc,
-        reader: new rpc.StreamMessageReader(lspProc.stdout),
-        writer: new rpc.StreamMessageWriter(lspProc.stdin),
-        live: true,
-        stopping: false,
-      };
-      this.lsp = lsp;
-      this.lsp.reader.listen((data) => {
-        this.send({ event: "lspOutput", output: data });
-      });
-      lspProc.stderr.on("data", (data) => {
-        if (lsp.live) {
-          this.send({
-            event: "serviceLog",
-            service: "lsp",
-            output: data.toString("utf8"),
-          });
-        }
-      });
-      lspProc.on("close", (code, signal) => {
-        if (lsp.stopping) {
-          this.send({
-            event: "lspStopped",
-          });
-        } else {
-          this.send({
-            event: "serviceFailed",
-            service: "lsp",
-            error: `Exited with status ${signal || code}`,
-            code: signal || code,
-          });
-        }
-      });
-      lspProc.on("error", (err) =>
-        this.send({ event: "serviceFailed", service: "lsp", error: `${err}` })
-      );
-      this.send({ event: "lspStarted", root: this.homedir });
+    } catch (err) {
+      logError(err);
     }
   };
 
   ensure = async (cmd) => {
-    const code = (
-      await this.run(this.privilegedExec(cmd), {
-        check: false,
-      })
-    ).code;
-    this.send({ event: "ensured", code });
+    try {
+      const code = (
+        await this.run(this.privilegedExec(cmd), {
+          check: false,
+        })
+      ).code;
+      this.send({ event: "ensured", code });
+    } catch (err) {
+      logError(err);
+    }
   };
 
   teardown = async () => {
