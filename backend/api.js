@@ -164,6 +164,10 @@ export class Session {
       }
       this.ws.send(JSON.stringify(msg));
     } catch (err) {
+      if (this.ws.readyState === WebSocket.CLOSED) {
+        // User closed their end, no big deal.
+        return;
+      }
       logError(err);
       await this.teardown();
     }
