@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import collections
 import csv
 import decimal
 import gzip
@@ -92,13 +93,67 @@ def read_csv(csv_path):
     return rows
 
 
-def classify_line_item(item):
-    return [
-        item["lineItem/LineItemType"],
-        item["lineItem/ProductCode"],
-        item["lineItem/UsageType"],
-        item.get("lineItem/ResourceId", "(no resource)"),
+def get_tax_key(item):
+    service = item["lineItem/ProductCode"]
+    usage_type = item["lineItem/UsageType"]
+    if "DataTransfer" in usage_type:
+        service = "AWSDataTransfer"
+    return (service, usage_type)
+
+
+def embed_taxes(items):
+    tax_items = collections.defaultdict(list)
+    usage_items = collections.defaultdict(list)
+    for item in items:
+        item_type = item["lineItem/LineItemType"]
+        if item_type == "Tax":
+            tax_items[get_tax_key(item)].append(item)
+        elif item_type == "Usage":
+            usage_items[get_tax_key(item)].append(item)
+        else:
+            die(f"unexpected line item type {repr(item_type)}")
+    for key in tax_items:
+        if key not in usage_items:
+            die(f"tax for {repr(key)} but no usage for that key")
+        tax_cost = sum(item["lineItem/UnblendedCost"] for item in tax_items[key])
+        usage_cost = sum(item["lineItem/UnblendedCost"] for item in usage_items[key])
+        tax_multiplier = (tax_cost + usage_cost) / usage_cost
+        for item in usage_items[key]:
+            item["lineItem/UnblendedCost"] *= tax_multiplier
+    return [item for group in usage_items.values() for item in group]
+
+
+def classify_line_item(item, full=False):
+    service = item["lineItem/ProductCode"]
+    usage_type = item["lineItem/UsageType"]
+    operation = item.get("lineItem/Operation")
+    resource = item.get("lineItem/ResourceId")
+    project = item.get("resourceTags/user:BillingCategory")
+    if service == "AmazonECRPublic" and resource.endswith("repository/riju"):
+        project = "Riju"
+    category = [
+        "Uncategorized",
+        service,
+        usage_type,
+        operation or "(no operation)",
+        resource or "(no resource)",
     ]
+    if not full:
+        if service == "AmazonS3":
+            category = ["S3"]
+        elif service == "AmazonSNS":
+            category = ["SNS"]
+        elif service in ("AmazonECR", "AmazonECRPublic"):
+            category = ["ECR"]
+        elif service == "AmazonEC2":
+            category = ["EC2"]
+        elif service == "AWSELB":
+            category = ["ELB"]
+        elif service == "AmazonCloudWatch":
+            category = ["CloudWatch"]
+        elif service == "awskms":
+            category = ["KMS"]
+    return [project or "Uncategorized", *category]
 
 
 def add_to_taxonomy(taxonomy, category, item):
@@ -111,18 +166,26 @@ def add_to_taxonomy(taxonomy, category, item):
     taxonomy["cost"] += float(item["lineItem/UnblendedCost"])
 
 
+def uncategorized_last(key):
+    return (key == "Uncategorized", key)
+
+
 def print_taxonomy(taxonomy, indent=""):
-    for category, subtaxonomy in taxonomy.get("categories", {}).items():
-        print(indent + category)
+    categories = taxonomy.get("categories", {})
+    for category in sorted(categories, key=uncategorized_last):
+        subtaxonomy = categories[category]
+        cost = subtaxonomy["cost"]
+        print(f"{indent}{category} :: ${cost:.2f}")
         print_taxonomy(subtaxonomy, indent=indent + "  ")
 
 
-def classify_costs(csv_path):
-    items = read_csv(csv_path)
-    taxonomy = {}
+def classify_costs(csv_path, **kwargs):
+    items = [item for item in read_csv(csv_path) if item["lineItem/UnblendedCost"]]
     for item in items:
-        if item["lineItem/UnblendedCost"]:
-            add_to_taxonomy(taxonomy, classify_line_item(item), item)
+        item["lineItem/UnblendedCost"] = float(item["lineItem/UnblendedCost"])
+    taxonomy = {}
+    for item in embed_taxes(items):
+        add_to_taxonomy(taxonomy, classify_line_item(item, **kwargs), item)
     print_taxonomy(taxonomy)
 
 
