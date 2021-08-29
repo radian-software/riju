@@ -92,14 +92,38 @@ def read_csv(csv_path):
     return rows
 
 
+def classify_line_item(item):
+    return [
+        item["lineItem/LineItemType"],
+        item["lineItem/ProductCode"],
+        item["lineItem/UsageType"],
+        item.get("lineItem/ResourceId", "(no resource)"),
+    ]
+
+
+def add_to_taxonomy(taxonomy, category, item):
+    if category:
+        categories = taxonomy.setdefault("categories", {})
+        add_to_taxonomy(categories.setdefault(category[0], {}), category[1:], item)
+    else:
+        taxonomy.setdefault("items", []).append(item)
+    taxonomy.setdefault("cost", 0)
+    taxonomy["cost"] += float(item["lineItem/UnblendedCost"])
+
+
+def print_taxonomy(taxonomy, indent=""):
+    for category, subtaxonomy in taxonomy.get("categories", {}).items():
+        print(indent + category)
+        print_taxonomy(subtaxonomy, indent=indent + "  ")
+
+
 def classify_costs(csv_path):
     items = read_csv(csv_path)
+    taxonomy = {}
     for item in items:
-        cost = decimal.Decimal(item["lineItem/UnblendedCost"])
-        if not cost:
-            continue
-        category = f"{item['lineItem/LineItemType']} - {item['lineItem/ProductCode']} - {item['lineItem/UsageType']} - {item.get('lineItem/ResourceId', '(no resource)')}"
-        print(f"{category} :: ${cost:.2f}")
+        if item["lineItem/UnblendedCost"]:
+            add_to_taxonomy(taxonomy, classify_line_item(item), item)
+    print_taxonomy(taxonomy)
 
 
 def main():
