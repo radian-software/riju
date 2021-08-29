@@ -10,6 +10,7 @@ import json
 import logging
 import os
 import pathlib
+import re
 import sys
 from urllib.parse import urlparse
 
@@ -145,10 +146,62 @@ def classify_line_item(item, full=False):
             category = ["SNS"]
         elif service in ("AmazonECR", "AmazonECRPublic"):
             category = ["ECR"]
+            if "DataTransfer" in usage_type:
+                category.append("Data Transfer")
+            elif "TimedStorage" in usage_type:
+                category.append("Storage")
+            else:
+                category.extend(
+                    [
+                        "Uncategorized",
+                        usage_type,
+                        operation or "(no operation)",
+                        resource or "(no resource)",
+                    ]
+                )
         elif service == "AmazonEC2":
             category = ["EC2"]
+            if "ElasticIP:IdleAddress" in usage_type:
+                category.append("EIP")
+            elif "EBS:VolumeUsage" in usage_type:
+                category.append("EBS Volume")
+                category.extend(["EBS Volume", re.sub(r"^.+\.", "", usage_type)])
+            elif "EBS:SnapshotUsage" in usage_type:
+                category.append("EBS Snapshot")
+            elif (
+                "DataTransfer" in usage_type
+                or "In-Bytes" in usage_type
+                or "Out-Bytes" in usage_type
+            ):
+                category.append("Data Transfer")
+            elif "BoxUsage" in usage_type or "CPUCredits" in usage_type:
+                category.extend(["Instance", re.sub(r"^.+:", "", usage_type)])
+            else:
+                category.extend(
+                    [
+                        "Uncategorized",
+                        usage_type,
+                        operation or "(no operation)",
+                        resource or "(no resource)",
+                    ]
+                )
         elif service == "AWSELB":
             category = ["ELB"]
+            if "DataTransfer" in usage_type:
+                category.append("Data Transfer")
+            elif "LCUUsage" in usage_type:
+                category.append("LCUs")
+            elif "LoadBalancerUsage":
+                category.append("Load Balancer")
+            else:
+                category.extend(
+                    [
+                        "Uncategorized",
+                        usage_type,
+                        operation or "(no operation)",
+                        resource or "(no resource)",
+                    ]
+                )
         elif service == "AmazonCloudWatch":
             category = ["CloudWatch"]
         elif service == "awskms":
@@ -171,10 +224,15 @@ def uncategorized_last(key):
 
 
 def print_taxonomy(taxonomy, indent=""):
+    cost = taxonomy["cost"]
+    if not indent:
+        print(f"(total) :: ${cost:.2f}")
     categories = taxonomy.get("categories", {})
     for category in sorted(categories, key=uncategorized_last):
         subtaxonomy = categories[category]
         cost = subtaxonomy["cost"]
+        if cost < 0.01:
+            continue
         print(f"{indent}{category} :: ${cost:.2f}")
         print_taxonomy(subtaxonomy, indent=indent + "  ")
 
