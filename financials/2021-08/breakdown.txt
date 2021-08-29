@@ -1,3 +1,5 @@
+NOTE: this is still provisional, as the month hasn't finished yet
+
 Riju :: $52.21
   EC2 :: $27.85
     Data Transfer :: $0.03
