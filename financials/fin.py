@@ -149,8 +149,11 @@ def classify_line_item(item, billing_month=None, full=False):
             service == "AmazonEC2"
             and resource != "i-077884b74aba86bac"
             and "ElasticIP:IdleAddress" not in usage_type
+            and "EBS:SnapshotUsage" not in usage_type
         ):
             project = "Riju"
+    # AWS does not let you put tags on a public ECR repository,
+    # yippee.
     if service == "AmazonECRPublic" and resource.endswith("repository/riju"):
         project = "Riju"
     category = [
@@ -287,17 +290,19 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("date")
     parser.add_argument("-f", "--force-download", action="store_true")
+    parser.add_argument("-w", "--write", action="store_true")
     args = parser.parse_args()
     year, month = map(int, args.date.split("-"))
     billing_month = f"{year}-{month:02d}"
     csv_path = get_csv(year, month, force_download=args.force_download)
     taxonomy = classify_costs(csv_path, billing_month=billing_month)
     print_taxonomy(taxonomy)
-    riju_taxonomy = taxonomy["categories"]["AWS"]
-    riju_taxonomy["categories"] = {"Riju": riju_taxonomy["categories"]["Riju"]}
-    target_dir = ROOT / f"{year}-{month:02d}"
-    with open(target_dir / "breakdown.txt", "w") as f:
-        print_taxonomy(riju_taxonomy, file=f)
+    if args.write:
+        riju_taxonomy = taxonomy["categories"]["AWS"]
+        riju_taxonomy["categories"] = {"Riju": riju_taxonomy["categories"]["Riju"]}
+        target_dir = ROOT / f"{year}-{month:02d}"
+        with open(target_dir / "breakdown.txt", "w") as f:
+            print_taxonomy(riju_taxonomy, file=f)
 
 
 if __name__ == "__main__":
