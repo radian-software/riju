@@ -184,6 +184,12 @@ def classify_line_item(item, billing_month=None, full=False):
             category = ["EC2"]
             if "ElasticIP:IdleAddress" in usage_type:
                 category.append("EIP")
+                # Apparently tags on EIPs are ignored for billing
+                # purposes, so we just have to know what we were using
+                # them for. (Leaving them uncategorized for 2021-07
+                # though.)
+                if billing_month != "2021-07":
+                    project = "Corona"
             elif "EBS:VolumeUsage" in usage_type:
                 category.append("EBS Volume")
                 category.extend(["EBS Volume", re.sub(r"^.+\.", "", usage_type)])
@@ -252,28 +258,29 @@ def uncategorized_last(key):
     return (key == "Uncategorized", key)
 
 
-def print_taxonomy(taxonomy, indent=""):
+def print_taxonomy(taxonomy, indent="", file=sys.stdout):
     cost = taxonomy["cost"]
-    if not indent:
-        print(f"(total) :: ${cost:.2f}")
     categories = taxonomy.get("categories", {})
     for category in sorted(categories, key=uncategorized_last):
         subtaxonomy = categories[category]
         cost = subtaxonomy["cost"]
         if cost < 0.01:
             continue
-        print(f"{indent}{category} :: ${cost:.2f}")
-        print_taxonomy(subtaxonomy, indent=indent + "  ")
+        print(f"{indent}{category} :: ${cost:.2f}", file=file)
+        print_taxonomy(subtaxonomy, indent=indent + "  ", file=file)
 
 
 def classify_costs(csv_path, **kwargs):
-    items = [item for item in read_csv(csv_path) if item["lineItem/UnblendedCost"]]
-    for item in items:
-        item["lineItem/UnblendedCost"] = float(item["lineItem/UnblendedCost"])
+    all_items = [item for item in read_csv(csv_path)]
+    items = []
+    for item in all_items:
+        cost = item["lineItem/UnblendedCost"]
+        if cost and float(cost):
+            items.append({**item, "lineItem/UnblendedCost": float(cost)})
     taxonomy = {}
     for item in embed_taxes(items):
-        add_to_taxonomy(taxonomy, classify_line_item(item, **kwargs), item)
-    print_taxonomy(taxonomy)
+        add_to_taxonomy(taxonomy, ["AWS", *classify_line_item(item, **kwargs)], item)
+    return taxonomy
 
 
 def main():
@@ -284,7 +291,13 @@ def main():
     year, month = map(int, args.date.split("-"))
     billing_month = f"{year}-{month:02d}"
     csv_path = get_csv(year, month, force_download=args.force_download)
-    classify_costs(csv_path, billing_month=billing_month)
+    taxonomy = classify_costs(csv_path, billing_month=billing_month)
+    print_taxonomy(taxonomy)
+    riju_taxonomy = taxonomy["categories"]["AWS"]
+    riju_taxonomy["categories"] = {"Riju": riju_taxonomy["categories"]["Riju"]}
+    target_dir = ROOT / f"{year}-{month:02d}"
+    with open(target_dir / "breakdown.txt", "w") as f:
+        print_taxonomy(riju_taxonomy, file=f)
 
 
 if __name__ == "__main__":
