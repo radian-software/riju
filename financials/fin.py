@@ -124,12 +124,33 @@ def embed_taxes(items):
     return [item for group in usage_items.values() for item in group]
 
 
-def classify_line_item(item, full=False):
+def classify_line_item(item, billing_month=None, full=False):
     service = item["lineItem/ProductCode"]
     usage_type = item["lineItem/UsageType"]
     operation = item.get("lineItem/Operation")
     resource = item.get("lineItem/ResourceId")
     project = item.get("resourceTags/user:BillingCategory")
+    # In 2021-07, the first month that I was using AWS resources for
+    # Riju in a nontrivial capacity, I had subpar billing
+    # observability, so a lot of the resources aren't tagged
+    # correctly. So for that month specifically, I'm hacking in a
+    # couple of heuristics to tag the resources after the fact based
+    # on what I know about my usage of AWS.
+    if billing_month == "2021-07":
+        if resource and "riju" in resource.lower():
+            project = "Riju"
+        elif resource and "shallan" in resource.lower():
+            project = "Shallan"
+        elif resource and "veidt" in resource.lower():
+            project = "Veidt"
+        elif service == "AmazonCloudWatch":
+            project = "Riju"
+        elif (
+            service == "AmazonEC2"
+            and resource != "i-077884b74aba86bac"
+            and "ElasticIP:IdleAddress" not in usage_type
+        ):
+            project = "Riju"
     if service == "AmazonECRPublic" and resource.endswith("repository/riju"):
         project = "Riju"
     category = [
@@ -206,6 +227,14 @@ def classify_line_item(item, full=False):
             category = ["CloudWatch"]
         elif service == "awskms":
             category = ["KMS"]
+    if not project:
+        category.extend(
+            [
+                usage_type,
+                operation or "(no operation)",
+                resource or "(no resource)",
+            ]
+        )
     return [project or "Uncategorized", *category]
 
 
@@ -253,8 +282,9 @@ def main():
     parser.add_argument("-f", "--force-download", action="store_true")
     args = parser.parse_args()
     year, month = map(int, args.date.split("-"))
+    billing_month = f"{year}-{month:02d}"
     csv_path = get_csv(year, month, force_download=args.force_download)
-    classify_costs(csv_path)
+    classify_costs(csv_path, billing_month=billing_month)
 
 
 if __name__ == "__main__":
