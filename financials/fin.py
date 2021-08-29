@@ -59,14 +59,19 @@ def get_csv(year, month, force_download=False):
         (month_prefix,) = matching_month_prefixes
         stream = io.BytesIO()
         manifest_path = f"{month_prefix}{report_name}-Manifest.json"
-        logging.info(f"Download s3://{bucket}/{manifest_path}")
+        logging.info(f"Download s3://{bucket}/{manifest_path} in-memory")
         s3.download_fileobj(bucket, manifest_path, stream)
         manifest = json.loads(stream.getvalue())
         (report_path,) = manifest["reportKeys"]
         if not report_path.endswith(".csv.gz"):
             die(f"unexpected report extension in {report_path}")
-        basename = pathlib.Path(report_path).name.removesuffix(".csv.gz")
-        logging.info(f"Download s3://{bucket}/{report_path}")
+        logging.info(f"Get metadata for s3://{bucket}/{report_path}")
+        basename = s3.head_object(Bucket=bucket, Key=report_path)[
+            "LastModified"
+        ].strftime("%Y-%m-%d")
+        logging.info(
+            f"Download s3://{bucket}/{report_path} to {target_dir.relative_to(ROOT)}/{basename}.csv.gz"
+        )
         s3.download_file(bucket, report_path, f"{target_dir}/{basename}.csv.gz")
         logging.info(f"Decompress {basename}.csv.gz")
         with gzip.open(f"{target_dir}/{basename}.csv.gz") as f_read:
