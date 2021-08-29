@@ -88,7 +88,7 @@ def read_csv(csv_path):
         reader = csv.reader(f)
         header = next(reader)
         for row in reader:
-            rows.append(dict(zip(header, row)))
+            rows.append(dict((key, val) for (key, val) in zip(header, row) if val))
     return rows
 
 
@@ -98,7 +98,8 @@ def classify_costs(csv_path):
         cost = decimal.Decimal(item["lineItem/UnblendedCost"])
         if not cost:
             continue
-        breakpoint()
+        category = f"{item['lineItem/LineItemType']} - {item['lineItem/ProductCode']} - {item['lineItem/UsageType']} - {item.get('lineItem/ResourceId', '(no resource)')}"
+        print(f"{category} :: ${cost:.2f}")
 
 
 def main():
@@ -108,7 +109,7 @@ def main():
     args = parser.parse_args()
     year, month = map(int, args.date.split("-"))
     csv_path = get_csv(year, month, force_download=args.force_download)
-    analyze(csv_path)
+    classify_costs(csv_path)
 
 
 if __name__ == "__main__":
