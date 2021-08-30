@@ -29,6 +29,11 @@ type message struct {
 	Event string `json:"event"`
 }
 
+type errorMessage struct {
+	message
+	Error string `json:"errorMessage"`
+}
+
 type terminalInput struct {
 	message
 	Input string `json:"input"`
@@ -100,6 +105,13 @@ func run() error {
 				return
 			}
 			switch genericMsg.Event {
+			case "error":
+				var msg errorMessage
+				if err := json.Unmarshal(rawMsg, &msg); err != nil {
+					done1 <- errors.Wrap(err, "failed to parse websocket message")
+					return
+				}
+				done1 <- errors.New(msg.Error)
 			case "terminalOutput":
 				var msg terminalOutput
 				if err := json.Unmarshal(rawMsg, &msg); err != nil {
@@ -162,6 +174,8 @@ func run() error {
 }
 
 func main() {
+	log.SetPrefix("riju: ")
+	log.SetFlags(0)
 	kong.Parse(&cli)
 	exitStatus := 0
 	if err := run(); err != nil {
