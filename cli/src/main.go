@@ -8,10 +8,15 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"os"
+	"os/signal"
 	"path"
+	"syscall"
 
 	"github.com/alecthomas/kong"
 	"github.com/gorilla/websocket"
+	"github.com/pkg/errors"
+	"github.com/pkg/term"
 )
 
 var cli struct {
@@ -32,6 +37,18 @@ type terminalInput struct {
 type terminalOutput struct {
 	message
 	Output string `json:"output"`
+}
+
+type serviceFailed struct {
+	message
+	Service string `json:"service"`
+	Error   string `json:"error"`
+	Code    int    `json:"code"`
+}
+
+type errorExit struct {
+	error
+	status int
 }
 
 func run() error {
@@ -56,33 +73,89 @@ func run() error {
 		return err
 	}
 	defer conn.Close()
-	done := make(chan struct{})
+	tty, err := term.Open("/dev/tty")
+	if err != nil {
+		return errors.Wrap(err, "failed to open stdin tty")
+	}
+	if err := tty.SetRaw(); err != nil {
+		return errors.Wrap(err, "failed to set raw mode")
+	}
+	defer tty.Restore()
+	sigint := make(chan os.Signal, 1)
+	sigterm := make(chan os.Signal, 1)
+	signal.Notify(sigint, syscall.SIGINT)
+	signal.Notify(sigterm, syscall.SIGTERM)
+	done1 := make(chan error)
 	go func() {
-		defer close(done)
+		defer close(done1)
 		for {
 			_, rawMsg, err := conn.ReadMessage()
 			if err != nil {
-				log.Println("failed to read websocket message:", err)
+				done1 <- errors.Wrap(err, "failed to read websocket message")
 				return
 			}
 			var genericMsg message
 			if err := json.Unmarshal(rawMsg, &genericMsg); err != nil {
-				log.Println("failed to parse websocket message:", err)
+				done1 <- errors.Wrap(err, "failed to parse websocket message")
+				return
 			}
 			switch genericMsg.Event {
 			case "terminalOutput":
 				var msg terminalOutput
 				if err := json.Unmarshal(rawMsg, &msg); err != nil {
-					log.Println("failed to parse websocket message:", err)
+					done1 <- errors.Wrap(err, "failed to parse websocket message")
+					return
 				}
 				fmt.Print(msg.Output)
+			case "serviceFailed":
+				var msg serviceFailed
+				if err := json.Unmarshal(rawMsg, &msg); err != nil {
+					done1 <- errors.Wrap(err, "failed to parse websocket message")
+					return
+				}
+				done1 <- errorExit{nil, msg.Code}
+				return
 			}
+		}
+	}()
+	input := make(chan []byte)
+	done2 := make(chan error)
+	go func() {
+		defer close(done2)
+		for {
+			buf := make([]byte, 1024)
+			n, err := os.Stdin.Read(buf)
+			if err != nil {
+				done2 <- errors.Wrap(err, "failed to read from stdin")
+				return
+			}
+			input <- buf[:n]
 		}
 	}()
 	for {
 		select {
-		case <-done:
-			return nil
+		case err := <-done1:
+			return err
+		case err := <-done2:
+			return err
+		case <-sigint:
+			return errorExit{nil, int(syscall.SIGINT) + 128}
+		case <-sigterm:
+			return errorExit{nil, int(syscall.SIGTERM) + 128}
+		case data := <-input:
+			msg := terminalInput{
+				message: message{
+					Event: "terminalInput",
+				},
+				Input: string(data),
+			}
+			rawMsg, err := json.Marshal(&msg)
+			if err != nil {
+				return errors.Wrap(err, "failed to create websocket message")
+			}
+			if err := conn.WriteMessage(websocket.TextMessage, rawMsg); err != nil {
+				return errors.Wrap(err, "failed to send websocket message")
+			}
 		}
 	}
 	return nil
@@ -90,7 +163,17 @@ func run() error {
 
 func main() {
 	kong.Parse(&cli)
+	exitStatus := 0
 	if err := run(); err != nil {
-		log.Fatalln(err)
+		if typedErr, ok := err.(errorExit); ok {
+			err = typedErr.error
+			exitStatus = typedErr.status
+		} else {
+			exitStatus = 1
+		}
+		if err != nil {
+			log.Println(err)
+		}
 	}
+	os.Exit(exitStatus)
 }
