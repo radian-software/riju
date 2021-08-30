@@ -168,6 +168,12 @@ supervisor: # Compile supervisor binary for production
 supervisor-dev: # Compile and watch supervisor binary for development
 	watchexec -w supervisor/src -n -- ./supervisor/compile.bash
 
+cli: # Compile cli binary for production
+	./cli/compile.bash
+
+cli-dev: # Compile and watch cli binary for development
+	watchexec -w cli/src -n -- ./cli/compile.bash
+
 server: # Run server for production
 	node backend/server.js
 
