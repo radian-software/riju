@@ -5,6 +5,7 @@ import process from "process";
 import pQueue from "p-queue";
 const PQueue = pQueue.default;
 import rpc from "vscode-jsonrpc";
+import WebSocket from "ws";
 
 import { langs } from "./langs.js";
 import * as util from "./util.js";
