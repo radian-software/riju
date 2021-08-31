@@ -16,12 +16,14 @@ import (
 	"github.com/alecthomas/kong"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
-	"github.com/pkg/term"
+	"github.com/pkg/term/termios"
+	"golang.org/x/sys/unix"
 )
 
 var cli struct {
-	Lang string `arg help:"Name of programming language."`
-	File string `arg optional type:"path" help:"File to run."`
+	Lang string `arg:"" help:"Name of programming language."`
+	File string `arg:"" optional:"" type:"existingfile" help:"File to run."`
+	Raw  bool   `short:"r" default:"false" help:"Pass ctrl-C to Riju instead of terminating the connection."`
 	Host string `default:"https://riju.codes/api/v1" help:"URL of Riju API."`
 }
 
@@ -78,14 +80,21 @@ func run() error {
 		return err
 	}
 	defer conn.Close()
-	tty, err := term.Open("/dev/tty")
-	if err != nil {
-		return errors.Wrap(err, "failed to open stdin tty")
+	var origAttr unix.Termios
+	if err := termios.Tcgetattr(os.Stdin.Fd(), &origAttr); err != nil {
+		return err
 	}
-	if err := tty.SetRaw(); err != nil {
-		return errors.Wrap(err, "failed to set raw mode")
+	rawAttr := origAttr
+	termios.Cfmakeraw(&rawAttr)
+	if !cli.Raw {
+		// Do not pass ctrl-C over pty, instead invoke our
+		// signal handler and abort.
+		rawAttr.Lflag |= syscall.ISIG
 	}
-	defer tty.Restore()
+	if err := termios.Tcsetattr(os.Stdin.Fd(), termios.TCSAFLUSH, &rawAttr); err != nil {
+		return err
+	}
+	defer termios.Tcsetattr(os.Stdin.Fd(), termios.TCSAFLUSH, &origAttr)
 	sigint := make(chan os.Signal, 1)
 	sigterm := make(chan os.Signal, 1)
 	signal.Notify(sigint, syscall.SIGINT)
