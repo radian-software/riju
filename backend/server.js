@@ -71,7 +71,10 @@ function addWebsocket(baseApp, httpsServer) {
   const app = ws(baseApp, httpsServer).app;
   app.ws("/api/v1/ws", (ws, req) => {
     try {
-      const lang = req.query.get("lang");
+      let lang = req.query.get("lang");
+      if (aliases[lang]) {
+        lang = aliases[lang];
+      }
       if (!lang) {
         ws.send(
           JSON.stringify({
