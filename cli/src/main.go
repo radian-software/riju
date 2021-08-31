@@ -31,6 +31,15 @@ type message struct {
 	Event string `json:"event"`
 }
 
+type langConfig struct {
+	message
+	Config struct {
+		Id   string `json:"id"`
+		Name string `json:"name"`
+		Repl string `json:"repl"`
+	} `json:"config"`
+}
+
 type errorMessage struct {
 	message
 	Error string `json:"errorMessage"`
@@ -121,6 +130,16 @@ func run() error {
 					return
 				}
 				done1 <- errors.New(msg.Error)
+			case "langConfig":
+				var msg langConfig
+				if err := json.Unmarshal(rawMsg, &msg); err != nil {
+					done1 <- errors.Wrap(err, "failed to parse websocket message")
+					return
+				}
+				if msg.Config.Repl == "" {
+					done1 <- fmt.Errorf("%s has no repl, you must provide a file to run", msg.Config.Name)
+					return
+				}
 			case "terminalOutput":
 				var msg terminalOutput
 				if err := json.Unmarshal(rawMsg, &msg); err != nil {

@@ -58,6 +58,10 @@ export class Session {
     try {
       setTimeout(this.teardown, 3600 * 1000); // max session length of 1hr
       allSessions.add(this);
+      this.send({
+        event: "langConfig",
+        config: this.config,
+      });
       const containerArgs = this.privilegedSession();
       const containerProc = spawn(containerArgs[0], containerArgs.slice(1));
       this.container = {
