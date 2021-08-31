@@ -4,6 +4,10 @@ aliases:
   - "objcpp"
   - "objectivec++"
   - "objectivecplusplus"
+  - "obj-c++"
+  - "obj-cpp"
+  - "objective-c++"
+  - "objective-cplusplus"
 name: "Objective-C++"
 
 install:

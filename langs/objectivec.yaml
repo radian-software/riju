@@ -2,6 +2,8 @@ id: "objectivec"
 aliases:
   - "objc"
   - "gnustep"
+  - "obj-c"
+  - "objective-c"
 name: "Objective-C"
 monacoLang: objective-c
 
