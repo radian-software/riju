@@ -1,21 +1,20 @@
 name: Build and deploy
 on:
-  {}
-  # push:
-  #   branches:
-  #     - master
-  # pull_request:
-  #   branches:
-  #     - master
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 concurrency: deploy
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build and deploy
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_REGION: us-west-1
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: tools/ci-ec2.bash
+      # - name: Build and deploy
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_REGION: us-west-1
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #   run: tools/ci-ec2.bash
