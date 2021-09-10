@@ -123,8 +123,10 @@ API. Generate one randomly with `pwgen -s 30 1`.
 ## Build AMI
 
 You'll want to run `make env` to load in the new variables from
-`.env`. Now run `make packer`. This will take up to 10 minutes to
-build a timestamped AMI with a name like `riju-20210711223158`.
+`.env`. Now run `make packer-ci`. This will take up to 5 minutes to
+build a timestamped AMI with a name like `riju-ci-20210711223158`.
+Then run `make packer-web`. This will take up to 10 minutes to build
+another AMI with a name like `riju-web-20210711223158.`
 
 ## Create local configuration (part 2 of 3)
 
@@ -132,14 +134,20 @@ Add to `.env` the following contents:
 
 ```
 # Terraform
-AMI_NAME=riju-20210711223158
+AMI_NAME=riju-web-20210711223158
+CI_AMI_NAME=riju-ci-20210711223158
 AWS_REGION=us-west-1
-S3_BUCKET=yourname-riju
+S3_BUCKET=riju-yourname-tf
+SSH_KEY_NAME=
 ```
 
 ### AMI\_NAME
 
-This is the AMI name from the Packer build.
+This is the AMI name from `make packer-web`.
+
+### CI\_AMI\_NAME
+
+This is the AMI name from `make packer-ci`.
 
 ### AWS\_REGION
 
@@ -155,9 +163,8 @@ use.
 
 ### S3\_BUCKET
 
-This is the name of the S3 bucket that will be used to store Riju
-build artifacts (aside from Docker images). It needs to be globally
-unique, so `yourname-riju` is a good choice.
+This is the name of the S3 bucket that you created in a previous step.
+`riju-yourname-tf`
 
 ### SSH\_KEY\_NAME
 
