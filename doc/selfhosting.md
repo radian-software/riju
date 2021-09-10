@@ -123,8 +123,8 @@ API. Generate one randomly with `pwgen -s 30 1`.
 ## Build AMI
 
 You'll want to run `make env` to load in the new variables from
-`.env`. Now run `make packer`. This will take up to 10 minutes to
-build a timestamped AMI with a name like `riju-20210711223158`.
+`.env`. Now run `make packer-ci`. This will take up to 10 minutes to
+build a timestamped AMI with a name like `riju-ci-20210711223158`.
 
 ## Create local configuration (part 2 of 3)
 
