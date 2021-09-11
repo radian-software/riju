@@ -229,19 +229,6 @@ console and running `mssh admin@i-theinstanceid`. Then you can check
 (using the previously configured admin password) `sudo journalctl -efu
 riju` to see the supervisor logs.
 
-## Set up CI (optional)
-
-In your GitHub repo settings, create the secrets `AWS_ACCESS_KEY_ID`
-and `AWS_SECRET_ACCESS_KEY` with the values from `terraform output
--json`. GitHub Actions should be good to go! However, I would
-recommend doing builds from the EC2 dev server when you need to
-rebuild a lot of artifacts.
-
-You'll also want to go to `.github/workflows/main.yml` and update the
-environment variables `AWS_REGION`, `DOCKER_REPO`,
-`PUBLIC_DOCKER_REPO`, and `S3_BUCKET` as appropriate for your own
-deployment (see the `.env` file you created earlier).
-
 ## Set up content delivery caching (optional)
 
 Enter your domain name on CloudFlare and go through the setup and DNS
