@@ -215,6 +215,12 @@ provision one manually with at least 256 GB of disk space, install
 Docker, clone down Riju, copy over your `.env` file, and proceed as if
 you were running locally.)*
 
+Authenticate to ECR (lasts for 12 hours):
+
+```
+$ make ecr
+```
+
 Invoke Depgraph:
 
 ```
