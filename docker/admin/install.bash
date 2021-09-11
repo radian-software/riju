@@ -70,7 +70,7 @@ yarn
 apt-get update
 apt-get install -y $(sed 's/#.*//' <<< "${packages}")
 
-pip3 install ec2instanceconnectcli
+pip3 install ec2instanceconnectcli poetry
 
 npm install -g prettier
 

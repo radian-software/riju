@@ -38,6 +38,7 @@ clang
 docker-ce-cli
 make
 nodejs
+poetry
 yarn
 
 # packaging tools
