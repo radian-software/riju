@@ -15,15 +15,15 @@ resource "aws_iam_access_key" "deploy" {
 }
 
 data "aws_iam_policy_document" "deploy" {
-  statement {
-    actions = [
-      "ec2:RunInstances",
-    ]
+  # statement {
+  #   actions = [
+  #     "ec2:RunInstances",
+  #   ]
 
-    resources = [
-      data.aws_ami.ci.arn,
-    ]
-  }
+  #   resources = [
+  #     data.aws_ami.ci.arn,
+  #   ]
+  # }
 
   statement {
     actions = [

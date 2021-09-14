@@ -5,12 +5,12 @@ resource "aws_ssm_parameter" "web_ami_id" {
   data_type = "aws:ec2:image"
 }
 
-resource "aws_ssm_parameter" "ci_ami_id" {
-  name      = "riju-ci-ami-id"
-  type      = "String"
-  value     = data.aws_ami.ci.id
-  data_type = "aws:ec2:image"
-}
+# resource "aws_ssm_parameter" "ci_ami_id" {
+#   name      = "riju-ci-ami-id"
+#   type      = "String"
+#   value     = data.aws_ami.ci.id
+#   data_type = "aws:ec2:image"
+# }
 
 resource "aws_ssm_parameter" "docker_repo" {
   name  = "riju-docker-repo-host"
