@@ -122,6 +122,7 @@ Add to `.env` the following contents:
 # Terraform
 AMI_NAME=riju-web-20210711223158
 AWS_REGION=us-west-1
+DOMAIN=your.domain
 S3_BUCKET=yourname-riju
 ```
 
@@ -140,6 +141,12 @@ matters to keep them in the same region.
 The main utility of having this as an explicit environment variable is
 that Terraform respects it and won't always ask you what region to
 use.
+
+### DOMAIN
+
+This is the base hostname you will be hosting Riju at (e.g.
+`riju.codes`). Even if you plan to host on a subdomain of your domain,
+set this to the apex. It's just used for TLS certificate provisioning.
 
 ### S3\_BUCKET
 

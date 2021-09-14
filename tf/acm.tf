@@ -1,6 +1,6 @@
 resource "aws_acm_certificate" "riju" {
-  domain_name               = "riju.codes"
-  subject_alternative_names = ["*.riju.codes"]
+  domain_name               = data.external.env.result.DOMAIN
+  subject_alternative_names = ["*.${data.external.env.result.DOMAIN}"]
   validation_method         = "DNS"
 
   tags = {
