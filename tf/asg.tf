@@ -37,7 +37,7 @@ resource "aws_security_group" "server" {
 resource "aws_launch_template" "server" {
   name          = "riju-server"
   image_id      = data.aws_ami.server.id
-  instance_type = "t3.small"
+  instance_type = "t3.medium"
 
   security_group_names = [aws_security_group.server.name]
   iam_instance_profile {
