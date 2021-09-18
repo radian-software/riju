@@ -155,6 +155,11 @@ export class Session {
         logError(err);
         await this.teardown();
       });
+      // User may have closed websocket before we were able to set up
+      // the onclose listener.
+      if (this.ws.readyState === WebSocket.CLOSED) {
+        await this.teardown();
+      }
     } catch (err) {
       logError(err);
       this.sendError(err);
