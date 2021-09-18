@@ -5,7 +5,6 @@
   },
   "metrics": {
     "append_dimensions": {
-      "RijuInstanceGroup": "Webserver",
       "ImageId": "${aws:ImageId}",
       "InstanceId": "${aws:InstanceId}",
       "InstanceType": "${aws:InstanceType}"
@@ -16,15 +15,24 @@
     ],
     "metrics_collected": {
       "cpu": {
+        "append_dimensions": {
+          "RijuInstanceGroup": "Webserver"
+        },
         "measurement": ["usage_active"],
         "metrics_collection_interval": 60
       },
       "disk": {
+        "append_dimensions": {
+          "RijuInstanceGroup": "Webserver"
+        },
         "measurement": ["used_percent"],
         "metrics_collection_interval": 60,
         "resources": ["/", "/mnt/riju"]
       },
       "mem": {
+        "append_dimensions": {
+          "RijuInstanceGroup": "Webserver"
+        },
         "measurement": ["mem_used_percent"],
         "metrics_collection_interval": 60
       }
