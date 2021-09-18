@@ -38,6 +38,7 @@ clang
 docker-ce-cli
 make
 nodejs
+python3-pip
 yarn
 
 # packaging tools
