@@ -5,14 +5,14 @@
   },
   "metrics": {
     "append_dimensions": {
-      "AutoScalingGroupName": "${aws:AutoScalingGroupName}",
+      "RijuInstanceGroup": "Webserver",
       "ImageId": "${aws:ImageId}",
       "InstanceId": "${aws:InstanceId}",
       "InstanceType": "${aws:InstanceType}"
     },
     "aggregation_dimensions": [
-      ["AutoScalingGroupName"],
-      ["AutoScalingGroupName", "path"]
+      ["RijuInstanceGroup"],
+      ["RijuInstanceGroup", "path"]
     ],
     "metrics_collected": {
       "cpu": {

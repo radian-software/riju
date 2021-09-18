@@ -77,8 +77,3 @@ resource "aws_lb_listener" "server_https" {
     target_group_arn = aws_lb_target_group.server.arn
   }
 }
-
-resource "aws_autoscaling_attachment" "server" {
-  autoscaling_group_name = aws_autoscaling_group.server.name
-  alb_target_group_arn   = aws_lb_target_group.server.arn
-}

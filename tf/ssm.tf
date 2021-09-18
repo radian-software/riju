@@ -29,9 +29,3 @@ resource "aws_ssm_parameter" "s3_bucket" {
   type  = "String"
   value = aws_s3_bucket.riju.bucket
 }
-
-resource "aws_ssm_parameter" "asg_desired_capacity" {
-  name  = "riju-asg-desired-capacity"
-  type  = "String"
-  value = aws_autoscaling_group.server.desired_capacity
-}

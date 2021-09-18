@@ -13,7 +13,7 @@ resource "aws_cloudwatch_metric_alarm" "server_cpu" {
   alarm_actions             = [aws_sns_topic.riju.arn]
   insufficient_data_actions = [aws_sns_topic.riju.arn]
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.server.name
+    RijuInstanceGroup = "Webserver"
   }
 
   tags = {
@@ -36,7 +36,7 @@ resource "aws_cloudwatch_metric_alarm" "server_memory" {
   alarm_actions             = [aws_sns_topic.riju.arn]
   insufficient_data_actions = [aws_sns_topic.riju.arn]
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.server.name
+    RijuInstanceGroup = "Webserver"
   }
 
   tags = {
@@ -59,8 +59,8 @@ resource "aws_cloudwatch_metric_alarm" "server_data_volume_disk_space" {
   alarm_actions             = [aws_sns_topic.riju.arn]
   insufficient_data_actions = [aws_sns_topic.riju.arn]
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.server.name
-    path                 = "/mnt/riju"
+    RijuInstanceGroup = "Webserver"
+    path              = "/mnt/riju"
   }
 
   tags = {
@@ -83,8 +83,8 @@ resource "aws_cloudwatch_metric_alarm" "server_root_volume_disk_space" {
   alarm_actions             = [aws_sns_topic.riju.arn]
   insufficient_data_actions = [aws_sns_topic.riju.arn]
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.server.name
-    path                 = "/"
+    RijuInstanceGroup = "Webserver"
+    path              = "/"
   }
 
   tags = {
