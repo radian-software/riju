@@ -1,6 +1,7 @@
-# Contributing guide
+# Contributing guide / Documentation
 
 * [Criteria for language inclusion](doc/what-languages.md)
+* [Running Riju locally](doc/local.md)
 * [How to add your own language to Riju](doc/tutorial.md)
 * [Deep dive on Riju build system](doc/build.md)
 * [Riju infrastructure layout](doc/infra.md)
