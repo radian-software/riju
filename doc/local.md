@@ -10,10 +10,10 @@ hesitate to open an issue!
 
 ## Project setup
 
-Fork this repository to your account on GitHub, and clone it locally:
+Clone locally:
 
 ```
-$ git clone https://github.com/yourname/riju.git
+$ git clone https://github.com/raxod502/riju.git
 $ cd riju
 ```
 
