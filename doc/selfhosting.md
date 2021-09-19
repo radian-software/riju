@@ -212,6 +212,17 @@ install it as a CNAME record in your DNS panel. After DNS propagates,
 you should now be able to receive a 502 from Riju with no body
 content.
 
+## Launch instance
+
+Navigate to your EC2 dashboard instances. Select "Launch instance from template"
+and select riju-server for the launch template.
+
+## Attach to target group
+
+Once your instance is running you can attach it to a target group. Navigate to
+Load Balancing > Target groups. Select riju-server-http and register the instance
+that you just launched.
+
 ## Build and deploy
 
 *(Note: Although it's easy to build Riju locally, you have to be able
