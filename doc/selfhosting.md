@@ -209,19 +209,21 @@ This is the URL for your public ECR repository.
 
 Obtain the DNS record for Riju's ALB from `terraform output` and
 install it as a CNAME record in your DNS panel. After DNS propagates,
-you should now be able to receive a 502 from Riju with no body
-content.
+you should now be able to receive a 502 from the load balancer.
 
 ## Launch instance
 
-Navigate to your EC2 dashboard instances. Select "Launch instance from template"
-and select riju-server for the launch template.
+Navigate to your EC2 dashboard instances. Select "Launch instance from
+template" and select `riju-server` for the launch template.
 
 ## Attach to target group
 
-Once your instance is running you can attach it to a target group. Navigate to
-Load Balancing > Target groups. Select riju-server-http and register the instance
-that you just launched.
+Once your instance is running you can attach it to the target group.
+Navigate to Load Balancing > Target Groups. Select `riju-server-http`
+and register the instance that you just launched. Within a minute or
+two, you should still be getting 502s, but now with an empty response
+body (these are now coming from the Riju server itself rather than
+from the load balancer).
 
 ## Build and deploy
 
