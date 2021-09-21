@@ -134,6 +134,9 @@ async function main() {
 
   fitAddon.fit();
   window.addEventListener("resize", () => fitAddon.fit());
+  window.addEventListener("message", (msg) => {
+    console.log(msg)
+  })
 
   await new Promise((resolve) =>
     term.write("Connecting to server...", resolve)
