@@ -137,6 +137,7 @@ async function main() {
   window.addEventListener("message", (msg) => {
     console.log(msg)
   })
+  console.log('change made')
 
   await new Promise((resolve) =>
     term.write("Connecting to server...", resolve)
