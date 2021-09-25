@@ -1,5 +1,3 @@
-import { AbstractMessageReader } from "vscode-jsonrpc/lib/messageReader.js";
-import { AbstractMessageWriter } from "vscode-jsonrpc/lib/messageWriter.js";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 
@@ -7,11 +5,6 @@ import "xterm/css/xterm.css";
 
 const DEBUG = window.location.hash === "#debug";
 const config = window.rijuConfig;
-
-const formatButton = document.getElementById("formatButton");
-const lspButton = document.getElementById("lspButton");
-const lspButtonState = document.getElementById("lspButtonState");
-const connectionStatus = document.getElementById("connectionStatus");
 
 function closeModal() {
   document.querySelector("html").classList.remove("is-clipped");
@@ -24,85 +17,6 @@ function showError({ message, data }) {
     data || "(no output on stderr)";
   document.getElementById("modal").classList.add("is-active");
   document.querySelector("html").classList.add("is-clipped");
-}
-
-class RijuMessageReader extends AbstractMessageReader {
-  constructor(socket) {
-    super();
-    this.state = "initial";
-    this.callback = null;
-    this.messageQueue = [];
-    this.socket = socket;
-    this.socket.addEventListener("message", (event) => {
-      this.readMessage(event.data);
-    });
-  }
-
-  listen(callback) {
-    if (this.state === "initial") {
-      this.state = "listening";
-      this.callback = callback;
-      while (this.messageQueue.length > 0) {
-        this.readMessage(this.messageQueue.pop());
-      }
-    }
-  }
-
-  readMessage(rawMessage) {
-    if (this.state === "initial") {
-      this.messageQueue.splice(0, 0, rawMessage);
-    } else if (this.state === "listening") {
-      let message;
-      try {
-        message = JSON.parse(rawMessage);
-      } catch (err) {
-        return;
-      }
-      switch (message && message.event) {
-        case "lspOutput":
-          if (DEBUG) {
-            console.log("RECEIVE LSP:", message.output);
-          }
-          this.callback(message.output);
-          break;
-      }
-    }
-  }
-}
-
-class RijuMessageWriter extends AbstractMessageWriter {
-  constructor(socket) {
-    super();
-    this.socket = socket;
-  }
-
-  write(msg) {
-    switch (msg.method) {
-      case "initialize":
-        msg.params.processId = null;
-        if (config.lsp.disableDynamicRegistration) {
-          this.disableDynamicRegistration(msg);
-        }
-        break;
-      case "textDocument/didOpen":
-        if (config.lsp.lang) {
-          msg.params.textDocument.languageId = config.lsp.lang;
-        }
-    }
-    if (DEBUG) {
-      console.log("SEND LSP:", msg);
-    }
-    this.socket.send(JSON.stringify({ event: "lspInput", input: msg }));
-  }
-
-  disableDynamicRegistration(msg) {
-    if (!msg || typeof msg !== "object") return;
-    for (const [key, val] of Object.entries(msg)) {
-      if (key === "dynamicRegistration" && val === true)
-        msg.dynamicRegistration = false;
-      this.disableDynamicRegistration(val);
-    }
-  }
 }
 
 async function main() {
@@ -147,10 +61,10 @@ async function main() {
   window.addEventListener("message", (msg) => {
     try {
       if (allowedOrigins.indexOf(msg.origin) !== -1) {
-        sendMessage(msg.data)
+        sendMessage(msg.data);
       }
     } catch (e) {
-      console.log("message error: ", e)
+      console.log("message error: ", e);
     }
     console.log("message from codeamigo", msg);
   });
@@ -160,7 +74,6 @@ async function main() {
     serviceLogLines = {};
     let clientDisposable = null;
     let servicesDisposable = null;
-    connectionStatus.innerText = "connecting...";
     console.log("Connecting to server...");
     socket = new WebSocket(
       (document.location.protocol === "http:" ? "ws://" : "wss://") +
@@ -168,7 +81,6 @@ async function main() {
         `/api/v1/ws?lang=${encodeURIComponent(config.id)}`
     );
     socket.addEventListener("open", () => {
-      connectionStatus.innerText = "connected";
       console.log("Successfully connected to server");
     });
     socket.addEventListener("message", (event) => {
@@ -202,10 +114,6 @@ async function main() {
           term.write(message.output);
           return;
         case "lspStopped":
-          lspButton.disabled = false;
-          lspButton.classList.remove("is-loading");
-          lspButton.classList.add("is-light");
-          lspButtonState.innerText = "OFF";
           if (clientDisposable) {
             clientDisposable.dispose();
             clientDisposable = null;
@@ -216,10 +124,6 @@ async function main() {
           }
           break;
         case "lspStarted":
-          lspButton.disabled = false;
-          lspButton.classList.remove("is-loading");
-          lspButton.classList.remove("is-light");
-          lspButtonState.innerText = "ON";
           if (typeof message.root !== "string") {
             console.error("Unexpected message from server:", message);
             return;
@@ -270,10 +174,6 @@ async function main() {
               });
               break;
             case "lsp":
-              lspButton.disabled = false;
-              lspButton.classList.remove("is-loading");
-              lspButton.classList.add("is-light");
-              lspButtonState.innerText = "CRASHED";
               break;
             case "terminal":
               term.write(`\r\n[${message.error}]`);
@@ -299,12 +199,6 @@ async function main() {
         servicesDisposable.dispose();
         servicesDisposable = null;
       }
-      if (lspButtonState.innerText === "ON") {
-        lspButton.disabled = false;
-        lspButton.classList.remove("is-loading");
-        lspButton.classList.add("is-light");
-        lspButtonState.innerText = "DISCONNECTED";
-      }
       scheduleConnect();
     });
   }
@@ -312,7 +206,6 @@ async function main() {
   function scheduleConnect() {
     idleDueToInactivity = new Date() - lastActivityTimestamp > 10 * 60 * 1000;
     if (idleDueToInactivity) {
-      connectionStatus.innerText = "idle";
       return;
     }
     const delay = retryDelayMs * Math.random();
@@ -328,22 +221,6 @@ async function main() {
     sendMessage({ event: "terminalInput", input: data });
     recordActivity();
   });
-  
-  if (config.lsp) {
-    lspButton.classList.remove("is-hidden");
-    lspButton.addEventListener("click", () => {
-      lspButton.classList.add("is-loading");
-      lspButton.disabled = true;
-      lspButton.classList.remove("is-light");
-      if (lspButtonState.innerText === "ON") {
-        sendMessage({ event: "lspStop" });
-      } else {
-        serviceLogBuffers["lsp"] = "";
-        serviceLogLines["lsp"] = [];
-        sendMessage({ event: "lspStart" });
-      }
-    });
-  }
 
   for (const elt of document.querySelectorAll(".will-close-modal")) {
     elt.addEventListener("click", closeModal);
