@@ -21,9 +21,6 @@ const fathomSiteId = process.env.FATHOM_SITE_ID || "";
 const langs = await langsPromise;
 const app = express();
 
-app.use(cors());
-app.options("*", cors());
-
 app.set("query parser", (qs) => new URLSearchParams(qs));
 app.set("view engine", "ejs");
 
@@ -48,7 +45,8 @@ for (const [lang, { aliases }] of Object.entries(langs)) {
     }
   }
 }
-app.get("/:lang", (req, res) => {
+app.options('/:lang', cors())
+app.get("/:lang", cors(), (req, res) => {
   const lang = req.params.lang;
   const lowered = lang.toLowerCase();
   if (lowered !== lang) {
