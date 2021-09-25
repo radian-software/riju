@@ -1,11 +1,3 @@
-import * as monaco from "monaco-editor";
-import {
-  createConnection,
-  MonacoLanguageClient,
-  MonacoServices,
-  Services,
-} from "monaco-languageclient";
-import { createMessageConnection } from "vscode-jsonrpc";
 import { AbstractMessageReader } from "vscode-jsonrpc/lib/messageReader.js";
 import { AbstractMessageWriter } from "vscode-jsonrpc/lib/messageWriter.js";
 import { Terminal } from "xterm";
@@ -134,9 +126,6 @@ async function main() {
 
   fitAddon.fit();
   window.addEventListener("resize", () => fitAddon.fit());
-  window.addEventListener("message", (msg) => {
-    console.log('message from codeamigo', msg)
-  })
 
   await new Promise((resolve) =>
     term.write("Connecting to server...", resolve)
@@ -154,6 +143,18 @@ async function main() {
     }
   }
 
+  const allowedOrigins = ["http://localhost:3000", "https://codeamigo.dev"];
+  window.addEventListener("message", (msg) => {
+    try {
+      if (allowedOrigins.indexOf(msg.origin) !== -1) {
+        sendMessage(msg.data)
+      }
+    } catch (e) {
+      console.log("message error: ", e)
+    }
+    console.log("message from codeamigo", msg);
+  });
+
   function tryConnect() {
     serviceLogBuffers = {};
     serviceLogLines = {};
@@ -166,9 +167,6 @@ async function main() {
         document.location.host +
         `/api/v1/ws?lang=${encodeURIComponent(config.id)}`
     );
-    socket.addEventListener("error", (ev) => {
-      console.log(ev)
-    });
     socket.addEventListener("open", () => {
       connectionStatus.innerText = "connected";
       console.log("Successfully connected to server");
@@ -203,20 +201,6 @@ async function main() {
           }
           term.write(message.output);
           return;
-        case "formattedCode":
-          formatButton.disabled = false;
-          formatButton.classList.remove("is-loading");
-          if (
-            typeof message.code !== "string" ||
-            typeof message.originalCode !== "string"
-          ) {
-            console.error("Unexpected message from server:", message);
-            return;
-          }
-          if (editor.getValue() === message.originalCode) {
-            editor.setValue(message.code);
-          }
-          return;
         case "lspStopped":
           lspButton.disabled = false;
           lspButton.classList.remove("is-loading");
@@ -240,50 +224,6 @@ async function main() {
             console.error("Unexpected message from server:", message);
             return;
           }
-          const services = MonacoServices.create(editor, {
-            rootUri: `file://${message.root}`,
-          });
-          servicesDisposable = Services.install(services);
-          const newURI = `file://${message.root}/${config.main}`;
-          const oldModel = editor.getModel();
-          if (oldModel.uri.toString() !== newURI) {
-            // This code is likely to be buggy as it will probably
-            // never run and has thus never been tested.
-            editor.setModel(
-              monaco.editor.createModel(
-                oldModel.getValue(),
-                undefined,
-                monaco.Uri.parse(newURI)
-              )
-            );
-            oldModel.dispose();
-          }
-          const connection = createMessageConnection(
-            new RijuMessageReader(socket),
-            new RijuMessageWriter(socket)
-          );
-          const client = new MonacoLanguageClient({
-            name: "Riju",
-            clientOptions: {
-              documentSelector: [{ pattern: "**" }],
-              middleware: {
-                workspace: {
-                  configuration: (params, token, configuration) => {
-                    return Array(configuration(params, token).length).fill(
-                      config.lsp.config !== undefined ? config.lsp.config : {}
-                    );
-                  },
-                },
-              },
-              initializationOptions: config.lsp.init || {},
-            },
-            connectionProvider: {
-              get: (errorHandler, closeHandler) =>
-                Promise.resolve(
-                  createConnection(connection, errorHandler, closeHandler)
-                ),
-            },
-          });
           clientDisposable = client.start();
           return;
         case "lspOutput":
@@ -388,41 +328,7 @@ async function main() {
     sendMessage({ event: "terminalInput", input: data });
     recordActivity();
   });
-
-  const editor = monaco.editor.create(document.getElementById("editor"), {
-    minimap: { enabled: false },
-    scrollbar: { verticalScrollbarSize: 0 },
-  });
-  editor.addAction({
-    id: "runCode",
-    label: "Run",
-    keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
-    contextMenuGroupId: "2_execution",
-    run: () => {
-      sendMessage({ event: "runCode", code: editor.getValue() });
-    },
-  });
-  editor.getModel().onDidChangeContent(() => recordActivity());
-  window.addEventListener("resize", () => editor.layout());
-  editor.getModel().setValue(config.template + "\n");
-  monaco.editor.setModelLanguage(
-    editor.getModel(),
-    config.monacoLang || "plaintext"
-  );
-
-  document.getElementById("runButton").addEventListener("click", () => {
-    sendMessage({ event: "runCode", code: editor.getValue() });
-  });
-  if (config.format) {
-    formatButton.classList.remove("is-hidden");
-    formatButton.addEventListener("click", () => {
-      formatButton.classList.add("is-loading");
-      formatButton.disabled = true;
-      serviceLogBuffers["formatter"] = "";
-      serviceLogLines["formatter"] = [];
-      sendMessage({ event: "formatCode", code: editor.getValue() });
-    });
-  }
+  
   if (config.lsp) {
     lspButton.classList.remove("is-hidden");
     lspButton.addEventListener("click", () => {

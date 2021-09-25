@@ -28,43 +28,6 @@
   </head>
   <body>
     <div class="columns" style="height: 100vh; margin: 0">
-      <div class="column" style="padding: 0">
-        <div id="header" style="border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: lightgray">
-          <a href="/" class="button is-small is-info">
-            <span class="icon is-small">
-              <i class="fas fa-home"></i>
-            </span>
-          </a>
-          <span style="display: inline-block; vertical-align: middle; margin-left: 6px; padding-top: 2px">
-            <b>Riju :: <%= config.name %></b>
-          </span>
-          <span style="display: inline-block; vertical-align: middle; margin-left: 6px; padding-top: 2px">
-            <i id="connectionStatus" style="color: lightgray"></i>
-          </span>
-          <span style="display: inline-block; vertical-align: middle; height: 100%"></span>
-          <button id="runButton" type="button" class="button is-small is-success is-pulled-right">
-            <span>Run</span>
-            <span class="icon is-small">
-              <i class="fas fa-play"></i>
-            </span>
-          </button>
-          <button id="formatButton" type="button" class="button is-small is-info is-pulled-right is-hidden">
-            <span>Prettify</span>
-            <span class="icon is-small">
-              <i class="fas fa-code"></i>
-            </span>
-          </button>
-          <button id="lspButton" type="button" class="button is-small is-warning is-light is-pulled-right is-hidden">
-            <span>Autocomplete <span id="lspButtonState">OFF</span></span>
-            <span class="icon is-small">
-              <i class="fas fa-bolt"></i>
-            </span>
-          </button>
-        </div>
-        <div style="height: 100%">
-          <div id="editor" style="height: 100%; margin: 12px; margin-left: 0"></div>
-        </div>
-      </div>
       <div class="column" id="terminal" style="background: black; padding: 0">
       </div>
     </div>
