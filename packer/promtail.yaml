@@ -22,13 +22,18 @@ scrape_configs:
     relabel_configs:
       - source_labels:
           - __journal__systemd_unit
-        regex: "(docker|riju)\\.service"
+        regex: "(docker|promtail|riju)\\.service"
         action: keep
       - source_labels:
           - __journal__systemd_unit
         regex: "docker\\.service"
         target_label: source
         replacement: "dockerd"
+      - source_labels:
+          - __journal__systemd_unit
+        regex: "promtail\\.service"
+        target_label: source
+        replacement: "promtail"
       - source_labels:
           - __journal__systemd_unit
         regex: "riju\\.service"

@@ -47,7 +47,7 @@ being nice include:
 * *Mining cryptocurrency.* Since hosting Riju comes out of my
   paycheck, this is exactly equivalent to stealing, which isn't nice.
 
-## Can I help?
+## Can I help? / Documentation
 
 Absolutely, please see [Contributing guide](CONTRIBUTING.md).
 
