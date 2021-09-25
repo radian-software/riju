@@ -15,6 +15,7 @@
     "babel-walk": "^3.0.0",
     "buffer": "^6.0.3",
     "commander": "^7.1.0",
+    "cors": "2.8.5",
     "css-loader": "^5.0.1",
     "debounce": "^1.2.0",
     "docker-file-parser": "^1.0.5",

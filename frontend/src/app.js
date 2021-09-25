@@ -166,6 +166,9 @@ async function main() {
         document.location.host +
         `/api/v1/ws?lang=${encodeURIComponent(config.id)}`
     );
+    socket.addEventListener("error", (ev) => {
+      console.log(ev)
+    });
     socket.addEventListener("open", () => {
       connectionStatus.innerText = "connected";
       console.log("Successfully connected to server");
