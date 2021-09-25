@@ -135,8 +135,8 @@ async function main() {
   fitAddon.fit();
   window.addEventListener("resize", () => fitAddon.fit());
   window.addEventListener("message", (msg) => {
-    console.log(msg)
-  })
+    console.log(msg);
+  });
 
   await new Promise((resolve) =>
     term.write("Connecting to server...", resolve)
@@ -167,8 +167,8 @@ async function main() {
         `/api/v1/ws?lang=${encodeURIComponent(config.id)}`
     );
     socket.addEventListener("error", (ev) => {
-      console.log(ev)
-    })
+      console.log(ev);
+    });
     socket.addEventListener("open", () => {
       connectionStatus.innerText = "connected";
       console.log("Successfully connected to server");
