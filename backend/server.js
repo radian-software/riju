@@ -1,8 +1,8 @@
 import http from "http";
 import https from "https";
 import path from "path";
-
 import cors from "cors"
+
 import express from "express";
 import ws from "express-ws";
 import _ from "lodash";
@@ -21,8 +21,8 @@ const fathomSiteId = process.env.FATHOM_SITE_ID || "";
 const langs = await langsPromise;
 const app = express();
 
-app.use(cors());
-app.options("*", cors());
+app.use(cors({ origin: true, credentials: true }));
+app.options("*", cors({ origin: true, credentials: true }));
 
 app.set("query parser", (qs) => new URLSearchParams(qs));
 app.set("view engine", "ejs");
