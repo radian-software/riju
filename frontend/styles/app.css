@@ -5,3 +5,7 @@
 #header .button {
   border-radius: 0;
 }
+
+.column {
+  height: 100%;
+}
