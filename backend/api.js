@@ -309,7 +309,7 @@ export class Session {
         code = createEmpty !== undefined ? createEmpty : template + "\n";
       }
       if (code && suffix) {
-        code += suffix + "\n";
+        code += "\n" + suffix + "\n";
       }
       await this.writeCode(code);
       const termArgs = this.privilegedPty(cmdline);
