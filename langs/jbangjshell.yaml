@@ -1,5 +1,5 @@
-id: "jbang"
-name: "Java w/JBang"
+id: "jbangjshell"
+name: "JShell"
 monacoLang: java
 
 install:
@@ -19,28 +19,21 @@ install:
     wget https://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz
     tar -xf jdt-language-server-latest.tar.gz -C "${pkg}/opt/jdt"
 
-main: "Main.java"
+main: "Main.jsh"
 template: |
-  public class Main {
-      public static void main(String[] args) {
-          System.out.println("Hello, world!");
-      }
-  }
+    System.out.println("Hello, world!");
 
 run: |
-    jbang Main.java
+    jbang Main.jsh
+
+repl: |
+    jbang --interactive Main.jsh
 
 format:
   run: |
     clang-format --style="{BasedOnStyle: llvm, IndentWidth: 4}" --assume-filename=Format.java
   input: |
-    public class Main
-    {
-        public static void main(String[] args)
-        {
-            System.out.println("Hello, world!");
-        }
-    }
+     System.out.println("Hello, world!");
 
 lsp:
   setup: |
