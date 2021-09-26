@@ -1,6 +1,4 @@
 id: "jbang"
-aliases:
-  - "javac"
 name: "JBang"
 monacoLang: java
 
