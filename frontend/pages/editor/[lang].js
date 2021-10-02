@@ -1,7 +1,7 @@
 import MonacoEditor, { useMonaco } from "@monaco-editor/react";
 import { Circle, Code as Format, Home, PlayArrow } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Box, Button, Chip, Divider, Typography } from "@mui/material";
 import ansi from "ansicolor";
 import dynamic from "next/dynamic";
 import Head from "next/head";
@@ -34,12 +34,14 @@ const CodeRunner = (props) => {
   const [isLspStarted, setLspStarted] = useState(false);
   const [isLspRequested, setIsLspRequested] = useState(false);
   const monaco = useMonaco();
+  const [status, setStatus] = useState("connecting");
 
   function sendToTerminal(type, data) {
     EventEmitter.dispatch("terminal", { type, data });
   }
 
   function connect() {
+    setStatus("connecting");
     const socket = new WebSocket(
       // (document.location.protocol === "http:" ? "ws://" : "wss://") +
       "wss://" +
@@ -48,6 +50,7 @@ const CodeRunner = (props) => {
     );
     socket.addEventListener("open", () => {
       console.log("Successfully connected to server playground");
+      setStatus("connected");
     });
     EventEmitter.subscribe("send", (payload) => {
       if (DEBUG) {
@@ -262,9 +265,10 @@ const CodeRunner = (props) => {
       setRunning(false);
       setLspStarted(false);
       setIsLspRequested(false);
+      setStatus("idle");
     });
 
-    return () => socket && socket.close();
+    return socket;
   }
 
   useEffect(() => {
@@ -326,6 +330,14 @@ const CodeRunner = (props) => {
     }
   };
 
+  const handleChange = () => {
+    if (isConnected) {
+      return;
+    } else {
+      connect();
+    }
+  };
+
   return (
     <>
       <Head>
@@ -353,7 +365,7 @@ const CodeRunner = (props) => {
           sx={{
             display: "flex",
             flexDirection: "row",
-            alignItems: "center",
+            alignItems: "stretch",
             boxShadow: `0 2px 4px rgb(0 0 0 / 2%)`,
             width: "60%",
           }}
@@ -374,6 +386,16 @@ const CodeRunner = (props) => {
             <Typography sx={{ fontSize: 14, px: 2, fontWeight: 600 }}>
               {config.name}
             </Typography>
+            <Chip
+              size="small"
+              variant="outlined"
+              sx={{
+                fontSize: "0.7rem",
+                alignSelf: "center",
+                height: "16px",
+              }}
+              label={connectionStatus}
+            />
           </Box>
           <LoadingButton
             onClick={handleLspClick}
@@ -442,6 +464,7 @@ const CodeRunner = (props) => {
             <Box
               component={MonacoEditor}
               wrapperClassName={"rijuEditor"}
+              onChange={handleChange}
               height="90vh"
               defaultLanguage="javascript"
               defaultValue="// some comment"
