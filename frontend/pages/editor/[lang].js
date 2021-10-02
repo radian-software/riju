@@ -331,7 +331,7 @@ const CodeRunner = (props) => {
   };
 
   const handleChange = () => {
-    if (isConnected) {
+    if (status != "idle") {
       return;
     } else {
       connect();
@@ -389,7 +389,7 @@ const CodeRunner = (props) => {
             <Chip
               size="small"
               variant="outlined"
-              color="info"
+              color={status != "idle" ? "info" : "default"}
               sx={{
                 fontSize: "0.7rem",
                 alignSelf: "center",
