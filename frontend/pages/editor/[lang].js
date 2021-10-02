@@ -1,7 +1,7 @@
 import MonacoEditor, { useMonaco } from "@monaco-editor/react";
 import { Circle, Code as Format, Home, PlayArrow } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+import { Box, Button, Divider, Typography } from "@mui/material";
 import ansi from "ansicolor";
 import dynamic from "next/dynamic";
 import Head from "next/head";
@@ -20,7 +20,8 @@ const RijuTerminal = dynamic(() => import("../../components/RijuTerminal"), {
 const DEBUG = true;
 let clientDisposable = null;
 let servicesDisposable = null;
-const serviceLogBuffers = {};
+let serviceLogBuffers = {};
+let serviceLogLines = {};
 
 const CodeRunner = (props) => {
   const router = useRouter();
@@ -89,6 +90,7 @@ const CodeRunner = (props) => {
           setRunning(false);
           return;
         case "formattedCode":
+          setFormatting(false);
           if (
             typeof message.code !== "string" ||
             typeof message.originalCode !== "string"
@@ -99,7 +101,6 @@ const CodeRunner = (props) => {
           if (editorRef.current?.getValue() === message.originalCode) {
             editorRef.current?.setValue(message.code);
           }
-          setFormatting(false);
           return;
         case "lspStopped":
           setIsLspRequested(false);
@@ -399,9 +400,9 @@ const CodeRunner = (props) => {
           >
             <Typography sx={{ fontSize: 12 }}>Autocomplete</Typography>
           </LoadingButton>
-          <Button
+          <LoadingButton
             onClick={sendFormat}
-            disabled={isFormatting || isRunning}
+            loading={isFormatting}
             size="small"
             color="primary"
             variant="contained"
@@ -410,27 +411,23 @@ const CodeRunner = (props) => {
               visibility: config.format ? "visible" : "hidden",
             }}
             disableElevation
+            endIcon={<Format fontSize="small" />}
           >
-            <Stack direction="row" gap={1} alignItems="center">
-              <Typography sx={{ fontSize: 12 }}>Prettify</Typography>
-              <Format fontSize="small" />
-            </Stack>
-          </Button>
+            <Typography sx={{ fontSize: 12 }}>Prettify</Typography>
+          </LoadingButton>
           <Divider orientation="vertical" />
-          <Button
+          <LoadingButton
             onClick={showValue}
-            disabled={isRunning || isRunning}
+            loading={isRunning}
             size="small"
             color="success"
             variant="contained"
             sx={{ borderRadius: 0 }}
             disableElevation
+            endIcon={<PlayArrow fontSize="small" htmlColor="#fff" />}
           >
-            <Stack direction="row" gap={1} alignItems="center">
-              <Typography sx={{ fontSize: 12, color: "#fff" }}>Run</Typography>
-              <PlayArrow fontSize="small" htmlColor="#fff" />
-            </Stack>
-          </Button>
+            <Typography sx={{ fontSize: 12, color: "#fff" }}>Run</Typography>
+          </LoadingButton>
         </Box>
         <Divider />
         <Box
