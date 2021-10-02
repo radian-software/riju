@@ -1,0 +1,3951 @@
+{
+  "abc": {
+    "id": "abc",
+    "name": "ABC",
+    "install": {
+      "apt": ["libtinfo5:i386"],
+      "manual": "wget https://homepages.cwi.nl/~steven/abc/implementations/abc.tar.gz\ninstall -d \"${pkg}/opt/abc\"\ntar -xf abc.tar.gz -C \"${pkg}/opt/abc\" --strip-components=1\nchmod +x \"${pkg}/opt/abc/abc\" \"${pkg}/opt/abc/abckeys\"\ninstall -d \"${pkg}/usr/local/bin\"\ntee \"${pkg}/usr/local/bin/abc\" >/dev/null <<\"EOF\"\n#!/usr/bin/env bash\ncd /opt/abc\nexec ./abc \"$@\"\nEOF\nchmod +x \"${pkg}/usr/local/bin/abc\""
+    },
+    "repl": "abc",
+    "input": "DELAY: 2\nWRITE 123 * 234",
+    "main": "main.abc",
+    "template": "WRITE \"Hello, world!\" /",
+    "run": "abc \"$PWD/main.abc\" -",
+    "scope": { "code": "PUT 123 * 234 IN x", "input": "WRITE x" }
+  },
+  "ada": {
+    "id": "ada",
+    "aliases": ["adb", "gnat"],
+    "name": "Ada",
+    "info": {
+      "impl": "GNAT",
+      "year": 1980,
+      "desc": "Structured, statically typed, imperative, and object-oriented high-level programming language, extended from Pascal and other languages",
+      "ext": ["adb", "ads"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Ada_(programming_language)",
+        "home": "https://www.adaic.org/",
+        "impl": "https://www.gnu.org/software/gnat/",
+        "source": "https://gcc.gnu.org/git.html"
+      },
+      "category": "general",
+      "mode": "compiled",
+      "platform": [],
+      "syntax": "pascal",
+      "typing": "static",
+      "paradigm": ["imperative", "oo"],
+      "usage": "popular"
+    },
+    "install": { "apt": ["gnat"] },
+    "main": "main.adb",
+    "template": "with Ada.Text_IO;\n\nprocedure Main is\nbegin\n   Ada.Text_IO.Put_Line(\"Hello, world!\");\nend Main;",
+    "compile": "gnatmake main.adb",
+    "run": "./main"
+  },
+  "afnix": {
+    "id": "afnix",
+    "aliases": ["als", "axc", "axi"],
+    "name": "Afnix",
+    "install": { "apt": ["afnix", "afnix-doc"] },
+    "repl": "LD_LIBRARY_PATH=/usr/lib/afnix axi",
+    "input": "DELAY: 1\nprintln (* 123 234)",
+    "main": "main.als",
+    "template": "println \"Hello, world!\"",
+    "run": "LD_LIBRARY_PATH=/usr/lib/afnix axi main.als; LD_LIBRARY_PATH=/usr/lib/afnix axi"
+  },
+  "aheui": {
+    "id": "aheui",
+    "aliases": [
+      "aheui",
+      "aheuis",
+      "rpaheui",
+      "caheui",
+      "naheui",
+      "goaheui",
+      "jsaheui",
+      "pyaheui",
+      "rsaheui",
+      "as3aheui",
+      "raheui",
+      "아희"
+    ],
+    "name": "아희",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\ngit clone https://github.com/aheui/caheui.git\npushd caheui\nmake\ncp aheui \"${pkg}/usr/local/bin/\"\npopd"
+    },
+    "main": "main.aheui",
+    "template": "밤밣따빠밣밟따뿌\n빠맣파빨받밤뚜뭏\n돋밬탕빠맣붏두붇\n볻뫃박발뚷투뭏붖\n뫃도뫃희멓뭏뭏붘\n뫃봌토범더벌뿌뚜\n뽑뽀멓멓더벓뻐뚠\n뽀덩벐멓뻐덕더벅",
+    "run": "aheui main.aheui"
+  },
+  "algol": {
+    "id": "algol",
+    "aliases": ["alg", "a68g", "genie", "a68genie"],
+    "name": "ALGOL 68",
+    "info": {
+      "impl": "ALGOL 68 Genie",
+      "version": "ALGOL 68",
+      "year": 1958,
+      "desc": "Seminal imperative programming language which introduced lexical scope and formal grammar specification",
+      "ext": "alg",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/ALGOL",
+        "home": "http://algol68.sourceforge.net/",
+        "source": "https://jmvdveer.home.xs4all.nl/en.algol-68-genie.html"
+      },
+      "category": "general",
+      "mode": ["interpreted", "compiled"],
+      "platform": [],
+      "syntax": "pascal",
+      "typing": "static",
+      "paradigm": "imperative",
+      "usage": []
+    },
+    "install": { "apt": ["algol68g"] },
+    "main": "main.alg",
+    "template": "print((\"Hello, world!\",new line))",
+    "run": "a68g main.alg"
+  },
+  "ante": {
+    "id": "ante",
+    "aliases": ["an"],
+    "name": "Ante",
+    "install": {
+      "prepare": {
+        "apt": [
+          "cargo",
+          "cmake",
+          "libssl-dev",
+          "pkg-config",
+          "python3-distutils"
+        ],
+        "manual": "export PATH=\"$HOME/.cargo/bin:$PATH\"\ncargo install llvmenv\nllvmenv init\n# If compiler is not explicitly set to LLVM, then we get an\n# error: unrecognized command-line option ‘-Wnewline-eof’.\nCC=/usr/bin/clang CXX=/usr/bin/clang++ llvmenv build-entry -G Makefile -j$(nproc) 10.0.0\nllvmenv global 10.0.0"
+      },
+      "manual": "git clone https://github.com/jfecher/ante.git\npushd ante\nLLVM_SYS_100_PREFIX=\"$(llvmenv prefix)\" cargo build --release\ninstall -d \"${pkg}/opt/ante\"\ninstall -d \"${pkg}/usr/local/bin\"\ncp target/release/ante \"${pkg}/usr/local/bin/\"\ncp -R stdlib \"${pkg}/opt/ante/\"\npopd"
+    },
+    "setup": "mkdir -p \"$HOME/.config/ante\"\ncp -R /opt/ante/stdlib \"$HOME/.config/ante/\"",
+    "main": "main.an",
+    "template": "print \"Hello, world!\"",
+    "compile": "ante main.an",
+    "run": "./main"
+  },
+  "antecards": {
+    "id": "antecards",
+    "name": "Ante (Cards)",
+    "install": {
+      "manual": "wget https://github.com/michaeldv/ante/raw/master/ante.rb\nchmod +x ante.rb\ninstall -d \"${pkg}/usr/local/bin\"\nmv ante.rb \"${pkg}/usr/local/bin/ante-cards\""
+    },
+    "main": "main.ante",
+    "template": "9♦8♥J♦A♦2♣3♥7♠J♦A♦7♦J♦J♦A♦3♦J♦5♥6♦4♥J♥A♥6♠6♠J♥A♦8♦J♦A♦8♠J♦A♦3♦J♦A♦6♠J♦A♦8♠J♦A♥3♦2♠J♥A♥2♣6♠J♥",
+    "run": "RUBYOPT=\"-W0\" ante-cards main.ante"
+  },
+  "apl": {
+    "id": "apl",
+    "name": "APL",
+    "info": {
+      "impl": "GNU APL",
+      "year": 1966,
+      "desc": "Array-based programming language using large range of special symbols for concision",
+      "ext": "apl",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/APL_(programming_language)",
+        "impl": "https://www.gnu.org/software/apl/",
+        "source": "https://savannah.gnu.org/svn/?group=apl"
+      },
+      "category": ["general"],
+      "mode": "interpreted",
+      "platform": [],
+      "syntax": ["golf", "symbol"],
+      "typing": "dynamic",
+      "paradigm": ["array", "functional", "imperative"],
+      "usage": []
+    },
+    "install": {
+      "apt": ["libtinfo5"],
+      "manual": "path=\"$(curl -sS ftp://ftp.gnu.org/gnu/apl/ | grep -Eo 'apl_[-0-9.]+_amd64.deb$' | sort -rV | head -n1)\"\nwget \"ftp://ftp.gnu.org/gnu/apl/${path}\" -O apl.deb",
+      "deb": ["apl.deb"]
+    },
+    "repl": "apl",
+    "input": "123 × 234",
+    "main": "main.apl",
+    "template": "'Hello, world!'",
+    "run": "apl -f main.apl",
+    "scope": { "code": "x ← 123 × 234" }
+  },
+  "aplus": {
+    "id": "aplus",
+    "aliases": ["a+", "ap", "aplus"],
+    "name": "A+",
+    "install": { "apt": ["aplus-fsf", "aplus-fsf-doc", "rlwrap"] },
+    "repl": "rlwrap a+",
+    "input": "2 * 16",
+    "output": "65536",
+    "main": "main.a+",
+    "template": "'Hello, world!'",
+    "run": "rlwrap a+ main.a+",
+    "skip": ["scope"]
+  },
+  "arm": {
+    "id": "arm",
+    "name": "ARM",
+    "info": {
+      "impl": "GCC",
+      "year": 1985,
+      "desc": "Popular RISC architecture used in mobile devices",
+      "ext": "S",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/ARM_architecture",
+        "home": "https://developer.arm.com/architectures/cpu-architecture",
+        "impl": "https://gcc.gnu.org/",
+        "source": "https://gcc.gnu.org/git.html"
+      },
+      "category": "assembly",
+      "mode": "compiled",
+      "platform": [],
+      "syntax": "assembly",
+      "typing": "weak",
+      "paradigm": "imperative",
+      "usage": []
+    },
+    "install": { "apt": ["gcc-arm-linux-gnueabihf", "qemu-user-static"] },
+    "main": "main.S",
+    "template": "\t.text\n\t.globl main\nmain:\n\tmov r7, #4\n\tmov r0, #1\n\tldr r1, =message\n\tmov r2, #14\n\tswi 0\n\tmov r7, #1\n\tmov r0, #0\n\tswi 0\n\t.data\nmessage:\n\t.string \"Hello, world!\\n\"",
+    "compile": "arm-linux-gnueabihf-gcc main.S -o main -static",
+    "run": "qemu-arm-static main"
+  },
+  "asciidoc": {
+    "id": "asciidoc",
+    "aliases": ["adoc", "asc"],
+    "name": "AsciiDoc",
+    "info": {
+      "year": 2002,
+      "desc": "Human-readable document format, semantically equivalent to DocBook XML, but using plain-text mark-up conventions",
+      "ext": "adoc",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/AsciiDoc",
+        "home": "https://asciidoc.org/",
+        "source": "https://github.com/asciidoc/asciidoc"
+      },
+      "category": "markup",
+      "mode": [],
+      "platform": [],
+      "syntax": "text",
+      "typing": [],
+      "paradigm": [],
+      "usage": []
+    },
+    "install": { "apt": ["asciidoctor"], "riju": ["prettier"] },
+    "main": "main.adoc",
+    "template": "Hello, world!",
+    "compile": "asciidoctor -s main.adoc",
+    "run": "prettier --no-config main.html"
+  },
+  "aspectcpp": {
+    "id": "aspectcpp",
+    "aliases": ["aspectc++", "aspectcplusplus"],
+    "name": "AspectC++",
+    "install": { "apt": ["aspectc++", "libstdc++-9-dev"] },
+    "main": "main.cpp",
+    "template": "#include <iostream>\n\nint main() {\n  std::cout << \"Hello, world!\" << std::endl;\n  return 0;\n}",
+    "compile": "CPLUS_INCLUDE_PATH=/usr/include/c++/9 ag++ main.cpp -o main",
+    "run": "./main"
+  },
+  "aspectj": {
+    "id": "aspectj",
+    "aliases": ["aj"],
+    "name": "AspectJ",
+    "install": { "apt": ["aspectj"] },
+    "main": "Main.aj",
+    "template": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, world!\");\n    }\n}",
+    "compile": "ajc Main.aj",
+    "run": "java Main"
+  },
+  "asymptote": {
+    "id": "asymptote",
+    "aliases": ["asy"],
+    "name": "Asymptote",
+    "install": { "apt": ["asymptote"] },
+    "repl": "asy",
+    "main": "main.asy",
+    "template": "write(\"Hello, world!\");",
+    "run": "asy main.asy; asy"
+  },
+  "ats": {
+    "id": "ats",
+    "aliases": ["dats", "sats", "cats", "hats"],
+    "name": "ATS",
+    "monacoLang": "postiats",
+    "info": {
+      "impl": "ATS2/Postiats",
+      "year": 2007,
+      "desc": "Programming language designed to unify programming with formal specification",
+      "ext": ["sats", "dats", "cats", "hats"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/ATS_(programming_language)",
+        "home": "http://www.ats-lang.org/",
+        "source": "https://github.com/githwxi/ATS-Postiats"
+      },
+      "category": "general",
+      "mode": "compiled",
+      "platform": [],
+      "syntax": ["c", "haskell"],
+      "typing": ["static", "theorem"],
+      "paradigm": ["imperative", "declarative"],
+      "usage": []
+    },
+    "install": { "apt": ["ats2-lang"] },
+    "main": "main.dats",
+    "template": "val _ = print (\"Hello, world!\\n\")\nimplement main0 () = ()",
+    "compile": "patscc main.dats -o main",
+    "run": "./main"
+  },
+  "awk": {
+    "id": "awk",
+    "aliases": ["gawk", "mawk", "nawk"],
+    "name": "Awk",
+    "info": {
+      "impl": "GNU Awk",
+      "year": 1977,
+      "desc": "Domain-specific language designed for text processing and typically used as a data extraction and reporting tool",
+      "ext": "awk",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/AWK",
+        "impl": "https://www.gnu.org/software/gawk/manual/gawk.html",
+        "source": "https://savannah.gnu.org/git/?group=gawk"
+      },
+      "category": "tool",
+      "mode": "interpreted",
+      "platform": [],
+      "syntax": "c",
+      "typing": "weak",
+      "paradigm": "imperative",
+      "usage": []
+    },
+    "install": { "apt": ["mawk"] },
+    "main": "main.awk",
+    "template": "BEGIN { print \"Hello, world!\" }",
+    "run": "awk -f main.awk"
+  },
+  "bash": {
+    "id": "bash",
+    "aliases": ["bashrc", "bourneshell"],
+    "name": "Bash",
+    "monacoLang": "shell",
+    "info": {
+      "impl": "GNU Bash",
+      "year": 1989,
+      "desc": "Unix shell and command language written by Brian Fox for the GNU Project as a free software replacement for the Bourne shell",
+      "ext": ["bash", "sh"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Bash_(Unix_shell)",
+        "impl": "https://www.gnu.org/software/bash/",
+        "source": "https://savannah.gnu.org/projects/bash/"
+      },
+      "category": "shell",
+      "mode": "interpreted",
+      "platform": [],
+      "syntax": "pascal",
+      "typing": "weak",
+      "paradigm": "imperative",
+      "usage": []
+    },
+    "install": { "apt": ["bash"], "npm": ["bash-language-server"] },
+    "repl": "bash --rcfile /dev/null",
+    "input": "expr 123 \\* 234",
+    "main": "main.bash",
+    "template": "echo \"Hello, world!\"",
+    "run": "bash --rcfile main.bash",
+    "scope": { "code": "x=\"$(expr 123 \\* 234)\"", "input": "echo \"$x\"" },
+    "lsp": {
+      "start": "bash-language-server start",
+      "code": "read",
+      "item": "readonly"
+    }
+  },
+  "basic": {
+    "id": "basic",
+    "aliases": ["bas", "qbasic"],
+    "name": "BASIC",
+    "info": {
+      "impl": "Bywater BASIC",
+      "year": 1964,
+      "desc": "General-purpose, high-level programming language whose design philosophy emphasizes ease of use",
+      "ext": "bas",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/BASIC",
+        "impl": "https://sourceforge.net/projects/bwbasic/",
+        "source": "https://sourceforge.net/projects/bwbasic/files/bwbasic/"
+      },
+      "category": "general",
+      "mode": "interpreted",
+      "platform": [],
+      "syntax": ["basic", "column", "whitespace"],
+      "typing": "static",
+      "paradigm": "imperative",
+      "usage": []
+    },
+    "install": { "apt": ["bwbasic"] },
+    "repl": "bwbasic",
+    "input": "PRINT 123 * 234",
+    "main": "main.bas",
+    "template": "PRINT \"Hello, world!\"",
+    "run": "bwbasic main.bas",
+    "scope": { "code": "x = 123 * 234", "input": "PRINT x" }
+  },
+  "battlestar": {
+    "id": "battlestar",
+    "aliases": ["battlestarc", "bts"],
+    "name": "Battlestar",
+    "info": {
+      "year": 2014,
+      "desc": "A different take on assembly, with the goal of creating tiny executables",
+      "ext": "bts",
+      "web": { "source": "https://github.com/xyproto/battlestar" },
+      "category": "assembly",
+      "mode": "compiled",
+      "platform": [],
+      "syntax": "assembly",
+      "typing": "weak",
+      "paradigm": "imperative",
+      "usage": "personal"
+    },
+    "install": {
+      "prepare": { "apt": ["golang"] },
+      "apt": ["yasm"],
+      "manual": "install -d \"${pkg}/usr/local/bin\"\ngit clone https://github.com/xyproto/battlestar.git\npushd battlestar\nmake\ncp cmd/battlestarc/battlestarc \"${pkg}/usr/local/bin/\"\ncp scripts/bts.sh \"${pkg}/usr/local/bin/bts\"\npopd"
+    },
+    "main": "main.bts",
+    "template": "const message = \"Hello, world!\\n\"\n\nfun main\n    syscall(1, 1, message, len(message))\nend",
+    "run": "bts main.bts"
+  },
+  "bc": {
+    "id": "bc",
+    "name": "bc",
+    "install": { "apt": ["bc"] },
+    "repl": "bc",
+    "main": "main.bc",
+    "template": "\"Hello, world!\n\"",
+    "run": "bc main.bc"
+  },
+  "beanshell": {
+    "id": "beanshell",
+    "aliases": ["bsh"],
+    "name": "Beanshell",
+    "install": { "apt": ["bsh"] },
+    "repl": "CLASSPATH=/usr/share/java/jline.jar:/usr/share/java/bsh.jar java -Duser.home=\"$PWD\" jline.ConsoleRunner bsh.Interpreter",
+    "input": "print(123 * 234);",
+    "main": ".bshrc",
+    "template": "print(\"Hello, world!\");",
+    "createEmpty": "",
+    "run": "CLASSPATH=/usr/share/java/jline.jar:/usr/share/java/bsh.jar java -Duser.home=\"$PWD\" jline.ConsoleRunner bsh.Interpreter",
+    "scope": { "code": "x = 123 * 234;", "input": "print(x);" }
+  },
+  "beatnik": {
+    "id": "beatnik",
+    "name": "Beatnik",
+    "info": {
+      "impl": "Cat's Eye Beatnik",
+      "year": 2001,
+      "desc": "Stack-based esoteric programming language created by Cliff L. Biffle",
+      "ext": "beatnik",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Beatnik_(programming_language)",
+        "esolang": "https://esolangs.org/wiki/Beatnik",
+        "home": "https://cliffle.com/esoterica/beatnik/",
+        "source": "https://github.com/catseye/Beatnik"
+      },
+      "category": "esoteric",
+      "mode": "interpreted",
+      "platform": [],
+      "syntax": [],
+      "typing": "integer",
+      "paradigm": "stack",
+      "usage": []
+    },
+    "install": {
+      "apt": ["python2"],
+      "manual": "install -d \"${pkg}/usr/local/bin\"\ngit clone https://github.com/catseye/Beatnik.git\nsed -i 's#env python#env python2#' Beatnik/script/beatnik.py\ncp Beatnik/script/beatnik.py \"${pkg}/usr/local/bin/beatnik\""
+    },
+    "main": "main.beatnik",
+    "template": "Soars, larkspurs, rains.\nIndistinctness.\nMario snarl (nurses, natures, rules...) sensuously retries goal.\nAgribusinesses' costs par lain ropes (mopes) autos' cores.\nTuner ambitiousness.\nFlit.\nDour entombment.\nLegals' saner kinking lapse.\nNests glint.\nDread, tied futures, dourer usual tumor grunts alter atonal\n  garb tries shouldered coins.\nTaste a vast lustiness.\nStile stuns gad subgroup gram lanes.\nDraftee insurer road: cuckold blunt, strut sunnier.\nRely enure pantheism: arty gain groups (genies, pan) titters, tattles, nears.\nBluffer tapes?  Idle diatom stooge!\nFeted antes anklets ague?  Remit goiter gout!\nDoubtless teared toed alohas will dull gangs' aerials' tails' sluices;\nGusset ends!  Gawkier halo!\n\nEnter abstruse rested loser beer guy louts.\nCurtain roams lasso weir lupus stunt.\nTruant bears animate talon.  Entire torte originally timer.\nRedo stilt gobs.\n\nUtter centaurs;\nUrgent stars;\nUsurers (dilute);\nNoses;\nBones;\nBrig sonar graders;\nUtensil silts;\nLazies.\nFret arson veterinary rows.\n\nAtlas grunted: \"Pates, slues, sulfuric manor liaising tines,\n  trailers, rep... unfair!  Instant snots!\"\n\nSled rested until eatery fail.\nErgs fortitude\n  Indent spotter\nEuros enter egg.\nCurious tenures.\nTorus cutlasses.\nSarong torso earns cruel lags it reeled.\n\nEngineer: \"Erase handbag -- unite ratification!\"\n\noaring oaten donkeys unsold, surer rapid saltest tags\nBUTTERED TIBIA LUGS REWIRING TOILETS\nanion festers raring edit epilogues.\nDIRGE ROTOR.\nlinnet oaring.\nGORE BOOTIES.\nIroned goon lists tallest sublets --\nRiots,\nRaucous onset.\n\nIgnobly, runners' diet anguishes sunrise loner.\nErode mob, slier switcher!\nLoaners stilt drudge pearl atoll, risking hats' ends.\n\nRebind sitters.\n\nToga epistles -- crud lard.  (Pager purse dons souls.)\n\nglob title a curio hired rites shed suds lade grease strut arctic revs toad\nunless idlers rind stilt region land GERMICIDES SULTANA GUTS gill siting leans\nnice spurs\ntests gloves\nroused asp\n\nHoles!  Moles!  (Sores!)\nHygienists!  Scars!  (Asses!)\nSmells spell rares.\n\nCubs instant sing in parse goodies.\nRosin.  Unhelpful sisal acres.  Slope told.\nMALENESS PASTA LAB.  \"Infirmary vine,\" rang illiterates (beans).\nRosin sours, insults truss abalones, nailed rules, helical atlases.\nDear remodeling stings mar rents.\nSunless shiner orb (silly idol.)\nClarity disses senna.\nVagabonds sauted; sloes performed gelds.\nAlter post radial lip sectioning gums.\nSaint Towellings.\nLarger aeons telephone stolid char, pal!\nBoats Dean forsook, rosters, tunas, terrariums -- united, traced.\nNude pagoda careens.",
+    "run": "beatnik main.beatnik"
+  },
+  "befunge": {
+    "id": "befunge",
+    "aliases": ["be"],
+    "name": "Befunge",
+    "info": {
+      "impl": "amicloud Befunge-93",
+      "version": "Befunge-93",
+      "year": 1993,
+      "desc": "Two-dimensional esoteric programming language invented in 1993 by Chris Pressey with the goal of being as difficult to compile as possible",
+      "ext": ["be", "bf", "b93", "b98", "befunge"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Befunge",
+        "esolang": "https://esolangs.org/wiki/Befunge",
+        "home": "https://catseye.tc/article/Languages.md#befunge-93",
+        "source": "https://github.com/amicloud/befunge93"
+      },
+      "category": "esoteric",
+      "mode": "interpreted",
+      "platform": [],
+      "syntax": ["golf", "2d"],
+      "typing": "integer",
+      "paradigm": "stack",
+      "usage": []
+    },
+    "install": {
+      "npm": ["befunge93", "prompt-sync"],
+      "scripts": {
+        "befunge": "#!/usr/bin/env -S NODE_PATH=/opt/befunge93/lib/node_modules:/opt/prompt-sync/lib/node_modules node\nconst fs = require(\"fs\");\n\nconst Befunge = require(\"befunge93\");\nconst prompt = require(\"prompt-sync\")();\n\nconst befunge = new Befunge();\nbefunge.onInput = prompt;\nbefunge.onOutput = (output) => {\n  if (typeof output === \"string\") {\n    process.stdout.write(output);\n  } else {\n    process.stdout.write(output + \" \");\n  }\n};\n\nconst args = process.argv.slice(2);\nif (args.length !== 1) {\n  console.error(\"usage: befunge FILE\");\n  process.exit(1);\n}\n\nbefunge.run(fs.readFileSync(args[0], { encoding: \"utf-8\" })).catch((err) => {\n  console.error(err);\n  process.exit(1);\n});"
+      }
+    },
+    "main": "main.be",
+    "template": "64+\"!dlrow ,olleH\">:#,_@",
+    "run": "befunge main.be"
+  },
+  "blc": {
+    "id": "blc",
+    "aliases": [
+      "binarylambdacalculus",
+      "lc",
+      "binary",
+      "lambdacalculus",
+      "lambda"
+    ],
+    "name": "Binary Lambda Calculus",
+    "info": {
+      "year": 2004,
+      "desc": "Minimal, pure functional programming language invented by John Tromp in 2004, based on a binary encoding of the untyped lambda calculus in De Bruijn index notation",
+      "ext": "blc",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Binary_combinatory_logic",
+        "esolang": "https://esolangs.org/wiki/Binary_lambda_calculus",
+        "home": "https://tromp.github.io/cl/Binary_lambda_calculus.html",
+        "impl": "https://www.ioccc.org/2012/tromp/hint.html",
+        "source": "https://www.ioccc.org/2012/tromp/tromp.c"
+      },
+      "category": "esoteric",
+      "mode": "interpreted",
+      "platform": [],
+      "syntax": [],
+      "typing": "lambda",
+      "paradigm": "functional",
+      "usage": []
+    },
+    "install": {
+      "scripts": {
+        "binary-to-text": "#!/usr/bin/env python3\n\nimport re\nimport sys\n\ntext = re.sub(r\"[^01]\", \"\", sys.stdin.read())\nout = []\n\nfor m in re.finditer(r\"([01]{8})\", text):\n    out += chr(int(m.group(0), 2))\n\nprint(\"\".join(out), end=\"\")"
+      },
+      "manual": "install -d \"${pkg}/usr/local/bin\"\nwget https://www.ioccc.org/2012/tromp/tromp.c\nclang tromp.c -Wno-everything -DInt=long -DX=8 -DA=500000 -o \"${pkg}/usr/local/bin/tromp\""
+    },
+    "main": "main.blc",
+    "template": "001010100100100001100101011011000110110001101111001011000010\n000001110111011011110111001001101100011001000010000100001010",
+    "run": "cat main.blc | binary-to-text | tromp"
+  },
+  "boo": {
+    "id": "boo",
+    "aliases": ["booc"],
+    "name": "Boo",
+    "info": {
+      "year": 2003,
+      "desc": "Object-oriented, statically typed, general-purpose programming language on Microsoft's Common Language Infrastructure",
+      "ext": "boo",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Boo_(programming_language)",
+        "home": "https://boo-language.github.io/",
+        "source": "https://github.com/boo-lang/boo"
+      },
+      "category": "general",
+      "mode": "compiled",
+      "platform": "clr",
+      "syntax": ["python", "extensible", "whitespace"],
+      "typing": ["static", "dynamic"],
+      "paradigm": ["imperative", "oo"],
+      "usage": []
+    },
+    "install": {
+      "apt": ["mono-runtime", "mono-devel"],
+      "manual": "install -d \"${pkg}/usr/local/lib\"\ninstall -d \"${pkg}/usr/local/bin\"\nwget https://github.com/boo-lang/boo/releases/download/unstable/boo-latest.zip\nunzip boo-latest.zip\nmv -T boo-latest \"${pkg}/usr/local/lib/boo\"\nchmod +x \"${pkg}/usr/local/lib/boo/booc\" \"${pkg}/usr/local/lib/boo/booish\"\nln -s /usr/local/lib/boo/booc /usr/local/lib/boo/booish \"${pkg}/usr/local/bin/\""
+    },
+    "setup": "mkdir -p \"$HOME/.local/share\"\ntouch \"$HOME/.local/share/booish_history\"",
+    "repl": "booish",
+    "main": "main.boo",
+    "template": "print \"Hello, world!\"",
+    "compile": "booc main.boo",
+    "run": "mono main.exe; booish"
+  },
+  "brainf": {
+    "id": "brainf",
+    "aliases": ["brainfuck", "bf"],
+    "name": "Brainf***",
+    "info": {
+      "impl": "Beef",
+      "year": 1993,
+      "desc": "Famous esoteric programming language created in 1993 by Urban Müller",
+      "ext": ["b", "bf"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Brainfuck",
+        "esolang": "https://esolangs.org/wiki/Brainfuck",
+        "impl": "https://kiyuko.org/software/beef",
+        "source": "https://github.com/andreabolognani/beef"
+      },
+      "category": "esoteric",
+      "mode": "interpreted",
+      "platform": "bf",
+      "syntax": "golf",
+      "typing": "integer",
+      "paradigm": "turing",
+      "usage": []
+    },
+    "install": {
+      "apt": ["beef"],
+      "scripts": {
+        "brainf": "#!/usr/bin/env python3\nimport argparse\nimport readline\nimport subprocess\nimport tempfile\n\nparser = argparse.ArgumentParser()\nparser.add_argument(\"file\", nargs=\"?\")\nargs = parser.parse_args()\n\nif args.file:\n    subprocess.run([\"beef\", args.file])\nwhile True:\n    try:\n        code = input(\"bf> \")\n    except KeyboardInterrupt:\n        print(\"^C\")\n        continue\n    except EOFError:\n        print(\"^D\")\n        break\n    if not code:\n        continue\n    with tempfile.NamedTemporaryFile(mode=\"w\") as f:\n        f.write(code)\n        f.flush()\n        subprocess.run([\"beef\", f.name])"
+      }
+    },
+    "repl": "brainf",
+    "input": ">++>+[>++++[-<++++>]<<]> [>>+>+<<<-]>>>[<<<+>>>-]<<+>[<->[>++++++++++<[->-[>+>>]>[+[-<+>]>+>>]<<<<<]>[-]++++++++[<++++++>-]>[<<+>>-]>[<<+>>-]<<]>]<[->>++++++++[<++++++>-]]<[.[-]<]<",
+    "output": "86",
+    "main": "main.bf",
+    "template": "++++++++\n[\n    >++++\n    [\n        >++\n        >+++\n        >+++\n        >+\n        <<<<-\n    ]\n    >+\n    >+\n    >-\n    >>+\n    [<]\n\n    <-\n]\n\n>>.\n>---.\n+++++++..+++.\n>>.\n<-.\n<.\n+++.------.--------.\n>>+.\n>++.",
+    "run": "brainf main.bf",
+    "hello": "Hello World"
+  },
+  "bython": {
+    "id": "bython",
+    "aliases": ["by"],
+    "name": "Bython",
+    "install": { "pip": ["bython"] },
+    "main": "main.by",
+    "template": "print(\"Hello, world!\")",
+    "run": "bython main.by"
+  },
+  "c": {
+    "id": "c",
+    "aliases": ["gcc", "clang", "h", "cc", "c99", "c11", "c18"],
+    "name": "C",
+    "monacoLang": "c",
+    "info": {
+      "impl": "LLVM",
+      "version": "C18",
+      "year": 1972,
+      "desc": "General-purpose, procedural computer programming language supporting structured programming, lexical variable scope, and recursion, with a static type system",
+      "ext": ["c", "h"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/C_(programming_language)",
+        "impl": "https://llvm.org/",
+        "source": "https://github.com/llvm/llvm-project"
+      },
+      "category": "general",
+      "mode": "compiled",
+      "platform": [],
+      "syntax": "c",
+      "typing": "static",
+      "paradigm": "imperative",
+      "usage": "popular"
+    },
+    "install": { "apt": ["clang", "clang-format", "clangd"] },
+    "main": "main.c",
+    "template": "#include <stdio.h>\n\nint main() {\n  printf(\"Hello, world!\\n\");\n  return 0;\n}",
+    "compile": "clang -std=c17 -pedantic -Wall -Wextra main.c -o main",
+    "run": "./main",
+    "format": {
+      "run": "clang-format --assume-filename=format.c",
+      "input": "#include <stdio.h>\n\nint main()\n{\n  printf(\"Hello, world!\\n\");\n  return 0;\n}"
+    },
+    "lsp": {
+      "setup": "echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt",
+      "start": "clangd",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "carp": {
+    "id": "carp",
+    "name": "Carp",
+    "info": {
+      "year": 2015,
+      "desc": "Programming language designed to work well for interactive and performance sensitive use cases like games, sound synthesis and visualizations",
+      "ext": "carp",
+      "web": { "source": "https://github.com/carp-lang/Carp" },
+      "category": "general",
+      "mode": "interpreted",
+      "platform": [],
+      "syntax": "lisp",
+      "typing": "static",
+      "paradigm": ["functional", "imperative"],
+      "usage": []
+    },
+    "install": {
+      "manual": "install -d \"${pkg}/opt/carp\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nver=\"$(curl -sSL \"https://api.github.com/repos/carp-lang/Carp/releases\" | jq '.[].tag_name' -r | grep Linux | sort -rV | grep -Eo '[0-9.]+' | head -n1)\"\nwget \"https://github.com/carp-lang/Carp/releases/download/v${ver}_Linux/v${ver}.zip\" -O carp.zip\nunzip carp.zip\nmv \"v${ver}/bin\"/* \"${pkg}/usr/local/bin/\"\nmv \"v${ver}/core\" \"${pkg}/opt/carp/\""
+    },
+    "repl": "CARP_DIR=/opt/carp carp",
+    "input": "(* 123 234)",
+    "main": "main.carp",
+    "template": "(use IO)\n\n(println \"Hello, world!\")",
+    "run": "CARP_DIR=/opt/carp carp main.carp",
+    "scope": { "code": "(def x (* 123 234))" },
+    "timeoutFactor": 8
+  },
+  "cat": {
+    "id": "cat",
+    "aliases": ["cat-language"],
+    "name": "Cat",
+    "info": {
+      "year": 2006,
+      "desc": "Statically typed stack-based programming language in C#",
+      "ext": "cat",
+      "web": { "source": "https://github.com/cdiggins/cat-language" },
+      "category": "pure",
+      "mode": "interpreted",
+      "platform": [],
+      "syntax": "tokens",
+      "typing": "static",
+      "paradigm": "stack",
+      "usage": []
+    },
+    "install": {
+      "scripts": {
+        "cat-lang": "#!/usr/bin/env -S NODE_PATH=/opt/cat node\nconst fs = require(\"fs\");\nconst repl = require(\"repl\");\n\nconst args = process.argv.slice(2);\nif (args.length > 1) {\n  console.error(\"usage: cat-lang [FILE]\");\n  process.exit(1);\n}\n\nconst program = args.length === 1 ? fs.readFileSync(args[0], \"utf-8\") : null;\n\nconst cat = require(\"cat\");\nconst ce = new cat.CatLanguage.CatEvaluator();\n\nif (program !== null) {\n  ce.eval(program);\n}\n\nrepl.start({prompt: \"cat> \", eval: (cmd, context, filename, callback) => callback(null, ce.eval(cmd))});"
+      },
+      "manual": "git clone https://github.com/cdiggins/cat-language \"${pkg}/opt/cat\""
+    },
+    "repl": "cat-lang",
+    "input": "123 234 mul",
+    "main": "main.cat",
+    "template": "72 101 108 108 111 44 32 119 111 114 108 100 33 10",
+    "run": "cat-lang main.cat",
+    "hello": "72,101,108,108,111,44,32,119,111,114,108,100,33,10"
+  },
+  "ceylon": {
+    "id": "ceylon",
+    "name": "Ceylon",
+    "info": {
+      "year": 2011,
+      "desc": "Object-oriented, strongly statically typed programming language with an emphasis on immutability, created by Red Hat",
+      "ext": "ceylon",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Ceylon_(programming_language)",
+        "home": "https://ceylon-lang.org/",
+        "source": "https://ceylon-lang.org/code/source/"
+      },
+      "category": "general",
+      "mode": "compiled",
+      "platform": "jvm",
+      "syntax": "c",
+      "typing": "static",
+      "paradigm": ["imperative", "oo"],
+      "usage": []
+    },
+    "install": {
+      "prepare": {
+        "cert": [
+          "https://cacerts.digicert.com/DigiCertTLSRSASHA2562020CA1.crt.pem"
+        ],
+        "aptKey": [
+          "https://downloads.ceylon-lang.org/apt/ceylon-debian-repo.gpg.key"
+        ],
+        "aptRepo": [
+          "deb [arch=amd64] https://downloads.ceylon-lang.org/apt/ unstable main"
+        ]
+      },
+      "cert": [
+        "https://cacerts.digicert.com/DigiCertTLSRSASHA2562020CA1.crt.pem"
+      ],
+      "aptKey": [
+        "https://downloads.ceylon-lang.org/apt/ceylon-debian-repo.gpg.key"
+      ],
+      "aptRepo": [
+        "deb [arch=amd64] https://downloads.ceylon-lang.org/apt/ unstable main"
+      ],
+      "apt": [
+        "$(grep-aptavail -F Package ceylon -s Package -n | sort -rV | head -n1)",
+        "openjdk-8-jdk-headless"
+      ]
+    },
+    "main": "source/main.ceylon",
+    "template": "shared void run() {\n    print(\"Hello, world!\");\n}",
+    "run": "PATH=\"/usr/lib/jvm/java-8-openjdk-amd64/bin:$PATH\" ceylon run --compile=force default"
+  },
+  "chef": {
+    "id": "chef",
+    "name": "Chef",
+    "info": {
+      "impl": "Acme::Chef",
+      "year": 2002,
+      "desc": "Stack-based language where programs look like cooking recipes",
+      "ext": "chef",
+      "web": {
+        "esolang": "https://esolangs.org/wiki/Chef",
+        "home": "https://www.dangermouse.net/esoteric/chef.html",
+        "source": "http://search.cpan.org/author/SMUELLER/Acme-Chef/"
+      },
+      "category": "esoteric",
+      "mode": ["compiled", "interpreted"],
+      "platform": [],
+      "syntax": "text",
+      "typing": "integer",
+      "paradigm": "imperative",
+      "usage": []
+    },
+    "install": { "cpan": ["Acme::Chef"] },
+    "main": "main.chef",
+    "template": "Hello World Cake with Chocolate Sauce.\n\nIngredients.\n33 g chocolate chips\n100 g butter\n54 ml double cream\n2 pinches baking powder\n114 g sugar\n111 ml beaten eggs\n119 g flour\n32 g cocoa powder\n0 g cake mixture\n\nCooking time: 25 minutes.\n\nPre-heat oven to 180 degrees Celsius.\n\nMethod.\nPut chocolate chips into the mixing bowl.\nPut butter into the mixing bowl.\nPut sugar into the mixing bowl.\nPut beaten eggs into the mixing bowl.\nPut flour into the mixing bowl.\nPut baking powder into the mixing bowl.\nPut cocoa  powder into the mixing bowl.\nStir the mixing bowl for 1 minute.\nCombine double cream into the mixing bowl.\nStir the mixing bowl for 4 minutes.\nLiquefy the contents of the mixing bowl.\nPour contents of the mixing bowl into the baking dish.\nbake the cake mixture.\nWait until baked.\nServe with chocolate sauce.\n\nChocolate Sauce.\n\nIngredients.\n111 g sugar\n108 ml hot water\n108 ml heated double cream\n101 g dark chocolate\n72 g milk chocolate\n\nMethod.\nClean the mixing bowl.\nPut sugar into the mixing bowl.\nPut hot water into the mixing bowl.\nPut heated double cream into the mixing bowl.\ndissolve the sugar.\nagitate the sugar until dissolved.\nLiquefy the dark chocolate.\nPut dark chocolate into the mixing bowl.\nLiquefy the milk chocolate.\nPut milk chocolate into the mixing bowl.\nLiquefy contents of the mixing bowl.\nPour contents of the mixing bowl into the baking dish.\nRefrigerate for 1 hour.",
+    "run": "chef main.chef",
+    "hello": "Hello world!"
+  },
+  "cil": {
+    "id": "cil",
+    "aliases": ["msil", "il", "ilasm"],
+    "name": "CIL",
+    "install": { "apt": ["mono-devel"] },
+    "main": "main.il",
+    "template": ".assembly main {}\n.class Main\n{\n  .method static void Main() cil managed\n  {\n    .entrypoint\n    ldstr \"Hello, world!\"\n    call void [mscorlib]System.Console::WriteLine(string)\n    ret\n  }\n}",
+    "compile": "ilasm main.il",
+    "run": "mono main.exe"
+  },
+  "clean": {
+    "id": "clean",
+    "aliases": ["icl", "clm", "dcl"],
+    "name": "Clean",
+    "info": {
+      "year": 1987,
+      "desc": "General-purpose purely functional computer programming language",
+      "ext": ["icl", "dcl", "abc"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Clean_(programming_language)",
+        "home": "https://clean.cs.ru.nl/Clean",
+        "source": "https://gitlab.science.ru.nl/clean-compiler-and-rts/compiler"
+      },
+      "category": "general",
+      "mode": "compiled",
+      "platform": [],
+      "syntax": "haskell",
+      "typing": "static",
+      "paradigm": ["declarative", "functional"],
+      "usage": []
+    },
+    "install": {
+      "manual": "install -d \"${pkg}/opt/clean\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nurl=\"$(curl -fsSL https://clean.cs.ru.nl/Download_Clean | grep linux/clean | grep -F 64.tar.gz | grep -Eo \"https://[^>]+\\.tar\\.gz\")\"\nwget \"${url}\"\n\nsudo mkdir /opt/clean\nsudo chown riju:riju /opt/clean\ntar -xf clean*_64.tar.gz -C /opt/clean --strip-components=1\n\npushd /opt/clean\nmake\npopd\n\nmv /opt/clean/* \"${pkg}/opt/clean/\"\nsudo rmdir /opt/clean\n\nln -s /opt/clean/bin/clm \"${pkg}/usr/local/bin/\"\n\nsleep 2\nfind \"${pkg}/opt/clean\" -name '*.o' -exec touch '{}' ';'"
+    },
+    "main": "main.icl",
+    "template": "module main\n\nimport StdEnv\n\nStart world\n  #(console, world) = stdio world\n  #console = fwrites \"Hello, world!\\n\" console\n  #(ok, world) = fclose console world\n  = world",
+    "compile": "clm main -o main",
+    "run": "./main"
+  },
+  "clojure": {
+    "id": "clojure",
+    "aliases": ["clj"],
+    "name": "Clojure",
+    "monacoLang": "clojure",
+    "info": {
+      "impl": "Java Clojure",
+      "year": 2007,
+      "desc": "Modern, dynamic, and functional dialect of the Lisp programming language on the Java platform",
+      "ext": ["clj", "cljc", "edn"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Clojure",
+        "home": "https://clojure.org/",
+        "source": "https://github.com/clojure/clojure"
+      },
+      "category": "general",
+      "mode": "interpreted",
+      "platform": "jvm",
+      "syntax": ["lisp", "extensible"],
+      "typing": "dynamic",
+      "paradigm": ["declarative", "functional", "imperative", "oo"],
+      "usage": []
+    },
+    "install": {
+      "apt": ["clojure"],
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nver=\"$(latest_release snoe/clojure-lsp)\"\nwget \"https://github.com/snoe/clojure-lsp/releases/download/${ver}/clojure-lsp\"\nchmod +x clojure-lsp\ncp clojure-lsp \"${pkg}/usr/local/bin/\""
+    },
+    "repl": "clojure",
+    "input": "(* 123 234)",
+    "main": "main.clj",
+    "template": "(println \"Hello, world!\")",
+    "run": "clojure -i main.clj -r",
+    "scope": { "code": "(def x (* 123 234))" },
+    "lsp": { "start": "clojure-lsp", "code": "TODO", "item": "TODO" },
+    "skip": ["lsp"]
+  },
+  "clojurescript": {
+    "id": "clojurescript",
+    "aliases": ["cljs", "lumo"],
+    "name": "ClojureScript",
+    "monacoLang": "clojure",
+    "info": {
+      "year": 2011,
+      "desc": "Compiler for Clojure that targets JavaScript",
+      "ext": "cljs",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Clojure#Platforms",
+        "home": "https://clojurescript.org/",
+        "source": "https://github.com/clojure/clojurescript"
+      },
+      "category": "general",
+      "mode": ["compiled", "interpreted"],
+      "platform": "js",
+      "syntax": ["lisp", "extensible"],
+      "typing": ["dynamic", "weak"],
+      "paradigm": ["declarative", "functional", "imperative", "oo"],
+      "usage": []
+    },
+    "install": { "npm": ["lumo-cljs"] },
+    "repl": "lumo -r",
+    "input": "(* 123 234)",
+    "main": "main.cljs",
+    "template": "(println \"Hello, world!\")",
+    "run": "lumo -i main.cljs -r",
+    "scope": { "code": "(def x (* 123 234))" }
+  },
+  "cmake": {
+    "id": "cmake",
+    "aliases": ["cmakelists"],
+    "name": "CMake",
+    "install": { "apt": ["cmake"] },
+    "main": "main.cmake",
+    "template": "message(\"Hello, world!\")",
+    "run": "cmake -P main.cmake"
+  },
+  "cmd": {
+    "id": "cmd",
+    "aliases": ["bat", "batch", "wine"],
+    "name": "Cmd",
+    "monacoLang": "bat",
+    "info": {
+      "year": 1987,
+      "desc": "Obsolete (but still default) command-line interpreter for Microsoft Windows",
+      "ext": "bat",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Cmd.exe",
+        "home": "https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/windows-commands",
+        "source": null
+      },
+      "category": "shell",
+      "mode": "interpreted",
+      "platform": "windows",
+      "syntax": "basic",
+      "typing": "weak",
+      "paradigm": "imperative",
+      "usage": []
+    },
+    "install": { "apt": ["wine", "wine32:i386"] },
+    "repl": "wine cmd",
+    "input": "set /a 123 * 234",
+    "main": "main.bat",
+    "template": "echo \"Hello, world!\"",
+    "run": "wine cmd /k main.bat",
+    "scope": { "code": "set /a x = 123 * 234", "input": "echo %x%" }
+  },
+  "cobol": {
+    "id": "cobol",
+    "aliases": ["cbl", "cob", "cobc", "cpy"],
+    "name": "COBOL",
+    "info": {
+      "impl": "GnuCOBOL",
+      "version": "COBOL 2014",
+      "year": 1959,
+      "desc": "Compiled English-like computer programming language designed for business use",
+      "ext": ["cbl", "cob", "cpy"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/COBOL",
+        "impl": "https://sourceforge.net/projects/gnucobol/",
+        "source": "https://sourceforge.net/p/gnucobol/_list/svn"
+      },
+      "category": "general",
+      "mode": "compiled",
+      "platform": [],
+      "syntax": "basic",
+      "typing": "weak",
+      "paradigm": ["imperative", "oo"],
+      "usage": "popular"
+    },
+    "install": { "apt": ["gnucobol"] },
+    "main": "main.cbl",
+    "template": "IDENTIFICATION DIVISION.\nPROGRAM-ID. MAIN.\nPROCEDURE DIVISION.\n    DISPLAY \"Hello, world!\".\n    STOP RUN.",
+    "compile": "cobc -free -x main.cbl -o main",
+    "run": "./main"
+  },
+  "coconut": {
+    "id": "coconut",
+    "aliases": ["coco", "coconutlang", "coconut-lang"],
+    "name": "Coconut",
+    "monacoLang": "python",
+    "info": {
+      "year": 2014,
+      "desc": "Simple, elegant, Pythonic functional programming",
+      "ext": ["coco"],
+      "web": {
+        "home": "https://coconut-lang.org/",
+        "source": "https://github.com/evhub/coconut"
+      },
+      "category": "general",
+      "mode": "interpreted",
+      "platform": "python",
+      "syntax": ["haskell", "python", "whitespace"],
+      "typing": "dynamic",
+      "paradigm": ["functional", "imperative", "oo"],
+      "usage": []
+    },
+    "install": { "pip": ["coconut"] },
+    "repl": "coconut",
+    "input": "DELAY: 3\n123 * 234",
+    "main": "main.coco",
+    "template": "print(\"Hello, world!\")",
+    "run": "coconut -i main.coco",
+    "scope": { "code": "x = 123 * 234", "input": "DELAY: 3\nx" }
+  },
+  "coffeescript": {
+    "id": "coffeescript",
+    "aliases": ["coffee", "litcoffee"],
+    "name": "CoffeeScript",
+    "monacoLang": "coffee",
+    "info": {
+      "year": 2009,
+      "desc": "Compile-to-JavaScript programming language adding syntactic sugar inspired by Ruby, Python and Haskell in an effort to enhance JavaScript's brevity and readability",
+      "ext": ["coffee", "litcoffee"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/CoffeeScript",
+        "home": "https://coffeescript.org/",
+        "source": "https://github.com/jashkenas/coffeescript"
+      },
+      "category": "general",
+      "mode": ["interpreted", "compiled"],
+      "platform": "js",
+      "syntax": ["c", "haskell"],
+      "typing": "weak",
+      "paradigm": ["declarative", "functional", "imperative"],
+      "usage": []
+    },
+    "install": { "npm": ["coffeescript"] },
+    "repl": "coffee",
+    "main": "main.coffee",
+    "template": "console.log \"Hello, world!\"",
+    "compile": "coffee -b -c main.coffee",
+    "run": "node -e '\neval.apply(this, [require(\"fs\").readFileSync(\"main.js\", {encoding: \"utf-8\"})])\nrequire(\"/opt/coffeescript/lib/node_modules/coffeescript/repl\").start()\n'",
+    "scope": { "code": "x = 123 * 234" }
+  },
+  "commonlisp": {
+    "id": "commonlisp",
+    "aliases": ["lisp", "sbcl"],
+    "name": "Common Lisp",
+    "info": {
+      "impl": "SBCL",
+      "year": 1984,
+      "desc": "Modern, multi-paradigm, high-performance, compiled, ANSI-standardized, most prominent (along with Scheme) descendant of the Lisp family",
+      "ext": ["lisp", "lsp", "l", "cl", "fasl"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Common_Lisp",
+        "home": "https://common-lisp.net/",
+        "impl": "http://www.sbcl.org/",
+        "source": "https://sourceforge.net/p/sbcl/sbcl/ci/master/tree/"
+      },
+      "category": "general",
+      "mode": ["compiled", "interpreted"],
+      "platform": [],
+      "syntax": ["lisp", "extensible"],
+      "typing": ["static", "dynamic"],
+      "paradigm": ["declarative", "functional", "imperative", "oo"],
+      "usage": []
+    },
+    "install": { "apt": ["sbcl", "rlwrap"] },
+    "repl": "rlwrap sbcl",
+    "input": "(* 123 234)",
+    "main": "main.lisp",
+    "template": "(format t \"Hello, world!\")",
+    "run": "rlwrap sbcl --userinit main.lisp",
+    "scope": { "code": "(defvar x (* 123 234))" }
+  },
+  "confluence": {
+    "id": "confluence",
+    "aliases": ["jira", "atlassian"],
+    "name": "Confluence",
+    "info": {
+      "impl": "Pandoc",
+      "year": 2004,
+      "desc": "Markup format for a popular web-based corporate wiki developed by Atlassian",
+      "ext": [],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Confluence_(software)",
+        "home": "https://confluence.atlassian.com/doc/confluence-wiki-markup-251003035.html",
+        "impl": "https://pandoc.org/",
+        "source": "https://github.com/jgm/pandoc"
+      },
+      "category": "markup",
+      "mode": [],
+      "platform": [],
+      "syntax": "text",
+      "typing": [],
+      "paradigm": [],
+      "usage": []
+    },
+    "install": { "apt": ["pandoc"], "riju": ["prettier"] },
+    "main": "main.txt",
+    "template": "Hello, world!",
+    "compile": "pandoc main.txt -f jira -o main.html",
+    "run": "prettier --no-config main.html"
+  },
+  "cpp": {
+    "id": "cpp",
+    "aliases": [
+      "c++",
+      "g++",
+      "clang++",
+      "c++98",
+      "c++03",
+      "c++11",
+      "c++14",
+      "c++17",
+      "c++20",
+      "cpp98",
+      "cpp03",
+      "cpp11",
+      "cpp14",
+      "cpp17",
+      "cpp20",
+      "hpp",
+      "cxx",
+      "hxx",
+      "cplusplus"
+    ],
+    "name": "C++",
+    "monacoLang": "cpp",
+    "info": {
+      "impl": "LLVM",
+      "version": "C++20",
+      "year": 1985,
+      "desc": "General-purpose programming language created by Bjarne Stroustrup as an extension of the C programming language",
+      "ext": ["C", "cc", "cpp", "cxx", "c++", "h", "hh", "hpp", "hxx", "h++"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/C%2B%2B",
+        "impl": "https://llvm.org/",
+        "source": "https://github.com/llvm/llvm-project"
+      },
+      "category": "general",
+      "mode": "compiled",
+      "platform": [],
+      "syntax": "c",
+      "typing": "static",
+      "paradigm": ["functional", "imperative", "oo"],
+      "usage": "popular"
+    },
+    "install": { "apt": ["clang", "clang-format", "clangd"] },
+    "main": "main.cpp",
+    "template": "#include <iostream>\n\nint main() {\n  std::cout << \"Hello, world!\" << std::endl;\n  return 0;\n}",
+    "compile": "clang++ -std=c++17 -pedantic -Wall -Wextra main.cpp -o main",
+    "run": "./main",
+    "format": {
+      "run": "clang-format --assume-filename=format.cpp",
+      "input": "#include <iostream>\n\nint main()\n{\n  std::cout << \"Hello, world!\" << std::endl;\n  return 0;\n}"
+    },
+    "lsp": {
+      "setup": "echo '-Wall -Wextra' | sed -E 's/\\s+/\\n/g' > compile_flags.txt",
+      "start": "clangd",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "crystal": {
+    "id": "crystal",
+    "aliases": ["cr"],
+    "name": "Crystal",
+    "info": {
+      "year": 2014,
+      "desc": "General-purpose, object-oriented programming language with syntax inspired by the language Ruby",
+      "ext": "cr",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Crystal_(programming_language)",
+        "home": "https://crystal-lang.org/",
+        "source": "https://github.com/crystal-lang/crystal"
+      },
+      "category": "general",
+      "mode": "compiled",
+      "platform": [],
+      "syntax": "pascal",
+      "typing": "static",
+      "paradigm": "oo",
+      "usage": []
+    },
+    "install": {
+      "aptKey": ["https://keybase.io/crystal/pgp_keys.asc"],
+      "aptRepo": [
+        "deb [arch=amd64] https://dist.crystal-lang.org/apt crystal main"
+      ],
+      "apt": ["crystal"]
+    },
+    "main": "main.cr",
+    "template": "puts \"Hello, world!\"",
+    "run": "crystal main.cr"
+  },
+  "csharp": {
+    "id": "csharp",
+    "aliases": ["cs", "mcs"],
+    "name": "C#",
+    "monacoLang": "csharp",
+    "install": { "apt": ["mono-mcs", "clang-format"] },
+    "main": "main.cs",
+    "template": "class main {\n    static void Main(string[] args) {\n        System.Console.WriteLine(\"Hello, world!\");\n    }\n}",
+    "compile": "mcs main.cs",
+    "run": "mono main.exe",
+    "format": {
+      "run": "clang-format --style=\"{BasedOnStyle: llvm, IndentWidth: 4}\" --assume-filename=format.cs",
+      "input": "class main\n{\n    static void Main(string[] args)\n    {\n        System.Console.WriteLine(\"Hello, world!\");\n    }\n}"
+    }
+  },
+  "curry": {
+    "id": "curry",
+    "aliases": ["curry2prolog", "pakcs"],
+    "name": "Curry",
+    "install": {
+      "prepare": { "apt": ["swi-prolog"] },
+      "apt": ["swi-prolog"],
+      "manual": "install -d \"${pkg}/opt\"\ninstall -d \"${pkg}/usr/local/bin\"\n\npath=\"$(curl -fsSL https://www.informatik.uni-kiel.de/~pakcs/download.html | sed '0,/Current release:/d' | grep 'href=\"download' | grep Linux | grep -Eo 'download/[^\"]+' | head -n1)\"\nwget \"https://www.informatik.uni-kiel.de/~pakcs/${path}\" -O pakcs.tar.gz\nmkdir pakcs\ntar -xf pakcs.tar.gz -C pakcs --strip-components=1\n\npushd pakcs\nmake PAKCSINSTALLDIR=/opt/pakcs\npopd\n\ncp -R pakcs \"${pkg}/opt/\"\nln -s /opt/pakcs/src/pakcs \"${pkg}/usr/local/bin/\""
+    },
+    "repl": "SWIPL=swipl pakcs",
+    "main": "main.curry",
+    "template": "main :: IO ()\nmain = putStrLn \"Hello, world!\"",
+    "run": "SWIPL=swipl pakcs :load main.curry :eval main",
+    "scope": { "code": "x = 123 * 234" }
+  },
+  "d": {
+    "id": "d",
+    "aliases": ["dmd"],
+    "name": "D",
+    "install": {
+      "prepare": {
+        "cert": ["https://letsencrypt.org/certs/lets-encrypt-r3.pem"],
+        "manual": "file=\"$(curl -fsSL https://dlang.org/download.html | grep -Eo '\"https://[^\"]+amd64.deb\"' | grep -v pre-release | tr -d '\"')\"\nwget \"${file}\" -O dmd.deb\nsudo --preserve-env=DEBIAN_FRONTEND apt-get install -y ./dmd.deb"
+      },
+      "cert": ["https://letsencrypt.org/certs/lets-encrypt-r3.pem"],
+      "manual": "install -d \"${pkg}/usr/local/bin\"\ndub fetch dfmt@~master\ndub run dfmt -- --version\ncp \"$HOME/.dub/packages/dfmt-master/dfmt/bin/dfmt\" \"${pkg}/usr/local/bin/\"",
+      "deb": ["dmd.deb"]
+    },
+    "main": "main.d",
+    "template": "import std.stdio;\n\nvoid main()\n{\n    writeln(\"Hello, world!\");\n}",
+    "compile": "dmd main.d",
+    "run": "./main",
+    "format": {
+      "run": "dfmt",
+      "input": "import std.stdio;\n\nvoid main() {\n    writeln(\"Hello, world!\");\n}"
+    }
+  },
+  "dafny": {
+    "id": "dafny",
+    "aliases": ["dfy"],
+    "name": "Dafny",
+    "install": { "apt": ["dafny", "mono-runtime"] },
+    "main": "main.dfy",
+    "template": "method Main() {\n  print \"Hello, world!\\n\";\n}",
+    "compile": "dafny main.dfy",
+    "run": "mono main.exe"
+  },
+  "dart": {
+    "id": "dart",
+    "name": "Dart",
+    "monacoLang": "dart",
+    "install": {
+      "aptKey": ["https://dl-ssl.google.com/linux/linux_signing_key.pub"],
+      "aptRepo": [
+        "deb [arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main"
+      ],
+      "apt": ["dart"]
+    },
+    "main": "main.dart",
+    "template": "void main() {\n  print('Hello, world!');\n}",
+    "run": "dart main.dart",
+    "lsp": {
+      "start": "dart /usr/lib/dart/bin/snapshots/analysis_server.dart.snapshot --lsp",
+      "disableDynamicRegistration": true,
+      "lang": "dart",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "dc": {
+    "id": "dc",
+    "name": "dc",
+    "install": { "apt": ["dc"] },
+    "repl": "echo 'Reading from stdin...' >&2; dc",
+    "input": "123 234 * p",
+    "main": "main.dc",
+    "template": "[Hello, world!] p",
+    "run": "echo 'Reading from stdin...' >&2; dc main.dc -",
+    "scope": { "code": "123 234 *", "input": "p" }
+  },
+  "dhall": {
+    "id": "dhall",
+    "name": "Dhall",
+    "install": {
+      "apt": ["dhall"],
+      "manual": "install -d \"${pkg}/usr/local/bin\"\nver=\"$(latest_release dhall-lang/dhall-haskell)\"\nfile=\"$(curl -sSL \"https://api.github.com/repos/dhall-lang/dhall-haskell/releases/tags/${ver}\" | jq -r '.assets | map(select(.name | (contains(\"dhall-json\") and contains(\"x86_64-linux.tar.bz2\")))) | .[0].name')\"\nwget \"https://github.com/dhall-lang/dhall-haskell/releases/download/${ver}/${file}\"\nmkdir dhall-json\ntar -xf dhall-json-*-x86_64-linux.tar.bz2 -C dhall-json\ncp dhall-json/bin/dhall-to-json dhall-json/bin/json-to-dhall \"${pkg}/usr/local/bin/\""
+    },
+    "main": "main.dhall",
+    "template": "{ output = \"Hello, world!\" }",
+    "compile": "cat main.dhall | dhall-to-json > main.json",
+    "run": "cat main.json | jq ."
+  },
+  "dogescript": {
+    "id": "dogescript",
+    "aliases": ["doge", "ds", "wow"],
+    "name": "Dogescript",
+    "install": { "npm": ["dogescript"] },
+    "repl": "dogescript",
+    "main": "main.djs",
+    "template": "plz console.loge with \"Hello, world!\"",
+    "run": "dogescript main.djs | node; dogescript"
+  },
+  "dokuwiki": {
+    "id": "dokuwiki",
+    "aliases": ["doku"],
+    "name": "DokuWiki",
+    "install": { "apt": ["pandoc"], "riju": ["prettier"] },
+    "main": "main.txt",
+    "template": "Hello, world!",
+    "compile": "pandoc main.txt -f dokuwiki -o main.html",
+    "run": "prettier --no-config main.html"
+  },
+  "dylan": {
+    "id": "dylan",
+    "aliases": ["opendylan"],
+    "name": "Dylan",
+    "install": {
+      "apt": ["libunwind-dev"],
+      "manual": "install -d \"${pkg}/opt/dylan\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nver=\"$(latest_release dylan-lang/opendylan)\"\nwget \"https://github.com/dylan-lang/opendylan/releases/download/${ver}/opendylan-$(grep -Eo '[0-9]+\\.[0-9]+' <<< \"$ver\")-x86_64-linux.tar.bz2\" -O opendylan.tar.bz2\ntar -xf opendylan.tar.bz2 -C \"${pkg}/opt/dylan\" --strip-components=1\nln -s /opt/dylan/bin/dylan-compiler /opt/dylan/bin/make-dylan-app \"${pkg}/usr/local/bin/\"\n\nexport PATH=\"${pkg}/opt/dylan/bin:$PATH\"\n\npushd \"${pkg}/opt/dylan\"\nmake-dylan-app main\nmv main skel\npushd skel\ncat <<\"EOF\" > main.dylan\nModule: main\n\ndefine function main\n    (name :: <string>, arguments :: <vector>)\n  format-out(\"Hello, world!\\n\");\n  exit-application(0);\nend function main;\n\nmain(application-name(), application-arguments());\nEOF\ndylan-compiler -build main.lid\nrm main.dylan\npopd\npopd"
+    },
+    "setup": "cp -R /opt/dylan/skel/* ./",
+    "main": "main.dylan",
+    "template": "Module: main\n\ndefine function main\n    (name :: <string>, arguments :: <vector>)\n  format-out(\"Hello, world!\\n\");\n  exit-application(0);\nend function main;\n\nmain(application-name(), application-arguments());",
+    "compile": "dylan-compiler -build main.lid && echo",
+    "run": "_build/bin/main"
+  },
+  "ec": {
+    "id": "ec",
+    "aliases": ["ecere", "ecp", "ecs", "ecc"],
+    "name": "eC",
+    "install": {
+      "prepare": {
+        "apt": [
+          "libasound2-dev",
+          "libcurl4-openssl-dev",
+          "libfontconfig1-dev",
+          "libgif-dev",
+          "libgl-dev",
+          "libglx-dev",
+          "libjpeg-dev",
+          "libpng-dev",
+          "libsqlite3-dev",
+          "libssl-dev",
+          "libxext-dev",
+          "libxrender-dev"
+        ]
+      },
+      "apt": [
+        "libfontconfig1",
+        "libfreetype6",
+        "libgif7",
+        "libgl1",
+        "libjpeg-turbo8",
+        "libpng16-16",
+        "libxrender1"
+      ],
+      "manual": "git clone https://github.com/ecere/ecere-sdk.git\npushd ecere-sdk\nmake\nmake install prefix=\"${pkg}/usr/local\"\npopd"
+    },
+    "main": "main.ec",
+    "template": "class Main : Application\n{\n   void Main()\n   {\n      PrintLn(\"Hello, world!\");\n   }\n}",
+    "compile": "export LD_LIBRARY_PATH=/usr/local/lib/ec\necp -c main.ec -o main.sym\necc -c main.ec -o main.c\necs -console main.sym main.imp -o main.main.ec\necp -c main.main.ec -o main.main.sym\necc -c main.main.ec -o main.main.c\nclang main.c main.main.c -lecereCOM -o main",
+    "run": "./main",
+    "helloStatus": 139
+  },
+  "elixir": {
+    "id": "elixir",
+    "aliases": ["iex", "exs"],
+    "name": "Elixir",
+    "install": {
+      "apt": ["elixir", "erlang-edoc"],
+      "manual": "install -d \"${pkg}/opt/elixir-ls\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nver=\"$(latest_release elixir-lsp/elixir-ls)\"\nwget \"https://github.com/elixir-lsp/elixir-ls/releases/download/${ver}/elixir-ls.zip\"\nunzip -d \"${pkg}/opt/elixir-ls\" elixir-ls.zip\nln -s /opt/elixir-ls/language_server.sh \"${pkg}/usr/local/bin/elixir-ls\""
+    },
+    "repl": "iex",
+    "input": "DELAY: 1\n123 * 234",
+    "main": "main.exs",
+    "template": "IO.puts(\"Hello, world!\")",
+    "run": "iex main.exs",
+    "scope": {
+      "code": "defmodule Scope do\n  def x do\n    123 * 234\n  end\nend",
+      "input": "DELAY: 1\nScope.x"
+    },
+    "lsp": {
+      "start": "/opt/elixir-ls/language_server.sh",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "elm": {
+    "id": "elm",
+    "name": "Elm",
+    "install": {
+      "npm": ["@kachkaev/run-elm", "@elm-tooling/elm-language-server"],
+      "manual": "install -d \"${pkg}/opt/elm\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nver=\"$(latest_release elm/compiler)\"\nwget \"https://github.com/elm/compiler/releases/download/${ver}/binary-for-linux-64-bit.gz\"\ngunzip binary-for-linux-64-bit.gz\nchmod +x binary-for-linux-64-bit\ncp binary-for-linux-64-bit \"${pkg}/usr/local/bin/elm\"\n\nmkdir elm-project\npushd elm-project\n(yes || true) | \"${pkg}/usr/local/bin/elm\" init\ncat elm.json | jq '.\"source-directories\" = [\".\"]' > \"${pkg}/opt/elm/elm\".json\npopd"
+    },
+    "repl": "elm repl",
+    "main": "Main.elm",
+    "template": "module Main exposing (..)\n\noutput : String\noutput = \"Hello, world!\"",
+    "run": "cp /opt/elm/elm.json elm.json || exit\n\nrun-elm Main.elm\nelm repl",
+    "scope": { "code": "x = 123 * 234", "input": "import Main\nMain.x" },
+    "lsp": {
+      "setup": "cp /opt/elm/elm.json elm.json",
+      "start": "elm-language-server --stdio",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "elvish": {
+    "id": "elvish",
+    "aliases": ["elv"],
+    "name": "Elvish",
+    "install": { "apt": ["elvish"] },
+    "repl": "SHELL=/usr/bin/elvish HOME=\"$PWD\" elvish",
+    "input": "* 123 234",
+    "main": ".elvish/rc.elv",
+    "template": "echo \"Hello, world!\"",
+    "createEmpty": "",
+    "run": "SHELL=/usr/bin/elvish HOME=\"$PWD\" elvish",
+    "scope": { "code": "x = (* 123 234)", "input": "echo $x" }
+  },
+  "emacslisp": {
+    "id": "emacslisp",
+    "aliases": ["elisp", "emacs", "gnuemacs", "xemacs", "ielm"],
+    "name": "Emacs Lisp",
+    "install": { "apt": ["emacs-nox"] },
+    "repl": "emacs --eval \"(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (ielm))\"",
+    "input": "(* 123 234)",
+    "main": "main.el",
+    "template": "(message \"Hello, world!\")",
+    "run": "emacs --load main.el --eval \"(progn (require 'package) (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) (package-initialize) (ielm))\"",
+    "scope": { "code": "(defvar x (* 123 234))" },
+    "pkg": {
+      "install": "emacs -Q --batch --eval \"(progn (require 'package) (push '(\\\"melpa\\\" . \\\"https://melpa.org/packages/\\\") package-archives) (package-initialize) (unless (ignore-errors (>= (length (directory-files \\\"~/.emacs.d/elpa/archives\\\")) 4)) (package-refresh-contents)) (package-install 'NAME))\"",
+      "uninstall": "ls ~/.emacs.d/elpa | grep -- - | grep '^NAME-[0-9]' | while read pkg; do emacs -Q --batch --eval \"(progn (require 'package) (push '(\\\"melpa\" . \"https://melpa.org/packages/\\\") package-archives) (package-initialize) (unless (ignore-errors (>= (length (directory-files \\\"~/.emacs.d/elpa/archives\\\")) 4)) (package-refresh-contents)) (call-interactively 'package-delete))\" <<< \"$pkg\"; done",
+      "all": "(curl -sS https://elpa.gnu.org/packages/ | grep '<td>' | grep -Eo '[^>]+</a>' | grep -Eo '^[^<]+' && curl -sS https://melpa.org/archive.json | jq -r 'keys | .[]') | sort | uniq"
+    }
+  },
+  "emojicode": {
+    "id": "emojicode",
+    "aliases": ["emoji", "emojic", "emojicodec"],
+    "name": "Emojicode",
+    "install": {
+      "apt": ["libtinfo5"],
+      "manual": "install -d \"${pkg}/usr/local/bin\"\ninstall -d \"${pkg}/usr/local/include/emojicode\"\ninstall -d \"${pkg}/usr/local/EmojicodePackages\"\n\nver=\"$(latest_release emojicode/emojicode)\"\nwget \"https://github.com/emojicode/emojicode/releases/download/${ver}/Emojicode-$(sed 's/^v//' <<< \"$ver\")-Linux-x86_64.tar.gz\"\ntar -xf Emojicode-*-Linux-x86_64.tar.gz\npushd Emojicode-*-Linux-x86_64\ncp emojicodec \"${pkg}/usr/local/bin/\"\ncp -R include/* \"${pkg}/usr/local/include/emojicode/\"\ncp -R packages/* \"${pkg}/usr/local/EmojicodePackages/\"\npopd"
+    },
+    "main": "main.emojic",
+    "template": "🏁 🍇\n  😀 🔤Hello, world!🔤❗️\n🍉",
+    "compile": "emojicodec main.emojic",
+    "run": "./main"
+  },
+  "entropy": {
+    "id": "entropy",
+    "aliases": ["ent", "entc", "vge"],
+    "name": "Entropy",
+    "install": {
+      "apt": ["mono-mcs", "mono-runtime"],
+      "manual": "install -d \"${pkg}/opt/entropy\"\n\nwget http://danieltemkin.com/Content/Entropy/Entropy.zip\nunzip -d \"${pkg}/opt/entropy\" Entropy.zip"
+    },
+    "main": "main.vge",
+    "template": "Program MyNamespace MyProgram [\n\tprint \"Hello, world!\\n\";\n]",
+    "compile": "mono /opt/entropy/entc.exe main.vge | grep -Ev 'WARNING:|Using default' > main.cs\nmcs -lib:/opt/entropy -r:Rottytooth.Esolang.Entropy main.cs",
+    "run": "MONO_PATH=/opt/entropy mono main.exe",
+    "hello": "[F-J][c-g][j-n][j-n][m-q][*-.][\\x1e-\"][u-y][m-q][p-t][j-n][b-f][\\x1f-#]",
+    "helloMaxLength": 13
+  },
+  "erlang": {
+    "id": "erlang",
+    "aliases": ["erl"],
+    "name": "Erlang",
+    "install": {
+      "prepare": { "apt": ["erlang-nox", "erlang-dev"] },
+      "apt": ["erlang-nox"],
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nwget https://s3.amazonaws.com/rebar3/rebar3\nchmod +x rebar3\nexport PATH=\"$PWD:$PATH\"\n\ngit clone https://github.com/erlang-ls/erlang_ls.git\npushd erlang_ls\nmake\ncp _build/default/bin/erlang_ls \"${pkg}/usr/local/bin/erlang_ls\"\npopd"
+    },
+    "repl": "erl",
+    "input": "123 * 234.",
+    "main": "main.erl",
+    "template": "-module(main).\n-export([main/0]).\n\nmain() ->\n    io:fwrite(\"Hello, world!\\n\").",
+    "compile": "erl -compile main",
+    "run": "erl -s main main",
+    "scope": {
+      "code": "-export([x/0]).\nx() -> 123 * 234.",
+      "after": "-export([main/0]).",
+      "input": "main:x()."
+    },
+    "lsp": { "start": "erlang_ls", "code": "TODO", "item": "TODO" },
+    "skip": ["lsp"]
+  },
+  "euphoria": {
+    "id": "euphoria",
+    "aliases": ["ex", "exw", "exu", "euc", "eui", "eub"],
+    "name": "Euphoria",
+    "install": {
+      "manual": "install -d \"${pkg}/opt/euphoria\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nwget http://www.rapideuphoria.com/31/euphor31.tar\ntar -xf euphor*.tar -C \"${pkg}/opt/euphoria\" --strip-components=1\nln -s /opt/euphoria/bin/exu \"${pkg}/usr/local/bin/\""
+    },
+    "main": "main.exu",
+    "template": "puts(1, \"Hello, world!\\n\")",
+    "run": "exu main.exu"
+  },
+  "ezhil": {
+    "id": "ezhil",
+    "aliases": ["ezhili", "ezhuthi", "tamil", "எழில்"],
+    "name": "எழில்",
+    "install": {
+      "pip": ["ezhil"],
+      "manual": "sed -i 's/clock,//' \"${pkg}\"/opt/ezhil/lib/*/site-packages/ezhil/ezhil.py"
+    },
+    "repl": "ezhili",
+    "main": "main.n",
+    "template": "பதிப்பி \"வணக்கம், உலகமே!\"",
+    "run": "ezhili main.n; ezhili",
+    "hello": "வணக்கம், உலகமே!"
+  },
+  "factor": {
+    "id": "factor",
+    "aliases": ["fact"],
+    "name": "Factor",
+    "install": {
+      "manual": "install -d \"${pkg}/opt/factor\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nver=\"$(curl -sSL https://factorcode.org/ | grep -Eo 'release\\?os=linux[^>]+>[^<]+' | sed -E 's/[^>]+>//' | head -n1)\"\nwget \"https://downloads.factorcode.org/releases/${ver}/factor-linux-x86-64-${ver}.tar.gz\" -O factor.tar.gz\ntar -xf factor.tar.gz -C \"${pkg}/opt/factor\" --strip-components=1\nln -sT /opt/factor/factor \"${pkg}/usr/local/bin/factor-lang\""
+    },
+    "repl": "HOME=\"$PWD\" factor-lang",
+    "input": "123 234 *",
+    "main": ".factor-rc",
+    "template": "IN: main\nUSE: io\n\n\"Hello, world!\" print",
+    "createEmpty": "",
+    "run": "HOME=\"$PWD\" factor-lang",
+    "scope": {
+      "code": "USE: math\n: x ( -- x ) 123 234 * ;",
+      "input": "USE: main\nx"
+    }
+  },
+  "false": {
+    "id": "false",
+    "aliases": ["falselang"],
+    "name": "FALSE",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nwget https://github.com/mame/quine-relay/raw/master/vendor/false.rb\ncat <(echo '#!/usr/bin/env ruby') false.rb > \"${pkg}/usr/local/bin/false-lang\"\nchmod +x \"${pkg}/usr/local/bin/false-lang\""
+    },
+    "main": "main.false",
+    "template": "\"Hello, world!\"",
+    "run": "false-lang main.false"
+  },
+  "fish": {
+    "id": "fish",
+    "name": "Fish",
+    "install": { "apt": ["fish"] },
+    "repl": "SHELL=/usr/bin/fish fish",
+    "input": "expr 123 \\* 234",
+    "main": "main.fish",
+    "template": "echo \"Hello, world!\"",
+    "run": "SHELL=/usr/bin/fish fish -C \"$(< main.fish)\"",
+    "scope": { "code": "set x (expr 123 \\* 234)", "input": "echo $x" }
+  },
+  "fishlang": {
+    "id": "fishlang",
+    "aliases": ["><>"],
+    "name": "><>",
+    "install": {
+      "manual": "wget https://gist.githubusercontent.com/anonymous/6392418/raw/fish.py\nsed -i 's:^#!.*:#!/usr/bin/env python3:' fish.py\nchmod +x fish.py\ninstall -d \"${pkg}/usr/local/bin\"\ncp fish.py \"${pkg}/usr/local/bin/fish-lang\""
+    },
+    "info": {
+      "year": 2009,
+      "desc": "Stack-based, reflective, two-dimensional esoteric programming language",
+      "ext": "fish",
+      "web": {
+        "esolang": "https://esolangs.org/wiki/Fish",
+        "source": "https://gist.github.com/anonymous/6392418"
+      },
+      "category": "esoteric",
+      "mode": "interpreted",
+      "platform": [],
+      "syntax": ["golf", "2d"],
+      "typing": "float",
+      "paradigm": "stack",
+      "usage": []
+    },
+    "main": "main.fish",
+    "template": "\"Hello, world!\"r\\\n           o;!?l<",
+    "run": "fish-lang main.fish"
+  },
+  "flex": {
+    "id": "flex",
+    "aliases": ["lex"],
+    "name": "Flex",
+    "install": { "apt": ["flex", "flex-doc"] },
+    "main": "main.lex",
+    "template": "%{\n#include <stdio.h>\n%}\n\n%%\n%%\n\nint yywrap() {\n  printf(\"Hello, world!\\n\");\n  return 1;\n}\n\nint main() {\n  yylex();\n  return 0;\n}",
+    "compile": "lex -o main.c main.lex\nclang main.c -o main",
+    "run": "echo 'Reading from stdin, ctrl+D to end input...' >&2\n./main",
+    "helloInput": "DELAY: 1\nEOF"
+  },
+  "forth": {
+    "id": "forth",
+    "aliases": ["gforth"],
+    "name": "Forth",
+    "install": { "apt": ["gforth"] },
+    "repl": "gforth",
+    "input": "123 234 * .",
+    "main": "main.fs",
+    "template": ".\" Hello, world!\" CR",
+    "run": "gforth main.fs",
+    "scope": { "code": "VARIABLE X\n123 234 * X !", "input": "X @ ." }
+  },
+  "fortran": {
+    "id": "fortran",
+    "aliases": [
+      "f",
+      "flang",
+      "fortran77",
+      "fortran90",
+      "fortran95",
+      "fortran2003",
+      "fortran2008"
+    ],
+    "name": "FORTRAN",
+    "install": { "apt": ["gfortran"], "pip": ["fortran-language-server"] },
+    "main": "main.f95",
+    "template": "       PROGRAM hello\n          PRINT *, \"Hello, world!\"\n       END PROGRAM hello",
+    "compile": "gfortran main.f95 -o main",
+    "run": "./main",
+    "lsp": { "start": "fortls", "code": "TODO", "item": "TODO" },
+    "skip": ["lsp"]
+  },
+  "fsharp": {
+    "id": "fsharp",
+    "aliases": ["fsharpi", "fsx", "fs"],
+    "name": "F#",
+    "monacoLang": "fsharp",
+    "install": { "apt": ["fsharp"] },
+    "repl": "fsharpi",
+    "input": "123 * 234 ;;",
+    "main": "main.fsx",
+    "template": "printfn \"Hello, world!\"",
+    "run": "fsharpi --use:main.fsx",
+    "scope": { "code": "let x = 123 * 234", "input": "x ;;" }
+  },
+  "gambas": {
+    "id": "gambas",
+    "aliases": ["gambasscript", "gbs"],
+    "name": "Gambas",
+    "install": { "apt": ["gambas3-script"] },
+    "main": "main.gbs",
+    "template": "Print \"Hello, world!\"",
+    "run": "gbs3 main.gbs"
+  },
+  "gap": {
+    "id": "gap",
+    "name": "GAP",
+    "install": { "apt": ["gap"] },
+    "repl": "gap",
+    "input": "123 * 234;",
+    "main": "main.gap",
+    "template": "Print(\"Hello, world!\\n\");",
+    "run": "gap main.gap",
+    "scope": { "code": "x := 123 * 234;", "input": "123 * 234;" }
+  },
+  "gdb": {
+    "id": "gdb",
+    "name": "GDB",
+    "install": { "apt": ["gdb"] },
+    "repl": "gdb",
+    "input": "p 123 * 234",
+    "main": "main.gdb",
+    "template": "p \"Hello, world!\"",
+    "run": "gdb -x main.gdb",
+    "scope": { "code": "set $x = 123 * 234", "input": "p $x" }
+  },
+  "gel": {
+    "id": "gel",
+    "aliases": ["genius"],
+    "name": "GEL",
+    "install": { "apt": ["genius"] },
+    "repl": "HOME=\"$PWD\" genius",
+    "main": ".geniusinit",
+    "template": "print(\"Hello, world!\")",
+    "createEmpty": "",
+    "run": "HOME=\"$PWD\" genius",
+    "scope": { "code": "x = 123 * 234" }
+  },
+  "gnuplot": {
+    "id": "gnuplot",
+    "name": "Gnuplot",
+    "install": { "apt": ["gnuplot-nox"] },
+    "repl": "gnuplot",
+    "input": "print 123 * 234",
+    "main": "main.gnuplot",
+    "template": "print \"Hello, world!\"",
+    "run": "gnuplot main.gnuplot -",
+    "scope": { "code": "x = 123 * 234", "input": "print x" }
+  },
+  "go": {
+    "id": "go",
+    "aliases": ["golang"],
+    "name": "Go",
+    "monacoLang": "go",
+    "install": {
+      "prepare": { "apt": ["golang"] },
+      "apt": ["golang"],
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nexport GO111MODULE=on\nexport GOPATH=\"$PWD/go\"\ngo get golang.org/x/tools/gopls@latest\ncp go/bin/gopls \"${pkg}/usr/local/bin/\""
+    },
+    "main": "main.go",
+    "template": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, world!\")\n}",
+    "compile": "go build main.go",
+    "run": "./main",
+    "format": {
+      "run": "gofmt",
+      "input": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, world!\");\n}"
+    },
+    "lsp": { "start": "gopls", "code": "TODO", "item": "TODO" },
+    "skip": ["lsp"]
+  },
+  "golfscript": {
+    "id": "golfscript",
+    "aliases": ["golf"],
+    "name": "GolfScript",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nwget http://www.golfscript.com/golfscript/golfscript.rb\nchmod +x golfscript.rb\ncp -T golfscript.rb \"${pkg}/usr/local/bin/golfscript\""
+    },
+    "main": "main.gs",
+    "template": "'Hello, world!'",
+    "run": "golfscript main.gs"
+  },
+  "grass": {
+    "id": "grass",
+    "name": "Grass",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nwget http://www.blue.sky.or.jp/grass/grass.rb\nchmod +x grass.rb\ncp -T grass.rb \"${pkg}/usr/local/bin/grass\""
+    },
+    "main": "main.grass",
+    "template": "wWWwwww",
+    "run": "grass < main.grass",
+    "hello": "w"
+  },
+  "groovy": {
+    "id": "groovy",
+    "name": "Groovy",
+    "install": { "apt": ["groovy"] },
+    "repl": "JAVA_OPTS=\"-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs\" groovysh",
+    "main": "main.groovy",
+    "template": "print \"Hello, world!\";",
+    "run": "JAVA_OPTS=\"-Djava.util.prefs.systemRoot=$PWD/.java -Djava.util.prefs.userRoot=$PWD/.java/.userPrefs\" groovysh main.groovy",
+    "scope": { "code": "x = 123 * 234;" }
+  },
+  "hack": {
+    "id": "hack",
+    "aliases": ["hhvm"],
+    "name": "Hack",
+    "install": {
+      "aptKey": ["B4112585D386EB94"],
+      "aptRepo": [
+        "deb [arch=amd64] https://dl.hhvm.com/ubuntu ${ubuntu_name} main"
+      ],
+      "apt": ["hhvm"]
+    },
+    "repl": "hhvm -a",
+    "input": "print 123 * 234",
+    "main": "main.hack",
+    "template": "<<__EntryPoint>>\nfunction main(): void {\n  echo \"Hello, world!\\n\";\n}",
+    "run": "echo \"Type 'r' at the debugger prompt to run the code\" && hhvm -a main.hack",
+    "helloInput": "r",
+    "scope": {
+      "code": "function x() : int {\n  return 123 * 234;\n}",
+      "input": "r\np x()"
+    }
+  },
+  "haskell": {
+    "id": "haskell",
+    "aliases": ["ghc", "ghci", "hs"],
+    "name": "Haskell",
+    "install": {
+      "prepare": { "apt": ["cabal-install"], "manual": "cabal update" },
+      "apt": ["ghc"],
+      "manual": "install -d \"${pkg}/usr/local/bin\"\ninstall -d \"${pkg}/opt/brittany\"\n\ncabal install brittany --installdir \"$PWD\"\ncp -L brittany \"${pkg}/usr/local/bin/\"\n\nmkdir haskell-language-server\npushd haskell-language-server\nver=\"$(latest_release haskell/haskell-language-server)\"\nrelease=\"$(curl -fsSL \"https://api.github.com/repos/haskell/haskell-language-server/releases/tags/${ver}\")\"\necho \"${release}\" | jq '.assets[].name' -r | grep Linux | grep -vF .tar | while read asset; do\n    wget \"https://github.com/haskell/haskell-language-server/releases/download/${ver}/${asset}\"\n    gunzip \"${asset}\"\ndone\nchmod +x *\nfor binary in *; do\n    cp -T \"${binary}\" \"${pkg}/usr/local/bin/${binary//-Linux/}\"\ndone\npopd"
+    },
+    "repl": "rm -f .ghci\nghci",
+    "main": "Main.hs",
+    "template": "module Main where\n\nmain :: IO ()\nmain = putStrLn \"Hello, world!\"",
+    "run": "(echo ':load Main' && echo 'main') > .ghci && ghci",
+    "scope": { "code": "x = 123 * 234" },
+    "format": {
+      "run": "brittany",
+      "input": "module Main where\n\nmain :: IO ()\nmain =\n  putStrLn \"Hello, world!\""
+    },
+    "lsp": {
+      "start": "haskell-language-server-wrapper --lsp",
+      "init": { "languageServerHaskell": {} },
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "haxe": {
+    "id": "haxe",
+    "aliases": ["hx"],
+    "name": "Haxe",
+    "install": { "apt": ["haxe", "nodejs"] },
+    "main": "Main.hx",
+    "template": "class Main {\n    static public function main() {\n        trace(\"Hello, world!\");\n    }\n}",
+    "compile": "haxe --main Main --js Main.js",
+    "run": "node Main.js"
+  },
+  "hcl": {
+    "id": "hcl",
+    "aliases": ["tf", "terraform", "hashicorp", "hc"],
+    "name": "HCL",
+    "install": { "riju": ["yj"] },
+    "main": "main.hcl",
+    "template": "output = \"Hello, world!\"",
+    "compile": "cat main.hcl | yj -cj > main.json",
+    "run": "cat main.json | jq ."
+  },
+  "hexagony": {
+    "id": "hexagony",
+    "aliases": ["hxg", "hex"],
+    "name": "Hexagony",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\ninstall -d \"${pkg}/opt\"\n\ngit clone https://github.com/m-ender/hexagony.git \"${pkg}/opt/hexagony\"\nln -sT /opt/hexagony/interpreter.rb \"${pkg}/usr/local/bin/hexagony\""
+    },
+    "main": "main.hxg",
+    "template": "   H ; e ;\n  l ; d ; *\n ; r ; o ; w\nl ; ; o ; * 4\n 3 3 ; @ . >\n  ; 2 3 < \\\n   4 ; * /",
+    "run": "hexagony main.hxg"
+  },
+  "hmmm": {
+    "id": "hmmm",
+    "name": "HMMM",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nwget https://www.cs.hmc.edu/~cs5grad/cs5/hmmm/code/hmmm\nchmod +x hmmm\ncp hmmm \"${pkg}/usr/local/bin/\""
+    },
+    "main": "main.hmmm",
+    "template": " 0 setn r1, 72\n 1 write r1\n 2 setn r1, 101\n 3 write r1\n 4 setn r1, 108\n 5 write r1\n 6 setn r1, 108\n 7 write r1\n 8 setn r1, 111\n 9 write r1\n10 setn r1, 44\n11 write r1\n12 setn r1, 32\n13 write r1\n14 setn r1, 119\n15 write r1\n16 setn r1, 111\n17 write r1\n18 setn r1, 114\n19 write r1\n20 setn r1, 108\n21 write r1\n22 setn r1, 100\n23 write r1\n24 setn r1, 33\n25 write r1\n26 setn r1, 10\n27 write r1\n28 halt",
+    "run": "hmmm main.hmmm",
+    "hello": "72\n101\n108\n108\n111\n44\n32\n119\n111\n114\n108\n100\n33\n10"
+  },
+  "hy": {
+    "id": "hy",
+    "name": "Hy",
+    "install": { "apt": ["python3-distutils"], "pip": ["hy"] },
+    "repl": "hy",
+    "input": "(* 123 234)",
+    "main": "main.hy",
+    "template": "(print \"Hello, world!\")",
+    "run": "hy -i main.hy",
+    "scope": { "code": "(setv x (* 123 234))" }
+  },
+  "icon": {
+    "id": "icon",
+    "aliases": ["icn", "icont", "iconx"],
+    "name": "Icon",
+    "install": { "apt": ["icont"] },
+    "main": "main.icn",
+    "template": "procedure main ()\n    write(\"Hello, world!\")\nend",
+    "compile": "icont main.icn",
+    "run": "./main"
+  },
+  "idris": {
+    "id": "idris",
+    "aliases": ["idr", "idris2"],
+    "name": "Idris",
+    "install": {
+      "prepare": { "apt": ["chezscheme"] },
+      "apt": ["chezscheme"],
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nwget https://www.idris-lang.org/idris2-src/idris2-latest.tgz\nmkdir idris\ntar -xf idris2-latest.tgz -C idris --strip-components=1\npushd idris\nmake bootstrap-build SCHEME=chezscheme PREFIX=/usr/local\nsudo make install PREFIX=/usr/local\nsudo mv /usr/local/idris* \"${pkg}/usr/local/\"\nsudo mv /usr/local/bin/idris* \"${pkg}/usr/local/bin/\"\nsudo chown -R riju:riju \"${pkg}/usr/local\"\nchmod -R a=u,go-w \"${pkg}/usr/local\"/idris*\npopd"
+    },
+    "repl": "rm -f .idris/repl/init; idris2",
+    "main": "Main.idr",
+    "template": "module Main\n\nmain : IO ()\nmain = putStrLn \"Hello, world!\"",
+    "run": "mkdir -p .idris/repl; echo ':exec main' > .idris/repl/init; idris2 Main.idr -x main; idris2 Main.idr",
+    "scope": { "code": "x : Int\nx = 123 * 234" }
+  },
+  "ink": {
+    "id": "ink",
+    "name": "Ink",
+    "install": {
+      "manual": "install -d \"${pkg}/opt/ink\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nver=\"$(latest_release thesephist/ink)\"\nwget \"https://github.com/thesephist/ink/releases/download/${ver}/ink-linux\"\nwget \"https://github.com/thesephist/ink/releases/download/${ver}/std.ink\"\nwget \"https://github.com/thesephist/ink/releases/download/${ver}/str.ink\"\nchmod +x ink-linux\ncp -T ink-linux \"${pkg}/usr/local/bin/ink\"\ncp std.ink str.ink \"${pkg}/opt/ink/\""
+    },
+    "repl": "ink",
+    "main": "main.ink",
+    "template": "std := load('../../../opt/ink/std')\nstr := load('../../../opt/ink/str')\n\nlog := std.log\n\nlog('Hello, world!')",
+    "run": "ink main.ink; ink"
+  },
+  "intercal": {
+    "id": "intercal",
+    "aliases": ["i", "ick"],
+    "name": "INTERCAL",
+    "install": { "apt": ["intercal"] },
+    "main": "main.i",
+    "template": "DO ,1 <- #14\nPLEASE DO ,1 SUB #1 <- #238\nDO ,1 SUB #2 <- #108\nDO ,1 SUB #3 <- #112\nDO ,1 SUB #4 <- #0\nDO ,1 SUB #5 <- #64\nDO ,1 SUB #6 <- #194\nDO ,1 SUB #7 <- #48\nPLEASE DO ,1 SUB #8 <- #22\nDO ,1 SUB #9 <- #248\nDO ,1 SUB #10 <- #168\nDO ,1 SUB #11 <- #24\nDO ,1 SUB #12 <- #16\nPLEASE DO ,1 SUB #13 <- #162\nDO ,1 SUB #14 <- #52\nPLEASE READ OUT ,1\nPLEASE GIVE UP",
+    "compile": "ick -b main.i",
+    "run": "./main"
+  },
+  "io": {
+    "id": "io",
+    "name": "Io",
+    "info": {
+      "year": 2002,
+      "desc": "Dynamic prototype-based programming language in the same realm as Smalltalk and Self",
+      "ext": ["io"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Io_(programming_language)",
+        "home": "https://iolanguage.org/",
+        "source": "https://github.com/IoLanguage/io"
+      },
+      "category": "general",
+      "mode": "interpreted",
+      "platform": [],
+      "syntax": "lua",
+      "typing": "dynamic",
+      "paradigm": ["functional", "imperative", "oo"],
+      "usage": "abandoned"
+    },
+    "install": {
+      "prepare": {
+        "manual": "wget https://iobin.suspended-chord.info/linux/iobin-linux-x64-deb-current.zip -O io.zip\nunzip io.zip\nmv IoLanguage-*-Linux-x64.deb io.deb"
+      },
+      "deb": ["io.deb"]
+    },
+    "repl": "io",
+    "main": "Main.io",
+    "template": "\"Hello, world!\" println",
+    "run": "io -i Main.io",
+    "scope": { "code": "x := 123 * 234" }
+  },
+  "ioke": {
+    "id": "ioke",
+    "aliases": ["ik"],
+    "name": "Ioke",
+    "install": {
+      "prepare": {
+        "cert": ["https://letsencrypt.org/certs/lets-encrypt-r3.pem"]
+      },
+      "apt": ["default-jdk"],
+      "manual": "install -d \"${pkg}/opt/ioke\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nwget https://ioke.org/dist/ioke-ikj-latest.tar.gz -O ioke.tar.gz\ntar -xf ioke.tar.gz -C \"${pkg}/opt/ioke\" --strip-components=1\nln -s /opt/ioke/bin/ioke \"${pkg}/usr/local/bin/ioke\""
+    },
+    "repl": "JAVA_OPTS=\"-Duser.home=$PWD\" ioke",
+    "main": "main.ik",
+    "template": "\"Hello, world!\" println",
+    "run": "JAVA_OPTS=\"-Duser.home=$PWD\" ioke main.ik; JAVA_OPTS=\"-Duser.home=$PWD\" ioke"
+  },
+  "j": {
+    "id": "j",
+    "aliases": ["jconsole", "ijconsole"],
+    "name": "J",
+    "install": {
+      "manual": "wget \"$(curl -sSL https://code.jsoftware.com/wiki/System/Installation/J901/Debian | grep -F '<a' | grep 'amd64\\.deb' | grep -Eo 'http://.+?\\.deb')\" -O j.deb",
+      "deb": ["j.deb"]
+    },
+    "repl": "echo 'ijconsole:'\nijconsole",
+    "main": "main.ijs",
+    "template": "echo 'Hello, world!'",
+    "run": "ijconsole main.ijs"
+  },
+  "jasmin": {
+    "id": "jasmin",
+    "name": "Jasmin",
+    "install": { "apt": ["jasmin-sable"] },
+    "main": "Main.j",
+    "template": ".class public Main\n.super java/lang/Object\n\n.method public <init>()V\n    aload_0\n    invokenonvirtual java/lang/Object/<init>()V\n    return\n.end method\n\n.method public static main([Ljava/lang/String;)V\n    .limit stack 2\n    getstatic java/lang/System/out Ljava/io/PrintStream;\n    ldc \"Hello, world!\"\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n    return\n.end method",
+    "compile": "jasmin Main.j",
+    "run": "java Main"
+  },
+  "java": {
+    "id": "java",
+    "aliases": ["javac"],
+    "name": "Java",
+    "monacoLang": "java",
+    "install": {
+      "apt": ["default-jdk", "clang-format"],
+      "manual": "install -d \"${pkg}/opt/jdt\"\n\nwget https://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz\ntar -xf jdt-language-server-latest.tar.gz -C \"${pkg}/opt/jdt\""
+    },
+    "main": "Main.java",
+    "template": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, world!\");\n    }\n}",
+    "compile": "javac Main.java",
+    "run": "java Main",
+    "format": {
+      "run": "clang-format --style=\"{BasedOnStyle: llvm, IndentWidth: 4}\" --assume-filename=Format.java",
+      "input": "public class Main\n{\n    public static void main(String[] args)\n    {\n        System.out.println(\"Hello, world!\");\n    }\n}"
+    },
+    "lsp": {
+      "setup": "rm -rf jdt && cp -RT /opt/jdt/config_linux jdt",
+      "start": "java -Declipse.application=org.eclipse.jdt.ls.core.id1 -Dosgi.bundles.defaultStartLevel=4 -Declipse.product=org.eclipse.jdt.ls.core.product -Dlog.level=ALL -noverify -Xmx1G -jar /opt/jdt/plugins/org.eclipse.equinox.launcher_*.jar -configuration \"$PWD/jdt\" -data \"$PWD\" --add-modules=ALL-SYSTEM --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED",
+      "init": {
+        "bundles": [
+          "/opt/jdt/bundles/com.microsoft.java.test.plugin-0.19.0.jar",
+          "/opt/jdt/bundles/com.microsoft.jdtls.ext.core-0.5.1.jar",
+          "/opt/jdt/bundles/dg.jdt.ls.decompiler.cfr-0.0.2-201802221740.jar",
+          "/opt/jdt/bundles/dg.jdt.ls.decompiler.common-0.0.2-201802221740.jar",
+          "/opt/jdt/bundles/dg.jdt.ls.decompiler.fernflower-0.0.2-201802221740.jar",
+          "/opt/jdt/bundles/dg.jdt.ls.decompiler.procyon-0.0.2-201802221740.jar",
+          "/opt/jdt/bundles/io.projectreactor.reactor-core.jar",
+          "/opt/jdt/bundles/java.debug.plugin.jar",
+          "/opt/jdt/bundles/jdt-ls-commons.jar",
+          "/opt/jdt/bundles/jdt-ls-extension.jar",
+          "/opt/jdt/bundles/org.reactivestreams.reactive-streams.jar"
+        ],
+        "extendedClientCapabilities": {
+          "advancedExtractRefactoringSupport": true,
+          "advancedGenerateAccessorsSupport": true,
+          "advancedOrganizeImportsSupport": true,
+          "classFileContentsSupport": true,
+          "generateConstructorsPromptSupport": true,
+          "generateToStringPromptSupport": true,
+          "hashCodeEqualsPromptSupport": true,
+          "moveRefactoringSupport": true,
+          "overrideMethodsPromptSupport": true,
+          "progressReportProvider": true
+        },
+        "settings": {
+          "java": {
+            "autobuild": { "enabled": true },
+            "codeGeneration": {
+              "generateComments": false,
+              "hashCodeEquals": {
+                "useInstanceof": false,
+                "useJava7Objects": false
+              },
+              "toString": {
+                "codeStyle": "STRING_CONCATENATION",
+                "limitElements": 0,
+                "listArrayContents": true,
+                "skipNullValues": false,
+                "template": "${object.className} [${member.name()}=${member.value}, ${otherMembers}]"
+              },
+              "useBlocks": false
+            },
+            "completion": {
+              "enabled": true,
+              "favoriteStaticMembers": [
+                "org.junit.Assert.*",
+                "org.junit.Assume.*",
+                "org.junit.jupiter.api.Assertions.*",
+                "org.junit.jupiter.api.Assumptions.*",
+                "org.junit.jupiter.api.DynamicContainer.*",
+                "org.junit.jupiter.api.DynamicTest.*",
+                "org.mockito.Mockito.*",
+                "org.mockito.ArgumentMatchers.*",
+                "org.mockito.Answers.*"
+              ],
+              "filteredTypes": ["java.awt.*", "com.sun.*"],
+              "guessMethodArguments": true,
+              "importOrder": ["java", "javax", "com", "org"],
+              "overwrite": true
+            },
+            "configuration": {
+              "checkProjectSettingsExclusions": true,
+              "updateBuildConfiguration": "automatic"
+            },
+            "dependency": { "packagePresentation": "flat" },
+            "errors": { "incompleteClasspath": { "severity": "warning" } },
+            "foldingRange": { "enabled": true },
+            "format": {
+              "comments": { "enabled": true },
+              "enabled": true,
+              "onType": { "enabled": true }
+            },
+            "implementationsCodeLens": { "enabled": false },
+            "import": {
+              "exclusions": [
+                "**/node_modules/**",
+                "**/.metadata/**",
+                "**/archetype-resources/**",
+                "**/META-INF/maven/**"
+              ],
+              "gradle": { "enabled": true, "wrapper": { "enabled": true } },
+              "maven": { "enabled": true }
+            },
+            "maven": { "downloadSources": false },
+            "maxConcurrentBuilds": 1,
+            "progressReports": { "enabled": true },
+            "referencesCodeLens": { "enabled": false },
+            "saveActions": { "organizeImports": false },
+            "selection": { "enabled": true },
+            "signatureHelp": { "enabled": true },
+            "trace": { "server": "off" }
+          }
+        }
+      },
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "javascript": {
+    "id": "javascript",
+    "aliases": ["node", "js", "web", "jsx", "v8", "closure", "nodejs"],
+    "name": "JavaScript",
+    "monacoLang": "javascript",
+    "install": { "apt": ["nodejs", "yarn"], "riju": ["prettier"] },
+    "repl": "node",
+    "main": "main.js",
+    "template": "console.log(\"Hello, world!\");",
+    "run": "node -e \"$(< main.js)\" -i",
+    "scope": { "code": "let x = 123 * 234;" },
+    "format": {
+      "run": "prettier --no-config --stdin-filepath=format.js",
+      "input": "console.log('Hello, world!');"
+    },
+    "pkg": {
+      "install": "yarn add NAME",
+      "uninstall": "yarn remove NAME",
+      "search": "curl -sS 'https://registry.npmjs.org/-/v1/search?text=NAME' | jq -r '.objects | map(.package.name) | .[]'"
+    }
+  },
+  "jq": {
+    "id": "jq",
+    "name": "jq",
+    "install": { "apt": ["jq"] },
+    "repl": "echo 'Reading from stdin...' >&2\nwhile true; do\n    jq .\ndone",
+    "input": "{\"foo\":\"bar\"}",
+    "output": "\"foo\": \"bar\"",
+    "main": "main.jq",
+    "template": "\"Hello, world!\"",
+    "run": "echo 'Reading from stdin...' >&2\nwhile true; do\n    jq \"$(< main.jq)\"\ndone",
+    "helloInput": "{}",
+    "runReplOutput": "\"Hello, world!\""
+  },
+  "jsf": {
+    "id": "jsf",
+    "name": "JSF***",
+    "install": { "apt": ["nodejs"] },
+    "main": "main.js",
+    "template": "[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]][([]+[][(![]\n+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(\n!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]\n+[+[]]]+([][[]]+[])[+!![]]+(![]+[])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!!\n[]]+([][[]]+[])[+[]]+([]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!\n![]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!!\n[]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+(!![]+[])[+!![]]]((!![]+[\n])[+!![]]+(!![]+[])[!![]+!![]+!![]]+(!![]+[])[+[]]+([][[]]+[])[+[]]+(!![]+[])[+!\n![]]+([][[]]+[])[+!![]]+(![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]\n]+(!![]+[])[+[]]])[!![]+!![]+[+[]]]+([]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![\n]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!!\n[]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+([][[]]+[])[+!![]]+(![]+[\n])[!![]+!![]+!![]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!\n![]+[])[+[]]])[+!![]+[+[]]]+(![]+[])[!![]+!![]]+(!![]+[])[!![]+!![]+!![]])()[(![\n]+[])[!![]+!![]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![\n]+[])[+[]]])[+!![]+[+[]]]+(+[]+[![]]+([]+[])[([]+[][(![]+[])[+[]]+(![]+[])[!![]+\n!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[][(![]+[])[+[]]+(!\n[]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+([][[]]+[])[+!![\n]]+(![]+[])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+[]]+([]\n+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]\n+!![]]+(!![]+[])[+[]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]\n+(!![]+[])[+[]]])[+!![]+[+[]]]+(!![]+[])[+!![]]])[!![]+!![]+[+[]]]]([][(![]+[])[\n+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]][([]+[][(![]+[])[+[]]+(!\n[]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[][(![]\n+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+([][\n[]]+[])[+!![]]+(![]+[])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+\n[])[+[]]+([]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]\n])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![\n]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+(!![]+[])[+!![]]]((!![]+[])[+!![]]+(!\n![]+[])[!![]+!![]+!![]]+(!![]+[])[+[]]+([][[]]+[])[+[]]+(!![]+[])[+!![]]+([][[]]\n+[])[+!![]]+([]+[])[(![]+[])[+[]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![\n]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+([][[]]+[])[+!![]]+(!![]+[])[+[]]+([]\n+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]\n+!![]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]\n])[+!![]+[+[]]]+(![]+[])[!![]+!![]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(\n![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+(!![]+[])[+!![]]]()[+!![]+[!![]+!![\n]]]+(![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]][([\n]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![\n]+!![]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]\n]])[+!![]+[+[]]]+([][[]]+[])[+!![]]+(![]+[])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![\n]+[])[+!![]]+([][[]]+[])[+[]]+([]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[\n+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[][(![]+[])[+[]]+(!\n[]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+(!![]+[])[+!![]]\n]((!![]+[])[+!![]]+(!![]+[])[!![]+!![]+!![]]+(!![]+[])[+[]]+([][[]]+[])[+[]]+(!!\n[]+[])[+!![]]+([][[]]+[])[+!![]]+(!![]+[])[(![]+[])[!![]+!![]+!![]]+([][[]]+[])[\n+[]]+([][(!![]+[])[!![]+!![]+!![]]+([][[]]+[])[+!![]]+(!![]+[])[+[]]+(!![]+[])[+\n!![]]+([![]]+[][[]])[+!![]+[+[]]]+(!![]+[])[!![]+!![]+!![]]+(![]+[])[!![]+!![]+!\n![]]]()+[])[!![]+!![]]]()[+!![]+[+[]]]+![]+(!![]+[])[(![]+[])[!![]+!![]+!![]]+([\n][[]]+[])[+[]]+([][(!![]+[])[!![]+!![]+!![]]+([][[]]+[])[+!![]]+(!![]+[])[+[]]+(\n!![]+[])[+!![]]+([![]]+[][[]])[+!![]+[+[]]]+(!![]+[])[!![]+!![]+!![]]+(![]+[])[!\n![]+!![]+!![]]]()+[])[!![]+!![]]]()[+!![]+[+[]]])()[([]+[][(![]+[])[+[]]+(![]+[]\n)[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[][(![]+[])[\n+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+([][[]]+[\n])[+!![]]+(![]+[])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+\n[]]+([]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!!\n[]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])\n[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+(!![]+[])[+!![]]](([]+[])[([![]]+[][[]])[+\n!![]+[+[]]]+(!![]+[])[+[]]+(![]+[])[+!![]]+(![]+[])[!![]+!![]]+([![]]+[][[]])[+!\n![]+[+[]]]+([]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[\n]]])[!![]+!![]+!![]]+(![]+[])[!![]+!![]+!![]]]()))[+!![]+[+[]]]+(+!![])+(+!![])+\n(+[])+([]+[])[(![]+[])[+[]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[\n+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+([][[]]+[])[+!![]]+(!![]+[])[+[]]+([]+[][(!\n[]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]\n+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!!\n[]+[+[]]]+(![]+[])[!![]+!![]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[]\n)[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+(!![]+[])[+!![]]]()[+!![]+[!![]+!![]]])()\n+(!![]+[])[!![]+!![]+!![]]+(![]+[])[!![]+!![]]+(![]+[])[!![]+!![]]+(!![]+[][(![]\n+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+([][\n(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]][([]+[][(![]+[]\n)[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(![]\n+[])[+!![]]+(![]+[])[!![]+!![]]+(![]+[])[!![]+!![]]](![]+[])+[])[+!![]]+(![]+[][\n(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+[+[\n]]]+(+(+!![]+[+!![]]+(+!![])+(!![]+!![])))[(!![]+[])[+[]]+(!![]+[][(![]+[])[+[]]\n+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+([]+[])[([]+[\n][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!\n![]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])\n[+!![]+[+[]]]+([][[]]+[])[+!![]]+(![]+[])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[\n])[+!![]]+([][[]]+[])[+[]]+([]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!!\n[]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[][(![]+[])[+[]]+(![]+\n[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+(!![]+[])[+!![]]][(\n[][[]]+[])[+!![]]+(![]+[])[+!![]]+([]+(+[])[([]+[][(![]+[])[+[]]+(![]+[])[!![]+!\n![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[][(![]+[])[+[]]+(![\n]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+([][[]]+[])[+!![]\n]+(![]+[])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+[]]+([]+\n[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+\n!![]]+(!![]+[])[+[]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+\n(!![]+[])[+[]]])[+!![]+[+[]]]+(!![]+[])[+!![]]])[+!![]+[+!![]]]+(!![]+[])[!![]+!\n![]+!![]]]](!![]+!![]+!![]+[!![]+!![]+!![]+!![]])+(!![]+[])[+!![]]+(![]+[])[!![]\n+!![]]+([][[]]+[])[!![]+!![]]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![\n]]+(!![]+[])[+[]]][([]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![\n]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])\n[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+([][[]]+[])[+!![]]+(![]+[])[!![]+!![]+!![]\n]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+[]]+([]+[][(![]+[])[+[]]+(![]+[])\n[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![\n]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+\n[]]]+(!![]+[])[+!![]]]((!![]+[])[+!![]]+(!![]+[])[!![]+!![]+!![]]+(!![]+[])[+[]]\n+([][[]]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+!![]]+([]+[])[(![]+[])[+[]]+(!![\n]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+\n[]]]+([][[]]+[])[+!![]]+(!![]+[])[+[]]+([]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+\n(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[][(![]+[])[+[]]+(![]+[])\n[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+(![]+[])[!![]+!![]]+(!\n![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+\n[+[]]]+(!![]+[])[+!![]]]()[+!![]+[!![]+!![]]]+(![]+[][(![]+[])[+[]]+(![]+[])[!![\n]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]][([]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]\n+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[][(![]+[])[+[]]+(![]+[]\n)[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+([][[]]+[])[+!![]]+(!\n[]+[])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+[]]+([]+[][(\n![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]\n]+(!![]+[])[+[]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![\n]+[])[+[]]])[+!![]+[+[]]]+(!![]+[])[+!![]]]((!![]+[])[+!![]]+(!![]+[])[!![]+!![]\n+!![]]+(!![]+[])[+[]]+([][[]]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+!![]]+(!![]\n+[])[(![]+[])[!![]+!![]+!![]]+([][[]]+[])[+[]]+([][(!![]+[])[!![]+!![]+!![]]+([]\n[[]]+[])[+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([![]]+[][[]])[+!![]+[+[]]]+(!![\n]+[])[!![]+!![]+!![]]+(![]+[])[!![]+!![]+!![]]]()+[])[!![]+!![]]]()[+!![]+[+[]]]\n+![]+(!![]+[])[(![]+[])[!![]+!![]+!![]]+([][[]]+[])[+[]]+([][(!![]+[])[!![]+!![]\n+!![]]+([][[]]+[])[+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([![]]+[][[]])[+!![]+[\n+[]]]+(!![]+[])[!![]+!![]+!![]]+(![]+[])[!![]+!![]+!![]]]()+[])[!![]+!![]]]()[+!\n![]+[+[]]])()[([]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])\n[+[]]])[!![]+!![]+!![]]+(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![\n]]+(!![]+[])[+[]]])[+!![]+[+[]]]+([][[]]+[])[+!![]]+(![]+[])[!![]+!![]+!![]]+(!!\n[]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+[]]+([]+[][(![]+[])[+[]]+(![]+[])[!![]\n+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[][\n(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+\n(!![]+[])[+!![]]](([]+[])[([![]]+[][[]])[+!![]+[+[]]]+(!![]+[])[+[]]+(![]+[])[+!\n![]]+(![]+[])[!![]+!![]]+([![]]+[][[]])[+!![]+[+[]]]+([]+[][(![]+[])[+[]]+(![]+[\n])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(![]+[])[!![]+!![\n]+!![]]]()))[+!![]+[+[]]]+(!![]+!![]+!![]+!![])+(+!![])+([]+[])[(![]+[])[+[]]+(!\n![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+\n[+[]]]+([][[]]+[])[+!![]]+(!![]+[])[+[]]+([]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]\n]+(![]+[])[+!![]]+(!![]+[])[+[]]])[!![]+!![]+!![]]+(!![]+[][(![]+[])[+[]]+(![]+[\n])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![]+[+[]]]+(![]+[])[!![]+!![]]+\n(!![]+[][(![]+[])[+[]]+(![]+[])[!![]+!![]]+(![]+[])[+!![]]+(!![]+[])[+[]]])[+!![\n]+[+[]]]+(!![]+[])[+!![]]]()[+!![]+[!![]+!![]]])())",
+    "run": "sed 's/[^[]()!+]//g' main.js | node"
+  },
+  "julia": {
+    "id": "julia",
+    "aliases": ["jl"],
+    "name": "Julia",
+    "install": {
+      "prepare": { "apt": ["julia"] },
+      "apt": ["julia"],
+      "manual": "install -d \"${pkg}/opt/julia-language-server\"\n\nexport JULIA_DEPOT_PATH=\"${pkg}/opt/julia-language-server\"\njulia -e 'using Pkg; Pkg.add(\"LanguageServer\")'"
+    },
+    "repl": "julia",
+    "main": "main.jl",
+    "template": "println(\"Hello, world!\")",
+    "run": "julia -L main.jl",
+    "scope": { "code": "x = 123 * 234" },
+    "lsp": {
+      "start": "JULIA_DEPOT_PATH=:/opt/julia-language-server julia -e 'using LanguageServer; run(LanguageServerInstance(stdin, stdout))'",
+      "config": null,
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "kalyn": {
+    "id": "kalyn",
+    "name": "Kalyn",
+    "install": {
+      "prepare": { "apt": ["haskell-stack"] },
+      "manual": "install -d \"${pkg}/opt/kalyn\"\ninstall -d \"${pkg}/usr/local/bin\"\n\ngit clone https://github.com/raxod502/kalyn.git\npushd kalyn\nstack build kalyn\ncp \"$(stack exec which kalyn)\" \"${pkg}/usr/local/bin/\"\ncp -R src-kalyn/Stdlib src-kalyn/Stdlib.kalyn \"${pkg}/opt/kalyn/\"\npopd"
+    },
+    "main": "src-kalyn/Main.kalyn",
+    "template": "(import \"/opt/kalyn/Stdlib.kalyn\")\n\n(public def main (IO Empty)\n  (print \"Hello, world!\\n\"))",
+    "compile": "kalyn",
+    "run": "out-kalyn/Main"
+  },
+  "kitten": {
+    "id": "kitten",
+    "aliases": ["ktn"],
+    "name": "Kitten",
+    "install": {
+      "prepare": { "apt": ["haskell-stack"] },
+      "manual": "install -d \"${pkg}/opt/kitten\"\ninstall -d \"${pkg}/usr/local/bin\"\n\ngit clone https://github.com/evincarofautumn/kitten.git\npushd kitten\nstack setup\nstack build\ncp \"$(stack exec which kitten)\" \"${pkg}/usr/local/bin/\"\ncp common.ktn \"${pkg}/opt/kitten/\"\npopd\n\npat=\"$(strings \"${pkg}/usr/local/bin/kitten\" | grep share | tr -d '\\n' | xxd -p | tr -d '\\n')\"\nrepl=\"$(echo -n /opt/kitten | xxd -p | tr -d '\\n')\"\nrepl=\"$(printf \"%-$(echo -n \"${pat}\" | wc -c)s\" \"${repl}\" | sed 's/ /0/g')\"\ncat \"${pkg}/usr/local/bin/kitten\" | xxd -p | tr -d '\\n' | sed \"s/${pat}/${repl}/g\" | xxd -p -r | sponge \"${pkg}/usr/local/bin/kitten\""
+    },
+    "repl": "kitten",
+    "input": "(123 * 234) say",
+    "main": "main.ktn",
+    "template": "\"Hello, world!\" say",
+    "run": "kitten main.ktn; kitten"
+  },
+  "kotlin": {
+    "id": "kotlin",
+    "aliases": ["kts", "kotlinc"],
+    "name": "Kotlin",
+    "monacoLang": "kotlin",
+    "install": {
+      "apt": ["default-jre"],
+      "manual": "install -d \"${pkg}/opt\"\ninstall -d \"${pkg}/usr/local/bin\"\ninstall -d \"${pkg}/usr/local/lib\"\n\nver=\"$(latest_release JetBrains/kotlin)\"\nwget \"https://github.com/JetBrains/kotlin/releases/download/${ver}/kotlin-compiler-$(sed 's/^v//' <<< \"$ver\").zip\" -O kotlin.zip\nunzip kotlin.zip\ncp -RT kotlinc \"${pkg}/opt/kotlin\"\n\nls \"${pkg}/opt/kotlin/bin\" | while read name; do\n    ln -s \"/opt/kotlin/bin/${name}\" \"${pkg}/usr/local/bin/\"\ndone\n\nls \"${pkg}/opt/kotlin/lib\" | while read name; do\n    ln -s \"/opt/kotlin/lib/${name}\" \"${pkg}/usr/local/lib/\"\ndone"
+    },
+    "repl": "JAVA_OPTS=\"-Duser.home=$PWD\" kotlinc",
+    "main": "main.kts",
+    "template": "println(\"Hello, world!\")",
+    "run": "JAVA_OPTS=\"-Duser.home=$PWD\" kotlinc -script main.kts\nkotlinc"
+  },
+  "ksh": {
+    "id": "ksh",
+    "aliases": ["kshell"],
+    "name": "Ksh",
+    "monacoLang": "shell",
+    "install": { "apt": ["ksh"] },
+    "repl": "SHELL=/usr/bin/ksh HOME=\"$PWD\" ksh",
+    "input": "expr 123 * 234",
+    "main": ".kshrc",
+    "template": "echo \"Hello, world!\"",
+    "createEmpty": "",
+    "run": "SHELL=/usr/bin/ksh HOME=\"$PWD\" ksh",
+    "scope": { "code": "x=\"$(expr 123 * 234)\"", "input": "echo \"$x\"" }
+  },
+  "lazyk": {
+    "id": "lazyk",
+    "name": "Lazy K",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\ngit clone https://github.com/irori/lazyk.git\npushd lazyk\nmake\nmv lazyk \"${pkg}/usr/local/bin/\"\npopd"
+    },
+    "main": "main.lazy",
+    "template": "K(S(S(S(S(S(S(SI`S`K(S(S`KS(S`KK(S`KS(S(S`KS(S`K`S(SI`KK)(S`KKK)))`K`K(SI`K0))))\n)`K(S`K`S(S`KS(S`K`SI(S`KK(S`K(S(S(SSS)(SS(SSI(SS0))))S(S`KSK))(SI`K(S`KSK))))))\n(S`KKK)))(SII)`K(SII(SII(S(S`KSK)I))))(S`K`S(S(S(SSS)(SS0))S)(SSSS))(SS(SS0))(S(\nSI(SS0))(SS(SS(SS(SS`S(SSS)(SS0))))))(SS(SS(SS(SSSSSS(SS0))))))`S(S(S(SS(SS0))(S\nS0))S))`K(SS0))`K(SS(SS(S(SSS)(SS(SS0))))))I(SSSSSS(SS0)))I(S(SI(SS0))(SS(SS(SS(\nSS`S(SSS)(SS0))))))(SS(S(S(S(SSS)(SS0))S)(SSSS(SS(SS0)))))(S(SSS)(S(SSS)(SS0)))`\nK0)",
+    "run": "lazyk -u main.lazy"
+  },
+  "less": {
+    "id": "less",
+    "aliases": ["lessc"],
+    "name": "Less",
+    "monacoLang": "less",
+    "install": { "riju": ["prettier"], "npm": ["less"] },
+    "main": "main.less",
+    "template": "body:before {\n  content: \"Hello, world!\";\n}",
+    "run": "lessc main.less",
+    "format": {
+      "run": "prettier --no-config --stdin-filepath=format.less",
+      "input": "body:before {\n    content: \"Hello, world!\";\n}"
+    }
+  },
+  "limbo": {
+    "id": "limbo",
+    "aliases": ["inferno", "b"],
+    "name": "Limbo",
+    "install": {
+      "prepare": {
+        "apt": [
+          "gcc-multilib",
+          "libc6-dev-i386",
+          "libx11-dev:i386",
+          "libxext-dev:i386"
+        ]
+      },
+      "apt": ["libx11-6:i386", "libxext6:i386"],
+      "manual": "install -d \"${pkg}/opt/inferno\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nurl=\"$(curl -sSL http://www.vitanuova.com/inferno/downloads.html | grep -E 'inferno-[0-9]+\\.tgz' | grep -Eo 'http://[^\"]+')\"\nwget \"${url}\" -O inferno.tgz\n\nsudo mkdir /opt/inferno\nsudo chown riju:riju /opt/inferno\ntar -xf inferno.tgz -C /opt/inferno --strip-components=1\nchmod -R u+w,a=u,go-w /opt/inferno\n\npushd /opt/inferno\nsed -i 's/gcc/gcc -m32/g' makemk.sh\nsed -i \"s#ROOT=.*#ROOT=${PWD}#\" mkconfig\nsed -i \"s#CFLAGS=#CFLAGS=-fcommon#\" mkfiles/mkfile-Linux-386\n./makemk.sh\nPATH=\"$PWD/Linux/386/bin:$PATH\" mk install\npopd\n\nshopt -s dotglob\nmv /opt/inferno/* \"${pkg}/opt/inferno/\"\nsudo rmdir /opt/inferno\n\nln -s \"/opt/inferno/Linux/386/bin/emu\" \"/opt/inferno/Linux/386/bin/limbo\" \"${pkg}/usr/local/bin/\""
+    },
+    "setup": "ln -s /opt/inferno/* ./",
+    "main": "riju/main.b",
+    "template": "implement Cmd;\n\ninclude \"sys.m\";\ninclude \"draw.m\";\n\nCmd : module {\n    init : fn (ctxt : ref Draw->Context, args : list of string);\n};\n\ninit(nil : ref Draw->Context, nil : list of string)\n{\n    sys := load Sys Sys->PATH;\n    sys->print(\"Hello, world!\\n\");\n}",
+    "compile": "limbo -o riju/main.dis riju/main.b",
+    "run": "emu -r . riju/main.dis",
+    "helloStatus": 137
+  },
+  "lisaac": {
+    "id": "lisaac",
+    "name": "Lisaac",
+    "install": { "apt": ["lisaac"] },
+    "main": "main.li",
+    "template": "Section Header\n  + name := MAIN;\n\nSection Public\n  - main <-\n  (\n    \"Hello, world!\\n\".print;\n  );",
+    "compile": "lisaac -gcc -Wno-implicit-function-declaration main.li",
+    "run": "./main"
+  },
+  "livescript": {
+    "id": "livescript",
+    "aliases": ["lsc", "ls"],
+    "name": "LiveScript",
+    "install": { "npm": ["livescript"] },
+    "repl": "lsc",
+    "input": "DELAY: 1\n123 * 234",
+    "main": "main.ls",
+    "template": "console.log \"Hello, world!\"",
+    "run": "lsc -r ./main.ls"
+  },
+  "llvm": {
+    "id": "llvm",
+    "name": "LLVM",
+    "monacoLang": "shell",
+    "install": { "apt": ["llvm"] },
+    "main": "main.ll",
+    "template": "@.str = private unnamed_addr constant [13 x i8] c\"Hello, world!\"\n\ndeclare i32 @puts(i8* nocapture) nounwind\n\ndefine i32 @main() {\n    %cast210 = getelementptr [13 x i8],[13 x i8]* @.str, i64 0, i64 0\n    call i32 @puts(i8* %cast210)\n    ret i32 0\n}",
+    "compile": "clang -Wno-override-module main.ll -o main",
+    "run": "./main"
+  },
+  "lolcode": {
+    "id": "lolcode",
+    "aliases": ["lol", "lci"],
+    "name": "LOLCODE",
+    "install": {
+      "prepare": { "apt": ["cmake"] },
+      "manual": "git clone https://github.com/justinmeza/lci.git\npushd lci\npython3 install.py --prefix=\"${pkg}/usr/local\"\npopd"
+    },
+    "main": "main.lol",
+    "template": "HAI 1.2\n  VISIBLE \"Hello, world!\"\nKTHXBYE",
+    "run": "lci main.lol"
+  },
+  "lua": {
+    "id": "lua",
+    "name": "Lua",
+    "monacoLang": "lua",
+    "install": {
+      "apt": [
+        "$(grep-aptavail -XF Provides lua -a -XF Version \"$(grep-aptavail -XF Provides lua -s Version -n | sort -Vr | head -n1)\" -s Package -n | head -n1)"
+      ],
+      "manual": "install -d \"${pkg}/opt/emmylua\"\n\nver=\"$(latest_release EmmyLua/EmmyLua-LanguageServer)\"\nwget \"https://github.com/EmmyLua/EmmyLua-LanguageServer/releases/download/${ver}/EmmyLua-LS-all.jar\"\ncp EmmyLua-LS-all.jar \"${pkg}/opt/emmylua/EmmyLua.jar\""
+    },
+    "repl": "lua",
+    "main": "main.lua",
+    "template": "print(\"Hello, world!\")",
+    "run": "lua -i main.lua",
+    "scope": { "code": "x = 123 * 234" },
+    "lsp": {
+      "start": "java -cp /opt/emmylua/EmmyLua.jar com.tang.vscode.MainKt",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "m4": {
+    "id": "m4",
+    "name": "m4",
+    "install": { "apt": ["m4"] },
+    "repl": "echo 'Reading from stdin...' >&2; m4",
+    "input": "eval(123 * 234)",
+    "main": "main.m4",
+    "template": "errprint(`Hello, world!')",
+    "run": "echo 'Reading from stdin...' >&2; m4 main.m4 -",
+    "scope": { "code": "define(`x', eval(123 * 234))" }
+  },
+  "make": {
+    "id": "make",
+    "aliases": [
+      "gmake",
+      "makefile",
+      "gmakefile",
+      "gnumakefile",
+      "gnumake",
+      "bsdmake"
+    ],
+    "name": "Make",
+    "install": { "apt": ["make"] },
+    "main": "Makefile",
+    "template": ".PHONY: all\nall:\n\t@echo \"Hello, world!\"",
+    "run": "make"
+  },
+  "malbolge": {
+    "id": "malbolge",
+    "aliases": ["mb"],
+    "name": "Malbolge",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\ngit clone https://github.com/bipinu/malbolge.git\nclang malbolge/malbolge.c -o \"${pkg}/usr/local/bin/malbolge\""
+    },
+    "main": "main.mb",
+    "template": " (=<`#9]~6ZY32Vx/4Rs+0No-&Jk)\"Fh}|Bcy?`=*z]Kw%oG4UUS0/@-ejc(:'8dc",
+    "run": "malbolge main.mb",
+    "hello": "Hello World!"
+  },
+  "mariadb": {
+    "id": "mariadb",
+    "aliases": ["maria"],
+    "name": "MariaDB",
+    "install": {
+      "apt": ["libaio1", "libtinfo5", "mysql-client"],
+      "riju": ["sqls"],
+      "manual": "install -d \"${pkg}/opt/mariadb\"\n\nver=\"$(curl -sSL https://downloads.mariadb.org/ | grep 'href=\"/mariadb/[0-9]' | grep -Eo '[0-9][^/]+' | sort -rV | head -n1)\"\nwget \"https://downloads.mariadb.org/f/mariadb-${ver}/bintar-linux-systemd-x86_64/mariadb-${ver}-linux-systemd-x86_64.tar.gz/from/http%3A//sfo1.mirrors.digitalocean.com/mariadb/?serve\" -O mariadb.tar.gz\ntar -xf mariadb.tar.gz -C \"${pkg}/opt/mariadb\" --strip-components=1\nchmod a=rx,u=rwx \"${pkg}/opt/mariadb/lib/plugin/auth_pam_tool_dir\"\nchmod a=rx,u=rwxs \"${pkg}/opt/mariadb/lib/plugin/auth_pam_tool_dir/auth_pam_tool\""
+    },
+    "repl": "rm -rf data\n/opt/mariadb/scripts/mariadb-install-db --no-defaults --user=\"$(id -un)\"\n(/opt/mariadb/bin/mysqld --no-defaults --datadir=\"$PWD/data\" --socket=\"$PWD/socket\" --skip-networking &)\nuntil [[ -e socket ]]; do\n    sleep 0.01\ndone\nmysql --socket=socket",
+    "input": "SELECT 123 * 234;",
+    "main": "main.sql",
+    "template": "SELECT 'Hello, world!';",
+    "run": "set -e\nrm -rf data\n/opt/mariadb/scripts/mariadb-install-db --no-defaults --user=\"$(id -un)\"\n(/opt/mariadb/bin/mysqld --no-defaults --datadir=\"$PWD/data\" --socket=\"$PWD/socket\" --skip-networking &)\nuntil [[ -e socket ]]; do\n    sleep 0.01\ndone\n(mysql --socket=socket < main.sql; mysql --socket=socket)",
+    "lsp": { "start": "sqls", "code": "TODO", "item": "TODO" },
+    "skip": ["lsp"]
+  },
+  "markdown": {
+    "id": "markdown",
+    "aliases": [
+      "mdown",
+      "mkdn",
+      "md",
+      "mkd",
+      "mdwn",
+      "mdtxt",
+      "mdtext",
+      "text",
+      "rmd"
+    ],
+    "name": "Markdown",
+    "monacoLang": "markdown",
+    "install": { "apt": ["pandoc"], "riju": ["prettier"] },
+    "main": "main.md",
+    "template": "Hello, world!",
+    "compile": "pandoc main.md -o main.html",
+    "run": "prettier --no-config main.html",
+    "format": {
+      "run": "prettier --no-config --stdin-filepath=format.md",
+      "input": "1. First\n3. Second",
+      "output": "1. First\n2. Second"
+    }
+  },
+  "mediawiki": {
+    "id": "mediawiki",
+    "aliases": ["media"],
+    "name": "MediaWiki",
+    "install": { "apt": ["pandoc"], "riju": ["prettier"] },
+    "main": "main.txt",
+    "template": "Hello, world!",
+    "compile": "pandoc main.txt -f mediawiki -o main.html",
+    "run": "prettier --no-config main.html"
+  },
+  "minizinc": {
+    "id": "minizinc",
+    "aliases": ["mzn"],
+    "name": "MiniZinc",
+    "install": { "apt": ["minizinc"] },
+    "main": "main.mzn",
+    "template": "solve satisfy;\n\noutput [\"Hello, world!\\n\"];",
+    "run": "minizinc --solver Gecode main.mzn"
+  },
+  "mips": {
+    "id": "mips",
+    "aliases": ["mips64"],
+    "name": "MIPS",
+    "monacoLang": "mips",
+    "install": { "apt": ["gcc-mips64-linux-gnuabi64", "qemu-user-static"] },
+    "main": "main.S",
+    "template": "\t.text\n\t.global main\nmain:\n\tli $v0, 5001\n\tli $a0, 1\n\tdla $a1, message\n\tli $a2, 14\n\tsyscall\n\tli $v0, 5058\n\tli $a0, 0\n\tsyscall\n\t.data\nmessage:\n\t.string \"Hello, world!\\n\"",
+    "compile": "mips64-linux-gnuabi64-gcc main.S -o main -static",
+    "run": "qemu-mips64-static main"
+  },
+  "miranda": {
+    "id": "miranda",
+    "name": "Miranda",
+    "info": {
+      "year": 1983,
+      "desc": "Pure, non-strict, polymorphic, higher order functional programming language designed by David Turner in 1983-6",
+      "ext": "m",
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Miranda_(programming_language)",
+        "home": "https://www.cs.kent.ac.uk/people/staff/dat/miranda/",
+        "source": "https://www.cs.kent.ac.uk/people/staff/dat/miranda/downloads/"
+      },
+      "category": "pure",
+      "mode": ["compiled", "interpreted"],
+      "platform": [],
+      "syntax": "haskell",
+      "typing": "static",
+      "paradigm": ["declarative", "functional"],
+      "usage": []
+    },
+    "install": {
+      "apt": ["rlwrap"],
+      "manual": "install -d \"${pkg}/usr/local/bin\"\ninstall -d \"${pkg}/usr/local/lib\"\ninstall -d \"${pkg}/usr/share/man/man1\"\n\nurl=\"$(curl -fsSL https://www.cs.kent.ac.uk/people/staff/dat/miranda/downloads/ | grep 'click.php' | grep -Eo 'https?://[^\"]+' | head -n1)\"\nwget \"${url}\" -O miranda.tgz\ntar -xf miranda.tgz\n\npushd miranda\nmake cleanup\nmake CC=\"gcc -w -fcommon\"\nmv mira \"${pkg}/usr/local/bin/\"\nmv miralib \"${pkg}/usr/local/lib/\"\nmv mira.1 \"${pkg}/usr/share/man/man1/\"\npopd"
+    },
+    "repl": "rlwrap mira",
+    "main": "main.m",
+    "template": "main = [Stdout \"Hello, world!\"]",
+    "run": "echo \"[ Type 'main' to run code ]\"\nrlwrap mira main.m",
+    "helloInput": "main",
+    "scope": { "code": "x = 123 * 234" }
+  },
+  "mongodb": {
+    "id": "mongodb",
+    "aliases": ["mongo", "mongod", "webscale"],
+    "name": "MongoDB",
+    "install": {
+      "prepare": {
+        "aptRepo": [
+          "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ focal main universe"
+        ],
+        "manual": "sudo --preserve-env=DEBIAN_FRONTEND apt-get update\n\nfor name in mongodb mongodb-clients mongodb-server mongodb-server-core; do\n    apt-get download \"${name}\"\n    mv \"${name}\"_*.deb \"${name}.deb\"\ndone"
+      },
+      "deb": [
+        "mongodb.deb",
+        "mongodb-clients.deb",
+        "mongodb-server.deb",
+        "mongodb-server-core.deb"
+      ],
+      "depends": {
+        "strip": ["mongodb-clients", "mongodb-server", "mongodb-server-core"]
+      }
+    },
+    "repl": "while ps -u \"$(id -un)\" -o comm | grep -q mongod; do\n    sleep 0.01\ndone\nrm -rf data\nmkdir data\n(mongod --dbpath=data --unixSocketPrefix=\"$PWD\" --bind_ip=, &)\nuntil mongo --host \"$PWD/mongodb-27017.sock\" --eval ' ' &>/dev/null; do\n    sleep 0.01\ndone\nmongo --host \"$PWD/mongodb-27017.sock\"",
+    "main": "main.js",
+    "template": "print(\"Hello, world!\")",
+    "run": "while ps -u \"$(id -un)\" -o comm | grep -q mongod; do\n    ps -u \"$(id -un)\" -o pid,comm | cat\n    sleep 0.01\ndone\nrm -rf data\nmkdir data\n(mongod --dbpath=data --unixSocketPrefix=\"$PWD\" --bind_ip=, &)\nuntil mongo --host \"$PWD/mongodb-27017.sock\" --eval ' ' &>/dev/null; do\n    sleep 0.01\ndone\nmongo --host \"$PWD/mongodb-27017.sock\" --shell main.js"
+  },
+  "mumps": {
+    "id": "mumps",
+    "aliases": ["mlang", "gtm", "fisgtm"],
+    "name": "MUMPS",
+    "install": { "apt": ["fis-gtm"] },
+    "main": "main.m",
+    "template": "main()\n  write \"Hello, world!\",!\n  quit",
+    "run": "gtm_dist=(/usr/lib/x86_64-linux-gnu/fis-gtm/V*_x86_64)\ngtm_dist=\"${gtm_dist[@]}\" \"${gtm_dist[@]}/utf8/mumps\" -r main main.m"
+  },
+  "mysql": {
+    "id": "mysql",
+    "aliases": ["my"],
+    "name": "MySQL",
+    "install": { "apt": ["mysql-server", "mysql-client"], "riju": ["sqls"] },
+    "repl": "rm -rf data\nmysqld --no-defaults -h \"$PWD/data\" --initialize-insecure\n(mysqld --no-defaults -h \"$PWD/data\" --socket=\"$PWD/socket\" --pid-file=\"$PWD/pid-file\" --mysqlx=OFF --skip-networking &)\nuntil [[ -e socket ]]; do\n    sleep 0.01\ndone\nmysql --socket=\"$PWD/socket\" -u root",
+    "input": "SELECT 123 * 234;",
+    "main": "main.sql",
+    "template": "SELECT 'Hello, world!';",
+    "run": "set -e\nrm -rf data\nmysqld --no-defaults -h \"$PWD/data\" --initialize-insecure\n(mysqld --no-defaults -h \"$PWD/data\" --socket=\"$PWD/socket\" --pid-file=\"$PWD/pid-file\" --mysqlx=OFF --skip-networking &)\nuntil [[ -e socket ]]; do\n    sleep 0.01\ndone\n(mysql --socket=\"$PWD/socket\" -u root < main.sql; mysql --socket=\"$PWD/socket\" -u root)",
+    "lsp": { "start": "sqls", "code": "TODO", "item": "TODO" },
+    "skip": ["lsp"]
+  },
+  "neko": {
+    "id": "neko",
+    "aliases": ["nekoc"],
+    "name": "Neko",
+    "install": { "apt": ["neko"] },
+    "main": "main.neko",
+    "template": "$print(\"Hello, world!\\n\");",
+    "compile": "nekoc main.neko",
+    "run": "neko main"
+  },
+  "nelua": {
+    "id": "nelua",
+    "name": "Nelua",
+    "monacoLang": "lua",
+    "info": {
+      "year": 2019,
+      "desc": "Systems programming language for performance sensitive applications",
+      "ext": ["nelua"],
+      "web": {
+        "home": "https://nelua.io/",
+        "source": "https://github.com/edubart/nelua-lang"
+      },
+      "category": "general",
+      "mode": "compiled",
+      "platform": "lua",
+      "syntax": "lua",
+      "typing": "static",
+      "paradigm": ["imperative"],
+      "usage": []
+    },
+    "install": {
+      "manual": "git clone https://github.com/edubart/nelua-lang.git\n\npushd nelua-lang\nmake install PREFIX=\"${pkg}/usr/local\"\npopd"
+    },
+    "main": "main.nelua",
+    "template": "print 'Hello, world!'",
+    "run": "nelua main.nelua"
+  },
+  "nickle": {
+    "id": "nickle",
+    "name": "Nickle",
+    "install": { "apt": ["nickle"] },
+    "repl": "nickle",
+    "main": "main.nickle",
+    "template": "printf(\"Hello, world!\\n\");",
+    "run": "nickle main.nickle; echo \"Type 'load \\\"main.nickle\\\"' at the repl prompt to bring variables into scope\" >&2; nickle",
+    "scope": { "code": "x = 123 * 234;", "input": "load \"main.nickle\"\nx" }
+  },
+  "nim": {
+    "id": "nim",
+    "name": "Nim",
+    "install": { "apt": ["nim"] },
+    "main": "main.nim",
+    "template": "echo \"Hello, world!\"",
+    "compile": "nim compile main.nim",
+    "run": "./main"
+  },
+  "oberon": {
+    "id": "oberon",
+    "aliases": ["obn"],
+    "name": "Oberon",
+    "install": {
+      "prepare": { "apt": ["libgc-dev"] },
+      "apt": ["libgc-dev"],
+      "manual": "path=\"$(curl -sSL https://miasap.se/obnc/ | grep -F obnc_ | grep -Eo 'obnc_[^\"]+' | grep -v win | head -n1)\"\nwget \"https://miasap.se/obnc/downloads/${path}\" -O obnc.tar.gz\nmkdir obnc\ntar -xf obnc.tar.gz -C obnc --strip-components=1\npushd obnc\n./build\n./install --destdir=\"${pkg}\"\npopd"
+    },
+    "main": "Main.obn",
+    "template": "MODULE Main;\n\nIMPORT Out;\n\nBEGIN\n  Out.String(\"Hello, world!\");\n  Out.Ln;\nEND Main.",
+    "compile": "obnc Main.obn -o main",
+    "run": "./main"
+  },
+  "objectivec": {
+    "id": "objectivec",
+    "aliases": ["objc", "gnustep", "obj-c", "objective-c"],
+    "name": "Objective-C",
+    "monacoLang": "objective-c",
+    "install": { "apt": ["gnustep-devel", "clang-format", "clangd"] },
+    "main": "main.m",
+    "template": "#import <Foundation/Foundation.h>\n\nint main() {\n  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];\n  NSLog(@\"Hello, world!\");\n  [pool drain];\n  return 0;\n}",
+    "compile": "gcc $(gnustep-config --objc-flags) main.m $(gnustep-config --base-libs) -o main",
+    "run": "./main",
+    "format": {
+      "run": "clang-format --assume-filename=format.m",
+      "input": "#import <Foundation/Foundation.h>\n\nint main() {\n    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];\n    NSLog(@\"Hello, world!\");\n    [pool drain];\n    return 0;\n}"
+    },
+    "lsp": {
+      "setup": "(gnustep-config --objc-flags && gnustep-config --base-libs) | sed -E 's/\\s+/\\n/g' > compile_flags.txt",
+      "start": "clangd",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "objectivecpp": {
+    "id": "objectivecpp",
+    "aliases": [
+      "objc++",
+      "objcpp",
+      "objectivec++",
+      "objectivecplusplus",
+      "obj-c++",
+      "obj-cpp",
+      "objective-c++",
+      "objective-cplusplus"
+    ],
+    "name": "Objective-C++",
+    "install": {
+      "apt": ["gnustep-devel", "gobjc++", "clang-format", "clangd"]
+    },
+    "main": "main.mm",
+    "template": "#import <Foundation/Foundation.h>\n\nint main() {\n  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];\n  NSLog(@\"Hello, world!\");\n  [pool drain];\n  return 0;\n}",
+    "compile": "gcc $(gnustep-config --objc-flags) main.mm $(gnustep-config --base-libs) -o main",
+    "run": "./main",
+    "format": {
+      "run": "clang-format --assume-filename=format.m",
+      "input": "#import <Foundation/Foundation.h>\n\nint main() {\n    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];\n    NSLog(@\"Hello, world!\");\n    [pool drain];\n    return 0;\n}"
+    },
+    "lsp": {
+      "setup": "(gnustep-config --objc-flags && gnustep-config --base-libs) | sed -E 's/\\s+/\\n/g' > compile_flags.txt",
+      "start": "clangd",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "ocaml": {
+    "id": "ocaml",
+    "name": "OCaml",
+    "install": {
+      "apt": ["ocaml-nox"],
+      "opam": ["ocamlformat", "ocaml-lsp-server"]
+    },
+    "repl": "ocaml",
+    "input": "123 * 234 ;;",
+    "main": "main.ml",
+    "template": ";;\nprint_string \"Hello, world!\\n\"",
+    "run": "ocaml -init main.ml",
+    "scope": { "code": ";;\nlet x = 123 * 234", "input": "x ;;" },
+    "format": {
+      "run": "touch .ocamlformat; ocamlformat --name=format.ml -",
+      "input": "print_string \"Hello, world!\\n\";;"
+    },
+    "lsp": {
+      "start": "ocamllsp",
+      "lang": "ocaml",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "octave": {
+    "id": "octave",
+    "aliases": ["matlab", "m", "mathworks"],
+    "name": "Octave",
+    "install": { "apt": ["octave"] },
+    "repl": "octave",
+    "main": "main.m",
+    "template": "disp(\"Hello, world!\")",
+    "run": "octave --persist main.m",
+    "scope": { "code": "x = 123 * 234" }
+  },
+  "odin": {
+    "id": "odin",
+    "name": "Odin",
+    "info": {
+      "year": 2016,
+      "desc": "Alternative to C with goals of simplicity, high performance, built for modern systems, and joy of programming",
+      "ext": ["odin"],
+      "web": {
+        "home": "https://odin-lang.org/",
+        "source": "https://github.com/odin-lang/Odin"
+      },
+      "category": "general",
+      "mode": "compiled",
+      "platform": [],
+      "syntax": "lua",
+      "typing": "static",
+      "paradigm": ["imperative"],
+      "usage": []
+    },
+    "install": {
+      "apt": ["libllvm11"],
+      "manual": "install -d \"${pkg}/opt\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nver=\"$(latest_release odin-lang/Odin)\"\nwget \"https://github.com/odin-lang/Odin/releases/download/${ver}/odin-ubuntu-amd64-${ver}.zip\" -O odin.zip\nunzip odin.zip\n\nmv -T ubuntu_artifacts \"${pkg}/opt/odin\"\nchmod +x \"${pkg}/opt/odin/odin\"\nln -s /opt/odin/odin \"${pkg}/usr/local/bin/\""
+    },
+    "main": "main.odin",
+    "template": "package main\n\nimport \"core:fmt\"\n\nmain :: proc() {\n    fmt.printf(\"Hello, world!\\n\");\n}",
+    "compile": "odin build main.odin",
+    "run": "./main"
+  },
+  "omgrofl": {
+    "id": "omgrofl",
+    "aliases": ["omg", "rofl"],
+    "name": "Omgrofl",
+    "install": {
+      "apt": ["default-jre"],
+      "manual": "install -d \"${pkg}/opt/omgrofl\"\n\nver=\"$(latest_release OlegSmelov/omgrofl-interpreter)\"\nwget \"https://github.com/OlegSmelov/omgrofl-interpreter/releases/download/${ver}/Omgrofl.jar\" -O \"${pkg}/opt/omgrofl/omgrofl.jar\""
+    },
+    "main": "main.omgrofl",
+    "template": "lol iz 72\nrofl lol\nlol iz 101\nrofl lol\nlol iz 108\nrofl lol\nrofl lol\nlool iz 111\nrofl lool\nloool iz 44\nrofl loool\nloool iz 32\nrofl loool\nloool iz 119\nrofl loool\nrofl lool\nlool iz 114\nrofl lool\nrofl lol\nlol iz 100\nrofl lol\nlol iz 33\nrofl lol\nlol iz 10\nrofl lol",
+    "run": "java -jar /opt/omgrofl/omgrofl.jar main.omgrofl"
+  },
+  "ook": {
+    "id": "ook",
+    "name": "Ook",
+    "install": {
+      "prepare": { "apt": ["autoconf", "libtool", "libgmp-dev"] },
+      "manual": "git clone https://git.code.sf.net/p/esco/code esco\npushd esco\nautoreconf -fi\n./configure --prefix=\"${pkg}/usr/local\"\nmake\nmake install\npopd"
+    },
+    "main": "main.ook",
+    "template": "Ook. Ook? Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.\nOok. Ook. Ook. Ook. Ook! Ook? Ook? Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.\nOok. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook? Ook! Ook! Ook? Ook! Ook? Ook.\nOok! Ook. Ook. Ook? Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.\nOok. Ook. Ook! Ook? Ook? Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook?\nOok! Ook! Ook? Ook! Ook? Ook. Ook. Ook. Ook! Ook. Ook. Ook. Ook. Ook. Ook. Ook.\nOok. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook! Ook. Ook! Ook. Ook. Ook. Ook. Ook.\nOok. Ook. Ook! Ook. Ook. Ook? Ook. Ook? Ook. Ook? Ook. Ook. Ook. Ook. Ook. Ook.\nOok. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook! Ook? Ook? Ook. Ook. Ook.\nOok. Ook. Ook. Ook. Ook. Ook. Ook. Ook? Ook! Ook! Ook? Ook! Ook? Ook. Ook! Ook.\nOok. Ook? Ook. Ook? Ook. Ook? Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.\nOok. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook! Ook? Ook? Ook. Ook. Ook.\nOok. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.\nOok. Ook? Ook! Ook! Ook? Ook! Ook? Ook. Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook.\nOok? Ook. Ook? Ook. Ook? Ook. Ook? Ook. Ook! Ook. Ook. Ook. Ook. Ook. Ook. Ook.\nOok! Ook. Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook.\nOok! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook!\nOok! Ook. Ook. Ook? Ook. Ook? Ook. Ook. Ook! Ook.",
+    "run": "esco -q main.ook",
+    "hello": "Hello World!"
+  },
+  "openscad": {
+    "id": "openscad",
+    "name": "OpenSCAD",
+    "install": { "apt": ["openscad"] },
+    "main": "main.scad",
+    "template": "echo(\"Hello, world!\");",
+    "compile": "openscad main.scad -o main.stl",
+    "run": "cat main.stl",
+    "helloStatus": 1
+  },
+  "org": {
+    "id": "org",
+    "aliases": ["orgmode"],
+    "name": "Org",
+    "install": { "apt": ["pandoc"], "riju": ["prettier"] },
+    "main": "main.org",
+    "template": "Hello, world!",
+    "compile": "pandoc main.org -o main.html",
+    "run": "prettier --no-config main.html"
+  },
+  "oz": {
+    "id": "oz",
+    "aliases": ["mozart", "mozart2"],
+    "name": "Oz",
+    "install": {
+      "manual": "ver=\"$(latest_release mozart/mozart2 | sed 's/^v//')\"\nwget \"https://github.com/mozart/mozart2/releases/download/v${ver}/mozart2-${ver}-x86_64-linux.deb\" -O mozart.deb",
+      "deb": ["mozart.deb"]
+    },
+    "main": "main.oz",
+    "template": "functor\nimport\n    Application\n    System\ndefine\n    {System.showInfo 'Hello, world!'}\n    {Application.exit 0}\nend",
+    "compile": "ozc -c main.oz",
+    "run": "ozengine main.ozf"
+  },
+  "parigp": {
+    "id": "parigp",
+    "aliases": ["gp"],
+    "name": "PARI/GP",
+    "install": { "apt": ["pari-gp"] },
+    "repl": "gp",
+    "main": "main.gp",
+    "template": "print(\"Hello, world!\")",
+    "run": "gp main.gp",
+    "scope": { "code": "x = 123 * 234" }
+  },
+  "parser3": {
+    "id": "parser3",
+    "aliases": ["parser", "p"],
+    "name": "Parser3",
+    "install": { "apt": ["parser3-cgi"] },
+    "main": "main.p",
+    "template": "$console:line[Hello, world!]",
+    "run": "parser3 main.p"
+  },
+  "pascal": {
+    "id": "pascal",
+    "aliases": ["pas", "fpc"],
+    "name": "Pascal",
+    "monacoLang": "pascal",
+    "install": { "apt": ["fpc"] },
+    "main": "main.pas",
+    "template": "program Main;\nbegin\n   writeln('Hello, world!');\nend.",
+    "compile": "fpc main.pas",
+    "run": "./main"
+  },
+  "pawn": {
+    "id": "pawn",
+    "aliases": ["pawncc", "pawnrun"],
+    "name": "PAWN",
+    "install": {
+      "prepare": { "apt": ["cmake"] },
+      "manual": "install -d \"${pkg}/opt/pawn\"\ninstall -d \"${pkg}/usr/local/bin\"\n\ngit clone https://github.com/compuphase/pawn.git\npushd pawn\ncmake .\nmake\ncp pawncc pawnrun \"${pkg}/usr/local/bin/\"\ncp -R include \"${pkg}/opt/pawn/\"\npopd"
+    },
+    "main": "main.pawn",
+    "template": "#include <core>\n\nmain() {\n    print(\"Hello, world!\\n\");\n}",
+    "compile": "pawncc main.pawn -i/opt/pawn/include",
+    "run": "pawnrun main.amx"
+  },
+  "perl": {
+    "id": "perl",
+    "aliases": ["pl", "repl"],
+    "name": "Perl",
+    "monacoLang": "perl",
+    "install": { "apt": ["perl"], "cpan": ["Devel::REPL", "Perl::Tidy"] },
+    "repl": "re.pl",
+    "main": "main.pl",
+    "template": "print(\"Hello, world!\\n\");",
+    "run": "re.pl --rcfile ./main.pl",
+    "scope": { "code": "my $x = 123 * 234;", "input": "$x" },
+    "format": { "run": "perltidy", "input": "print (\"Hello, world!\\n\");" }
+  },
+  "php": {
+    "id": "php",
+    "aliases": ["phpcli"],
+    "name": "PHP",
+    "monacoLang": "php",
+    "install": { "apt": ["php"], "npm": ["intelephense"] },
+    "repl": "php -a",
+    "input": "print 123 * 234;",
+    "main": "main.php",
+    "template": "<?php\n\necho \"Hello, world!\\n\";",
+    "run": "php -d auto_prepend_file=main.php -a",
+    "scope": { "code": "$x = 123 * 234;", "input": "echo $x;" },
+    "lsp": { "start": "intelephense --stdio", "code": "TODO", "item": "TODO" },
+    "skip": ["lsp"]
+  },
+  "pikachu": {
+    "id": "pikachu",
+    "aliases": [
+      "pika",
+      "pi",
+      "ka",
+      "chu",
+      "pipi",
+      "pichu",
+      "pikapi",
+      "poke",
+      "pokemon",
+      "pokeball"
+    ],
+    "name": "Pikachu",
+    "install": { "apt": ["python3-setuptools"], "pip": ["pikalang"] },
+    "main": "main.pokeball",
+    "template": "pi pi pi pi pi pi pi pi pi pi pika pipi pi pi pi pi pi pi pi pipi pi pi\npi pi pi pi pi pi pi pi pipi pi pi pi pipi pi pichu pichu pichu pichu ka\nchu pipi pi pi pikachu pipi pi pikachu pi pi pi pi pi pi pi pikachu\npikachu pi pi pi pikachu pipi pi pi pikachu pichu pichu pi pi pi pi pi\npi pi pi pi pi pi pi pi pi pi pikachu pipi pikachu pi pi pi pikachu ka\nka ka ka ka ka pikachu ka ka ka ka ka ka ka ka pikachu pipi pi pikachu\npipi pikachu",
+    "run": "pikalang main.pokeball",
+    "hello": "Hello World!"
+  },
+  "pike": {
+    "id": "pike",
+    "name": "Pike",
+    "install": {
+      "apt": [
+        "$(grep-aptavail -wF Package \"pike[0-9.]+\" -s Package -n | sort -Vr | head -n1)",
+        "$(grep-aptavail -wF Package \"pike[0-9.]+\" -s Package -n | sort -Vr | head -n1)-doc"
+      ]
+    },
+    "repl": "pike",
+    "input": "123 * 234;",
+    "main": "main.pike",
+    "template": "int main()\n{\n  write(\"Hello, world!\\n\");\n  return 0;\n}",
+    "run": "pike main.pike; pike"
+  },
+  "postgresql": {
+    "id": "postgresql",
+    "aliases": ["psql", "postgres", "pgsql", "postgre"],
+    "name": "PostgreSQL",
+    "monacoLang": "pgsql",
+    "install": { "apt": ["postgresql", "postgresql-client"], "riju": ["sqls"] },
+    "repl": "rm -rf data\n/usr/lib/postgresql/*/bin/initdb -D data\n(echo \"listen_addresses = ''\"; echo \"unix_socket_directories = '.'\") >> data/postgresql.conf\n/usr/lib/postgresql/*/bin/pg_ctl -D data -w start\npsql -h \"$PWD/data\" postgres",
+    "input": "SELECT 123 * 234;",
+    "main": "main.sql",
+    "template": "SELECT 'Hello, world!';",
+    "run": "set -e\n\nrm -rf data\n/usr/lib/postgresql/*/bin/initdb -D data\n(echo \"listen_addresses = ''\"; echo \"unix_socket_directories = '.'\") >> data/postgresql.conf\n/usr/lib/postgresql/*/bin/pg_ctl -D data -w start\n\nset +e\npsql -h \"$PWD/data\" postgres -f main.sql\npsql -h \"$PWD/data\" postgres",
+    "lsp": { "start": "sqls", "code": "TODO", "item": "TODO" },
+    "skip": ["lsp"]
+  },
+  "postscript": {
+    "id": "postscript",
+    "aliases": ["ps", "gs", "ghostscript"],
+    "name": "PostScript",
+    "install": { "apt": ["ghostscript", "rlwrap"] },
+    "repl": "rlwrap gs",
+    "input": "123 234 mul =",
+    "main": "main.ps",
+    "template": "(Hello, world!) =",
+    "run": "rlwrap gs main.ps",
+    "scope": { "code": "123 234 mul", "input": "=" }
+  },
+  "powershell": {
+    "id": "powershell",
+    "aliases": ["pwsh", "ps1"],
+    "name": "PowerShell",
+    "monacoLang": "powershell",
+    "install": {
+      "manual": "install -d \"${pkg}/opt/powershell\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nver=\"$(latest_release PowerShell/PowerShell | sed 's/^v//')\"\nwget \"https://github.com/PowerShell/PowerShell/releases/download/v${ver}/powershell-${ver}-linux-x64.tar.gz\" -O powershell.tar.gz\ntar -xf powershell.tar.gz -C \"${pkg}/opt/powershell\"\nln -s /opt/powershell/pwsh \"${pkg}/usr/local/bin/\"\n\nver=\"$(latest_release PowerShell/PowerShellEditorServices)\"\nwget \"https://github.com/PowerShell/PowerShellEditorServices/releases/download/${ver}/PowerShellEditorServices.zip\"\nunzip PowerShellEditorServices.zip\ncp -RT PowerShellEditorServices \"${pkg}/opt/powershell-editor-services\""
+    },
+    "repl": "SHELL=/usr/bin/pwsh pwsh",
+    "input": "expr 123 \"*\" 234",
+    "main": "main.ps1",
+    "template": "Write-Host \"Hello, world!\"",
+    "run": "SHELL=/usr/bin/pwsh pwsh -NoExit main.ps1",
+    "scope": {
+      "code": "Set-Variable x \"$(expr 123 \"*\" 234)\"",
+      "input": "echo $x"
+    },
+    "lsp": {
+      "start": "pwsh -NoLogo -NoProfile -Command \"/opt/powershell-editor-services/PowerShellEditorServices/Start-EditorServices.ps1 -BundledModulesPath /opt/powershell-editor-services -LogPath '$PWD/.powershell-editor-services/lsp.log' -SessionDetailsPath '$PWD/.powershell-editor-services/session.json' -FeatureFlags @() -AdditionalModules @() -HostName Riju -HostProfileId 'riju' -HostVersion 0.0 -Stdio -LogLevel Normal\"",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["repl", "runrepl", "scope", "lsp"]
+  },
+  "prolog": {
+    "id": "prolog",
+    "name": "Prolog",
+    "install": { "apt": ["swi-prolog"] },
+    "repl": "prolog",
+    "input": "X is 123 * 234.",
+    "main": "main.pl",
+    "template": ":- initialization main.\n\nmain :-\n    write(\"Hello, world!\"), nl.",
+    "run": "prolog main.pl",
+    "scope": { "code": "x(X) :- X is 123 * 234.", "input": "x(X)." }
+  },
+  "promela": {
+    "id": "promela",
+    "aliases": ["spin", "pml"],
+    "name": "PROMELA",
+    "install": { "apt": ["spin"] },
+    "main": "main.pml",
+    "template": "active proctype main() {\n  printf(\"Hello, world!\\n\");\n}",
+    "run": "spin main.pml"
+  },
+  "pseint": {
+    "id": "pseint",
+    "aliases": ["psc"],
+    "name": "PSeInt",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nwget \"$(curl -sSL \"http://pseint.sourceforge.net/index.php?page=descargas.php&os=lnx\" | grep -Eo 'http://[^\"]+l64[^\"]+\\.tgz\\?download')\" -O pseint.tgz\ntar -xf pseint.tgz\ncp pseint/bin/pseint \"${pkg}/usr/local/bin/\""
+    },
+    "main": "main.psc",
+    "template": "Proceso Main\n    Escribir \"¡Hola, mundo!\";\nFinProceso",
+    "run": "pseint --nouser main.psc",
+    "hello": "¡Hola, mundo!"
+  },
+  "pug": {
+    "id": "pug",
+    "name": "Pug",
+    "monacoLang": "pug",
+    "install": { "riju": ["prettier"], "npm": ["pug-cli"] },
+    "main": "main.pug",
+    "template": "html\n  body\n    p Hello, world!",
+    "compile": "pug main.pug",
+    "run": "prettier --no-config main.html"
+  },
+  "purescript": {
+    "id": "purescript",
+    "aliases": ["purs", "pure"],
+    "name": "PureScript",
+    "install": {
+      "prepare": { "apt": ["libtinfo5"], "npm": ["purescript", "spago"] },
+      "apt": ["libtinfo5"],
+      "npm": ["purescript", "spago"],
+      "manual": "install -d \"${pkg}/opt/purescript/skel-home\"\ninstall -d \"${pkg}/opt/purescript/skel-src\"\n\nspago init -C\nrm -rf .gitignore test\nsed -i 's#, \"test/\\*\\*/\\*\\.purs\"##' spago.dhall\n\ncat <<\"EOF\" > src/Main.purs\nmodule Main where\n\nimport Prelude\n\nimport Effect (Effect)\nimport Effect.Console (log)\n\nmain :: Effect Unit\nmain = log \"Hello, world!\"\nEOF\n\nspago build\nspago repl < /dev/null\n\nrm -rf src\n\nshopt -s dotglob\ncp -R --preserve=timestamps * \"${pkg}/opt/purescript/skel-src/\"\ncp -R --preserve=timestamps \"${HOME}/.cache\" \"${pkg}/opt/purescript/skel-home/\""
+    },
+    "setup": "shopt -s dotglob\ncp -R --preserve=timestamps /opt/purescript/skel-home/* \"${HOME}/\"\ncp -R --preserve=timestamps /opt/purescript/skel-src/* \"${PWD}/\"",
+    "repl": "spago repl",
+    "main": "src/Main.purs",
+    "template": "module Main where\n\nimport Prelude\n\nimport Effect (Effect)\nimport Effect.Console (log)\n\nmain :: Effect Unit\nmain = do\n  log \"Hello, world!\"",
+    "run": "if spago build -n; then spago run -n; (echo 'import Prelude'; echo 'import Main') > .purs-repl; spago repl; else echo 'import Prelude' > .purs-repl; spago repl -d; fi",
+    "timeoutFactor": 2
+  },
+  "python": {
+    "id": "python",
+    "aliases": ["python3", "python2", "py"],
+    "name": "Python",
+    "monacoLang": "python",
+    "info": {
+      "impl": "CPython",
+      "version": "Python 3",
+      "year": 1990,
+      "desc": "Interpreted, high-level, general-purpose programming language",
+      "ext": ["py", "pyi", "pyc", "pyd", "pyo", "pyw", "pyz"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Python_(programming_language)",
+        "home": "https://www.python.org/",
+        "source": "https://github.com/python/cpython"
+      },
+      "category": "general",
+      "mode": "interpreted",
+      "platform": "python",
+      "syntax": ["python", "whitespace"],
+      "typing": "dynamic",
+      "paradigm": ["functional", "imperative", "oo"],
+      "usage": "popular"
+    },
+    "install": {
+      "apt": ["python3", "python3-pip", "black"],
+      "manual": "install -d \"${pkg}/opt/mspyls\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nurl=\"$(curl -fsSL \"https://pvsc.blob.core.windows.net/python-language-server-stable?restype=container&comp=list&prefix=Python-Language-Server-linux-x64\" | grep -Eo 'https://[^<]+\\.nupkg' | tail -n1)\"\nwget \"${url}\"\nunzip -d \"${pkg}/opt/mspyls\" Python-Language-Server-linux-x64.*.nupkg\nchmod +x \"${pkg}/opt/mspyls/Microsoft.Python.LanguageServer\"\nln -s \"/opt/mspyls/Microsoft.Python.LanguageServer\" \"${pkg}/usr/local/bin/Microsoft.Python.LanguageServer\""
+    },
+    "repl": "python3 -u",
+    "main": "main.py",
+    "template": "print(\"Hello, world!\")",
+    "run": "python3 -u -i main.py",
+    "scope": { "code": "x = 123 * 234" },
+    "format": { "run": "black -", "input": "print('Hello, world!')" },
+    "pkg": {
+      "install": "pip3 install --user NAME",
+      "uninstall": "pip3 uninstall NAME",
+      "search": "python3 -c 'import json; from xmlrpc import client; print(json.dumps(client.ServerProxy(\"https://pypi.org/pypi\").search({\"name\": \"NAME\"})))' | jq -r 'map(.name) | .[]'"
+    },
+    "lsp": {
+      "start": "Microsoft.Python.LanguageServer",
+      "init": {
+        "interpreter": {
+          "properties": { "InterpreterPath": "/usr/bin/python3" }
+        }
+      },
+      "code": "import func",
+      "item": "functools"
+    }
+  },
+  "qalb": {
+    "id": "qalb",
+    "aliases": ["قلب"],
+    "name": "قلب",
+    "install": {
+      "scripts": {
+        "qalb": "#!/usr/bin/env node\n\nconst fs = require(\"fs\");\nconst repl = require(\"repl\");\n\nconst args = process.argv.slice(2);\nif (args.length > 1) {\n  console.error(\"usage: repl.js [FILE]\");\n  process.exit(1);\n}\n\nconst program = args.length === 1 ? fs.readFileSync(args[0], \"utf-8\") : null;\n\neval(fs.readFileSync(\"/opt/qalb/qlb.js\", \"utf-8\"));\neval(fs.readFileSync(\"/opt/qalb/parser.js\", \"utf-8\"));\neval(fs.readFileSync(\"/opt/qalb/primitives.js\", \"utf-8\"));\n\nQlb.init({console});\n\nif (program !== null) {\n  Qlb.execute(program);\n}\n\nrepl.start({prompt: \"قلب> \", eval: (cmd, context, filename, callback) => callback(null, Qlb.execute(cmd))});"
+      },
+      "manual": "install -d \"${pkg}/opt/qalb\"\n\ngit clone https://github.com/nasser/---.git qalb\npushd qalb\ncp public/qlb/*.js \"${pkg}/opt/qalb/\"\npopd"
+    },
+    "repl": "qalb",
+    "input": "(ضرب ١٢٣ ٢٣٤)",
+    "main": "main.qalb",
+    "template": "(قول \"مرحبا يا عالم\")",
+    "run": "qalb main.qalb",
+    "hello": "مرحبا يا عالم",
+    "scope": { "code": "(حدد خ (ضرب ١٢٣ ٢٣٤))", "input": "خ" }
+  },
+  "qsharp": {
+    "id": "qsharp",
+    "aliases": ["q", "qs"],
+    "name": "Q#",
+    "install": {
+      "prepare": {
+        "preface": "wget \"https://packages.microsoft.com/config/ubuntu/${ubuntu_ver}/packages-microsoft-prod.deb\"\nsudo --preserve-env=DEBIAN_FRONTEND apt-get install ./packages-microsoft-prod.deb\nsudo --preserve-env=DEBIAN_FRONTEND apt-get update",
+        "apt": [
+          "$(grep-aptavail -wF Package \"dotnet-sdk-3\\.[0-9.]+\" -s Package -n | sort -Vr | head -n1)"
+        ]
+      },
+      "preface": "wget \"https://packages.microsoft.com/config/ubuntu/${ubuntu_ver}/packages-microsoft-prod.deb\"\nsudo --preserve-env=DEBIAN_FRONTEND apt-get install ./packages-microsoft-prod.deb\nsudo --preserve-env=DEBIAN_FRONTEND apt-get update",
+      "apt": [
+        "$(grep-aptavail -wF Package \"dotnet-sdk-3\\.[0-9.]+\" -s Package -n | sort -Vr | head -n1)"
+      ],
+      "manual": "install -d \"${pkg}/opt/qsharp/skel-home\"\ninstall -d \"${pkg}/opt/qsharp/skel-src\"\n\ndotnet new -i Microsoft.Quantum.ProjectTemplates\ndotnet new console -lang Q# -o main\ndotnet run --project main\n\nshopt -s dotglob\ncp -R main \"${pkg}/opt/qsharp/skel-src/\"\ncp -R \"${HOME}/.dotnet\" \"${HOME}/.nuget\" \"${pkg}/opt/qsharp/skel-home/\"\nrm \"${pkg}/opt/qsharp/skel-src/main/Program.qs\"\nchmod -R a=u,go-w \"${pkg}/opt/qsharp\"",
+      "manualInstall": "wget \"https://packages.microsoft.com/config/ubuntu/${ubuntu_ver}/packages-microsoft-prod.deb\"\nsudo --preserve-env=DEBIAN_FRONTEND apt-get update\nsudo --preserve-env=DEBIAN_FRONTEND apt-get install ./packages-microsoft-prod.deb"
+    },
+    "setup": "shopt -s dotglob\ncp -R /opt/qsharp/skel-src/* ./\ncp -R /opt/qsharp/skel-home/* \"${HOME}/\"",
+    "main": "main/Main.qs",
+    "template": "namespace main {\n\n    open Microsoft.Quantum.Canon;\n    open Microsoft.Quantum.Intrinsic;\n\n    @EntryPoint()\n    operation Main() : Unit {\n        Message(\"Hello, world!\");\n    }\n}",
+    "run": "dotnet run --project main"
+  },
+  "r": {
+    "id": "r",
+    "aliases": ["rlang"],
+    "name": "R",
+    "monacoLang": "r",
+    "install": {
+      "aptKey": ["E298A3A825C0D65DFD57CBB651716619E084DAB9"],
+      "aptRepo": [
+        "deb [arch=amd64] https://cloud.r-project.org/bin/linux/ubuntu ${ubuntu_name}-$(curl -fsSL https://cran.r-project.org/bin/linux/ubuntu/ | grep -Eo 'cran[0-9]+' | head -n1)/"
+      ],
+      "apt": ["r-base"]
+    },
+    "repl": "HOME=\"$PWD\" R",
+    "main": ".Rprofile",
+    "template": "print(\"Hello, world!\")",
+    "run": "HOME=\"$PWD\" R --no-save",
+    "scope": { "code": "x = 123 * 234" }
+  },
+  "racket": {
+    "id": "racket",
+    "aliases": ["rkt"],
+    "name": "Racket",
+    "install": { "apt": ["racket"] },
+    "repl": "racket",
+    "input": "(* 123 234)",
+    "main": "main.rkt",
+    "template": "#lang racket/base\n(display \"Hello, world!\\n\")",
+    "run": "racket -i -e '(enter! \"main.rkt\") (display \"[ type (enter! \\\"main.rkt\\\") to access local variables ]\\n\")'",
+    "scope": {
+      "code": "(define x (* 123 234))",
+      "input": "(enter! \"main.rkt\")\nx"
+    }
+  },
+  "rapira": {
+    "id": "rapira",
+    "aliases": ["rap", "rerap", "rerap2", "рапира"],
+    "name": "Рапира",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\ngit clone https://github.com/freeduke33/rerap2.git\npushd rerap2\nmake\ncp rapira \"${pkg}/usr/local/bin/\"\npopd"
+    },
+    "main": "main.rap",
+    "template": "вывод: \"Hello, world!\"",
+    "run": "rapira main.rap"
+  },
+  "ratfor": {
+    "id": "ratfor",
+    "aliases": ["rationalfortran"],
+    "name": "Ratfor",
+    "install": { "apt": ["ratfor", "gfortran"] },
+    "main": "main.r",
+    "template": "PRINT *, 'Hello, world!'\nEND",
+    "compile": "ratfor main.r -o main.f\ngfortran main.f -o main",
+    "run": "./main"
+  },
+  "rc": {
+    "id": "rc",
+    "aliases": ["runcommands"],
+    "name": "rc",
+    "install": { "apt": ["rc"] },
+    "repl": "rc",
+    "input": "expr 123 '*' 234",
+    "main": "main.rc",
+    "template": "echo Hello, world!",
+    "run": "rc main.rc; rc"
+  },
+  "reasonml": {
+    "id": "reasonml",
+    "aliases": ["re", "reason", "bsc", "buckle", "bucklescript"],
+    "name": "ReasonML",
+    "install": {
+      "prepare": { "npm": ["bs-platform"] },
+      "npm": ["bs-platform"],
+      "opam": [{ "name": "reason", "binaries": ["refmt"] }],
+      "manual": "install -d \"${pkg}/opt/reasonml/skel\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nver=\"$(latest_release jaredly/reason-language-server)\"\nwget \"https://github.com/jaredly/reason-language-server/releases/download/${ver}/rls-linux.zip\"\nunzip rls-linux.zip\ncp rls-linux/reason-language-server \"${pkg}/usr/local/bin/\"\n\npushd \"${pkg}/opt/reasonml/skel\"\nbsb -init .\ncat bsconfig.json | jq '.name = \"riju-project\"' | sponge bsconfig.json\nnpm install\npopd"
+    },
+    "setup": "cp -a /opt/reasonml/skel/* ./",
+    "main": "main.re",
+    "template": "print_string(\"Hello, world!\\n\");",
+    "compile": "bsc main.re > main.js",
+    "run": "NODE_PATH=/usr/lib/node_modules node main.js",
+    "format": { "run": "refmt", "input": "print_string(\"Hello, world!\\n\")" },
+    "lsp": {
+      "start": "reason-language-server",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "rebol": {
+    "id": "rebol",
+    "name": "REBOL",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nfile=\"$(curl -sSL http://www.rebol.com/downloads.html | sed '0,/x86-64/d' | grep -Eo 'downloads/[^\"]+' | head -n1)\"\nwget \"http://www.rebol.com/${file}\" -O rebol.tar.gz\ntar -xf rebol.tar.gz\ncp rebol-core/rebol \"${pkg}/usr/local/bin/\""
+    },
+    "repl": "rebol",
+    "main": "main.r",
+    "template": "REBOL [Title: \"Main\"]\nprint \"Hello, world!\"",
+    "run": "rebol main.r; rebol",
+    "runReplInput": "DELAY: 1\n123 * 234"
+  },
+  "red": {
+    "id": "red",
+    "name": "Red",
+    "install": {
+      "apt": ["libcurl4:i386"],
+      "manual": "install -d \"${pkg}/opt/red/skel\"\ninstall -d \"${pkg}/usr/local/bin\"\n\npath=\"$(curl -fsSL https://static.red-lang.org/download.html | grep -Eo '/dl/linux/[^\"]+' | head -n1)\"\nwget \"https://static.red-lang.org${path}\" -O red\nchmod +x red\ncp red \"${pkg}/usr/local/bin/\"\n\n./red <<< quit\ncp -R \"$HOME/.red\" \"${pkg}/opt/red/skel/\""
+    },
+    "setup": "shopt -s dotglob; cp -R /opt/red/skel/* \"${HOME}/\"",
+    "repl": "\"$(which red)\"",
+    "input": "DELAY: 1\n123 * 234",
+    "main": "main.red",
+    "template": "Red [Title: \"Main\"]\n\nprint \"Hello, world!\"",
+    "run": "\"$(which red)\" main.red; \"$(which red)\""
+  },
+  "redis": {
+    "id": "redis",
+    "name": "Redis",
+    "monacoLang": "redis",
+    "install": { "apt": ["redis"] },
+    "repl": "rm -f socket; (redis-server --port 0 --unixsocket socket &); until [[ -e socket ]]; do sleep 0.01; done; redis-cli -s socket",
+    "input": "DELAY: 3\nEVAL \"return 123 * 234\" 0",
+    "main": "main.redis",
+    "template": "ECHO \"Hello, world!\"",
+    "run": "rm -f socket; (redis-server --port 0 --unixsocket socket &); until [[ -e socket ]]; do sleep 0.01; done; redis-cli -s socket < main.redis; redis-cli -s socket"
+  },
+  "restructuredtext": {
+    "id": "restructuredtext",
+    "aliases": ["rst"],
+    "name": "reStructuredText",
+    "monacoLang": "restructuredtext",
+    "install": { "apt": ["pandoc"], "riju": ["prettier"] },
+    "main": "main.rst",
+    "template": "Hello, world!",
+    "compile": "pandoc main.rst -o main.html",
+    "run": "prettier --no-config main.html"
+  },
+  "rexx": {
+    "id": "rexx",
+    "aliases": ["regina", "reginarexx"],
+    "name": "REXX",
+    "install": { "apt": ["regina-rexx"] },
+    "main": "main.rexx",
+    "template": "say \"Hello, world!\"",
+    "run": "rexx main.rexx"
+  },
+  "riscv": {
+    "id": "riscv",
+    "aliases": ["risc"],
+    "name": "RISC-V",
+    "install": { "apt": ["gcc-riscv64-linux-gnu", "qemu-user-static"] },
+    "main": "main.S",
+    "template": "\t.text\n\t.global main\nmain:\n\taddi a7, x0, 64\n\taddi a0, x0, 1\n\tla a1, message\n\taddi a2, x0, 14\n\tecall\n\taddi a7, x0, 93\n\taddi a0, x0, 0\n\tecall\n\t.data\nmessage:\n\t.string \"Hello, world!\\n\"",
+    "compile": "riscv64-linux-gnu-gcc main.S -o main -static",
+    "run": "qemu-riscv64-static main"
+  },
+  "roff": {
+    "id": "roff",
+    "aliases": [
+      "groff",
+      "nroff",
+      "troff",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "man",
+      "manual"
+    ],
+    "name": "roff",
+    "install": { "apt": ["pandoc"], "riju": ["prettier"] },
+    "main": "main.roff",
+    "template": ".PP\nHello, world!",
+    "compile": "pandoc main.roff -f man -o main.html",
+    "run": "prettier --no-config main.html"
+  },
+  "ruby": {
+    "id": "ruby",
+    "aliases": ["irb", "rb"],
+    "name": "Ruby",
+    "monacoLang": "ruby",
+    "install": {
+      "prepare": { "apt": ["ruby-dev"] },
+      "apt": ["ruby"],
+      "gem": ["rufo", "solargraph"]
+    },
+    "repl": "irb",
+    "main": "main.rb",
+    "template": "puts \"Hello, world!\"",
+    "suffix": "require 'irb'\nIRB.setup(ARGV[0], argv: [])\nworkspace = IRB::WorkSpace.new(binding)\nbinding_irb = IRB::Irb.new(workspace)\nbinding_irb.run(IRB.conf)",
+    "run": "ruby main.rb",
+    "scope": { "code": "x = 5" },
+    "format": { "run": "rufo -x", "input": "puts \"Hello, world!\";" },
+    "pkg": {
+      "install": "gem install --user-install NAME",
+      "uninstall": "gem uninstall --user-install NAME",
+      "search": "curl -sS 'https://rubygems.org/api/v1/search.json?query=NAME' | jq -r 'map(.name) | .[]'"
+    },
+    "lsp": { "start": "solargraph stdio", "code": "TODO", "item": "TODO" },
+    "skip": ["repl", "runrepl", "scope", "lsp"]
+  },
+  "rust": {
+    "id": "rust",
+    "aliases": ["rs", "rustc"],
+    "name": "Rust",
+    "monacoLang": "rust",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nexport CARGO_HOME=\"${pkg}/opt/rustup\"\nexport RUSTUP_HOME=\"${pkg}/opt/rustup\"\ncurl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path\n\"${pkg}/opt/rustup/bin/rustup\" component add rls rust-analysis rust-src\n\nls \"${pkg}/opt/rustup/bin\" | while read name; do\n    cat <<EOF > \"${pkg}/usr/local/bin/${name}\"\n#!/usr/bin/env bash\nexec env RUSTUP_HOME=/opt/rustup \"/opt/rustup/bin/${name}\" \"\\$@\"\nEOF\n    chmod +x \"${pkg}/usr/local/bin/${name}\"\ndone"
+    },
+    "main": "main.rs",
+    "template": "fn main() {\n    println!(\"Hello, world!\");\n}",
+    "compile": "rustc main.rs",
+    "run": "./main",
+    "lsp": { "start": "rls", "code": "TODO", "item": "TODO" },
+    "skip": ["lsp"]
+  },
+  "sagemath": {
+    "id": "sagemath",
+    "aliases": ["sage"],
+    "name": "SageMath",
+    "install": {
+      "prepare": { "apt": ["python2"] },
+      "apt": ["libpng16-16", "libfreetype6"],
+      "manual": "install -d \"${pkg}/opt/sagemath\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nfile=\"$(curl -fsSL https://mirrors.mit.edu/sage/linux/64bit/index.html | grep -Eo 'sage-[^\"]+\\.tar\\.bz2' | grep Ubuntu | sort -rV | head -n1)\"\nwget \"https://mirrors.mit.edu/sage/linux/64bit/${file}\" -O sage.tar.bz2\n\nsudo mkdir /opt/sagemath\nsudo chown riju:riju /opt/sagemath\ntar -xf sage.tar.bz2 -C /opt/sagemath --strip-components=1\n\npython2 /opt/sagemath/relocate-once.py\nfind /opt/sagemath -name __pycache__ -exec rm -rf '{}' ';' -prune\n\nshopt -s dotglob\nmv /opt/sagemath/* \"${pkg}/opt/sagemath/\"\nsudo rmdir /opt/sagemath\n\nln -s /opt/sagemath/sage \"${pkg}/usr/local/bin/\""
+    },
+    "repl": "HOME=\"$PWD\" sage",
+    "main": ".sage/init.sage",
+    "template": "print(\"Hello, world!\")",
+    "createEmpty": "",
+    "run": "HOME=\"$PWD\" sage",
+    "scope": { "code": "x = 123 * 234" }
+  },
+  "sass": {
+    "id": "sass",
+    "name": "Sass",
+    "install": { "riju": ["sass"] },
+    "main": "main.sass",
+    "template": "body:before\n  content: \"Hello, world!\"",
+    "run": "sass main.sass"
+  },
+  "scala": {
+    "id": "scala",
+    "name": "Scala",
+    "install": { "apt": ["scala"] },
+    "repl": "scala",
+    "main": "main.scala",
+    "template": "println(\"Hello, world!\")",
+    "run": "scala -i main.scala",
+    "scope": { "code": "val x = 123 * 234" }
+  },
+  "scheme": {
+    "id": "scheme",
+    "aliases": ["scm", "mitscheme"],
+    "name": "Scheme",
+    "monacoLang": "scheme",
+    "install": { "apt": ["mit-scheme"] },
+    "repl": "mit-scheme",
+    "input": "(* 123 234)",
+    "main": "main.scm",
+    "template": "(display \"Hello, world!\")\n(newline)",
+    "run": "mit-scheme --load main.scm",
+    "scope": { "code": "(define x (* 123 234))" }
+  },
+  "scilab": {
+    "id": "scilab",
+    "aliases": ["sci"],
+    "name": "Scilab",
+    "install": { "apt": ["scilab"] },
+    "repl": "scilab-cli",
+    "input": "DELAY: 1\n123 * 234",
+    "main": "main.sci",
+    "template": "disp(\"Hello, world!\")",
+    "run": "scilab-cli -f main.sci",
+    "scope": { "code": "x = 123 * 234", "input": "DELAY: 1\nx" }
+  },
+  "scss": {
+    "id": "scss",
+    "name": "SCSS",
+    "monacoLang": "scss",
+    "install": { "riju": ["sass", "prettier"] },
+    "main": "main.scss",
+    "template": "body:before {\n  content: \"Hello, world!\";\n}",
+    "run": "sass main.scss",
+    "format": {
+      "run": "prettier --no-config --stdin-filepath=format.scss",
+      "input": "body:before {\n    content: \"Hello, world!\";\n}"
+    }
+  },
+  "sed": {
+    "id": "sed",
+    "aliases": ["gsed"],
+    "name": "Sed",
+    "install": { "apt": ["sed"] },
+    "main": "main.sed",
+    "template": "s/.*/Hello, world!/",
+    "run": "echo 'Reading from stdin...' >&2; sed -f main.sed",
+    "helloInput": "\nDELAY: 1\nEOF"
+  },
+  "setl": {
+    "id": "setl",
+    "name": "SETL",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nwget https://setl.org/setl/bin/Linux-x86-64bit/setlbin.tgz\ntar -xf setlbin.tgz -C \"${pkg}/usr/local/bin\""
+    },
+    "main": "main.setl",
+    "template": "print(\"Hello, world!\");",
+    "run": "setl main.setl"
+  },
+  "sh": {
+    "id": "sh",
+    "aliases": ["shell", "posix", "posixsh", "ash", "dash", "posh"],
+    "name": "Sh",
+    "monacoLang": "shell",
+    "install": { "apt": ["posh"] },
+    "repl": "SHELL=/usr/bin/sh HOME=\"$PWD\" posh -l",
+    "input": "expr 123 \\* 234",
+    "main": ".profile",
+    "template": "echo \"Hello, world!\"",
+    "createEmpty": "",
+    "run": "SHELL=/usr/bin/sh HOME=\"$PWD\" posh -l",
+    "scope": { "code": "x=\"$(expr 123 \\* 234)\"", "input": "echo \"$x\"" }
+  },
+  "shakespeare": {
+    "id": "shakespeare",
+    "aliases": ["spl"],
+    "name": "Shakespeare",
+    "install": { "pip": ["shakespearelang"] },
+    "repl": "shakespeare console",
+    "input": "Hamlet, a placeholder.\ndone\nstage",
+    "output": "Off stage",
+    "main": "main.spl",
+    "template": "The Infamous Hello World Program.\n\nRomeo, a young man with a remarkable patience.\nJuliet, a likewise young woman of remarkable grace.\nOphelia, a remarkable woman much in dispute with Hamlet.\nHamlet, the flatterer of Andersen Insulting A/S.\n\n\n                    Act I: Hamlet's insults and flattery.\n\n                    Scene I: The insulting of Romeo.\n\n[Enter Hamlet and Romeo]\n\nHamlet:\n You lying stupid fatherless big smelly half-witted coward!\n You are as stupid as the difference between a handsome rich brave\n hero and thyself! Speak your mind!\n\n You are as brave as the sum of your fat little stuffed misused dusty\n old rotten codpiece and a beautiful fair warm peaceful sunny summer's\n day. You are as healthy as the difference between the sum of the\n sweetest reddest rose and my father and yourself! Speak your mind!\n\n You are as cowardly as the sum of yourself and the difference\n between a big mighty proud kingdom and a horse. Speak your mind.\n\n Speak your mind!\n\n[Exit Romeo]\n\n                    Scene II: The praising of Juliet.\n\n[Enter Juliet]\n\nHamlet:\n Thou art as sweet as the sum of the sum of Romeo and his horse and his\n black cat! Speak thy mind!\n\n[Exit Juliet]\n\n                    Scene III: The praising of Ophelia.\n\n[Enter Ophelia]\n\nHamlet:\n Thou art as lovely as the product of a large rural town and my amazing\n bottomless embroidered purse. Speak thy mind!\n\n Thou art as loving as the product of the bluest clearest sweetest sky\n and the sum of a squirrel and a white horse. Thou art as beautiful as\n the difference between Juliet and thyself. Speak thy mind!\n\n[Exeunt Ophelia and Hamlet]\n\n\n                    Act II: Behind Hamlet's back.\n\n                    Scene I: Romeo and Juliet's conversation.\n\n[Enter Romeo and Juliet]\n\nRomeo:\n Speak your mind. You are as worried as the sum of yourself and the\n difference between my small smooth hamster and my nose. Speak your\n mind!\n\nJuliet:\n Speak YOUR mind! You are as bad as Hamlet! You are as small as the\n difference between the square of the difference between my little pony\n and your big hairy hound and the cube of your sorry little\n codpiece. Speak your mind!\n\n[Exit Romeo]\n\n                    Scene II: Juliet and Ophelia's conversation.\n\n[Enter Ophelia]\n\nJuliet:\n Thou art as good as the quotient between Romeo and the sum of a small\n furry animal and a leech. Speak your mind!\n\nOphelia:\n Thou art as disgusting as the quotient between Romeo and twice the\n difference between a mistletoe and an oozing infected blister! Speak\n your mind!\n\n[Exeunt]",
+    "suffix": "[A pause]",
+    "run": "shakespeare debug main.spl",
+    "hello": "Hello World!",
+    "runReplInput": "stage"
+  },
+  "slang": {
+    "id": "slang",
+    "aliases": ["s", "sl"],
+    "name": "S-Lang",
+    "install": { "apt": ["slsh"] },
+    "repl": "slsh",
+    "input": "123 * 234;",
+    "main": "main.sl",
+    "template": "message(\"Hello, world!\");",
+    "run": "slsh -i main.sl",
+    "scope": { "code": "x = 123 * 234;" }
+  },
+  "slick": {
+    "id": "slick",
+    "name": "Slick",
+    "install": {
+      "prepare": { "apt": ["libgmp-dev"], "opam": ["dune"] },
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\ngit clone https://github.com/kwshi/slick.git\npushd slick\ndeps=\"$(dune external-lib-deps src --display=quiet | grep -F - | sed 's/- //; s/\\..*//')\"\nopam init -n --disable-sandboxing\nopam switch create .\nopam install --switch . ${deps} menhir -y\nopam exec --switch . dune build\ncp _build/default/src/exe/main.exe \"${pkg}/usr/local/bin/slick\"\npopd"
+    },
+    "repl": "slick",
+    "input": "DELAY: 1\n123 * 234",
+    "main": "main.sl",
+    "template": "def main:\n  print \"Hello, world!\"",
+    "run": "slick main.sl; slick"
+  },
+  "smalltalk": {
+    "id": "smalltalk",
+    "aliases": ["gst", "st"],
+    "name": "Smalltalk",
+    "install": { "apt": ["gnu-smalltalk"] },
+    "repl": "gst",
+    "main": "main.st",
+    "template": "'Hello, world!' displayNl !",
+    "run": "gst main.st; gst"
+  },
+  "snobol": {
+    "id": "snobol",
+    "aliases": ["snobol4", "spitbol", "sno"],
+    "name": "SNOBOL",
+    "install": {
+      "prepare": { "apt": ["m4"] },
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nfile=\"$(curl -sSL ftp://ftp.snobol4.org/snobol/ | grep -Eo 'snobol4-.*\\.tar\\.gz' | sort -rV | head -n1)\"\nwget \"ftp://ftp.snobol4.org/snobol/${file}\" -O snobol.tar.gz\nmkdir snobol\ntar -xf snobol.tar.gz -C snobol --strip-components=1\npushd snobol\nmake snobol4\ncp snobol4 \"${pkg}/usr/local/bin/\"\npopd"
+    },
+    "repl": "snobol4",
+    "input": " OUTPUT = 123 * 234\nEND",
+    "main": "main.sno",
+    "template": " OUTPUT = \"Hello, world!\"\nEND",
+    "run": "snobol4 main.sno; snobol4"
+  },
+  "sqlite": {
+    "id": "sqlite",
+    "aliases": ["sql", "db", "sqlite3"],
+    "name": "SQLite",
+    "monacoLang": "sql",
+    "install": {
+      "apt": ["sqlite"],
+      "riju": ["sqls"],
+      "files": {
+        "/opt/sqlite/sqls.yml": "connections:\n  - driver: sqlite3\n    dataSourceName: db.sqlite3"
+      }
+    },
+    "repl": "rm -f db.sqlite3\nsqlite3 db.sqlite3",
+    "input": "SELECT 123 * 234;",
+    "main": "main.sql",
+    "template": "SELECT 'Hello, world!';",
+    "run": "rm -f db.sqlite3\nsqlite3 db.sqlite3 -cmd \"$(< main.sql)\"",
+    "lsp": {
+      "start": "sqls -config /opt/sqlite/sqls.yml",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "squirrel": {
+    "id": "squirrel",
+    "aliases": ["nut", "cnut"],
+    "name": "Squirrel",
+    "install": { "apt": ["squirrel3"] },
+    "repl": "squirrel",
+    "input": "print(123 * 234)",
+    "main": "main.nut",
+    "template": "print(\"Hello, world!\\n\")",
+    "run": "squirrel main.nut; squirrel"
+  },
+  "standardml": {
+    "id": "standardml",
+    "aliases": ["sml", "ml"],
+    "name": "Standard ML",
+    "install": { "apt": ["smlnj", "rlwrap"] },
+    "repl": "rlwrap sml",
+    "input": "123 * 234;",
+    "main": "main.sml",
+    "template": "print \"Hello, world!\\n\";",
+    "run": "rlwrap sml main.sml",
+    "scope": { "code": "val x = 123 * 234;", "input": "x;" }
+  },
+  "subleq": {
+    "id": "subleq",
+    "aliases": ["sq", "asq"],
+    "name": "Subleq",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\ngit clone https://github.com/davidar/subleq.git\npushd subleq/src\nmake sq\ncp sq \"${pkg}/usr/local/bin/\"\npopd"
+    },
+    "main": "main.sq",
+    "template": "12 12 3\n36 37 6\n37 12 9\n37 37 12\n0 -1 15\n38 36 18\n12 12 21\n53 37 24\n37 12 27\n37 37 30\n36 12 -1\n37 37 0\n39 0 -1\n72 101 108\n108 111 44\n32 119 111\n114 108 100\n33 10 53",
+    "run": "sq main.sq"
+  },
+  "swift": {
+    "id": "swift",
+    "aliases": ["swiftc"],
+    "name": "Swift",
+    "monacoLang": "swift",
+    "install": {
+      "apt": ["libpython2.7"],
+      "manual": "install -d \"${pkg}/opt/swift\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nver=\"$(latest_release apple/swift | grep -Eo '[0-9.]+')\"\nwget \"https://swift.org/builds/swift-${ver}-release/ubuntu2004/swift-${ver}-RELEASE/swift-${ver}-RELEASE-ubuntu20.04.tar.gz\" -O swift.tar.gz\ntar -xf swift.tar.gz -C \"${pkg}/opt/swift\" --strip-components=2\nln -s /opt/swift/bin/swiftc /opt/swift/bin/sourcekit-lsp \"${pkg}/usr/local/bin/\""
+    },
+    "main": "main.swift",
+    "template": "print(\"Hello, world!\")",
+    "compile": "swiftc main.swift",
+    "run": "./main",
+    "lsp": { "start": "sourcekit-lsp", "code": "TODO", "item": "TODO" },
+    "skip": ["lsp"]
+  },
+  "tabloid": {
+    "id": "tabloid",
+    "name": "Tabloid",
+    "install": {
+      "scripts": {
+        "tabloid": "#!/usr/bin/env node\n\nconst fs = require(\"fs\");\n\nconst args = process.argv.slice(2);\nif (args.length !== 1) {\n  console.error(\"usage: run.js FILE\");\n  process.exit(1);\n}\n\nconst lang = require(\"/opt/tabloid/lang\");\n\nconst program = fs.readFileSync(args[0], \"utf-8\");\nconst tokens = lang.tokenize(program);\nconst parser = new lang.Parser(tokens);\nconst ast = parser.parse();\nconst runtime = { print: (s) => console.log(s.toString().toUpperCase() + \"!\") };\nconst env = new lang.Environment(runtime);\nenv.run(ast);"
+      },
+      "manual": "install -d \"${pkg}/opt/tabloid\"\n\npushd \"${pkg}/opt/tabloid\"\nwget https://github.com/thesephist/tabloid/raw/master/static/js/lang.js\ncat <<\"EOF\" >> lang.js\nmodule.exports = { tokenize, Parser, Environment };\nEOF\npopd"
+    },
+    "main": "main.tabloid",
+    "template": "YOU WON'T WANT TO MISS \"Hello, world\"\nPLEASE LIKE AND SUBSCRIBE",
+    "run": "tabloid main.tabloid",
+    "hello": "HELLO, WORLD!"
+  },
+  "tcl": {
+    "id": "tcl",
+    "aliases": ["tclsh", "tclshrc"],
+    "name": "Tcl",
+    "monacoLang": "tcl",
+    "install": { "apt": ["tcl"] },
+    "repl": "HOME=\"$PWD\" tclsh",
+    "input": "expr 123 * 234",
+    "main": ".tclshrc",
+    "template": "puts {Hello, world!}",
+    "createEmpty": "",
+    "run": "HOME=\"$PWD\" tclsh",
+    "scope": { "code": "set x [expr 123 * 234]", "input": "echo $x" }
+  },
+  "tcsh": {
+    "id": "tcsh",
+    "aliases": ["tcshell", "tcshrc", "csh"],
+    "name": "Tcsh",
+    "monacoLang": "shell",
+    "install": { "apt": ["tcsh"] },
+    "repl": "SHELL=/usr/bin/tcsh HOME=\"$PWD\" tcsh",
+    "input": "expr 123 \\* 234",
+    "main": ".tcshrc",
+    "template": "echo \"Hello, world!\"",
+    "createEmpty": "",
+    "run": "SHELL=/usr/bin/tcsh HOME=\"$PWD\" tcsh",
+    "scope": { "code": "set x=`expr 123 \\* 234`", "input": "echo \"$x\"" }
+  },
+  "teco": {
+    "id": "teco",
+    "aliases": ["mung"],
+    "name": "TECO",
+    "install": {
+      "scripts": {
+        "teco-encode": "#!/usr/bin/env -S python3 -u\n\nimport re\nimport sys\n\nfor line in sys.stdin:\n    line = re.sub(r\"\\^(.)\", lambda m: chr(ord(m.group(1)) ^ 0b1000000), line)\n    line = line.replace(\"$\", chr(27))\n    print(line, end=\"\")"
+      },
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\ngit clone https://github.com/blakemcbride/TECOC.git\npushd TECOC/src\nmake -f makefile.linux\ncp tecoc \"${pkg}/usr/local/bin/tecoc\"\nln -s /usr/local/bin/tecoc \"${pkg}/usr/local/bin/teco\"\nln -s /usr/local/bin/tecoc \"${pkg}/usr/local/bin/mung\"\npopd"
+    },
+    "repl": "teco",
+    "input": "123*234=\u001b\u001b",
+    "main": "main.txt",
+    "template": "IHello, world!\n$HT$$",
+    "compile": "cat main.txt | teco-encode > main.teco",
+    "run": "mung main.teco",
+    "scope": { "code": "123*234UX$$", "input": "QX=\u001b\u001b" }
+  },
+  "tex": {
+    "id": "tex",
+    "aliases": ["latex", "xetex", "plaintex"],
+    "name": "TeX",
+    "install": {
+      "prepare": { "apt": ["lua5.3", "liblua5.3", "luarocks"] },
+      "apt": ["lua5.3", "texlive-binaries"],
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nluarocks --tree=\"${pkg}/opt/digestif\" install digestif\n\ncat <<EOF > \"${pkg}/usr/local/bin/digestif\"\n#!/usr/bin/env bash\n\n$(luarocks --tree=/opt/digestif path)\nexec /opt/digestif/bin/digestif \"\\$@\"\nEOF\nchmod +x \"${pkg}/usr/local/bin/digestif\""
+    },
+    "repl": "tex",
+    "input": "\\newcount\\x\n\\advance\\x by 123\n\\multiply\\x by 234\n\\message{\\the\\x}",
+    "main": "main.tex",
+    "template": "\\message{Hello, world!}",
+    "run": "tex main.tex",
+    "scope": {
+      "code": "\\newcount\\x\n\\advance\\x by 123\n\\multiply\\x by 234",
+      "input": "\\message{\\the\\x}"
+    },
+    "lsp": {
+      "start": "digestif",
+      "lang": "tex",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "textile": {
+    "id": "textile",
+    "name": "Textile",
+    "install": { "apt": ["pandoc"], "riju": ["prettier"] },
+    "main": "main.textile",
+    "template": "Hello, world!",
+    "compile": "pandoc main.textile -o main.html",
+    "run": "prettier --no-config main.html"
+  },
+  "thue": {
+    "id": "thue",
+    "name": "Thue",
+    "install": {
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\nwget \"$(curl -sSL https://catseye.tc/distribution/Thue_distribution | grep -Eo 'https://catseye.tc/distfiles/thue-[^\"]+\\.zip' | head -n1)\" -O thue.zip\nunzip thue.zip\npushd thue-*\n./build.sh\ncp bin/thue \"${pkg}/usr/local/bin/\"\npopd"
+    },
+    "main": "main.thue",
+    "template": "a::=~Hello, world!\n::=\na",
+    "run": "thue main.thue"
+  },
+  "tikiwiki": {
+    "id": "tikiwiki",
+    "aliases": ["tiki"],
+    "name": "Tiki Wiki",
+    "install": { "apt": ["pandoc"], "riju": ["prettier"] },
+    "main": "main.txt",
+    "template": "Hello, world!",
+    "compile": "pandoc main.txt -f tikiwiki -o main.html",
+    "run": "prettier --no-config main.html"
+  },
+  "toml": {
+    "id": "toml",
+    "aliases": ["tom"],
+    "name": "TOML",
+    "install": { "riju": ["yj"] },
+    "main": "main.toml",
+    "template": "output = \"Hello, world!\"",
+    "compile": "cat main.toml | yj -tj > main.json",
+    "run": "cat main.json | jq ."
+  },
+  "twiki": {
+    "id": "twiki",
+    "name": "TWiki",
+    "install": { "apt": ["pandoc"], "riju": ["prettier"] },
+    "main": "main.txt",
+    "template": "Hello, world!",
+    "compile": "pandoc main.txt -f twiki -o main.html",
+    "run": "prettier --no-config main.html"
+  },
+  "typescript": {
+    "id": "typescript",
+    "aliases": ["ts", "tsnode", "tsc"],
+    "name": "TypeScript",
+    "monacoLang": "typescript",
+    "install": { "riju": ["prettier"], "npm": ["typescript", "ts-node"] },
+    "repl": "ts-node",
+    "main": "main.ts",
+    "template": "console.log(\"Hello, world!\");",
+    "run": "ts-node -i -e \"$(< main.ts)\"",
+    "scope": { "code": "let x = 123 * 234;" },
+    "format": {
+      "run": "prettier --no-config --stdin-filepath=format.ts",
+      "input": "console.log('Hello, world!');"
+    }
+  },
+  "unison": {
+    "id": "unison",
+    "aliases": ["ucm"],
+    "name": "Unison",
+    "install": {
+      "prepare": { "apt": ["haskell-stack"] },
+      "manual": "mkdir -p \"${pkg}/opt/unison/skel\"\ninstall -d \"${pkg}/usr/local/bin\"\n\ngit clone https://github.com/unisonweb/unison.git\npushd unison\nstack build\ncp \"$(stack exec which unison)\" \"${pkg}/usr/local/bin/\"\npopd\n\npushd \"${pkg}/opt/unison/skel\"\n\"${pkg}/usr/local/bin/unison\" -codebase . init\nLESS=\"+q\" \"${pkg}/usr/local/bin/unison\" -codebase . <<< 'pull https://github.com/unisonweb/base:.trunk .base'\npopd"
+    },
+    "setup": "shopt -s dotglob\ncp -R /opt/unison/skel/* ./",
+    "repl": "unison -codebase .",
+    "input": "DELAY: 10\nfind : [a] -> [a]",
+    "output": "base.List.reverse",
+    "main": "main.u",
+    "template": "use io\n\nrunProg: '{IO, Exception} a -> '{IO} ()\nrunProg f = 'let\n  printErr err = match err with\n    Failure _ errMsg _ -> handle putBytes (stdHandle StdErr) (toUtf8 errMsg) with cases\n      {raise _ -> _} -> ()\n      {_} -> ()\n  match catch f with\n    Left err -> printErr err\n    Right _ -> ()\n\nmain: '{IO} ()\nmain = runProg 'let\n  printLine \"Hello, world!\"",
+    "createEmpty": "",
+    "run": "unison -codebase . run.file main.u main\necho \"Type 'load main.u' at the repl prompt to bring variables into scope.\"\nunison -codebase .",
+    "scope": {
+      "code": "x = 123 * 234",
+      "input": "DELAY: 5\nload main.u\nDELAY: 5\nadd x\nDELAY: 5\ndisplay x"
+    },
+    "timeoutFactor": 2
+  },
+  "unlambda": {
+    "id": "unlambda",
+    "aliases": ["unl"],
+    "name": "Unlambda",
+    "install": {
+      "apt": ["unlambda"],
+      "scripts": {
+        "unlambda-repl": "#!/usr/bin/env python3\nimport argparse\nimport readline\nimport subprocess\n\nparser = argparse.ArgumentParser()\nparser.add_argument(\"file\", nargs=\"?\")\nargs = parser.parse_args()\n\nif args.file:\n    with open(args.file) as f:\n        subprocess.run([\"unlambda\"], input=f.read(), encoding=\"utf-8\")\nwhile True:\n    try:\n        code = input(\"λ> \")\n    except KeyboardInterrupt:\n        print(\"^C\")\n        continue\n    except EOFError:\n        print(\"^D\")\n        break\n    if not code:\n        continue\n    subprocess.run([\"unlambda\"], input=code, encoding=\"utf-8\")"
+      }
+    },
+    "repl": "unlambda-repl",
+    "input": "`.2`.8`.7`.8`.2i",
+    "main": "main.unl",
+    "template": "`.\n`.!`.d`.l`.r`.o`.w`. `.,`.o`.l`.l`.e`.Hi",
+    "run": "unlambda-repl main.unl"
+  },
+  "vala": {
+    "id": "vala",
+    "aliases": ["valac"],
+    "name": "Vala",
+    "install": { "apt": ["valac"] },
+    "main": "main.vala",
+    "template": "void main () {\n    print(\"Hello, world!\\n\");\n}",
+    "compile": "valac main.vala",
+    "run": "./main"
+  },
+  "velato": {
+    "id": "velato",
+    "aliases": ["vlt"],
+    "name": "Velato",
+    "install": {
+      "apt": ["mono-runtime"],
+      "manual": "install -d \"${pkg}/opt/velato\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nfile=\"$(curl -fsSL http://velato.net/ | grep -Eo 'Velato[0-9_]+.zip')\"\nwget \"http://velato.net/Content/Velato/${file}\" -O velato.zip\nunzip -d \"${pkg}/opt/velato\" velato.zip\n\nwget http://www.archduke.org/midi/asc2mid.c\nclang asc2mid.c -o \"${pkg}/usr/local/bin/asc2mid\""
+    },
+    "main": "main.asc",
+    "template": "format=1 tracks=2 division=2880\n\nBA    1   CR         0   TR  0   CH 16   Tempo 100\nBA    1   CR         0   TR  1   CH  1   NT  C--           4/5   von=101   voff=0\nBA    1   CR         0   TR  1   CH  1   NT  A             4/5   voff=0\nBA    1   CR         0   TR  1   CH  1   NT  G-            4/5   voff=0\nBA    1   CR         0   TR  1   CH  1   NT  E-            4/5   voff=0\n\nBA    2   CR         0   TR  1   CH  1   NT  F-            4/5   voff=0\nBA    2   CR         0   TR  1   CH  1   NT  A-            4/5   voff=0\nBA    2   CR         0   TR  1   CH  1   NT  Eb            4/5   voff=0\n\nBA    3   CR       1/2   TR  1   CH  1   NT  G-         3+7/20   voff=0\nBA    3   CR       1/2   TR  1   CH  1   NT  C          3+7/20   voff=0\n\nBA    5   CR         0   TR  1   CH  1   NT  C-            1/5   voff=0\nBA    5   CR       1/4   TR  1   CH  1   NT  D             1/5   voff=0\nBA    5   CR       1/2   TR  1   CH  1   NT  F             1/5   voff=0\nBA    5   CR       3/4   TR  1   CH  1   NT  F--           2/5   voff=0\nBA    5   CR       3/4   TR  1   CH  1   NT  D             2/5   voff=0\nBA    5   CR       3/4   TR  1   CH  1   NT  C-            2/5   voff=0\nBA    5   CR       3/4   TR  1   CH  1   NT  A-            2/5   voff=0\n\nBA    6   CR       1/4   TR  1   CH  1   NT  Bb            4/5   voff=0\nBA    6   CR       1/4   TR  1   CH  1   NT  G--           4/5   voff=0\nBA    6   CR       1/4   TR  1   CH  1   NT  F#-           4/5   voff=0\n\nBA    7   CR       3/4   TR  1   CH  1   NT  G-         3+7/20   voff=0\nBA    7   CR       3/4   TR  1   CH  1   NT  C          3+7/20   voff=0\n\nBA    9   CR       1/4   TR  1   CH  1   NT  F-            1/5   voff=0\nBA    9   CR       1/2   TR  1   CH  1   NT  G             1/5   voff=0\nBA    9   CR       3/4   TR  1   CH  1   NT  Bb            1/5   voff=0\n\nBA   10   CR         0   TR  1   CH  1   NT  Bb--          2/5   voff=0\nBA   10   CR         0   TR  1   CH  1   NT  G             2/5   voff=0\nBA   10   CR         0   TR  1   CH  1   NT  F-            2/5   voff=0\nBA   10   CR         0   TR  1   CH  1   NT  D-            2/5   voff=0\nBA   10   CR       1/2   TR  1   CH  1   NT  Eb            4/5   voff=0\nBA   10   CR       1/2   TR  1   CH  1   NT  C-            4/5   voff=0\nBA   10   CR       1/2   TR  1   CH  1   NT  B-            4/5   voff=0\n\nBA   11   CR       1/2   TR  1   CH  1   NT  G#            2/5   voff=0\n\nBA   12   CR         0   TR  1   CH  1   NT  F             4/5   voff=0\nBA   12   CR         0   TR  1   CH  1   NT  Bb            4/5   voff=0\n\nBA   13   CR         0   TR  1   CH  1   NT  Bb-           2/5   voff=0\nBA   13   CR       1/2   TR  1   CH  1   NT  Bb--          1/5   voff=0\nBA   13   CR       3/4   TR  1   CH  1   NT  G             1/5   voff=0\n\nBA   14   CR         0   TR  1   CH  1   NT  F-            1/5   voff=0\nBA   14   CR       1/4   TR  1   CH  1   NT  D-            1/5   voff=0\nBA   14   CR       1/2   TR  1   CH  1   NT  Eb            4/5   voff=0\nBA   14   CR       1/2   TR  1   CH  1   NT  C-            4/5   voff=0\nBA   14   CR       1/2   TR  1   CH  1   NT  B-            4/5   voff=0\n\nBA   15   CR       1/2   TR  1   CH  1   NT  G#            2/5   voff=0\n\nBA   16   CR         0   TR  1   CH  1   NT  F             4/5   voff=0\nBA   16   CR         0   TR  1   CH  1   NT  Bb            4/5   voff=0\n\nBA   17   CR         0   TR  1   CH  1   NT  Bb-           4/5   voff=0\n\nBA   18   CR         0   TR  1   CH  1   NT  Bb-           2/5   voff=0\nBA   18   CR       1/2   TR  1   CH  1   NT  C-            4/5   voff=0\nBA   18   CR       1/2   TR  1   CH  1   NT  C             4/5   voff=0\n\nBA   19   CR       1/2   TR  1   CH  1   NT  C--         3+2/5   voff=0\nBA   19   CR       1/2   TR  1   CH  1   NT  A           3+2/5   voff=0\nBA   19   CR       1/2   TR  1   CH  1   NT  G-          3+2/5   voff=0\nBA   19   CR       1/2   TR  1   CH  1   NT  E-          3+2/5   voff=0\n\nBA   21   CR         0   TR  1   CH  1   NT  F-            4/5   voff=0\nBA   21   CR         0   TR  1   CH  1   NT  D             4/5   voff=0\n\nBA   22   CR         0   TR  1   CH  1   NT  D             2/5   voff=0\nBA   22   CR       1/2   TR  1   CH  1   NT  D             2/5   voff=0\nBA   22   CR       1/2   TR  1   CH  1   NT  G-            2/5   voff=0\nBA   22   CR       1/2   TR  1   CH  1   NT  C             2/5   voff=0\n\nBA   23   CR         0   TR  1   CH  1   NT  C--           2/5   voff=0\nBA   23   CR       1/2   TR  1   CH  1   NT  A           1+3/5   voff=0\nBA   23   CR       1/2   TR  1   CH  1   NT  G-          1+3/5   voff=0\n\nBA   25   CR       1/2   TR  1   CH  1   NT  E             2/5   voff=0\nBA   25   CR       1/2   TR  1   CH  1   NT  F-         2+7/10   voff=0\nBA   25   CR       1/2   TR  1   CH  1   NT  F--        2+7/10   voff=0\n\nBA   27   CR         0   TR  1   CH  1   NT  F          3+7/10   voff=0\nBA   27   CR         0   TR  1   CH  1   NT  G-         5+9/20   voff=0\nBA   27   CR         0   TR  1   CH  1   NT  C          5+9/20   voff=0\n\nBA   30   CR         0   TR  1   CH  1   NT  C-            1/5   voff=0\nBA   30   CR       1/4   TR  1   CH  1   NT  D             1/5   voff=0\nBA   30   CR       1/2   TR  1   CH  1   NT  F             1/5   voff=0\nBA   30   CR       3/4   TR  1   CH  1   NT  F             4/5   voff=0\n\nBA   31   CR       3/4   TR  1   CH  1   NT  F-            2/5   voff=0\n\nBA   32   CR       1/4   TR  1   CH  1   NT  F--           2/5   voff=0\nBA   32   CR       1/4   TR  1   CH  1   NT  D             2/5   voff=0\nBA   32   CR       1/4   TR  1   CH  1   NT  C-            2/5   voff=0\nBA   32   CR       1/4   TR  1   CH  1   NT  A-            2/5   voff=0\nBA   32   CR       3/4   TR  1   CH  1   NT  Bb            4/5   voff=0\n\nBA   33   CR       3/4   TR  1   CH  1   NT  A             2/5   voff=0\n\nBA   34   CR       1/4   TR  1   CH  1   NT  G#-        3+7/20   voff=0\nBA   34   CR       1/4   TR  1   CH  1   NT  C          3+7/20   voff=0\n\nBA   35   CR       3/4   TR  1   CH  1   NT  F-            1/5   voff=0\n\nBA   36   CR         0   TR  1   CH  1   NT  G             1/5   voff=0\nBA   36   CR       1/4   TR  1   CH  1   NT  Bb            1/5   voff=0\nBA   36   CR       1/2   TR  1   CH  1   NT  Bb--          2/5   voff=0\nBA   36   CR       1/2   TR  1   CH  1   NT  G             2/5   voff=0\nBA   36   CR       1/2   TR  1   CH  1   NT  F-            2/5   voff=0\nBA   36   CR       1/2   TR  1   CH  1   NT  D-            2/5   voff=0\n\nBA   37   CR         0   TR  1   CH  1   NT  Eb            4/5   voff=0\nBA   37   CR         0   TR  1   CH  1   NT  G#            4/5   voff=0\n\nBA   38   CR         0   TR  1   CH  1   NT  G             2/5   voff=0\nBA   38   CR       1/2   TR  1   CH  1   NT  F             4/5   voff=0\nBA   38   CR       1/2   TR  1   CH  1   NT  Bb            4/5   voff=0\n\nBA   39   CR       1/2   TR  1   CH  1   NT  Bb-           2/5   voff=0\n\nBA   40   CR         0   TR  1   CH  1   NT  Bb-           2/5   voff=0\nBA   40   CR       1/2   TR  1   CH  1   NT  C-            4/5   voff=0\nBA   40   CR       1/2   TR  1   CH  1   NT  C             4/5   voff=0\n\nBA   41   CR       1/2   TR  1   CH  1   NT  C--         3+2/5   voff=0\nBA   41   CR       1/2   TR  1   CH  1   NT  A           3+2/5   voff=0\nBA   41   CR       1/2   TR  1   CH  1   NT  G-          3+2/5   voff=0\nBA   41   CR       1/2   TR  1   CH  1   NT  E-          3+2/5   voff=0\n\nBA   43   CR         0   TR  1   CH  1   NT  F-            4/5   voff=0\nBA   43   CR         0   TR  1   CH  1   NT  D             4/5   voff=0\n\nBA   44   CR         0   TR  1   CH  1   NT  D             2/5   voff=0\nBA   44   CR       1/2   TR  1   CH  1   NT  D             4/5   voff=0\nBA   44   CR       1/2   TR  1   CH  1   NT  G-            2/5   voff=0\nBA   44   CR       1/2   TR  1   CH  1   NT  C             4/5   voff=0\n\nBA   45   CR       1/2   TR  1   CH  1   NT  C--         3+2/5   voff=0\nBA   45   CR       1/2   TR  1   CH  1   NT  A           3+2/5   voff=0\nBA   45   CR       1/2   TR  1   CH  1   NT  G-          3+2/5   voff=0\nBA   45   CR       1/2   TR  1   CH  1   NT  E-          3+2/5   voff=0\n\nBA   47   CR         0   TR  1   CH  1   NT  F-            4/5   voff=0\nBA   47   CR         0   TR  1   CH  1   NT  D             4/5   voff=0\n\nBA   48   CR         0   TR  1   CH  1   NT  D             2/5   voff=0\nBA   48   CR       1/2   TR  1   CH  1   NT  F             4/5   voff=0\nBA   48   CR       1/2   TR  1   CH  1   NT  G             4/5   voff=0\nBA   48   CR       1/2   TR  1   CH  1   NT  C-            4/5   voff=0\n\nBA   49   CR       1/2   TR  1   CH  1   NT  C-            1/5   voff=0\nBA   49   CR       3/4   TR  1   CH  1   NT  D             1/5   voff=0\n\nBA   50   CR         0   TR  1   CH  1   NT  Bb            1/5   voff=0\nBA   50   CR       1/4   TR  1   CH  1   NT  Bb            2/5   voff=0\nBA   50   CR       3/4   TR  1   CH  1   NT  Bb-           4/5   voff=0\n\nBA   51   CR       3/4   TR  1   CH  1   NT  Bb            4/5   voff=0\n\nBA   52   CR       3/4   TR  1   CH  1   NT  Bb--          2/5   voff=0\nBA   52   CR       3/4   TR  1   CH  1   NT  G             2/5   voff=0\nBA   52   CR       3/4   TR  1   CH  1   NT  F-            2/5   voff=0\nBA   52   CR       3/4   TR  1   CH  1   NT  D-            2/5   voff=0\n\nBA   53   CR       1/4   TR  1   CH  1   NT  Eb            2/5   voff=0\nBA   53   CR       1/4   TR  1   CH  1   NT  C-            2/5   voff=0\nBA   53   CR       1/4   TR  1   CH  1   NT  B             2/5   voff=0\nBA   53   CR       3/4   TR  1   CH  1   NT  G#-           4/5   voff=0\n\nBA   54   CR       3/4   TR  1   CH  1   NT  F-            4/5   voff=0\nBA   54   CR       3/4   TR  1   CH  1   NT  Bb-           4/5   voff=0\n\nBA   55   CR       3/4   TR  1   CH  1   NT  Bb-           2/5   voff=0\n\nBA   56   CR       1/4   TR  1   CH  1   NT  Bb-           4/5   voff=0\n\nBA   57   CR       1/4   TR  1   CH  1   NT  Bb--          2/5   voff=0\nBA   57   CR       1/4   TR  1   CH  1   NT  G             2/5   voff=0\nBA   57   CR       1/4   TR  1   CH  1   NT  F-            2/5   voff=0\nBA   57   CR       1/4   TR  1   CH  1   NT  D-            2/5   voff=0\nBA   57   CR       3/4   TR  1   CH  1   NT  Eb            2/5   voff=0\nBA   57   CR       3/4   TR  1   CH  1   NT  C-            2/5   voff=0\nBA   57   CR       3/4   TR  1   CH  1   NT  B-            2/5   voff=0\n\nBA   58   CR       1/4   TR  1   CH  1   NT  B             2/5   voff=0\nBA   58   CR       3/4   TR  1   CH  1   NT  F             4/5   voff=0\nBA   58   CR       3/4   TR  1   CH  1   NT  Bb            4/5   voff=0\n\nBA   59   CR       3/4   TR  1   CH  1   NT  Bb-           2/5   voff=0\n\nBA   60   CR       1/4   TR  1   CH  1   NT  Bb-           2/5   voff=0\nBA   60   CR       3/4   TR  1   CH  1   NT  C-            4/5   voff=0\nBA   60   CR       3/4   TR  1   CH  1   NT  C             4/5   voff=0\n\nBA   61   CR       3/4   TR  1   CH  1   NT  C--       3+19/20   voff=0\nBA   61   CR       3/4   TR  1   CH  1   NT  A         3+19/20   voff=0\nBA   61   CR       3/4   TR  1   CH  1   NT  G-        3+19/20   voff=0\n\nBA   63   CR       1/4   TR  1   CH  1   NT  E-            1/5   voff=0\nBA   63   CR       1/2   TR  1   CH  1   NT  F-            1/5   voff=0\nBA   63   CR       3/4   TR  1   CH  1   NT  E-        1+11/20   voff=0\n\nBA   64   CR       1/2   TR  1   CH  1   NT  E           3+1/5   voff=0\nBA   64   CR       1/2   TR  1   CH  1   NT  G-          1+1/5   voff=0\nBA   64   CR       1/2   TR  1   CH  1   NT  C           3+1/5   voff=0\n\nBA   67   CR      7/10   TR  1   CH 16   End of track",
+    "compile": "asc2mid main.asc > main.mid\nmono /opt/velato/Vlt.exe /s main.mid",
+    "run": "mono main.exe",
+    "hello": "Hello, World!"
+  },
+  "verilog": {
+    "id": "verilog",
+    "aliases": ["systemverilog", "iverilog", "v"],
+    "name": "Verilog",
+    "install": { "apt": ["iverilog"] },
+    "main": "main.v",
+    "template": "module main;\n\ninitial begin\n  $display(\"Hello, world!\");\nend\n\nendmodule",
+    "compile": "iverilog main.v -o main",
+    "run": "./main"
+  },
+  "vimscript": {
+    "id": "vimscript",
+    "aliases": ["vim", "viml"],
+    "name": "Vimscript",
+    "install": { "apt": ["vim"], "npm": ["vim-language-server"] },
+    "repl": "vim",
+    "input": ":echo 123 * 234",
+    "main": "main.vim",
+    "template": ":echo \"Hello, world!\"",
+    "run": "vim -c \"$(< main.vim)\"",
+    "scope": { "code": ":let x = 123 * 234", "input": ":echo x" },
+    "lsp": {
+      "start": "vim-language-server --stdio",
+      "code": "TODO",
+      "item": "TODO"
+    },
+    "skip": ["lsp"]
+  },
+  "vimwiki": {
+    "id": "vimwiki",
+    "name": "Vimwiki",
+    "install": { "apt": ["pandoc"], "riju": ["prettier"] },
+    "main": "main.txt",
+    "template": "Hello, world!",
+    "compile": "pandoc main.txt -f vimwiki -o main.html",
+    "run": "prettier --no-config main.html"
+  },
+  "visualbasic": {
+    "id": "visualbasic",
+    "aliases": ["vbasic", "vb", "vbnc", "vba"],
+    "name": "Visual Basic",
+    "monacoLang": "vb",
+    "install": { "apt": ["mono-vbnc", "mono-runtime"] },
+    "main": "main.vb",
+    "template": "Module Main\n    Sub Main(args As String())\n        Console.WriteLine(\"Hello, world!\")\n    End Sub\nEnd Module",
+    "compile": "vbnc main.vb",
+    "run": "mono main.exe"
+  },
+  "whitespace": {
+    "id": "whitespace",
+    "aliases": ["ws"],
+    "name": "Whitespace",
+    "install": { "pip": ["whitespace"] },
+    "main": "main.ws",
+    "template": "Hello, world  \t  \t   \n\t\n     \t\t  \t \t\n\t\n     \t\t \t\t  \n\t\n     \t\t \t\t  \n\t\n     \t\t \t\t\t\t\n\t\n     \t \t\t  \n\t\n     \t     \n\t\n     \t\t\t \t\t\t\n\t\n     \t\t \t\t\t\t\n\t\n     \t\t\t  \t \n\t\n     \t\t \t\t  \n\t\n     \t\t  \t  \n\t\n  \n\n",
+    "run": "whitespace main.ws",
+    "hello": "Hello, world"
+  },
+  "wolframlanguage": {
+    "id": "wolframlanguage",
+    "aliases": [
+      "wolfram",
+      "mathematica",
+      "mathics",
+      "wolframmathematica",
+      "wls",
+      "expreduce",
+      "symja"
+    ],
+    "name": "Wolfram Language",
+    "install": { "pip": ["Mathics3"] },
+    "repl": "mathics",
+    "main": "main.wls",
+    "template": "Print[\"Hello, world!\"]",
+    "run": "mathics --persist main.wls",
+    "scope": { "code": "x = 123 * 234" }
+  },
+  "x86": {
+    "id": "x86",
+    "aliases": ["s", "asm", "assembly", "x86-64"],
+    "name": "x86",
+    "main": "main.S",
+    "template": "\t.text\n\t.globl main\nmain:\n\tmovq $1, %rax\n\tmovq $1, %rdi\n\tleaq message(%rip), %rsi\n\tmovq $14, %rdx\n\tsyscall\n\tmovq $60, %rax\n\tmovq $0, %rdi\n\tsyscall\n\t.data\nmessage:\n\t.string \"Hello, world!\\n\"",
+    "compile": "clang main.S -o main",
+    "run": "./main"
+  },
+  "xslt": {
+    "id": "xslt",
+    "aliases": ["xsltproc", "xsl"],
+    "name": "XSLT",
+    "install": { "apt": ["xsltproc"] },
+    "main": "main.xsl",
+    "template": "<?xml-stylesheet type=\"text/xml\" href=\"#style\"?>\n<main>\n  <xsl:stylesheet xml:id=\"style\"\n                  xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n                  version=\"1.0\">\n    <xsl:template match=\"main\">\n      <xsl:value-of select=\"data\"/>\n    </xsl:template>\n  </xsl:stylesheet>\n  <data>Hello, world!</data>\n</main>",
+    "compile": "xsltproc main.xsl -o main",
+    "run": "cat main"
+  },
+  "yaml": {
+    "id": "yaml",
+    "aliases": ["yml"],
+    "name": "YAML",
+    "monacoLang": "yaml",
+    "install": { "apt": ["jq"], "riju": ["prettier", "yj"] },
+    "main": "main.yaml",
+    "template": "output: \"Hello, world!\"",
+    "compile": "cat main.yaml | yj -yj > main.json",
+    "run": "cat main.json | jq .",
+    "format": {
+      "run": "prettier --no-config --stdin-filepath=format.yaml",
+      "input": "output: 'Hello, world!'"
+    }
+  },
+  "yoptascript": {
+    "id": "yoptascript",
+    "aliases": ["yopta"],
+    "name": "YoptaScript",
+    "info": {
+      "year": 2016,
+      "desc": "The world's first scripting programming language for gopniks and real boys",
+      "ext": "yopta",
+      "web": {
+        "home": "https://yopta.space/",
+        "source": "https://github.com/samgozman/YoptaScript"
+      },
+      "category": "general",
+      "mode": "interpreted",
+      "platform": "nodejs",
+      "syntax": "c",
+      "typing": "dynamic",
+      "paradigm": ["functional", "imperative", "oo"],
+      "usage": []
+    },
+    "install": {
+      "npm": ["yopta"],
+      "scripts": {
+        "yopta": "#!/usr/bin/env -S NODE_PATH=/opt/yopta/lib/node_modules node\nconst fs = require(\"fs\");\nconst repl = require(\"repl\");\n\nconst args = process.argv.slice(2);\nif (args.length > 1) {\n  console.error(\"usage: yopta [FILE]\");\n  process.exit(1);\n}\n\nconst program = args.length === 1 ? fs.readFileSync(args[0], \"utf-8\") : null;\n\nrequire(\"yopta\");\n\nif (program !== null) {\n  eval(yopta(program));\n}\n\nrepl.start({prompt: \"yopta> \", eval: (cmd, context, filename, callback) => callback(null, eval(yopta(cmd)))});"
+      }
+    },
+    "repl": "yopta",
+    "main": "main.yopta",
+    "template": "красноглазое.чмо(\"Привет мир!\") нах",
+    "hello": "Привет мир!",
+    "run": "yopta main.yopta",
+    "scope": { "code": "x = 123 * 234" }
+  },
+  "yorick": {
+    "id": "yorick",
+    "name": "Yorick",
+    "install": { "apt": ["yorick", "rlwrap"] },
+    "repl": "rlwrap yorick",
+    "main": "main.i",
+    "template": "write, \"Hello, world!\"",
+    "run": "echo \"Type '#include \\\"main.i\\\"' to run the code.\"\nrlwrap yorick",
+    "helloInput": "#include \"main.i\"",
+    "scope": { "code": "x = 123 * 234", "input": "#include \"main.i\"\nx" }
+  },
+  "zig": {
+    "id": "zig",
+    "name": "Zig",
+    "info": {
+      "year": 2016,
+      "desc": "General-purpose programming language and toolchain for maintaining robust, optimal, and reusable software",
+      "ext": ["zig"],
+      "web": {
+        "wiki": "https://en.wikipedia.org/wiki/Zig_(programming_language)",
+        "home": "https://ziglang.org/",
+        "source": "https://github.com/ziglang/zig"
+      },
+      "category": "general",
+      "mode": "compiled",
+      "platform": [],
+      "syntax": "lua",
+      "typing": "static",
+      "paradigm": ["imperative"],
+      "usage": []
+    },
+    "install": {
+      "prepare": { "apt": ["squashfs-tools"] },
+      "manual": "install -d \"${pkg}/opt\"\ninstall -d \"${pkg}/usr/local/bin\"\n\nurl=\"$(curl -fsSL -H \"X-Ubuntu-Series: 16\" \"https://api.snapcraft.io/api/v1/snaps/details/zig?channel=beta\" | jq .download_url -r)\"\nwget \"${url}\" -O zip.snap\nunsquashfs -d \"${pkg}/opt/zig\" zip.snap\nln -s /opt/zig/zig \"${pkg}/usr/local/bin/\""
+    },
+    "main": "main.zig",
+    "template": "const std = @import(\"std\");\n\npub fn main() anyerror!void {\n    std.log.info(\"Hello, world!\", .{});\n}",
+    "run": "zig run main.zig"
+  },
+  "zoem": {
+    "id": "zoem",
+    "aliases": ["azm"],
+    "name": "Zoem",
+    "install": { "apt": ["zoem"] },
+    "repl": "zoem",
+    "input": "\\let{123 * 234}\n.",
+    "main": "main.azm",
+    "template": "\\inform{Hello, world!}",
+    "run": "zoem -I main.azm; zoem"
+  },
+  "zot": {
+    "id": "zot",
+    "name": "Zot",
+    "install": {
+      "prepare": { "apt": ["qt5-qmake", "qtscript5-dev"] },
+      "apt": ["libqt5script5"],
+      "manual": "install -d \"${pkg}/usr/local/bin\"\n\ngit clone https://github.com/manyoso/zot.git\npushd zot\n./build.sh\ncp build/bin/zot \"${pkg}/usr/local/bin/\"\npopd"
+    },
+    "main": "main.zot",
+    "template": "111101010100111010101001001101010010010011101010100111010101\n001101010010101010011101010100110101001101010100110101001010\n101001110101010011101010100110101001010101001110101010011010\n100110101010011010100101010100111010101001101010011010101001\n101010011010101001110101010011101010100111010101001110101010\n010011010100100110101001001101010010011010100101010011101010\n100110101001101010100110101001101010100110101001010100111010\n101001110101010011010100101010100111010101001101010011010101\n001101010010101010011101010100110101001101010100111010101001\n101010010101010010101001110101010011010100101010011101010100\n111010101001101010010101010011101010100110101001010100111010\n101001101010010101010010101001101010011101010100110101001101\n010100100101010011010100101010011101010100110101001101010100\n110101001101010100110101001010100111010101001110101010011010\n100101010100111010101001101010011010101001101010010101010011\n101010100110101001101010100111010101001101010010101010010101\n001110101010011010100101010011101010100111010101001101010010\n101010011101010100110101001010100111010101001101010010101010\n010101001101010011101010100110101001101010100100101010011010\n100101010011101010100110101001010100101010001010000100001000\n010011000110110010011101111011011101110000001000011010011110\n11000110110001101101010011000010010",
+    "run": "zot --file main.zot",
+    "hello": "0100100001100101011011000110110001101111001011000010000001110111011011110111001001101100011001000010000100001010"
+  },
+  "zsh": {
+    "id": "zsh",
+    "aliases": ["zshell", "zshrc"],
+    "name": "Zsh",
+    "monacoLang": "shell",
+    "install": { "apt": ["zsh", "zsh-doc"] },
+    "repl": "SHELL=/usr/bin/zsh HOME=\"$PWD\" zsh",
+    "input": "expr 123 \\* 234",
+    "main": ".zshrc",
+    "template": "echo \"Hello, world!\"",
+    "createEmpty": "",
+    "run": "SHELL=/usr/bin/zsh HOME=\"$PWD\" zsh",
+    "scope": { "code": "x=\"$(expr 123 \\* 234)\"", "input": "echo \"$x\"" }
+  }
+}
