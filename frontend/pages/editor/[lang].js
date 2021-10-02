@@ -389,12 +389,13 @@ const CodeRunner = (props) => {
             <Chip
               size="small"
               variant="outlined"
+              color="info"
               sx={{
                 fontSize: "0.7rem",
                 alignSelf: "center",
                 height: "16px",
               }}
-              label={connectionStatus}
+              label={status}
             />
           </Box>
           <LoadingButton
