@@ -12,7 +12,6 @@ import {
   Box,
   Button,
   Chip,
-  Divider,
   Stack,
   ToggleButton,
   ToggleButtonGroup,
@@ -416,18 +415,20 @@ const CodeRunner = (props) => {
       >
         <Stack
           direction="row"
-          alignItems="stretch"
+          alignItems="center"
+          justifyContent="space-between"
           sx={{
             boxShadow: `0 2px 4px rgb(0 0 0 / 10%)`,
             zIndex: (t) => t.zIndex.appBar,
+            height: "48px",
+            p: "0 24px",
           }}
         >
-          <Stack direction="row" sx={{ flexGrow: 1 }} alignItems="stretch">
+          <Stack direction="row" alignItems="center" gap={2}>
             <Button
               variant="contained"
-              sx={{ borderRadius: 0, minWidth: 0 }}
               disableElevation
-              size="small"
+              size="medium"
               color="primary"
               onClick={() => {
                 router.push("/");
@@ -435,10 +436,7 @@ const CodeRunner = (props) => {
             >
               <Home fontSize={"small"} />
             </Button>
-            <Typography
-              sx={{ fontSize: 14, px: 2, fontWeight: 600, alignSelf: "center" }}
-              textAlign="center"
-            >
+            <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
               {config.name}
             </Typography>
             <Chip
@@ -447,97 +445,93 @@ const CodeRunner = (props) => {
               color={status != "idle" ? "info" : "default"}
               sx={{
                 fontSize: "0.7rem",
-                alignSelf: "center",
                 height: "16px",
               }}
               label={status}
             />
           </Stack>
-          <LoadingButton
-            onClick={handleLspClick}
-            size="small"
-            variant="text"
-            loading={isLspRequested}
-            sx={{
-              borderRadius: 0,
-              visibility: config.lsp ? "visible" : "hidden",
-              mr: 1,
-              color: (t) =>
-                isLspStarted ? t.palette.success.main : t.palette.text.disabled,
-            }}
-            disableElevation
-            endIcon={
-              <Circle
-                fontSize="small"
-                sx={{
-                  color: "inherit",
-                  fontSize: "0.6em !important",
-                }}
-              />
-            }
-          >
-            <Typography sx={{ fontSize: 12 }}>Autocomplete</Typography>
-          </LoadingButton>
-          <ToggleButtonGroup
-            size="small"
-            value={splitType}
-            color="primary"
-            exclusive
-            onChange={handleLayout}
-            aria-label="split type"
-            sx={{ mr: 1 }}
-          >
-            <ToggleButton
-              value="vertical"
-              aria-label="vertical split"
-              sx={{ borderRadius: 0 }}
+          <Stack direction="row" gap={1} alignItems="center">
+            <LoadingButton
+              onClick={handleLspClick}
+              size="medium"
+              variant="text"
+              loading={isLspRequested}
+              sx={{
+                visibility: config.lsp ? "visible" : "hidden",
+                mr: 1,
+                color: (t) =>
+                  isLspStarted
+                    ? t.palette.success.main
+                    : t.palette.text.disabled,
+              }}
+              disableElevation
+              endIcon={
+                <Circle
+                  fontSize="small"
+                  sx={{
+                    color: "inherit",
+                    fontSize: "0.6em !important",
+                  }}
+                />
+              }
             >
-              <VerticalSplit fontSize="small" />
-            </ToggleButton>
-            <ToggleButton
-              value="horizontal"
-              aria-label="horizontal split"
-              sx={{ borderRadius: 0 }}
+              <Typography sx={{ fontSize: 12 }}>Autocomplete</Typography>
+            </LoadingButton>
+            <ToggleButtonGroup
+              size="small"
+              value={splitType}
+              color="primary"
+              exclusive
+              onChange={handleLayout}
+              aria-label="split type"
             >
-              <HorizontalSplit fontSize="small" />
-            </ToggleButton>
-          </ToggleButtonGroup>
+              <ToggleButton
+                value="vertical"
+                aria-label="vertical split"
+                sx={{ border: "none" }}
+              >
+                <VerticalSplit fontSize="small" />
+              </ToggleButton>
+              <ToggleButton
+                value="horizontal"
+                aria-label="horizontal split"
+                sx={{ border: "none" }}
+              >
+                <HorizontalSplit fontSize="small" />
+              </ToggleButton>
+            </ToggleButtonGroup>
 
-          <LoadingButton
-            onClick={sendFormat}
-            loading={isFormatting}
-            size="small"
-            color="primary"
-            variant="contained"
-            sx={{
-              borderRadius: 0,
-              visibility: config.format ? "visible" : "hidden",
-            }}
-            disableElevation
-            endIcon={<Format fontSize="small" />}
-          >
-            <Typography sx={{ fontSize: 12 }}>Prettify</Typography>
-          </LoadingButton>
-          <Divider orientation="vertical" />
-          <LoadingButton
-            onClick={showValue}
-            loading={isRunning}
-            size="small"
-            color="success"
-            variant="contained"
-            sx={{ borderRadius: 0 }}
-            disableElevation
-            endIcon={<PlayArrow fontSize="small" htmlColor="#fff" />}
-          >
-            <Typography sx={{ fontSize: 12, color: "#fff" }}>Run</Typography>
-          </LoadingButton>
+            {config.format && (
+              <LoadingButton
+                onClick={sendFormat}
+                loading={isFormatting}
+                size="medium"
+                color="primary"
+                variant="contained"
+                disableElevation
+                endIcon={<Format fontSize="small" />}
+              >
+                <Typography sx={{ fontSize: 12 }}>Prettify</Typography>
+              </LoadingButton>
+            )}
+            <LoadingButton
+              onClick={showValue}
+              loading={isRunning}
+              size="medium"
+              color="success"
+              variant="contained"
+              disableElevation
+              endIcon={<PlayArrow fontSize="small" htmlColor="#fff" />}
+            >
+              <Typography sx={{ fontSize: 12, color: "#fff" }}>Run</Typography>
+            </LoadingButton>
+          </Stack>
         </Stack>
         <Layouts splitType={splitType}>
           <Box className="panel editor">
             <MonacoEditor
               wrapperClassName={"rijuEditor"}
               onChange={handleChange}
-              // height="100vh"
               defaultLanguage="javascript"
               defaultValue="// some comment"
               options={{
