@@ -334,6 +334,11 @@ async function main() {
               break;
           }
           return;
+        case "langConfig":
+          // We could use this message instead of hardcoding the
+          // language config into the HTML page returned from the
+          // server, but for now we just ignore it.
+          return;
         default:
           console.error("Unexpected message from server:", message);
           return;
