@@ -19,6 +19,9 @@ function RijuTerminal() {
     term.loadAddon(fitAddon);
 
     window.addEventListener("resize", () => fitAddon.fit());
+    EventEmitter.subscribe("resize", () => {
+      fitAddon.fit();
+    });
     EventEmitter.subscribe("terminal", (payload) => {
       if (!payload) return;
       const { type, data } = payload;
@@ -40,7 +43,14 @@ function RijuTerminal() {
   }, []);
 
   return (
-    <Box id="riju-term" sx={{ height: `calc(100% - 8px)`, mt: 1, ml: 2 }} />
+    <Box
+      id="riju-term"
+      sx={{
+        height: "100%",
+        width: "100%",
+        backgroundColor: "#292D3E",
+      }}
+    />
   );
 }
 

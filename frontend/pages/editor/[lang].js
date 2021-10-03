@@ -1,13 +1,30 @@
 import MonacoEditor, { useMonaco } from "@monaco-editor/react";
-import { Circle, Code as Format, Home, PlayArrow } from "@mui/icons-material";
+import {
+  Circle,
+  Code as Format,
+  Home,
+  HorizontalSplit,
+  PlayArrow,
+  VerticalSplit,
+} from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, Chip, Divider, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  Divider,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
 import ansi from "ansicolor";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
 import { createMessageConnection } from "vscode-jsonrpc";
+import Layouts from "../../components/Layouts";
 import langs from "../../static/langs.json";
 import { EventEmitter } from "../../utils/EventEmitter";
 ansi.rgb = {
@@ -27,12 +44,14 @@ const CodeRunner = (props) => {
   const router = useRouter();
   const { langConfig } = props;
   const editorRef = useRef(null);
+  const paneRef = useRef(null);
   const [config, setConfig] = useState(langConfig);
   const [mounted, setMounted] = useState(false);
   const [isRunning, setRunning] = useState(false);
   const [isFormatting, setFormatting] = useState(false);
   const [isLspStarted, setLspStarted] = useState(false);
   const [isLspRequested, setIsLspRequested] = useState(false);
+  const [splitType, setSplitType] = useState("horizontal");
   const monaco = useMonaco();
   const [status, setStatus] = useState("connecting");
 
@@ -233,8 +252,6 @@ const CodeRunner = (props) => {
             case "lsp":
               setLspStarted(false);
               setIsLspRequested(false);
-              // lspButton.classList.add("is-light");
-              // lspButtonState.innerText = "CRASHED";
               break;
             case "terminal":
               sendToTerminal(
@@ -307,13 +324,42 @@ const CodeRunner = (props) => {
         showValue();
       },
     });
-    // editor.getModel().onDidChangeContent(() => recordActivity());
-    // window.addEventListener("resize", () => editor.layout());
     editor.getModel().setValue(config.template + "\n");
     monaco.editor.setModelLanguage(
       editor.getModel(),
       config.monacoLang || "plaintext"
     );
+    // Below code is just for adding an empty line in editor
+    monaco.languages.registerCodeLensProvider(
+      config.monacoLang || "plaintext",
+      {
+        provideCodeLenses: function (model, token) {
+          return {
+            lenses: [
+              {
+                range: {
+                  startLineNumber: 1,
+                  startColumn: 1,
+                  endLineNumber: 2,
+                  endColumn: 1,
+                },
+                id: "Format",
+                command: {
+                  // id: commandId,
+                  // title: "Format",
+                  title: "",
+                },
+              },
+            ],
+            dispose: () => {},
+          };
+        },
+        resolveCodeLens: function (model, codeLens, token) {
+          return codeLens;
+        },
+      }
+    );
+
     setMounted(true);
   }
 
@@ -338,6 +384,17 @@ const CodeRunner = (props) => {
     }
   };
 
+  const handleLayout = (event, value) => {
+    const e = document.querySelector(".split .gutter");
+    e.classList.replace(`gutter-${splitType}`, `gutter-${value}`);
+    const es = document.querySelectorAll(".split .panel");
+    for (const e of es) {
+      e.removeAttribute("style");
+      e.removeAttribute("style");
+    }
+    setSplitType(value);
+  };
+
   return (
     <>
       <Head>
@@ -352,25 +409,20 @@ const CodeRunner = (props) => {
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
       </Head>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          height: "100vh",
-          bgcolor: "#fff",
-        }}
-        component="main"
+      <Stack
+        direction="column"
+        sx={{ height: "100vh", bgcolor: "white" }}
+        alignItems="stretch"
       >
-        <Box
+        <Stack
+          direction="row"
+          alignItems="stretch"
           sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "stretch",
-            boxShadow: `0 2px 4px rgb(0 0 0 / 2%)`,
-            width: "60%",
+            boxShadow: `0 2px 4px rgb(0 0 0 / 10%)`,
+            zIndex: (t) => t.zIndex.appBar,
           }}
         >
-          <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}>
+          <Stack direction="row" sx={{ flexGrow: 1 }} alignItems="stretch">
             <Button
               variant="contained"
               sx={{ borderRadius: 0, minWidth: 0 }}
@@ -383,7 +435,10 @@ const CodeRunner = (props) => {
             >
               <Home fontSize={"small"} />
             </Button>
-            <Typography sx={{ fontSize: 14, px: 2, fontWeight: 600 }}>
+            <Typography
+              sx={{ fontSize: 14, px: 2, fontWeight: 600, alignSelf: "center" }}
+              textAlign="center"
+            >
               {config.name}
             </Typography>
             <Chip
@@ -397,7 +452,7 @@ const CodeRunner = (props) => {
               }}
               label={status}
             />
-          </Box>
+          </Stack>
           <LoadingButton
             onClick={handleLspClick}
             size="small"
@@ -423,6 +478,31 @@ const CodeRunner = (props) => {
           >
             <Typography sx={{ fontSize: 12 }}>Autocomplete</Typography>
           </LoadingButton>
+          <ToggleButtonGroup
+            size="small"
+            value={splitType}
+            color="primary"
+            exclusive
+            onChange={handleLayout}
+            aria-label="split type"
+            sx={{ mr: 1 }}
+          >
+            <ToggleButton
+              value="vertical"
+              aria-label="vertical split"
+              sx={{ borderRadius: 0 }}
+            >
+              <VerticalSplit fontSize="small" />
+            </ToggleButton>
+            <ToggleButton
+              value="horizontal"
+              aria-label="horizontal split"
+              sx={{ borderRadius: 0 }}
+            >
+              <HorizontalSplit fontSize="small" />
+            </ToggleButton>
+          </ToggleButtonGroup>
+
           <LoadingButton
             onClick={sendFormat}
             loading={isFormatting}
@@ -451,26 +531,17 @@ const CodeRunner = (props) => {
           >
             <Typography sx={{ fontSize: 12, color: "#fff" }}>Run</Typography>
           </LoadingButton>
-        </Box>
-        <Divider />
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            flexGrow: 1,
-            alignItems: "stretch",
-          }}
-        >
-          <Box sx={{ backgroundColor: "white", width: "60%" }}>
-            <Box
-              component={MonacoEditor}
+        </Stack>
+        <Layouts splitType={splitType}>
+          <Box className="panel editor">
+            <MonacoEditor
               wrapperClassName={"rijuEditor"}
               onChange={handleChange}
-              height="90vh"
+              // height="100vh"
               defaultLanguage="javascript"
               defaultValue="// some comment"
               options={{
-                minimap: { enabled: false },
+                minimap: { enabled: splitType == "horizontal" ? false : true },
                 scrollbar: { verticalScrollbarSize: 0 },
                 fontLigatures: true,
                 fontFamily: "Fira Code",
@@ -478,17 +549,11 @@ const CodeRunner = (props) => {
               onMount={editorDidMount}
             />
           </Box>
-          <Box
-            sx={{
-              overflow: "hidden",
-              backgroundColor: "#292D3E",
-              width: "40%",
-            }}
-          >
+          <Box className="panel" sx={{ bgcolor: "#292D3E", p: 2 }}>
             <RijuTerminal />
           </Box>
-        </Box>
-      </Box>
+        </Layouts>
+      </Stack>
     </>
   );
 };

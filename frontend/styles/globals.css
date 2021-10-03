@@ -20,6 +20,43 @@ a {
 }
 
 .rijuEdutor {
+  height: 100%;
+  width: 100%;
+}
+
+/* Split pane */
+
+.split {
+  overflow: auto;
+}
+.split .panel {
+  overflow: auto;
+}
+.split .editor {
   overflow: hidden;
-  height: calc(100% - 8px);
+}
+.split .gutter {
+  background-color: #eee;
+  opacity: 1;
+  z-index: 1;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+/* .split .gutter:hover {
+  opacity: 1;
+  -webkit-transition: all 2s ease;
+  transition: all 2s ease;
+} */
+
+.split .gutter.gutter-vertical {
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=");
+  cursor: row-resize;
+  width: 100% !important;
+}
+
+.split .gutter.gutter-horizontal {
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==");
+  cursor: col-resize;
+  height: 100% !important;
 }
