@@ -229,6 +229,13 @@ export class Session {
           }
           await this.runCode(msg.code);
           break;
+        case "testCode":
+          if (typeof msg.code !== "string") {
+            this.logBadMessage(msg);
+            break;
+          }
+          await this.runCode(msg.code, true, msg.expectedOutput);
+          break;
         case "formatCode":
           if (typeof msg.code !== "string") {
             this.logBadMessage(msg);
@@ -279,7 +286,7 @@ export class Session {
     await this.run(this.privilegedExec(`cat > ${file}`), { input: code });
   };
 
-  runCode = async (code) => {
+  runCode = async (code, isTest = false, expectedOutput) => {
     try {
       const { name, repl, suffix, createEmpty, compile, run, template } =
         this.config;
@@ -322,7 +329,18 @@ export class Session {
         // Capture term in closure so that we don't keep sending output
         // from the old pty even after it's been killed (see ghci).
         if (term.live) {
-          this.send({ event: "terminalOutput", output: data.toString() });
+          if (isTest) {
+            this.send({
+              event: "testTerminalOutput",
+              output: data.toString(),
+              expectedOutput
+            });
+          } else {
+            this.send({
+              event: "terminalOutput",
+              output: data.toString()
+            });
+          }
         }
       });
       this.term.pty.stderr.on("data", (data) => {

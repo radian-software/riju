@@ -113,6 +113,40 @@ async function main() {
           }
           term.write(message.output);
           return;
+        case "testTerminalOutput":
+          if (typeof message.output !== "string") {
+            console.error("Unexpected message from server:", message);
+            return;
+          }
+          term.write(message.output);
+
+          const pass = message.output == message.expectedOutput
+          
+          window.parent.postMessage({
+            event: "total_test_start",
+            type: "test",
+          });
+
+          window.parent.postMessage({
+            $id: 0,
+            codesandbox: true,
+            event: "test_end",
+            test: {
+              blocks: ["Output"],
+              duration: 1,
+              errors: [],
+              name: `should be ${message.expectedOutput}.`,
+              path: "",
+              status: pass ? "pass" : "fail",
+            },
+            type: "test",
+          });
+
+          window.parent.postMessage({
+            event: "total_test_end",
+            type: "test",
+          });
+          return;
         case "lspStopped":
           if (clientDisposable) {
             clientDisposable.dispose();
