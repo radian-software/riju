@@ -21,7 +21,7 @@ const Layouts = (props) => {
             ? { display: "flex", flexDirection: "row", alignItems: "stretch" }
             : {}),
         }}
-        onDragEnd={() => EventEmitter.dispatch("resize")}
+        onDrag={() => EventEmitter.dispatch("resize")}
       >
         {children}
       </Split>

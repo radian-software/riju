@@ -323,11 +323,6 @@ const CodeRunner = (props) => {
         showValue();
       },
     });
-    editor.getModel().setValue(config.template + "\n");
-    monaco.editor.setModelLanguage(
-      editor.getModel(),
-      config.monacoLang || "plaintext"
-    );
     // Below code is just for adding an empty line in editor
     monaco.languages.registerCodeLensProvider(
       config.monacoLang || "plaintext",
@@ -532,8 +527,8 @@ const CodeRunner = (props) => {
             <MonacoEditor
               wrapperClassName={"rijuEditor"}
               onChange={handleChange}
-              defaultLanguage="javascript"
-              defaultValue="// some comment"
+              language={config.monacoLang || "plaintext"}
+              value={config.template + "\n"}
               options={{
                 minimap: { enabled: splitType == "horizontal" ? false : true },
                 scrollbar: { verticalScrollbarSize: 0 },
@@ -568,7 +563,7 @@ CodeRunner.getInitialProps = async (ctx) => {
 //   let lsp = langs.javascript;
 //   if (query.lang) lsp = langs[query.lang];
 //   return {
-//     props: { lsp }, // will be passed to the page component as props
+//     props: { langConfig: lsp }, // will be passed to the page component as props
 //   };
 // }
 
