@@ -13,14 +13,15 @@ function RijuTerminal() {
         background: "#292D3E",
       },
     });
-    term.open(document.getElementById("riju-term"));
-    term.write("Connecting to server...");
     const fitAddon = new FitAddon();
     term.loadAddon(fitAddon);
+    term.open(document.getElementById("riju-term"));
+    term.write("Connecting to server...");
 
     window.addEventListener("resize", () => fitAddon.fit());
     EventEmitter.subscribe("resize", () => {
-      fitAddon.fit();
+      const event = new Event("resize");
+      window.dispatchEvent(event);
     });
     EventEmitter.subscribe("terminal", (payload) => {
       if (!payload) return;
