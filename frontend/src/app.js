@@ -120,7 +120,7 @@ async function main() {
           }
           term.write(message.output);
 
-          const pass = message.output == message.expectedOutput
+          const pass = message.output.replace(/\r\n/g, '') == message.expectedOutput
           
           window.parent.postMessage({
             event: "total_test_start",
