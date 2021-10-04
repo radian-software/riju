@@ -287,6 +287,10 @@ export class Session {
   };
 
   runCode = async (code, isTest = false, expectedOutput) => {
+    console.log('runCode')
+    console.log('code', code)
+    console.log('isTest', isTest)
+    console.log('expectedOutput', expectedOutput)
     try {
       const { name, repl, suffix, createEmpty, compile, run, template } =
         this.config;

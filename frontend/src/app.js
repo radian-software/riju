@@ -125,7 +125,7 @@ async function main() {
           window.parent.postMessage({
             event: "total_test_start",
             type: "test",
-          });
+          }, "*");
 
           window.parent.postMessage({
             $id: 0,
@@ -140,12 +140,12 @@ async function main() {
               status: pass ? "pass" : "fail",
             },
             type: "test",
-          });
+          }, "*");
 
           window.parent.postMessage({
             event: "total_test_end",
             type: "test",
-          });
+          }, "*");
           return;
         case "lspStopped":
           if (clientDisposable) {
