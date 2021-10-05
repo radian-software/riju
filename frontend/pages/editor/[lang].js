@@ -1,4 +1,3 @@
-import MonacoEditor, { useMonaco } from "@monaco-editor/react";
 import {
   Circle,
   Code as Format,
@@ -22,7 +21,6 @@ import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
-import { createMessageConnection } from "vscode-jsonrpc";
 import Layouts from "../../components/Layouts";
 import langs from "../../static/langs.json";
 import { EventEmitter } from "../../utils/EventEmitter";
@@ -32,10 +30,11 @@ ansi.rgb = {
 const RijuTerminal = dynamic(() => import("../../components/RijuTerminal"), {
   ssr: false,
 });
+const RijuEditor = dynamic(() => import("../../components/RijuEditor"), {
+  ssr: false,
+});
 
 const DEBUG = true;
-let clientDisposable = null;
-let servicesDisposable = null;
 let serviceLogBuffers = {};
 let serviceLogLines = {};
 
@@ -43,7 +42,6 @@ const CodeRunner = (props) => {
   const router = useRouter();
   const { langConfig } = props;
   const editorRef = useRef(null);
-  const paneRef = useRef(null);
   const [config, setConfig] = useState(langConfig);
   const [mounted, setMounted] = useState(false);
   const [isRunning, setRunning] = useState(false);
@@ -51,7 +49,7 @@ const CodeRunner = (props) => {
   const [isLspStarted, setLspStarted] = useState(false);
   const [isLspRequested, setIsLspRequested] = useState(false);
   const [splitType, setSplitType] = useState("horizontal");
-  const monaco = useMonaco();
+
   const [status, setStatus] = useState("connecting");
 
   function sendToTerminal(type, data) {
@@ -59,6 +57,8 @@ const CodeRunner = (props) => {
   }
 
   function connect() {
+    serviceLogBuffers = {};
+    serviceLogLines = {};
     setStatus("connecting");
     const socket = new WebSocket(
       // (document.location.protocol === "http:" ? "ws://" : "wss://") +
@@ -126,14 +126,7 @@ const CodeRunner = (props) => {
         case "lspStopped":
           setIsLspRequested(false);
           setLspStarted(false);
-          if (clientDisposable) {
-            clientDisposable.dispose();
-            clientDisposable = null;
-          }
-          if (servicesDisposable) {
-            servicesDisposable.dispose();
-            servicesDisposable = null;
-          }
+          EventEmitter.dispatch("lspStopped");
           break;
         case "lspStarted":
           setLspStarted(true);
@@ -143,68 +136,10 @@ const CodeRunner = (props) => {
             return;
           }
 
-          console.log("Started", message.root, config.main);
-          // EventEmitter.dispatch("lspStarted", message);
-          const {
-            createConnection,
-            MonacoLanguageClient,
-            MonacoServices,
-            Services,
-          } = await import("monaco-languageclient");
-          const services = MonacoServices.create(editorRef.current, {
-            rootUri: `file://${message.root}`,
-          });
-          servicesDisposable = Services.install(services);
-          const newURI = `file://${message.root}/${config.main}`;
-          const oldModel = editorRef.current.getModel();
-          console.log("Check 4", oldModel.uri, newURI);
-          if (oldModel.uri.toString() !== newURI) {
-            // This code is likely to be buggy as it will probably
-            // never run and has thus never been tested.
-            editorRef.current.setModel(
-              monaco.editor.createModel(
-                oldModel.getValue(),
-                undefined,
-                monaco.Uri.parse(newURI)
-              )
-            );
-            oldModel.dispose();
-          }
+          EventEmitter.dispatch("lspStarted", { message, socket });
 
-          const RijuMessageReader = (
-            await import("../../services/RijuMessageReader")
-          ).default;
-          const RijuMessageWriter = (
-            await import("../../services/RijuMessageWriter")
-          ).default;
+          setTimeout(() => {}, 3000);
 
-          const connection = createMessageConnection(
-            new RijuMessageReader(socket),
-            new RijuMessageWriter(socket, config)
-          );
-          const client = new MonacoLanguageClient({
-            name: "Riju",
-            clientOptions: {
-              documentSelector: [{ pattern: "**" }],
-              middleware: {
-                workspace: {
-                  configuration: (params, token, configuration) => {
-                    return Array(configuration(params, token).length).fill(
-                      config.lsp.config !== undefined ? config.lsp.config : {}
-                    );
-                  },
-                },
-              },
-              initializationOptions: config.lsp.init || {},
-            },
-            connectionProvider: {
-              get: (errorHandler, closeHandler) =>
-                Promise.resolve(
-                  createConnection(connection, errorHandler, closeHandler)
-                ),
-            },
-          });
-          clientDisposable = client.start();
           return;
         case "lspOutput":
           // Should be handled by RijuMessageReader
@@ -251,6 +186,7 @@ const CodeRunner = (props) => {
             case "lsp":
               setLspStarted(false);
               setIsLspRequested(false);
+              EventEmitter.dispatch("lspStopped");
               break;
             case "terminal":
               sendToTerminal(
@@ -259,6 +195,12 @@ const CodeRunner = (props) => {
               );
               break;
           }
+          return;
+        case "langConfig":
+          console.log("Lang Config", message);
+          // We could use this message instead of hardcoding the
+          // language config into the HTML page returned from the
+          // server, but for now we just ignore it.
           return;
         default:
           console.error("Unexpected message from server:", message);
@@ -270,14 +212,7 @@ const CodeRunner = (props) => {
       } else {
         console.error("Connection died");
       }
-      if (clientDisposable) {
-        clientDisposable.dispose();
-        clientDisposable = null;
-      }
-      if (servicesDisposable) {
-        servicesDisposable.dispose();
-        servicesDisposable = null;
-      }
+      EventEmitter.dispatch("lspStopped");
       setRunning(false);
       setLspStarted(false);
       setIsLspRequested(false);
@@ -313,7 +248,6 @@ const CodeRunner = (props) => {
 
   function editorDidMount(editor, monaco) {
     editorRef.current = editor;
-
     editor.addAction({
       id: "runCode",
       label: "Run",
@@ -323,37 +257,6 @@ const CodeRunner = (props) => {
         showValue();
       },
     });
-    // Below code is just for adding an empty line in editor
-    monaco.languages.registerCodeLensProvider(
-      config.monacoLang || "plaintext",
-      {
-        provideCodeLenses: function (model, token) {
-          return {
-            lenses: [
-              {
-                range: {
-                  startLineNumber: 1,
-                  startColumn: 1,
-                  endLineNumber: 2,
-                  endColumn: 1,
-                },
-                id: "Format",
-                command: {
-                  // id: commandId,
-                  // title: "Format",
-                  title: "",
-                },
-              },
-            ],
-            dispose: () => {},
-          };
-        },
-        resolveCodeLens: function (model, codeLens, token) {
-          return codeLens;
-        },
-      }
-    );
-
     setMounted(true);
   }
 
@@ -415,7 +318,7 @@ const CodeRunner = (props) => {
           sx={{
             boxShadow: `0 2px 4px rgb(0 0 0 / 10%)`,
             zIndex: (t) => t.zIndex.appBar,
-            height: "48px",
+            minHeight: "48px",
             p: "0 24px",
           }}
         >
@@ -524,18 +427,11 @@ const CodeRunner = (props) => {
         </Stack>
         <Layouts splitType={splitType}>
           <Box className="panel editor">
-            <MonacoEditor
-              wrapperClassName={"rijuEditor"}
-              onChange={handleChange}
-              language={config.monacoLang || "plaintext"}
-              value={config.template + "\n"}
-              options={{
-                minimap: { enabled: splitType == "horizontal" ? false : true },
-                scrollbar: { verticalScrollbarSize: 0 },
-                fontLigatures: true,
-                fontFamily: "Fira Code",
-              }}
-              onMount={editorDidMount}
+            <RijuEditor
+              onEditorValueChange={handleChange}
+              config={config}
+              splitType={splitType}
+              onEditorMount={editorDidMount}
             />
           </Box>
           <Box className="panel" sx={{ bgcolor: "#292D3E", p: 2 }}>

@@ -41,6 +41,7 @@
     "historic-readline": "^1.0.8",
     "jsonschema": "^1.4.0",
     "lodash": "^4.17.20",
+    "monaco-editor": "^0.28.1",
     "monaco-editor-webpack-plugin": "^4.1.2",
     "monaco-languageclient": "0.13.0",
     "next": "11.0.1",

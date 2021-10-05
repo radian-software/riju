@@ -18,7 +18,7 @@ Router.events.on("routeChangeComplete", () => {
 });
 Router.events.on("routeChangeError", () => {
   console.log("routeChangeError");
-  NProgress.done();
+  // NProgress.done();
 });
 
 function MyApp({ Component, pageProps }) {
