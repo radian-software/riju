@@ -138,8 +138,6 @@ const CodeRunner = (props) => {
 
           EventEmitter.dispatch("lspStarted", { message, socket });
 
-          setTimeout(() => {}, 3000);
-
           return;
         case "lspOutput":
           // Should be handled by RijuMessageReader
