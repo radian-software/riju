@@ -29,6 +29,31 @@ install:
     - libjpeg-turbo8
     - libpng16-16
     - libxrender1
+  files:
+    "/opt/ec/skel/main.epj": |
+      {
+        "Version": 0.2,
+        "ModuleName": "main",
+        "Options": {
+          "Warnings": "All",
+          "TargetType": "Executable",
+          "TargetFileName": "main",
+          "Libraries": ["ecere"]
+        },
+        "Configurations": [
+          {
+            "Name": "Release",
+            "Options": {
+              "Debug": false,
+              "Optimization": "Speed",
+              "FastMath": true
+            }
+          }
+        ],
+        "Files": ["main.ec"],
+        "ResourcesPath": "",
+        "Resources": []
+      }
   # Release 0.44.15 failed to compile with "multiple definition"
   # errors from ld, so use the master branch instead.
   manual: |
@@ -48,14 +73,11 @@ template: |
      }
   }
 
+setup: |
+  cp -R /opt/ec/skel/* "$PWD/"
+  epj2make -o Makefile main.epj >/dev/null
+
 compile: |
-  export LD_LIBRARY_PATH=/usr/local/lib/ec
-  ecp -c main.ec -o main.sym
-  ecc -c main.ec -o main.c
-  ecs -console main.sym main.imp -o main.main.ec
-  ecp -c main.main.ec -o main.main.sym
-  ecc -c main.main.ec -o main.main.c
-  clang main.c main.main.c -lecereCOM -o main
+  make LD_LIBRARY_PATH=/usr/local/lib/ec
 run: |
-  ./main
-helloStatus: 139
+  ./obj/release.linux/main
