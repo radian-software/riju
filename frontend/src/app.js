@@ -66,7 +66,6 @@ async function main() {
     } catch (e) {
       console.log("message error: ", e);
     }
-    console.log("message from codeamigo", msg);
   });
 
   function tryConnect() {
@@ -83,6 +82,7 @@ async function main() {
     socket.addEventListener("open", () => {
       console.log("Successfully connected to server");
     });
+    let testData = [];
     socket.addEventListener("message", (event) => {
       let message;
       try {
@@ -112,7 +112,15 @@ async function main() {
             return;
           }
           term.write(message.output);
+          testData.push(message.output);
           return;
+        case "stdout end":
+          console.log(testData);
+          console.log(msg.isTest);
+          console.log(msg.expectedOutput);
+          console.log(testData);
+          testData = [];
+          return
         case "testTerminalOutput":
           if (typeof message.output !== "string") {
             console.error("Unexpected message from server:", message);
@@ -120,32 +128,46 @@ async function main() {
           }
           term.write(message.output);
 
-          const pass = message.output.replace(/\r\n/g, '') == message.expectedOutput
-          
-          window.parent.postMessage({
-            event: "total_test_start",
-            type: "test",
-          }, "*");
+          const pass =
+            message.output.replace(/\r\n/g, "") == message.expectedOutput;
 
-          window.parent.postMessage({
-            $id: 0,
-            codesandbox: true,
-            event: "test_end",
-            test: {
-              blocks: ["Output"],
-              duration: 1,
-              errors: [],
-              name: `should be ${message.expectedOutput}.`,
-              path: "",
-              status: pass ? "pass" : "fail",
+          window.parent.postMessage(
+            {
+              event: "total_test_start",
+              type: "test",
             },
-            type: "test",
-          }, "*");
+            "*"
+          );
 
-          window.parent.postMessage({
-            event: "total_test_end",
-            type: "test",
-          }, "*");
+          window.parent.postMessage(
+            {
+              $id: 0,
+              codesandbox: true,
+              event: "test_end",
+              test: {
+                blocks: ["Output"],
+                duration: 1,
+                errors: [
+                  `${message.output.replace(/\r\n/g, "")} did not equal ${
+                    message.expectedOutput
+                  }`,
+                ],
+                name: `should be ${message.expectedOutput}.`,
+                path: "",
+                status: pass ? "pass" : "fail",
+              },
+              type: "test",
+            },
+            "*"
+          );
+
+          window.parent.postMessage(
+            {
+              event: "total_test_end",
+              type: "test",
+            },
+            "*"
+          );
           return;
         case "lspStopped":
           if (clientDisposable) {

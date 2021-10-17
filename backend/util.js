@@ -63,10 +63,13 @@ export async function run(args, log, options) {
   if (typeof input === "string") {
     proc.stdin.end(input);
   }
-  let output = "";
+  let output = "start\n";
   proc.stdout.on("data", (data) => {
     output += `${data}`;
   });
+  proc.stdout.on("end", () => {
+    output += "\nend"
+  })
   proc.stderr.on("data", (data) => {
     output += `${data}`;
   });
@@ -74,6 +77,7 @@ export async function run(args, log, options) {
     proc.on("error", reject);
     proc.on("close", (code, signal) => {
       output = output.trim();
+      console.log(output)
       if (output && !suppressOutput) {
         log(`Output from ${args[0]}:\n` + output);
       }

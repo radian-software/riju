@@ -1,0 +1,48 @@
+id: "javascript"
+aliases:
+  - "node"
+  - "js"
+  - "web"
+  - "jsx"
+  - "v8"
+  - "closure"
+  - "nodejs"
+name: "JavaScript"
+monacoLang: javascript
+
+install:
+  apt:
+    - nodejs
+    - yarn
+  riju:
+    - prettier
+
+repl: |
+  node
+
+main: "main.js"
+template: |
+  console.log("Hello, world!");
+
+run: |
+  node -e "$(< main.js)" -i
+
+scope:
+  code: |
+    let x = 123 * 234;
+
+format:
+  run: |
+    prettier --no-config --stdin-filepath=format.js
+  input: |
+    console.log('Hello, world!');
+
+pkg:
+  install: |
+    yarn add NAME
+
+  uninstall: |
+    yarn remove NAME
+
+  search: |
+    curl -sS 'https://registry.npmjs.org/-/v1/search?text=NAME' | jq -r '.objects | map(.package.name) | .[]'

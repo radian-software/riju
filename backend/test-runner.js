@@ -573,8 +573,8 @@ async function getImageHash(tag) {
   const output = (
     await run(["docker", "inspect", `riju:${tag}`], console.error, {
       suppressOutput: true,
-    })
-  ).output;
+    }).output
+  );
   return JSON.parse(output)[0].Config.Labels["riju.image-hash"];
 }
 
