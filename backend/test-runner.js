@@ -570,12 +570,18 @@ async function writeLog(lang, type, result, log) {
 }
 
 async function getImageHash(tag) {
-  const output = (
-    await run(["docker", "inspect", `riju:${tag}`], console.error, {
+  const output = await run(
+    ["docker", "inspect", `riju:${tag}`],
+    console.error,
+    {
       suppressOutput: true,
-    }).output
-  );
-  return JSON.parse(output)[0].Config.Labels["riju.image-hash"];
+    }
+  ).output;
+  try {
+    return JSON.parse(output)[0].Config.Labels["riju.image-hash"];
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 async function main() {
