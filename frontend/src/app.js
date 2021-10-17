@@ -113,14 +113,16 @@ async function main() {
           }
           term.write(message.output);
           testData.push(message.output);
+          console.log("writing to term");
           return;
         case "stdout end":
+          console.log("stdout ended");
           console.log(testData);
-          console.log(msg.isTest);
-          console.log(msg.expectedOutput);
+          console.log(message.isTest);
+          console.log(message.expectedOutput);
           console.log(testData);
           testData = [];
-          return
+          return;
         case "testTerminalOutput":
           if (typeof message.output !== "string") {
             console.error("Unexpected message from server:", message);
