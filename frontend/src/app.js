@@ -115,12 +115,10 @@ async function main() {
           testData.push(message.output);
           console.log("writing to term");
           return;
-        case "stdout end":
-          console.log("stdout ended");
+        case "testRunFinished":
+          console.log("testRunFinished");
           console.log(testData);
-          console.log(message.isTest);
           console.log(message.expectedOutput);
-          console.log(testData);
           testData = [];
           return;
         case "testTerminalOutput":
