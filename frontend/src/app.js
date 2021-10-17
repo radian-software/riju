@@ -19,6 +19,44 @@ function showError({ message, data }) {
   document.querySelector("html").classList.add("is-clipped");
 }
 
+const postTestResults = (testData, expectedOutput) => {
+  const pass = testData.some((output) => output.includes(expectedOutput));
+
+  window.parent.postMessage(
+    {
+      event: "total_test_start",
+      type: "test",
+    },
+    "*"
+  );
+
+  window.parent.postMessage(
+    {
+      $id: 0,
+      codesandbox: true,
+      event: "test_end",
+      test: {
+        blocks: ["Output"],
+        duration: 1,
+        errors: [,],
+        name: `should be ${expectedOutput}.`,
+        path: "",
+        status: pass ? "pass" : "fail",
+      },
+      type: "test",
+    },
+    "*"
+  );
+
+  window.parent.postMessage(
+    {
+      event: "total_test_end",
+      type: "test",
+    },
+    "*"
+  );
+};
+
 async function main() {
   let serviceLogBuffers = {};
   let serviceLogLines = {};
@@ -113,61 +151,11 @@ async function main() {
           }
           term.write(message.output);
           testData.push(message.output);
-          console.log("writing to term");
-          return;
-        case "testRunFinished":
-          console.log("testRunFinished");
-          console.log(testData);
-          console.log(message.expectedOutput);
-          testData = [];
-          return;
-        case "testTerminalOutput":
-          if (typeof message.output !== "string") {
-            console.error("Unexpected message from server:", message);
-            return;
+
+          if (testData.join("").includes("Test run finished!")) {
+            postTestResults(testData, message.expectedOutput);
+            testData = [];
           }
-          term.write(message.output);
-
-          const pass =
-            message.output.replace(/\r\n/g, "") == message.expectedOutput;
-
-          window.parent.postMessage(
-            {
-              event: "total_test_start",
-              type: "test",
-            },
-            "*"
-          );
-
-          window.parent.postMessage(
-            {
-              $id: 0,
-              codesandbox: true,
-              event: "test_end",
-              test: {
-                blocks: ["Output"],
-                duration: 1,
-                errors: [
-                  `${message.output.replace(/\r\n/g, "")} did not equal ${
-                    message.expectedOutput
-                  }`,
-                ],
-                name: `should be ${message.expectedOutput}.`,
-                path: "",
-                status: pass ? "pass" : "fail",
-              },
-              type: "test",
-            },
-            "*"
-          );
-
-          window.parent.postMessage(
-            {
-              event: "total_test_end",
-              type: "test",
-            },
-            "*"
-          );
           return;
         case "lspStopped":
           if (clientDisposable) {

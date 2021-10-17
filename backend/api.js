@@ -335,15 +335,9 @@ export class Session {
 
           this.send({
             event: "terminalOutput",
+            expectedOutput,
             output,
           });
-
-          if (output.includes(TEST_RUN_FINISHED)) {
-            this.send({
-              event: "testRunFinished",
-              expectedOutput
-            })
-          }
         }
       });
       this.term.pty.stderr.on("data", (data) => {
