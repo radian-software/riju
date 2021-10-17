@@ -39,7 +39,7 @@ const postTestResults = (testData, expectedOutput) => {
         blocks: ["Output"],
         duration: 1,
         errors: [,],
-        name: `should be ${expectedOutput}.`,
+        name: `should be ${expectedOutput}`,
         path: "",
         status: pass ? "pass" : "fail",
       },
