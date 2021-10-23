@@ -156,7 +156,11 @@ async function getImageArtifact({ tag, isBaseImage, isLangImage }) {
       await runCommand(`make pull I=${tag}`);
     },
     publishToRegistry: async () => {
-      await runCommand(`make push I=${tag}`);
+      try {
+        await runCommand(`make push I=${tag}`);
+      } catch (e) {
+        console.log(e);
+      }
     },
     syncCommand: isBaseImage,
   };
@@ -492,10 +496,6 @@ async function executeDepGraph({
     })
   );
   const statuses = {};
-  console.log('HASHES', hashes)
-  for (const name in artifacts) {
-    console.log('name', name)
-  }
 
   for (const name in artifacts) {
     if (!hashes.desired[name]) {
