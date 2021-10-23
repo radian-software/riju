@@ -233,7 +233,7 @@ export class Session {
             this.logBadMessage(msg);
             break;
           }
-          await this.runCode(msg.code, msg.expectedOutput);
+          await this.runCode(msg.code + "\x04", msg.expectedOutput);
           break;
         case "formatCode":
           if (typeof msg.code !== "string") {
@@ -291,7 +291,7 @@ export class Session {
         this.config;
       if (this.term) {
         try {
-          process.kill(this.term.pty.pid);
+          process.kill(this.term.pty.pid, 'SIGKILL');
         } catch (err) {
           this.send({
             event: 'error doing process.kill',
