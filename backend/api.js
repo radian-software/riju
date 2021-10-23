@@ -306,10 +306,12 @@ export class Session {
         if (compile) {
           cmdline = `( ${compile} ) && ( ${run} )`;
         }
-      } else if (repl) {
+      } else if (repl && !expectedOutput) {
         cmdline = repl;
       } else {
-        cmdline = `echo '${name} has no REPL, press Run to see it in action'`;
+        cmdline = expectedOutput
+          ? "Test runner"
+          : `echo '${name} has no REPL, press Run to see it in action'`;
       }
       if (code === undefined) {
         code = createEmpty !== undefined ? createEmpty : template + "\n";
