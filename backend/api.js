@@ -1,4 +1,4 @@
-import { spawn, spawnSync } from "child_process";
+import { spawn } from "child_process";
 import path from "path";
 import process from "process";
 
@@ -12,6 +12,7 @@ import * as util from "./util.js";
 import { bash, getUUID, logError } from "./util.js";
 
 const allSessions = new Set();
+const TEST_RUN_FINISHED = 'Test run!\n'
 export class Session {
   get homedir() {
     return "/home/riju/src";
@@ -233,7 +234,8 @@ export class Session {
             this.logBadMessage(msg);
             break;
           }
-          await this.runCode(msg.code, msg.expectedOutput);
+          await this.runCode(msg.code, true, msg.expectedOutput);
+          this.term.pty.stdin.write(TEST_RUN_FINISHED);
           break;
         case "formatCode":
           if (typeof msg.code !== "string") {
@@ -285,18 +287,14 @@ export class Session {
     await this.run(this.privilegedExec(`cat > ${file}`), { input: code });
   };
 
-  runCode = async (code, expectedOutput) => {
+  runCode = async (code, isTest = false, expectedOutput) => {
     try {
       const { name, repl, suffix, createEmpty, compile, run, template } =
         this.config;
       if (this.term) {
         try {
-          process.kill(this.term.pty.pid, "SIGKILL");
+          process.kill(this.term.pty.pid);
         } catch (err) {
-          this.send({
-            event: "error doing process.kill",
-            err,
-          });
           // process might have already exited
         }
         // Signal to terminalOutput message generator using closure.
@@ -313,7 +311,7 @@ export class Session {
       } else if (repl) {
         cmdline = repl;
       } else {
-        cmdline = `Press Run to see your code in action!`;
+        cmdline = `echo '${name} has no REPL, press Run to see it in action'`;
       }
       if (code === undefined) {
         code = createEmpty !== undefined ? createEmpty : template + "\n";
@@ -323,67 +321,50 @@ export class Session {
       }
       await this.writeCode(code);
       const termArgs = this.privilegedPty(cmdline);
-      const result = spawnSync(termArgs[0], termArgs.slice(1), {
-        encoding: "utf-8",
+      const term = {
+        pty: spawn(termArgs[0], termArgs.slice(1)),
+        live: true,
+      };
+      this.term = term;
+
+      this.term.pty.stdout.on("data", (data) => {
+        // Capture term in closure so that we don't keep sending output
+        // from the old pty even after it's been killed (see ghci).
+        if (term.live) {
+          this.send({
+            event: "terminalOutput",
+            output: data.toString(),
+          });
+        }
       });
-
-      if (result.stderr) {
-        this.send({
-          event: "serviceLog",
-          service: "pty",
-          output: data.stderr,
-        });
-        return;
-      }
-
-      this.send({
-        event: "terminalOutput",
-        expectedOutput,
-        output: result.stdout,
+      this.term.pty.stderr.on("data", (data) => {
+        if (term.live) {
+          this.send({
+            event: "serviceLog",
+            service: "pty",
+            output: data.toString("utf8"),
+          });
+        }
       });
-
-      // this.term.pty.stdout.on("data", (data) => {
-      //   // Capture term in closure so that we don't keep sending output
-      //   // from the old pty even after it's been killed (see ghci).
-      //   if (term.live) {
-      //     const output = data.toString("utf8");
-
-      //     this.send({
-      //       event: "terminalOutput",
-      //       expectedOutput,
-      //       output,
-      //     });
-      //   }
-      // });
-      // this.term.pty.stderr.on("data", (data) => {
-      //   if (term.live) {
-      //     this.send({
-      //       event: "serviceLog",
-      //       service: "pty",
-      //       output: data.toString("utf8"),
-      //     });
-      //   }
-      // });
-      // this.term.pty.on("close", (code, signal) => {
-      //   if (term.live) {
-      //     this.send({
-      //       event: "serviceFailed",
-      //       service: "terminal",
-      //       error: `Exited with status ${signal || code}`,
-      //       expectedOutput,
-      //       code: signal || code,
-      //     });
-      //   }
-      // });
-      // this.term.pty.on("error", (err) => {
-      //   if (term.live) {
-      //     this.send({
-      //       event: "serviceFailed",
-      //       service: "terminal",
-      //       error: `${err}`,
-      //     });
-      //   }
-      // });
+      this.term.pty.on("close", (code, signal) => {
+        if (term.live) {
+          this.send({
+            event: "serviceFailed",
+            service: "terminal",
+            error: `Exited with status ${signal || code}`,
+            code: signal || code,
+          });
+        }
+      });
+      this.term.pty.on("error", (err) => {
+        if (term.live) {
+          this.send({
+            event: "serviceFailed",
+            service: "terminal",
+            error: `${err}`,
+          });
+        }
+      });
     } catch (err) {
       logError(err);
       this.sendError(err);

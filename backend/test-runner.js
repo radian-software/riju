@@ -81,7 +81,6 @@ class Test {
   };
 
   run = async () => {
-    return "skipped";
     if ((this.config.skip || []).includes(this.type)) {
       return "skipped";
     }
