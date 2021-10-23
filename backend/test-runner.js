@@ -580,7 +580,8 @@ async function getImageHash(tag) {
   try {
     return JSON.parse(output)[0].Config.Labels["riju.image-hash"];
   } catch (e) {
-    console.log(e);
+    console.log(output[0])
+    console.log('PARSE FAIL', e);
   }
 }
 
