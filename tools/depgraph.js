@@ -494,6 +494,10 @@ async function executeDepGraph({
   const statuses = {};
   console.log('HASHES', hashes)
   for (const name in artifacts) {
+    console.log('name', name)
+  }
+
+  for (const name in artifacts) {
     if (!hashes.desired[name]) {
       statuses[name] = "buildLocally";
     } else if (
