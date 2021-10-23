@@ -577,14 +577,9 @@ async function getImageHash(tag) {
       suppressOutput: true,
     }
   ).output;
-  if (!output) return
-  try {
-    return JSON.parse(output)[0].Config.Labels["riju.image-hash"];
-  } catch (e) {
-    console.log(typeof output);
-    console.log("PARSE FAIL");
-    console.log(output);
-  }
+  if (!output) return;
+  console.log('image hash', JSON.parse(output)[0].Config.Labels["riju.image-hash"])
+  return JSON.parse(output)[0].Config.Labels["riju.image-hash"];
 }
 
 async function main() {
