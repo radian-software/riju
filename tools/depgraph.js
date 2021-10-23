@@ -324,7 +324,6 @@ async function getDepGraph() {
   artifacts.push(await getImageArtifact({ tag: "app" }));
   artifacts.push(await getDeployReadyArtifact(langs));
   artifacts.push(await getDeployLiveArtifact(langs));
-  console.log(artifacts)
   return { informationalDependencies, artifacts };
 }
 
@@ -493,6 +492,7 @@ async function executeDepGraph({
     })
   );
   const statuses = {};
+  console.log('HASHES', hashes)
   for (const name in artifacts) {
     if (!hashes.desired[name]) {
       statuses[name] = "buildLocally";
