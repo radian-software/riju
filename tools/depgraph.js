@@ -324,6 +324,7 @@ async function getDepGraph() {
   artifacts.push(await getImageArtifact({ tag: "app" }));
   artifacts.push(await getDeployReadyArtifact(langs));
   artifacts.push(await getDeployLiveArtifact(langs));
+  console.log(artifacts)
   return { informationalDependencies, artifacts };
 }
 
