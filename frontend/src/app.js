@@ -150,11 +150,8 @@ async function main() {
             return;
           }
           term.write(message.output);
-          testData.push(message.output);
-
-          if (testData.join("").includes("Test run finished!")) {
-            postTestResults(testData, message.expectedOutput);
-            testData = [];
+          if (message.expectedOutput) {
+            testData.push(message.output);
           }
           return;
         case "lspStopped":
@@ -201,6 +198,12 @@ async function main() {
           serviceLogLines[message.service] = lines;
           return;
         case "serviceFailed":
+          if (message.expectedOutput) {
+            postTestResults(testData, message.expectedOutput);
+          }
+
+          testData = [];
+
           if (
             typeof message.service !== "string" ||
             typeof message.error !== "string"

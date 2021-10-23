@@ -12,7 +12,6 @@ import * as util from "./util.js";
 import { bash, getUUID, logError } from "./util.js";
 
 const allSessions = new Set();
-const TEST_RUN_FINISHED = "Test run finished!";
 export class Session {
   get homedir() {
     return "/home/riju/src";
@@ -235,7 +234,6 @@ export class Session {
             break;
           }
           await this.runCode(msg.code, msg.expectedOutput);
-          this.term.pty.stdin.write(TEST_RUN_FINISHED);
           break;
         case "formatCode":
           if (typeof msg.code !== "string") {
