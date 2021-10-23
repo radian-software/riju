@@ -49,3 +49,4 @@ lsp:
 
 skip:
   - lsp
+  - runrepl

@@ -135,9 +135,9 @@ class Test {
         case "repl":
           await this.testRepl();
           break;
-        // case "runrepl":
-        //   await this.testRunRepl();
-        //   break;
+        case "runrepl":
+          await this.testRunRepl();
+          break;
         case "scope":
           await this.testScope();
           break;
