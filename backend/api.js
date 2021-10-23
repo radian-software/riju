@@ -1,4 +1,4 @@
-import { spawn } from "child_process";
+import { spawn, spawnSync } from "child_process";
 import path from "path";
 import process from "process";
 
@@ -323,54 +323,67 @@ export class Session {
       }
       await this.writeCode(code);
       const termArgs = this.privilegedPty(cmdline);
-      const term = {
-        pty: spawn(termArgs[0], termArgs.slice(1)),
-        live: true,
-      };
-      this.term = term;
+      const result = spawnSync(termArgs[0], termArgs.slice(1), {
+        encoding: "utf-8",
+      });
 
-      this.term.pty.stdout.on("data", (data) => {
-        // Capture term in closure so that we don't keep sending output
-        // from the old pty even after it's been killed (see ghci).
-        if (term.live) {
-          const output = data.toString("utf8");
+      if (result.stderr) {
+        this.send({
+          event: "serviceLog",
+          service: "pty",
+          output: data.stderr,
+        });
+        return;
+      }
 
-          this.send({
-            event: "terminalOutput",
-            expectedOutput,
-            output,
-          });
-        }
+      this.send({
+        event: "terminalOutput",
+        expectedOutput,
+        output: result.stdout,
       });
-      this.term.pty.stderr.on("data", (data) => {
-        if (term.live) {
-          this.send({
-            event: "serviceLog",
-            service: "pty",
-            output: data.toString("utf8"),
-          });
-        }
-      });
-      this.term.pty.on("close", (code, signal) => {
-        if (term.live) {
-          this.send({
-            event: "serviceFailed",
-            service: "terminal",
-            error: `Exited with status ${signal || code}`,
-            expectedOutput,
-            code: signal || code,
-          });
-        }
-      });
-      this.term.pty.on("error", (err) => {
-        if (term.live) {
-          this.send({
-            event: "serviceFailed",
-            service: "terminal",
-            error: `${err}`,
-          });
-        }
-      });
+
+      // this.term.pty.stdout.on("data", (data) => {
+      //   // Capture term in closure so that we don't keep sending output
+      //   // from the old pty even after it's been killed (see ghci).
+      //   if (term.live) {
+      //     const output = data.toString("utf8");
+
+      //     this.send({
+      //       event: "terminalOutput",
+      //       expectedOutput,
+      //       output,
+      //     });
+      //   }
+      // });
+      // this.term.pty.stderr.on("data", (data) => {
+      //   if (term.live) {
+      //     this.send({
+      //       event: "serviceLog",
+      //       service: "pty",
+      //       output: data.toString("utf8"),
+      //     });
+      //   }
+      // });
+      // this.term.pty.on("close", (code, signal) => {
+      //   if (term.live) {
+      //     this.send({
+      //       event: "serviceFailed",
+      //       service: "terminal",
+      //       error: `Exited with status ${signal || code}`,
+      //       expectedOutput,
+      //       code: signal || code,
+      //     });
+      //   }
+      // });
+      // this.term.pty.on("error", (err) => {
+      //   if (term.live) {
+      //     this.send({
+      //       event: "serviceFailed",
+      //       service: "terminal",
+      //       error: `${err}`,
+      //     });
+      //   }
+      // });
     } catch (err) {
       logError(err);
       this.sendError(err);
