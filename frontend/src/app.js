@@ -130,7 +130,6 @@ async function main() {
         return;
       }
       if (
-        DEBUG &&
         message &&
         message.event !== "lspOutput" &&
         message.event !== "serviceLog"
