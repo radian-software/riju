@@ -577,12 +577,12 @@ async function getImageHash(tag) {
       suppressOutput: true,
     }
   ).output;
+  if (!output) return
   try {
     return JSON.parse(output)[0].Config.Labels["riju.image-hash"];
   } catch (e) {
     console.log(typeof output);
     console.log("PARSE FAIL");
-    // fs.writeFile('./output1.txt', output, (err, data) => console.log(data))
     console.log(output);
   }
 }
