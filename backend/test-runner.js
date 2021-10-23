@@ -578,8 +578,6 @@ async function getImageHash(tag) {
     }
   ).output;
   if (!output) return;
-  console.log('output config', JSON.parse(output)[0].Config)
-  // console.log('image hash', output.Config.Labels["riju.image-hash"])
   return JSON.parse(output)[0].Config.Labels["riju.image-hash"];
 }
 

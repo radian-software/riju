@@ -77,7 +77,6 @@ export async function run(args, log, options) {
     proc.on("error", reject);
     proc.on("close", (code, signal) => {
       output = output.trim();
-      console.log(output)
       if (output && !suppressOutput) {
         log(`Output from ${args[0]}:\n` + output);
       }

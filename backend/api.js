@@ -293,6 +293,10 @@ export class Session {
         try {
           process.kill(this.term.pty.pid);
         } catch (err) {
+          this.send({
+            event: 'error doing process.kill',
+            err
+          })
           // process might have already exited
         }
         // Signal to terminalOutput message generator using closure.
@@ -306,12 +310,10 @@ export class Session {
         if (compile) {
           cmdline = `( ${compile} ) && ( ${run} )`;
         }
-      } else if (repl && !expectedOutput) {
+      } else if (repl) {
         cmdline = repl;
       } else {
-        cmdline = expectedOutput
-          ? "Test runner"
-          : `echo '${name} has no REPL, press Run to see it in action'`;
+        cmdline = `echo '${name} has no REPL, press Run to see it in action'`;
       }
       if (code === undefined) {
         code = createEmpty !== undefined ? createEmpty : template + "\n";
