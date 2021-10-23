@@ -233,7 +233,7 @@ export class Session {
             this.logBadMessage(msg);
             break;
           }
-          await this.runCode(msg.code + "\x04", msg.expectedOutput);
+          await this.runCode(msg.code, msg.expectedOutput);
           break;
         case "formatCode":
           if (typeof msg.code !== "string") {
@@ -291,12 +291,12 @@ export class Session {
         this.config;
       if (this.term) {
         try {
-          process.kill(this.term.pty.pid, 'SIGKILL');
+          process.kill(this.term.pty.pid, "SIGKILL");
         } catch (err) {
           this.send({
-            event: 'error doing process.kill',
-            err
-          })
+            event: "error doing process.kill",
+            err,
+          });
           // process might have already exited
         }
         // Signal to terminalOutput message generator using closure.
@@ -313,7 +313,7 @@ export class Session {
       } else if (repl) {
         cmdline = repl;
       } else {
-        cmdline = `echo '${name} has no REPL, press Run to see it in action'`;
+        cmdline = `Press Run to see your code in action!`;
       }
       if (code === undefined) {
         code = createEmpty !== undefined ? createEmpty : template + "\n";
@@ -333,7 +333,7 @@ export class Session {
         // Capture term in closure so that we don't keep sending output
         // from the old pty even after it's been killed (see ghci).
         if (term.live) {
-          const output = data.toString();
+          const output = data.toString("utf8");
 
           this.send({
             event: "terminalOutput",
