@@ -582,7 +582,7 @@ async function getImageHash(tag) {
   } catch (e) {
     console.log(typeof output);
     console.log("PARSE FAIL");
-    fs.writeFile('./output1.txt', output)
+    fs.writeFile('./output1.txt', output, (err, data) => console.log(data))
     console.log(output);
   }
 }
