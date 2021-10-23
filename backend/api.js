@@ -355,6 +355,7 @@ export class Session {
             event: "serviceFailed",
             service: "terminal",
             error: `Exited with status ${signal || code}`,
+            expectedOutput,
             code: signal || code,
           });
         }
