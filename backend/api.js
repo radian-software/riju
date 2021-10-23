@@ -12,7 +12,7 @@ import * as util from "./util.js";
 import { bash, getUUID, logError } from "./util.js";
 
 const allSessions = new Set();
-const TEST_RUN_FINISHED = 'Test run!\n'
+export const TEST_RUN_FINISHED = 'Test run finished!\n'
 export class Session {
   get homedir() {
     return "/home/riju/src";
@@ -234,8 +234,10 @@ export class Session {
             this.logBadMessage(msg);
             break;
           }
-          await this.runCode(msg.code, true, msg.expectedOutput);
-          this.term.pty.stdin.write(TEST_RUN_FINISHED);
+          await this.runCode(msg.code, msg.expectedOutput);
+          setTimeout(() => {
+            this.term.pty.stdin.write(TEST_RUN_FINISHED);
+          }, 1500)
           break;
         case "formatCode":
           if (typeof msg.code !== "string") {
@@ -287,7 +289,7 @@ export class Session {
     await this.run(this.privilegedExec(`cat > ${file}`), { input: code });
   };
 
-  runCode = async (code, isTest = false, expectedOutput) => {
+  runCode = async (code, expectedOutput) => {
     try {
       const { name, repl, suffix, createEmpty, compile, run, template } =
         this.config;
@@ -334,6 +336,7 @@ export class Session {
           this.send({
             event: "terminalOutput",
             output: data.toString(),
+            expectedOutput
           });
         }
       });

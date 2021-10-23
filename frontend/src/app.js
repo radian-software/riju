@@ -2,6 +2,7 @@ import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 
 import "xterm/css/xterm.css";
+import { TEST_RUN_FINISHED } from "../../backend/api";
 
 const DEBUG = window.location.hash === "#debug";
 const config = window.rijuConfig;
@@ -152,7 +153,7 @@ async function main() {
           term.write(message.output);
           testData.push(message.output);
 
-          if (testData.join("").includes("Test run!")) {
+          if (testData.join("").includes(TEST_RUN_FINISHED)) {
             postTestResults(testData, message.expectedOutput);
             testData = [];
           }
