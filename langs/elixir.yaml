@@ -17,10 +17,6 @@ install:
     unzip -d "${pkg}/opt/elixir-ls" elixir-ls.zip
     ln -s /opt/elixir-ls/language_server.sh "${pkg}/usr/local/bin/elixir-ls"
 
-input: |
-  DELAY: 1
-  123 * 234
-
 main: "main.exs"
 template: |
   IO.puts("Hello, world!")
