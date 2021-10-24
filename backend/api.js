@@ -12,7 +12,7 @@ import * as util from "./util.js";
 import { bash, getUUID, logError } from "./util.js";
 
 const allSessions = new Set();
-export const TEST_RUN_FINISHED = "Test run finished!\n";
+export const TEST_RUN_FINISHED = "Test run!\n";
 export class Session {
   get homedir() {
     return "/home/riju/src";
@@ -235,7 +235,11 @@ export class Session {
             break;
           }
           await this.runCode(msg.code, msg.expectedOutput);
-          this.term.pty.stdin.write(TEST_RUN_FINISHED);
+          if (!this.config.repl) {
+            setTimeout(() => {
+              this.term.pty.stdin.write(TEST_RUN_FINISHED);
+            });
+          }
           break;
         case "formatCode":
           if (typeof msg.code !== "string") {
@@ -273,6 +277,7 @@ export class Session {
           break;
       }
     } catch (err) {
+      console.log(err);
       logError(err);
       this.sendError(err);
     }
@@ -353,6 +358,7 @@ export class Session {
             event: "serviceFailed",
             service: "terminal",
             error: `Exited with status ${signal || code}`,
+            expectedOutput,
             code: signal || code,
           });
         }

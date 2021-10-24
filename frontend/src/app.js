@@ -152,7 +152,7 @@ async function main() {
           term.write(message.output);
           testData.push(message.output);
 
-          if (testData.join("").includes('Test run finished')) {
+          if (testData.join("").includes('Test run')) {
             postTestResults(testData, message.expectedOutput);
             testData = [];
           }
@@ -201,6 +201,11 @@ async function main() {
           serviceLogLines[message.service] = lines;
           return;
         case "serviceFailed":
+          if (expectedOutput) {
+            postTestResults(testData, expectedOutput)
+            testData = []
+          }
+          
           if (
             typeof message.service !== "string" ||
             typeof message.error !== "string"
