@@ -12,7 +12,7 @@ import * as util from "./util.js";
 import { bash, getUUID, logError } from "./util.js";
 
 const allSessions = new Set();
-export const TEST_RUN_FINISHED = "\nTest run finished!\n";
+export const TEST_RUN_FINISHED = "\r\nTest run finished!\r\n";
 export class Session {
   get homedir() {
     return "/home/riju/src";
@@ -237,7 +237,7 @@ export class Session {
           await this.runCode(msg.code, msg.expectedOutput);
           setTimeout(() => {
             this.term.pty.stdout.emit("data", TEST_RUN_FINISHED);
-          }, 1500);
+          }, 2000);
           break;
         case "formatCode":
           if (typeof msg.code !== "string") {
