@@ -152,7 +152,7 @@ async function main() {
           term.write(message.output);
           testData.push(message.output);
 
-          if (testData.join("").includes('Test run')) {
+          if (testData.join("").includes('Test run finished')) {
             postTestResults(testData, message.expectedOutput);
             testData = [];
           }
