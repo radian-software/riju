@@ -202,7 +202,7 @@ async function main() {
           return;
         case "serviceFailed":
           if (expectedOutput) {
-            postTestResults(testData, expectedOutput)
+            postTestResults(testData, message.expectedOutput)
             testData = []
           }
           
