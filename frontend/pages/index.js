@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
 import LanguageLink from "../components/LanguageLink";
 import { Search, SearchIconWrapper, StyledInputBase } from "../components/UI";
-import langs from "../static/data.json";
+import langs from "../assets/data.json";
 
 export default function Home() {
   const [selected, setSelected] = useState(null);

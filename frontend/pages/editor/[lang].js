@@ -22,7 +22,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
 import Layouts from "../../components/Layouts";
-import langs from "../../static/langs.json";
+import langs from "../../assets/langs.json";
 import { EventEmitter } from "../../utils/EventEmitter";
 ansi.rgb = {
   green: "#00FD61",
