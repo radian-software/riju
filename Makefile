@@ -150,11 +150,11 @@ pkg: pkg-clean pkg-build pkg-deb # L=<lang> T=<type> [Z=gzip|xz] : Build fresh .
 
 ### Build and run application code
 
-frontend: # Compile frontend assets for production
-	npx webpack --mode=production
+frontend: # Compile and run frontend assets for production
+	yarn build && yarn start
 
 frontend-dev: # Compile and watch frontend assets for development
-	watchexec -w webpack.config.cjs -w node_modules -r --no-environment -- "echo 'Running webpack...' >&2; npx webpack --mode=development --watch"
+	yarn dev
 
 system: # Compile setuid binary for production
 	./system/compile.bash
