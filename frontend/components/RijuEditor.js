@@ -55,8 +55,8 @@ const RijuEditor = (props) => {
     });
 
     servicesDisposable = Services.install(services);
-    const newURI = `file://${message.root}/${config.main}`;
-    const oldModel = editor.getModel();
+    // const newURI = `file://${message.root}/${config.main}`;
+    // const oldModel = editor.getModel();
     // if (oldModel.uri.toString() !== newURI) {
     // This code is likely to be buggy as it will probably
     // never run and has thus never been tested.
