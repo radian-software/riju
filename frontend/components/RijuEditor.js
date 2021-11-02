@@ -9,6 +9,7 @@ import React from "react";
 import { createMessageConnection } from "vscode-jsonrpc";
 import RijuMessageReader from "../services/RijuMessageReader";
 import RijuMessageWriter from "../services/RijuMessageWriter";
+import { SocketManager } from "../services/WS";
 import { EventEmitter } from "../utils/EventEmitter";
 
 let clientDisposable = null;
@@ -20,11 +21,11 @@ const RijuEditor = (props) => {
   const monacoRef = React.useRef();
 
   React.useEffect(() => {
-    EventEmitter.subscribe("lspStarted", (data) => {
-      const { message, socket } = data;
-      initLSP(socket, message, monacoRef.current, editorRef.current);
+    const token1 = EventEmitter.subscribe("lspStarted", (data) => {
+      const { message } = data;
+      initLSP(message, monacoRef.current, editorRef.current);
     });
-    EventEmitter.subscribe("lspStopped", () => {
+    const token2 = EventEmitter.subscribe("lspStopped", () => {
       if (clientDisposable) {
         clientDisposable.dispose();
         clientDisposable = null;
@@ -34,9 +35,11 @@ const RijuEditor = (props) => {
         servicesDisposable = null;
       }
     });
+    () => EventEmitter.unsubcribe(token1, token2);
   }, []);
 
-  const initLSP = (socket, message, monaco, editor) => {
+  const initLSP = (message, monaco, editor) => {
+    const socket = SocketManager.socket;
     const services = MonacoServices.create(editor, {
       rootUri: `file://${message.root}`,
     });

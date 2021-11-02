@@ -19,11 +19,11 @@ function RijuTerminal() {
     term.write("Connecting to server...");
 
     window.addEventListener("resize", () => fitAddon.fit());
-    EventEmitter.subscribe("resize", () => {
+    const token1 = EventEmitter.subscribe("resize", () => {
       const event = new Event("resize");
       window.dispatchEvent(event);
     });
-    EventEmitter.subscribe("terminal", (payload) => {
+    const token2 = EventEmitter.subscribe("terminal", (payload) => {
       if (!payload) return;
       const { type, data } = payload;
       switch (type) {
@@ -41,6 +41,8 @@ function RijuTerminal() {
     term.onData((data) => {
       EventEmitter.dispatch("send", { event: "terminalInput", input: data });
     });
+
+    () => EventEmitter.unsubcribe(token1, token2);
   }, []);
 
   return (

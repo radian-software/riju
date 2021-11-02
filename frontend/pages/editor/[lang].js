@@ -24,6 +24,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Layouts from "../../components/Layouts";
 import langs from "../../assets/langs.json";
 import { EventEmitter } from "../../utils/EventEmitter";
+import { SocketManager } from "../../services/WS";
 ansi.rgb = {
   green: "#00FD61",
 };
@@ -42,7 +43,7 @@ const CodeRunner = (props) => {
   const router = useRouter();
   const { langConfig } = props;
   const editorRef = useRef(null);
-  const [config, setConfig] = useState(langConfig);
+  const [config] = useState(langConfig);
   const [mounted, setMounted] = useState(false);
   const [isRunning, setRunning] = useState(false);
   const [isFormatting, setFormatting] = useState(false);
@@ -56,179 +57,162 @@ const CodeRunner = (props) => {
     EventEmitter.dispatch("terminal", { type, data });
   }
 
-  function connect() {
-    serviceLogBuffers = {};
-    serviceLogLines = {};
-    setStatus("connecting");
-    const socket = new WebSocket(
-      // (document.location.protocol === "http:" ? "ws://" : "wss://") +
-      "wss://" +
-        "riju.codes" +
-        `/api/v1/ws?lang=${encodeURIComponent(config.id)}`
-    );
-    socket.addEventListener("open", () => {
-      console.log("Successfully connected to server playground");
-      setStatus("connected");
-    });
-    EventEmitter.subscribe("send", (payload) => {
-      if (DEBUG) {
-        console.log("SEND:", payload);
-      }
-      if (socket) {
-        socket.send(JSON.stringify(payload));
-      }
-    });
-    socket.addEventListener("message", async (event) => {
-      let message;
-      try {
-        message = JSON.parse(event.data);
-      } catch (err) {
-        console.error("Malformed message from server:", event.data);
+  const handleWsOpen = (event) => {
+    setStatus("connected");
+  };
+
+  const handleWsMessage = (event) => {
+    let message;
+    try {
+      message = JSON.parse(event.data);
+    } catch (err) {
+      console.error("Malformed message from server:", event.data);
+      return;
+    }
+    if (
+      DEBUG &&
+      message &&
+      message.event !== "lspOutput" &&
+      message.event !== "serviceLog"
+    ) {
+      console.log("RECEIVE:", message);
+    }
+    if (message && message.event && message.event !== "error") {
+      // retryDelayMs = initialRetryDelayMs;
+    }
+    switch (message && message.event) {
+      case "terminalClear":
+        // term.reset();
+        sendToTerminal("terminalClear");
         return;
-      }
-      if (
-        DEBUG &&
-        message &&
-        message.event !== "lspOutput" &&
-        message.event !== "serviceLog"
-      ) {
-        console.log("RECEIVE:", message);
-      }
-      if (message && message.event && message.event !== "error") {
-        // retryDelayMs = initialRetryDelayMs;
-      }
-      switch (message && message.event) {
-        case "terminalClear":
-          // term.reset();
-          sendToTerminal("terminalClear");
-          return;
-        case "terminalOutput":
-          if (typeof message.output !== "string") {
-            console.error("Unexpected message from server:", message);
-            return;
-          }
-          sendToTerminal("terminalOutput", ansi.white(message.output));
-          setRunning(false);
-          return;
-        case "formattedCode":
-          setFormatting(false);
-          if (
-            typeof message.code !== "string" ||
-            typeof message.originalCode !== "string"
-          ) {
-            console.error("Unexpected message from server:", message);
-            return;
-          }
-          if (editorRef.current?.getValue() === message.originalCode) {
-            editorRef.current?.setValue(message.code);
-          }
-          return;
-        case "lspStopped":
-          setIsLspRequested(false);
-          setLspStarted(false);
-          EventEmitter.dispatch("lspStopped");
-          break;
-        case "lspStarted":
-          setLspStarted(true);
-          setIsLspRequested(false);
-          if (typeof message.root !== "string") {
-            console.error("Unexpected message from server:", message);
-            return;
-          }
-
-          EventEmitter.dispatch("lspStarted", { message, socket });
-
-          return;
-        case "lspOutput":
-          // Should be handled by RijuMessageReader
-          return;
-        case "serviceLog":
-          if (
-            typeof message.service !== "string" ||
-            typeof message.output !== "string"
-          ) {
-            console.error("Unexpected message from server:", message);
-            return;
-          }
-          let buffer = serviceLogBuffers[message.service] || "";
-          let lines = serviceLogLines[message.service] || [];
-          buffer += message.output;
-          while (buffer.includes("\n")) {
-            const idx = buffer.indexOf("\n");
-            const line = buffer.slice(0, idx);
-            buffer = buffer.slice(idx + 1);
-            lines.push(line);
-            if (DEBUG) {
-              console.log(`${message.service.toUpperCase()} || ${line}`);
-            }
-          }
-          serviceLogBuffers[message.service] = buffer;
-          serviceLogLines[message.service] = lines;
-          return;
-        case "serviceFailed":
-          if (
-            typeof message.service !== "string" ||
-            typeof message.error !== "string"
-          ) {
-            console.error("Unexpected message from server:", message);
-            return;
-          }
-          switch (message.service) {
-            case "formatter":
-              setFormatting(false);
-              // showError({
-              //   message: "Could not prettify code!",
-              //   data: serviceLogLines["formatter"].join("\n"),
-              // });
-              break;
-            case "lsp":
-              setLspStarted(false);
-              setIsLspRequested(false);
-              EventEmitter.dispatch("lspStopped");
-              break;
-            case "terminal":
-              sendToTerminal(
-                "terminalOutput",
-                ansi.red(`\r\n[${message.error}]`)
-              );
-              break;
-          }
-          return;
-        case "langConfig":
-          console.log("Lang Config", message);
-          // We could use this message instead of hardcoding the
-          // language config into the HTML page returned from the
-          // server, but for now we just ignore it.
-          return;
-        default:
+      case "terminalOutput":
+        if (typeof message.output !== "string") {
           console.error("Unexpected message from server:", message);
-      }
-    });
-    socket.addEventListener("close", (event) => {
-      if (event.wasClean) {
-        console.log("Connection closed cleanly");
-      } else {
-        console.error("Connection died");
-      }
-      EventEmitter.dispatch("lspStopped");
-      setRunning(false);
-      setLspStarted(false);
-      setIsLspRequested(false);
-      setStatus("idle");
-    });
+          return;
+        }
+        sendToTerminal("terminalOutput", ansi.white(message.output));
+        setRunning(false);
+        return;
+      case "formattedCode":
+        setFormatting(false);
+        if (
+          typeof message.code !== "string" ||
+          typeof message.originalCode !== "string"
+        ) {
+          console.error("Unexpected message from server:", message);
+          return;
+        }
+        if (editorRef.current?.getValue() === message.originalCode) {
+          editorRef.current?.setValue(message.code);
+        }
+        return;
+      case "lspStopped":
+        setIsLspRequested(false);
+        setLspStarted(false);
+        EventEmitter.dispatch("lspStopped");
+        break;
+      case "lspStarted":
+        setLspStarted(true);
+        setIsLspRequested(false);
+        if (typeof message.root !== "string") {
+          console.error("Unexpected message from server:", message);
+          return;
+        }
 
-    return socket;
-  }
+        EventEmitter.dispatch("lspStarted", { message });
+
+        return;
+      case "lspOutput":
+        // Should be handled by RijuMessageReader
+        return;
+      case "serviceLog":
+        if (
+          typeof message.service !== "string" ||
+          typeof message.output !== "string"
+        ) {
+          console.error("Unexpected message from server:", message);
+          return;
+        }
+        let buffer = serviceLogBuffers[message.service] || "";
+        let lines = serviceLogLines[message.service] || [];
+        buffer += message.output;
+        while (buffer.includes("\n")) {
+          const idx = buffer.indexOf("\n");
+          const line = buffer.slice(0, idx);
+          buffer = buffer.slice(idx + 1);
+          lines.push(line);
+          if (DEBUG) {
+            console.log(`${message.service.toUpperCase()} || ${line}`);
+          }
+        }
+        serviceLogBuffers[message.service] = buffer;
+        serviceLogLines[message.service] = lines;
+        return;
+      case "serviceFailed":
+        if (
+          typeof message.service !== "string" ||
+          typeof message.error !== "string"
+        ) {
+          console.error("Unexpected message from server:", message);
+          return;
+        }
+        switch (message.service) {
+          case "formatter":
+            setFormatting(false);
+            // showError({
+            //   message: "Could not prettify code!",
+            //   data: serviceLogLines["formatter"].join("\n"),
+            // });
+            break;
+          case "lsp":
+            setLspStarted(false);
+            setIsLspRequested(false);
+            EventEmitter.dispatch("lspStopped");
+            break;
+          case "terminal":
+            sendToTerminal(
+              "terminalOutput",
+              ansi.red(`\r\n[${message.error}]`)
+            );
+            break;
+        }
+        return;
+      case "langConfig":
+        console.log("Lang Config", message);
+        // We could use this message instead of hardcoding the
+        // language config into the HTML page returned from the
+        // server, but for now we just ignore it.
+        return;
+      default:
+        console.error("Unexpected message from server:", message);
+    }
+  };
+
+  const handleWsClose = (event) => {
+    if (event.wasClean) {
+      console.log("Connection closed cleanly");
+    } else {
+      console.error("Connection died");
+    }
+    EventEmitter.dispatch("lspStopped");
+    setRunning(false);
+    setLspStarted(false);
+    setIsLspRequested(false);
+    setStatus("idle");
+  };
 
   useEffect(() => {
     if (!config || !mounted) return;
-    const socket = connect();
-    return () => socket && socket.close();
+    serviceLogBuffers = {};
+    serviceLogLines = {};
+    setStatus("connecting");
+    SocketManager.connect(config, handleWsOpen, handleWsMessage, handleWsClose);
+    return () => SocketManager.disconnect();
   }, [config, mounted]);
 
   function showValue() {
     setRunning(true);
-    EventEmitter.dispatch("send", {
+    SocketManager.send({
       event: "runCode",
       code: editorRef.current.getValue(),
     });
@@ -238,7 +222,7 @@ const CodeRunner = (props) => {
     setFormatting(true);
     serviceLogBuffers["formatter"] = "";
     serviceLogLines["formatter"] = [];
-    EventEmitter.dispatch("send", {
+    SocketManager.send({
       event: "formatCode",
       code: editorRef.current.getValue(),
     });
@@ -261,21 +245,28 @@ const CodeRunner = (props) => {
   const handleLspClick = () => {
     setIsLspRequested(true);
     if (isLspStarted) {
-      EventEmitter.dispatch("send", {
+      SocketManager.send({
         event: "lspStop",
       });
     } else {
-      EventEmitter.dispatch("send", {
+      SocketManager.send({
         event: "lspStart",
       });
     }
   };
 
   const handleChange = () => {
-    if (status != "idle") {
+    if (SocketManager.isConnected) {
       return;
     } else {
-      connect();
+      if (!SocketManager.isConnected) {
+        SocketManager.connect(
+          config,
+          handleWsOpen,
+          handleWsMessage,
+          handleWsClose
+        );
+      }
     }
   };
 
@@ -284,7 +275,6 @@ const CodeRunner = (props) => {
     e.classList.replace(`gutter-${splitType}`, `gutter-${value}`);
     const es = document.querySelectorAll(".split .panel");
     for (const e of es) {
-      e.removeAttribute("style");
       e.removeAttribute("style");
     }
     setSplitType(value);
