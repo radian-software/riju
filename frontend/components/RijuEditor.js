@@ -35,7 +35,17 @@ const RijuEditor = (props) => {
         servicesDisposable = null;
       }
     });
-    () => EventEmitter.unsubcribe(token1, token2);
+    () => {
+      EventEmitter.unsubcribe(token1, token2);
+      if (clientDisposable) {
+        clientDisposable.dispose();
+        clientDisposable = null;
+      }
+      if (servicesDisposable) {
+        servicesDisposable.dispose();
+        servicesDisposable = null;
+      }
+    };
   }, []);
 
   const initLSP = (message, monaco, editor) => {
@@ -43,21 +53,22 @@ const RijuEditor = (props) => {
     const services = MonacoServices.create(editor, {
       rootUri: `file://${message.root}`,
     });
+
     servicesDisposable = Services.install(services);
     const newURI = `file://${message.root}/${config.main}`;
     const oldModel = editor.getModel();
-    if (oldModel.uri.toString() !== newURI) {
-      // This code is likely to be buggy as it will probably
-      // never run and has thus never been tested.
-      editor.setModel(
-        monaco.editor.createModel(
-          oldModel.getValue(),
-          undefined,
-          monaco.Uri.parse(newURI)
-        )
-      );
-      oldModel.dispose();
-    }
+    // if (oldModel.uri.toString() !== newURI) {
+    // This code is likely to be buggy as it will probably
+    // never run and has thus never been tested.
+    // editor.setModel(
+    //   monaco.editor.createModel(
+    //     oldModel?.getValue(),
+    //     undefined,
+    //     monaco.Uri.parse(newURI)
+    //   )
+    // );
+    // oldModel.dispose();
+    // }
 
     const connection = createMessageConnection(
       new RijuMessageReader(socket),
