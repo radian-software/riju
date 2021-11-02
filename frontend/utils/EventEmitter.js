@@ -13,6 +13,7 @@ export const EventEmitter = {
     if (!this.events[event]) this.events[event] = {};
     const token = "uID_" + String(++this.lastUid);
     this.events[event][token] = callback;
+    return token;
   },
   unsubcribe: function (...tokens) {
     for (let k of Object.keys(events)) {
