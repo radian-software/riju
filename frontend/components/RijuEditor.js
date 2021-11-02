@@ -1,4 +1,5 @@
 import MonacoEditor from "@monaco-editor/react";
+
 import {
   createConnection,
   MonacoLanguageClient,
@@ -36,7 +37,7 @@ const RijuEditor = (props) => {
       }
     });
     () => {
-      EventEmitter.unsubcribe(token1, token2);
+      EventEmitter.unsubscribe(token1, token2);
       if (clientDisposable) {
         clientDisposable.dispose();
         clientDisposable = null;
@@ -58,16 +59,16 @@ const RijuEditor = (props) => {
     // const newURI = `file://${message.root}/${config.main}`;
     // const oldModel = editor.getModel();
     // if (oldModel.uri.toString() !== newURI) {
-    // This code is likely to be buggy as it will probably
-    // never run and has thus never been tested.
-    // editor.setModel(
-    //   monaco.editor.createModel(
-    //     oldModel?.getValue(),
-    //     undefined,
-    //     monaco.Uri.parse(newURI)
-    //   )
-    // );
-    // oldModel.dispose();
+    //   // This code is likely to be buggy as it will probably
+    //   // never run and has thus never been tested.
+    //   editor.setModel(
+    //     monaco.editor.createModel(
+    //       oldModel?.getValue(),
+    //       undefined,
+    //       monaco.Uri.parse(newURI)
+    //     )
+    //   );
+    //   oldModel.dispose();
     // }
 
     const connection = createMessageConnection(

@@ -15,11 +15,11 @@ export const EventEmitter = {
     this.events[event][token] = callback;
     return token;
   },
-  unsubcribe: function (...tokens) {
-    for (let k of Object.keys(events)) {
-      let toks = Object.keys(events[k]);
+  unsubscribe: function (...tokens) {
+    for (let k of Object.keys(this.events)) {
+      let toks = Object.keys(this.events[k]);
       for (let tok of toks) {
-        if (tokens.includes(tok)) delete events[k][tok];
+        if (tokens.includes(tok)) delete this.events[k][tok];
       }
     }
   },

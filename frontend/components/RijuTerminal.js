@@ -42,7 +42,7 @@ function RijuTerminal() {
       EventEmitter.dispatch("send", { event: "terminalInput", input: data });
     });
 
-    () => EventEmitter.unsubcribe(token1, token2);
+    () => EventEmitter.unsubscribe(token1, token2);
   }, []);
 
   return (
