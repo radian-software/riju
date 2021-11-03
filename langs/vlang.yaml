@@ -1,0 +1,28 @@
+id: "v"
+aliases:
+  - "vlang"
+name: "V"
+
+install:
+  manual: |
+    git clone https://github.com/vlang/v
+    pushd v
+    make
+    popd
+
+main: "main.v"
+template: |
+  fn main() {
+    println('hello world')
+  }
+
+compile: |
+  v run main.v
+
+format:
+  run: |
+    v fmt main.v
+  input: |
+    fn main() {
+      println('hello world')
+    }
