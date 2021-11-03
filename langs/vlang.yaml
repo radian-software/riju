@@ -21,7 +21,7 @@ compile: |
 
 format:
   run: |
-    v fmt main.v
+    v fmt -w main.v
   input: |
     fn main() {
       println('hello world')
