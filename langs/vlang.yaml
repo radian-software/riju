@@ -13,7 +13,7 @@ install:
 main: "main.v"
 template: |
   fn main() {
-	  println('Hello, world!')
+    println('Hello, world!')
   }
 
 compile: |
@@ -25,5 +25,5 @@ format:
   input: |
     fn main() 
     {
-	    println("Hello, world!")
+      println('Hello, world!')
     }
