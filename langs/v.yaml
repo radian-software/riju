@@ -17,7 +17,7 @@ template: |
     println('Hello, world!')
   }
 
-compile: |
+run: |
   v run main.v
 
 format:
