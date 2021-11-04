@@ -5,9 +5,10 @@ name: "V"
 
 install:
   manual: |
-    git clone https://github.com/vlang/v
+    git clone https://github.com/vlang/v.git
     pushd v
     make
+    cp v ${pkg}/usr/local/bin
     popd
 
 main: "main.v"
