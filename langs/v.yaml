@@ -3,6 +3,26 @@ aliases:
   - "vlang"
 name: "V"
 
+info:
+  year: 2019
+  desc: "V is a simple, statically-typed compiled programming language designed for building maintainable software."
+  ext:
+    - v
+  web:
+    home: "https://vlang.io/"
+    source: "https://github.com/vlang/v"
+    wiki: "https://github.com/vlang/v/wiki"
+  category: general
+  mode: compiled
+  syntax:
+    - c
+  typing:
+    - static
+  paradigm:
+    - functional
+    - imperative
+  usage: personal
+
 install:
   manual: |
     git clone https://github.com/vlang/v.git
