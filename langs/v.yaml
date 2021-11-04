@@ -22,7 +22,7 @@ run: |
 
 format:
   run: |
-    v fmt -w main.v
+    v fmt main.v
   input: |
     fn main() 
     {
