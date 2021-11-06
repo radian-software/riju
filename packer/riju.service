@@ -11,7 +11,7 @@ ExecStart=riju-supervisor
 Restart=always
 RestartSec=5
 Environment=AWS_REGION=$AWS_REGION
-Environment=FATHOM_SITE_ID=$FATHOM_SITE_ID
+Environment=ANALYTICS_TAG=ANALYTICS_TAG
 Environment=S3_BUCKET=$S3_BUCKET
 Environment=SENTRY_DSN=$SENTRY_DSN
 Environment=SUPERVISOR_ACCESS_TOKEN=$SUPERVISOR_ACCESS_TOKEN

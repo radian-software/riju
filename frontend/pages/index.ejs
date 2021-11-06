@@ -30,8 +30,8 @@
     <% } else { %>
       <i>Riju is loading language configuration...</i>
     <% } %>
-    <% if (fathomSiteId) { %>
-      <script src="https://cdn.usefathom.com/script.js" data-site="<%= fathomSiteId %>" defer></script>
+    <% if (analyticsTag) { %>
+      <%= analyticsTag %>
     <% } %>
   </body>
 </html>

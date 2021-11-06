@@ -22,8 +22,8 @@
      window.rijuConfig = <%- JSON.stringify(config) %>;
     </script>
     <script src="/js/app.js" defer></script>
-    <% if (fathomSiteId) { %>
-      <script src="https://cdn.usefathom.com/script.js" data-site="<%= fathomSiteId %>" defer></script>
+    <% if (analyticsTag) { %>
+      <%= analyticsTag %>
     <% } %>
   </head>
   <body>

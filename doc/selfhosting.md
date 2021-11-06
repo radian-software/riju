@@ -263,9 +263,9 @@ enable all the fun CloudFlare options you'd like.
 
 ## Set up analytics (optional)
 
-Sign up for Fathom Analytics, enter your domain name, and get a site
-ID. Set this as `FATHOM_SITE_ID` in your `.env` file, and build and
-roll out a new web AMI.
+Sign up for Fathom Analytics, enter your domain name, and get a tag
+for embedding. Set this as `ANALYTICS_TAG` in your `.env` file (don't
+forget the appropriate quoting), and build and roll out a new web AMI.
 
 ## Set up monitoring (optional)
 
