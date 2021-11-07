@@ -15,7 +15,10 @@ const host = process.env.HOST || "localhost";
 const port = parseInt(process.env.PORT || "") || 6119;
 const tlsPort = parseInt(process.env.TLS_PORT || "") || 6120;
 const useTLS = process.env.TLS ? true : false;
-const analyticsTag = process.env.ANALYTICS_TAG || "";
+const analyticsTag = (process.env.ANALYTICS_TAG || "").replace(
+  /^'(.+)'$/,
+  "$1"
+);
 
 const langs = await langsPromise;
 const app = express();
