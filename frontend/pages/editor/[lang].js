@@ -4,7 +4,7 @@ import {
   Home,
   HorizontalSplit,
   PlayArrow,
-  VerticalSplit,
+  VerticalSplit
 } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
@@ -14,17 +14,17 @@ import {
   Stack,
   ToggleButton,
   ToggleButtonGroup,
-  Typography,
+  Typography
 } from "@mui/material";
 import ansi from "ansicolor";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
-import Layouts from "../../components/Layouts";
 import langs from "../../assets/langs.json";
-import { EventEmitter } from "../../utils/EventEmitter";
+import Layouts from "../../components/Layouts";
 import { SocketManager } from "../../services/WS";
+import { EventEmitter } from "../../utils/EventEmitter";
 ansi.rgb = {
   green: "#00FD61",
 };
@@ -188,12 +188,7 @@ const CodeRunner = (props) => {
     }
   };
 
-  const handleWsClose = (event) => {
-    if (event.wasClean) {
-      console.log("Connection closed cleanly");
-    } else {
-      console.error("Connection died");
-    }
+  const handleWsClose = () => {
     EventEmitter.dispatch("lspStopped");
     setRunning(false);
     setLspStarted(false);
@@ -206,8 +201,6 @@ const CodeRunner = (props) => {
     serviceLogBuffers = {};
     serviceLogLines = {};
     setStatus("connecting");
-    SocketManager.connect(config, handleWsOpen, handleWsMessage, handleWsClose);
-    return () => SocketManager.disconnect();
   }, [config, mounted]);
 
   function showValue() {
@@ -420,6 +413,9 @@ const CodeRunner = (props) => {
               config={config}
               splitType={splitType}
               onEditorMount={editorDidMount}
+              onWsOpen={handleWsOpen}
+              onWsMessage={handleWsMessage}
+              onWsClose={handleWsClose}
             />
           </Box>
           <Box className="panel" sx={{ bgcolor: "#292D3E", p: 2 }}>

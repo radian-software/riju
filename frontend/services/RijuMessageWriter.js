@@ -25,7 +25,8 @@ class RijuMessageWriter extends AbstractMessageWriter {
     if (DEBUG) {
       console.log("SEND LSP:", msg);
     }
-    this.socket.send(JSON.stringify({ event: "lspInput", input: msg }));
+    if (this.socket && this.socket.readyState === WebSocket.OPEN)
+      this.socket.send(JSON.stringify({ event: "lspInput", input: msg }));
   }
 
   disableDynamicRegistration(msg) {
