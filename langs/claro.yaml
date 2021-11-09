@@ -1,0 +1,44 @@
+id: "claro"
+name: "Claro"
+
+install:
+    aptKey:
+      - "https://bazel.build/bazel-release.pub.gpg"
+    aptRepo:
+      - "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8"
+    apt:
+      - bazel
+      - default-jdk
+    manual: |
+      # Install Claro repo.
+      install -d "${pkg}/usr/local/bin"
+      touch "${pkg}/usr/local/bin/MYTEST"
+      wget "https://github.com/JasonSteving99/claro-lang/archive/refs/tags/v0.1.0.tar.gz"
+      tar -xf v0.1.0.tar.gz
+      pushd claro-lang-*
+      cp -R * "${pkg}/usr/local/bin"
+      popd 
+
+
+setup: |
+    echo "setting up!"
+    cp -R /usr/local/bin/* "${HOME}/src"
+
+main: "src/java/com/claro/claro_programs/conditions.claro"
+template: |
+    # Fill this in later
+    print("Hello, Riju world!");
+
+run: |
+    echo "Hello, world!"
+    echo $(bazel --version)
+    pwd
+    ls
+    # This --nojava_header_compilation flag is necessary because Lombok
+    # fails with error "Turbine is not currently supported by lombok."
+    # Followed the resolution here: https://githubmemory.com/repo/rzwitserloot/lombok/issues/2911
+    # I don't know what any of this means.... but hey it works now *shrug*
+    bazel run --nojava_header_compilation //src/java/com/claro/claro_programs:conditions_compiled_claro_image  
+
+skip:
+  - run
