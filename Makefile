@@ -150,8 +150,8 @@ pkg: pkg-clean pkg-build pkg-deb # L=<lang> T=<type> [Z=gzip|xz] : Build fresh .
 
 ### Build and run application code
 
-frontend: # Compile and run frontend assets for production
-	yarn build && yarn start
+frontend: # Compile frontend assets for production
+	yarn build
 
 frontend-dev: # Compile and watch frontend assets for development
 	yarn dev
