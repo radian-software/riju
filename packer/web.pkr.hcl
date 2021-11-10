@@ -8,9 +8,9 @@ variable "aws_region" {
   default = "${env("AWS_REGION")}"
 }
 
-variable "fathom_site_id" {
+variable "analytics_tag" {
   type    = string
-  default = "${env("FATHOM_SITE_ID")}"
+  default = "${env("ANALYTICS_TAG")}"
 }
 
 variable "grafana_api_key" {
@@ -35,7 +35,7 @@ variable "supervisor_access_token" {
 
 data "amazon-ami" "ubuntu" {
   filters = {
-    name                = "ubuntu/images/hvm-ssd/ubuntu-*-21.04-amd64-server-*"
+    name                = "ubuntu/images/hvm-ssd/ubuntu-*-21.10-amd64-server-*"
     root-device-type    = "ebs"
     virtualization-type = "hvm"
   }
@@ -116,7 +116,7 @@ build {
     environment_vars = [
       "ADMIN_PASSWORD=${var.admin_password}",
       "AWS_REGION=${var.aws_region}",
-      "FATHOM_SITE_ID=${var.fathom_site_id}",
+      "ANALYTICS_TAG=${var.analytics_tag}",
       "GRAFANA_API_KEY=${var.grafana_api_key}",
       "S3_BUCKET=${var.s3_bucket}",
       "SENTRY_DSN=${var.sentry_dsn}",

@@ -3,12 +3,26 @@ Description=Resource limits for Riju user containers
 Before=slices.target
 
 [Slice]
+
+# t3.large instance has baseline CPU performance of 60% and is
+# burstable up to 200%. Reserve bursting for server + operating
+# system.
 CPUAccounting=true
-CPUQuota=100%
+CPUQuota=60%
+
+# t3.large instance has 8GB memory, so reserve 3GB for server +
+# operating system. Disable swap for now.
 MemoryAccounting=true
-MemoryMax=3G
-MemorySwapMax=8G
+MemoryMax=5G
+MemorySwapMax=0
+
+# Empirically, EC2 instances appear to have /proc/sys/kernel/pid_max
+# equal to 2^22 = 4194304. It should be safe to give about a tenth of
+# this space to user code.
 TasksAccounting=true
-TasksMax=2048
+TasksMax=400000
+
+# Attempt to deny access to EC2 Instance Metadata service from user
+# code.
 IPAccounting=true
 IPAddressDeny=169.254.169.254

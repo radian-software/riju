@@ -44,8 +44,9 @@ being nice include:
 
 * *Trying to consume as many resources as possible.* All this will do
   is prevent others from using Riju, which isn't nice.
-* *Mining cryptocurrency.* Since hosting Riju comes out of my
-  paycheck, this is exactly equivalent to stealing, which isn't nice.
+* *Mining cryptocurrency.* Since hosting Riju comes out of ~my
+  paycheck~ community donations, this is exactly equivalent to
+  stealing, which isn't nice.
 
 ## Can I help? / Documentation
 
