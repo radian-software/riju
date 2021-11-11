@@ -19,6 +19,10 @@ function showError({ message, data }) {
   document.querySelector("html").classList.add("is-clipped");
 }
 
+const postExecutionResults = (output) => {
+  window.parent.postMessage({ event: "execution_has_results", output }, "*");
+}
+
 const postTestResults = (testData, expectedOutput) => {
   const pass = testData.some((output) => output.includes(expectedOutput));
 
@@ -152,9 +156,11 @@ async function main() {
           term.write(message.output);
           testData.push(message.output);
 
-          if (testData.join("").includes('Test run finished')) {
+          if (testData.join("").includes('Test run finished') && message.expectedOutput) {
             postTestResults(testData, message.expectedOutput);
             testData = [];
+          } else {
+            postExecutionResults(message.output);
           }
           return;
         case "lspStopped":
