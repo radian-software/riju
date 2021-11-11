@@ -20,8 +20,6 @@ main: "main.ts"
 template: |
   console.log("Hello, world!");
 
-compile: |
-  tsc main.ts
 run: |
   ts-node -i -e "$(< main.ts)"
 
