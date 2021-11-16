@@ -23,7 +23,7 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 
 ubuntu_name="$(lsb_release -cs)"
 
-node_repo="$(curl -sS https://deb.nodesource.com/setup_current.x | grep NODEREPO= | grep -Eo 'node_[0-9]+\.x' | head -n1)"
+node_repo="$(curl -sS https://deb.nodesource.com/setup_16.x | grep NODEREPO= | grep -Eo 'node_[0-9]+\.x' | head -n1)"
 
 tee -a /etc/apt/sources.list.d/custom.list >/dev/null <<EOF
 deb [arch=amd64] https://deb.nodesource.com/${node_repo} ${ubuntu_name} main
