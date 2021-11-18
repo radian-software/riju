@@ -52,8 +52,8 @@ ifeq ($(I),lang)
 	@: $${L}
 	node tools/build-lang-image.js --lang $(L)
 else ifeq ($(I),ubuntu)
-	docker pull ubuntu:rolling
-	hash="$$(docker inspect ubuntu:rolling -f '{{ .Id }}' | sha1sum | awk '{ print $$1 }')"; echo "FROM ubuntu:rolling" | docker build --label riju.image-hash="$${hash}" -t riju:$(I) -
+	docker pull ubuntu:21.04
+	hash="$$(docker inspect ubuntu:21.04 -f '{{ .Id }}' | sha1sum | awk '{ print $$1 }')"; echo "FROM ubuntu:21.04" | docker build --label riju.image-hash="$${hash}" -t riju:$(I) -
 else ifneq (,$(filter $(I),admin ci))
 	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) $(NO_CACHE)
 else
