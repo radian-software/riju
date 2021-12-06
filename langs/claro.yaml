@@ -101,3 +101,9 @@ run: |
 
 repl: |
     java -jar claro_compiler_binary_deploy.jar --repl --silent
+
+input: |
+    print(123 * 234);
+
+skip:
+    - runrepl
