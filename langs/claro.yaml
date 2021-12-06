@@ -44,6 +44,7 @@ install:
       # I'm not good enough with sed to figure out how to avoid this extra temporary stop in a second file. Oh well.
       chmod 777 conditions_compiled_claro_image
       cat conditions_compiled_claro_image2 > conditions_compiled_claro_image
+      rm conditions_compiled_claro_image2
 
       popd > /dev/null
       #####################################################################################################
@@ -69,11 +70,13 @@ run: |
     chmod +rw claro_programs/Conditions.java
     java -jar claro_compiler_binary_deploy.jar --java_source --silent --classname=Conditions --package=com.claro \
         < claro_programs/Conditions.claro \
-        > claro_programs/Conditions.java
-
-    pushd claro_programs/ > /dev/null
-    ./conditions_compiled_claro_image
-    popd > /dev/null
+        > claro_programs/Conditions.java \
+        && \
+        pushd claro_programs/ > /dev/null \
+        && \
+        ./conditions_compiled_claro_image \
+        && \
+        popd > /dev/null
 
 repl: |
     java -jar claro_compiler_binary_deploy.jar --repl --silent
