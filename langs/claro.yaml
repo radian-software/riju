@@ -2,102 +2,80 @@ id: "claro"
 name: "Claro"
 
 install:
-    aptKey:
-      - "https://bazel.build/bazel-release.pub.gpg"
-    aptRepo:
-      - "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8"
     apt:
-      - bazel
       - default-jdk
     manual: |
-      # Install Claro repo.
       install -d "${pkg}/usr/local/bin"
-      touch "${pkg}/usr/local/bin/MYTEST"
-      # Temporarily try to pull the tarball of the built Bazel repo instead of just the sources.
-      # wget "https://github.com/JasonSteving99/claro-lang/archive/refs/tags/v0.1.0.tar.gz"
-      # tar -xf v0.1.0.tar.gz
-      # pushd claro-lang-*
 
-      # wget "https://github.com/JasonSteving99/claro-lang/releases/download/v0.1.0/claro-lang.tar.gz"
-      # tar -xzvf claro-lang.tar.gz
-      wget "https://github.com/JasonSteving99/claro-lang/releases/download/v0.1.0/claro-lang-bazel-bin.tar.gz"
+      # Pull resources from the latest Claro repo release.
+      ver="$(latest_release JasonSteving99/claro-lang)"
+
+      # Pull the tarball of the built Bazel repo's bazel-bin instead of just the sources.
+      wget "https://github.com/JasonSteving99/claro-lang/releases/download/${ver}/claro-lang-bazel-bin.tar.gz"
       tar -xzvf claro-lang-bazel-bin.tar.gz
 
-      cp -R external "${pkg}/usr/local/bin"
-      cp -R src  "${pkg}/usr/local/bin"
+      #####################################################################################################
+      # We don't want to depend on Bazel at all for rebuilding, it's just one file changing. Rebuild it using
+      # the packaged jar files and then update the jar holding that recompiled file and run the Bazel gen'd
+      # run script which points at all the correct jar runfiles. First though, we need to slightly modify
+      # the Bazel gen'd runscript to rebuild using the packaged jars for us (without explicitly rerunning Bazel
+      # itself since this is super slow and involves starting up a new Bazel server...).
+      pushd claro_programs/ > /dev/null
+      fancydelim=$(printf '\001') # https://stackoverflow.com/a/25821096/10027370
 
-      # TODO(jsteving) I SHOULD NOW FOLLOW THIS GENERAL APPROACH TO CREATE A RUNSCRIPT:
-      # Create the shortest classpath we can, by making it relative if possible.
-      # RUNPATH="${JAVA_RUNFILES}/claro-lang/"
-      # RUNPATH="${RUNPATH#$PWD/}"
-      # CLASSPATH="${RUNPATH}src/java/com/claro/claro_programs/conditions_compiled_claro_image.jar:${RUNPATH}../maven/v1/https/jcenter.bintray.com/com/google/guava/guava/28.1-jre/guava-28.1-jre.jar:${RUNPATH}../maven/v1/https/jcenter.bintray.com/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:${RUNPATH}../maven/v1/https/jcenter.bintray.com/org/codehaus/mojo/animal-sniffer-annotations/1.18/animal-sniffer-annotations-1.18.jar:${RUNPATH}../maven/v1/https/jcenter.bintray.com/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar:${RUNPATH}../maven/v1/https/jcenter.bintray.com/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:${RUNPATH}../maven/v1/https/jcenter.bintray.com/org/checkerframework/checker-qual/2.8.1/checker-qual-2.8.1.jar:${RUNPATH}../maven/v1/https/jcenter.bintray.com/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:${RUNPATH}../maven/v1/https/jcenter.bintray.com/com/google/errorprone/error_prone_annotations/2.3.2/error_prone_annotations-2.3.2.jar:${RUNPATH}src/java/com/claro/intermediate_representation/types/impls/builtins_impls/collections/libcollections_impls.jar:${RUNPATH}src/java/com/claro/intermediate_representation/types/impls/builtins_impls/libbuiltins_impls.jar:${RUNPATH}src/java/com/claro/intermediate_representation/types/libtype.jar:${RUNPATH}src/java/com/claro/intermediate_representation/types/libbase_type.jar:${RUNPATH}src/java/com/claro/intermediate_representation/types/impls/libclaro_type_implementation.jar:${RUNPATH}src/java/com/claro/intermediate_representation/types/impls/user_defined_impls/libuser_defined_impls.jar:${RUNPATH}src/java/com/claro/intermediate_representation/types/libclaro_type_exception.jar:${RUNPATH}src/java/com/claro/intermediate_representation/types/libconcrete_type.jar:${RUNPATH}src/java/com/claro/intermediate_representation/types/libtypes.jar:${RUNPATH}src/java/com/claro/intermediate_representation/types/libparameterized_type.jar:${RUNPATH}src/java/com/claro/intermediate_representation/types/libtype_provider.jar:${RUNPATH}src/java/com/claro/compiler_backends/interpreted/libscoped_heap.jar:${RUNPATH}src/java/com/claro/libclaro_parser_exception.jar:${RUNPATH}src/java/com/claro/intermediate_representation/expressions/libexpr.jar:${RUNPATH}src/java/com/claro/intermediate_representation/libnode.jar:${RUNPATH}src/java/com/claro/intermediate_representation/types/libconcrete_types.jar:${RUNPATH}src/java/com/claro/runtime_utilities/libruntime_utilities.jar"
-      # CLASSPATH+=":${RUNPATH}../../../../../../../external/maven/v1/https/jcenter.bintray.com/org/projectlombok/lombok/1.18.20/lombok-1.18.20.jar"
-      # CLASSPATH+=":${RUNPATH}../../../../../../../external/maven/v1/https/jcenter.bintray.com/com/google/auto/value/auto-value/1.5.3/auto-value-1.5.3.jar"
-      # echo $CLASSPATH
-      # javac -classpath $CLASSPATH Conditions.java
-      # mkdir com
-      # mkdir com/claro
-      # mv Conditions.class com/claro
-      # jar -uf "${RUNPATH}src/java/com/claro/claro_programs/conditions_compiled_claro_image.jar" com/claro/Conditions.class
-      # exec $JAVABIN -classpath $CLASSPATH "${ARGS[@]}"
+      # MY_SCRIPT='  CLASSPATH+=":\${RUNPATH}../../../../../../../external/maven/v1/https/jcenter.bintray.com/org/projectlombok/lombok/1.18.20/lombok-1.18.20.jar"\n'
+      # MY_SCRIPT+='  CLASSPATH+=":\${RUNPATH}../../../../../../../external/maven/v1/https/jcenter.bintray.com/com/google/auto/value/auto-value/1.5.3/auto-value-1.5.3.jar"\n'
+      # For the purpose of rebuilding, we need lombok and autovalue on the classpath.
+      MY_SCRIPT='  REBUILD_CLASSPATH="${CLASSPATH}"\n'
+      MY_SCRIPT+='  REBUILD_CLASSPATH+=":lombok-1.18.20.jar"\n'
+      MY_SCRIPT+='  REBUILD_CLASSPATH+=":auto-value-1.5.3.jar"\n'
+      MY_SCRIPT+='  javac -classpath $REBUILD_CLASSPATH Conditions.java\n'
+      # There's an assumption that the dir ./com/claro/ was made in the tarball before this.
+      MY_SCRIPT+='  mv Conditions*.class com/claro\n'
+      MY_SCRIPT+='  jar -uf "${RUNPATH}src/java/com/claro/claro_programs/conditions_compiled_claro_image.jar" com/claro/Conditions*.class\n'
+      MY_SCRIPT+='  java -classpath $CLASSPATH "${ARGS[@]}"\n'
+      # We insert our own exit here to short-circuit the Bazel run script's call to JAVABIN which is
+      # invalid on this host machine.
+      MY_SCRIPT+='  exit $?\n'
 
-      # popd
+      # Insert MY_SCRIPT into the Bazel run script just before java gets executed. We're reusing Bazel's run
+      # script basically just to get a conveniently curated CLASSPATH variable generated to point to all the
+      # randomly scattered jar files that Bazel places throughout bazel-bin/.
+      sed -n "H;\${x;s/\n//;s${fancydelim}create_and_run_classpath_jar\nelse\n${fancydelim}&${MY_SCRIPT}\n${fancydelim};p;}" conditions_compiled_claro_image > conditions_compiled_claro_image2
+
+      # I'm not good enough with sed to figure out how to avoid this extra temporary stop in a second file. Oh well.
+      chmod 777 conditions_compiled_claro_image
+      cat conditions_compiled_claro_image2 > conditions_compiled_claro_image
+
+      popd > /dev/null
+      #####################################################################################################
+
+      cp -R claro_programs "${pkg}/usr/local/bin"
+
       wget "https://github.com/JasonSteving99/claro-lang/releases/download/v0.1.0/claro_compiler_binary_deploy.jar"
       cp  claro_compiler_binary_deploy.jar "${pkg}/usr/local/bin"
 
-
 setup: |
-    echo "setting up!"
     cp -R /usr/local/bin/* "${HOME}/src"
-    # touch src/java/com/claro/claro_programs/Riju.java
-    # bazel build --nojava_header_compilation //src/java/com/claro/claro_programs:riju
 
-main: "src/java/com/claro/claro_programs/Conditions.claro"
+main: "claro_programs/Conditions.claro"
 template: |
-    # Please allow a few minutes for your session to be ready to work with, then have fun!
+    # Thanks for trying out Claro during its early development stages!
+    # To learn Claro by example, check out:
+    # https://clarolang.com/tree/main/src/java/com/claro/claro_programs
+
     print("Hello, world!");
 
 run: |
     # Skip rebuilding the entire compiler all over again and instead just use the pre-built Claro compiler jar.
-    chmod +rw src/java/com/claro/claro_programs/Conditions.java
+    chmod +rw claro_programs/Conditions.java
     java -jar claro_compiler_binary_deploy.jar --java_source --silent --classname=Conditions --package=com.claro \
-        < src/java/com/claro/claro_programs/Conditions.claro \
-        > src/java/com/claro/claro_programs/Conditions.java
+        < claro_programs/Conditions.claro \
+        > claro_programs/Conditions.java
 
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # We don't want to depend on Bazel at all for rebuilding, it's just one file changing. Rebuild it using
-    # the packaged jar files and then update the jar holding that recompiled file and run the Bazel gen'd
-    # run script which points at all the correct jar runfiles.
-    pushd src/java/com/claro/claro_programs/ > /dev/null
-    fancydelim=$(printf '\001') # https://stackoverflow.com/a/25821096/10027370
-
-    MY_SCRIPT='  CLASSPATH+=":\${RUNPATH}../../../../../../../external/maven/v1/https/jcenter.bintray.com/org/projectlombok/lombok/1.18.20/lombok-1.18.20.jar"\n'
-    MY_SCRIPT+='  CLASSPATH+=":\${RUNPATH}../../../../../../../external/maven/v1/https/jcenter.bintray.com/com/google/auto/value/auto-value/1.5.3/auto-value-1.5.3.jar"\n'
-    MY_SCRIPT+='  javac -classpath $CLASSPATH Conditions.java\n'
-    # There's an assumption that the dir ./com/claro/ was made before this.
-    MY_SCRIPT+='  mv Conditions*.class com/claro\n'
-    MY_SCRIPT+='  jar -uf "${RUNPATH}src/java/com/claro/claro_programs/conditions_compiled_claro_image.jar" com/claro/Conditions*.class\n'
-    MY_SCRIPT+='  java -classpath $CLASSPATH "${ARGS[@]}"\n'
-    # We insert our own exit here to short-circuit the call to JAVABIN which is invalid on this host machine.
-    MY_SCRIPT+='  exit $?\n'
-
-    sed -n "H;\${x;s/\n//;s${fancydelim}create_and_run_classpath_jar\nelse\n${fancydelim}&${MY_SCRIPT}\n${fancydelim};p;}" conditions_compiled_claro_image > conditions_compiled_claro_image2
-
-    chmod 777 conditions_compiled_claro_image
-    cat conditions_compiled_claro_image2 > conditions_compiled_claro_image
-
+    pushd claro_programs/ > /dev/null
     ./conditions_compiled_claro_image
-
     popd > /dev/null
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
-    # This --nojava_header_compilation flag is necessary because Lombok
-    # fails with error "Turbine is not currently supported by lombok."
-    # Followed the resolution here: https://githubmemory.com/repo/rzwitserloot/lombok/issues/2911
-    # I don't know what any of this means.... but hey it works now *shrug*
-    # bazel run --nojava_header_compilation --ui_event_filters=-info,-stdout,-stderr --noshow_progress //src/java/com/claro/claro_programs:riju
-    # bazel run --nojava_header_compilation --ui_event_filters=-info,-stdout,-stderr --noshow_progress //src/java/com/claro/claro_programs:conditions_compiled_claro_image  
-
-skip:
-    - run
+repl: |
+    java -jar claro_compiler_binary_deploy.jar --repl --silent
