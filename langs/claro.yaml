@@ -1,6 +1,27 @@
 id: "claro"
 name: "Claro"
 
+info:
+  impl: "Claro"
+  version: "0.1.0"
+  year: 2021
+  desc: "Optionally compiled or interpreted, high-level, toy programming language, with an eye towards providing standardized Software Engineering best practices out of the box"
+  ext:
+    - claro
+  web:
+    home: "https://clarolang.com/"
+    source: "https://github.com/JasonSteving99/claro-lang/"
+  category: recreational
+  mode: compiled or interpreted
+  platform: Bazel
+  syntax:
+    - java
+  typing: static
+  paradigm:
+    - functional
+    - imperative
+  usage: literally just Jason Steving
+
 install:
     apt:
       - default-jdk
