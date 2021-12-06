@@ -23,8 +23,6 @@ install:
       pushd claro_programs/ > /dev/null
       fancydelim=$(printf '\001') # https://stackoverflow.com/a/25821096/10027370
 
-      # MY_SCRIPT='  CLASSPATH+=":\${RUNPATH}../../../../../../../external/maven/v1/https/jcenter.bintray.com/org/projectlombok/lombok/1.18.20/lombok-1.18.20.jar"\n'
-      # MY_SCRIPT+='  CLASSPATH+=":\${RUNPATH}../../../../../../../external/maven/v1/https/jcenter.bintray.com/com/google/auto/value/auto-value/1.5.3/auto-value-1.5.3.jar"\n'
       # For the purpose of rebuilding, we need lombok and autovalue on the classpath.
       MY_SCRIPT='  REBUILD_CLASSPATH="${CLASSPATH}"\n'
       MY_SCRIPT+='  REBUILD_CLASSPATH+=":lombok-1.18.20.jar"\n'
