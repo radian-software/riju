@@ -9,7 +9,6 @@ install:
       - cargo
       - cmake
       - libssl-dev
-      - libunwind-dev
       - pkg-config
       - python3-distutils
     manual: |
@@ -18,11 +17,12 @@ install:
       llvmenv init
       # If compiler is not explicitly set to LLVM, then we get an
       # error: unrecognized command-line option ‘-Wnewline-eof’.
-      CC=/usr/bin/clang CXX=/usr/bin/clang++ llvmenv build-entry -G Makefile -j$(nproc) 12.0.1
-      llvmenv global 12.0.1
+      CC=/usr/bin/clang CXX=/usr/bin/clang++ llvmenv build-entry -G Makefile -j$(nproc) 10.0.0
+      llvmenv global 10.0.0
   manual: |
-    git clone https://github.com/jfecher/ante.git
+    git clone https://github.com/jfecher/ante.git -n
     pushd ante
+    git checkout 6e61e9f7ed9300ed68f6b9459b69f027e09a0c42
     LLVM_SYS_100_PREFIX="$(llvmenv prefix)" cargo build --release
     install -d "${pkg}/opt/ante"
     install -d "${pkg}/usr/local/bin"
