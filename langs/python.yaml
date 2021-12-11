@@ -90,3 +90,6 @@ lsp:
         InterpreterPath: /usr/bin/python3
   code: "import func"
   item: "functools"
+
+skip:
+  - lsp

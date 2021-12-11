@@ -23,7 +23,7 @@ setup: |
 repl: |
   "$(which red)"
 input: |
-  DELAY: 1
+  DELAY: 5
   123 * 234
 
 main: "main.red"
