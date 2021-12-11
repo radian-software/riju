@@ -16,7 +16,7 @@ install:
       cargo install llvmenv
       llvmenv init
       # If compiler is not explicitly set to LLVM, then we get an
-      # error: unrecognized command-line option ‘-Wnewline-eof’.
+      # error: unrecognized command-line option '-Wnewline-eof'.
       CC=/usr/bin/clang CXX=/usr/bin/clang++ llvmenv build-entry -G Makefile -j$(nproc) 10.0.1
       llvmenv global 10.0.1
   manual: |
