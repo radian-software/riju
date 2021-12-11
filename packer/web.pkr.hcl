@@ -35,7 +35,7 @@ variable "supervisor_access_token" {
 
 data "amazon-ami" "ubuntu" {
   filters = {
-    name                = "ubuntu/images/hvm-ssd/ubuntu-*-21.10-amd64-server-*"
+    name                = "ubuntu/images/hvm-ssd/ubuntu-*-21.04-amd64-server-*"
     root-device-type    = "ebs"
     virtualization-type = "hvm"
   }
