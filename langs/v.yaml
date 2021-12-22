@@ -5,7 +5,7 @@ name: "V"
 
 info:
   year: 2019
-  desc: "V is a simple, statically-typed compiled programming language designed for building maintainable software"
+  desc: "Simple, statically-typed compiled programming language designed for building maintainable software"
   ext:
     - v
   web:
@@ -27,8 +27,10 @@ install:
   manual: |
     git clone https://github.com/vlang/v.git
     pushd v
+
     make
-    cp v ${pkg}/usr/local/bin
+    cp v "${pkg}/usr/local/bin/"
+
     popd
 
 main: "main.v"
@@ -44,7 +46,7 @@ format:
   run: |
     v fmt main.v
   input: |
-    fn main() 
+    fn main()
     {
       println("Hello, world!")
     }
