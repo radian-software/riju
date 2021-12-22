@@ -60,3 +60,5 @@ template: |
 
 run: |
   dotnet run --project main
+
+timeoutFactor: 4

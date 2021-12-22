@@ -36,3 +36,5 @@ template: |
 run: |
   JAVA_OPTS="-Duser.home=$PWD" kotlinc -script main.kts
   kotlinc
+
+timeoutFactor: 2
