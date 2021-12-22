@@ -8,9 +8,9 @@ variable "aws_region" {
   default = "${env("AWS_REGION")}"
 }
 
-variable "fathom_site_id" {
+variable "analytics_tag" {
   type    = string
-  default = "${env("FATHOM_SITE_ID")}"
+  default = "${env("ANALYTICS_TAG")}"
 }
 
 variable "grafana_api_key" {
@@ -116,7 +116,7 @@ build {
     environment_vars = [
       "ADMIN_PASSWORD=${var.admin_password}",
       "AWS_REGION=${var.aws_region}",
-      "FATHOM_SITE_ID=${var.fathom_site_id}",
+      "ANALYTICS_TAG=${var.analytics_tag}",
       "GRAFANA_API_KEY=${var.grafana_api_key}",
       "S3_BUCKET=${var.s3_bucket}",
       "SENTRY_DSN=${var.sentry_dsn}",

@@ -63,11 +63,11 @@ scope:
   code: |
     x = 123 * 234
   input: |
-    DELAY: 5
+    DELAY: 15
     load main.u
     DELAY: 5
     add x
     DELAY: 5
     display x
 
-timeoutFactor: 2
+timeoutFactor: 4

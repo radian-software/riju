@@ -19,9 +19,9 @@ template: |
   }
 
 compile: |
-  mcs main.cs
+  mcs -debug main.cs
 run: |
-  mono main.exe
+  mono --debug main.exe
 
 format:
   run: |

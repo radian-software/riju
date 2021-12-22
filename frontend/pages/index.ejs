@@ -4,6 +4,9 @@
     <meta charset="utf-8" />
     <title>Riju</title>
     <link rel="stylesheet" href="/css/index.css" />
+    <% if (analyticsTag) { %>
+      <%- analyticsTag %>
+    <% } %>
   </head>
   <body>
     <h1>Riju: <i>fast</i> online playground for every programming language</h1>
@@ -29,9 +32,6 @@
       </p>
     <% } else { %>
       <i>Riju is loading language configuration...</i>
-    <% } %>
-    <% if (fathomSiteId) { %>
-      <script src="https://cdn.usefathom.com/script.js" data-site="<%= fathomSiteId %>" defer></script>
     <% } %>
   </body>
 </html>

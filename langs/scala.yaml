@@ -7,6 +7,9 @@ install:
 
 repl: |
   scala
+input: |
+  DELAY: 5
+  123 * 234
 
 main: "main.scala"
 template: |
@@ -18,3 +21,5 @@ run: |
 scope:
   code: |
     val x = 123 * 234
+
+timeoutFactor: 2

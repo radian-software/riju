@@ -1,4 +1,4 @@
-FROM ubuntu:rolling
+FROM ubuntu:21.04
 
 COPY docker/admin/install.bash /tmp/
 RUN /tmp/install.bash
