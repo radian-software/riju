@@ -1,0 +1,107 @@
+id: "claro"
+name: "Claro"
+
+info:
+  impl: "Claro"
+  year: 2021
+  desc: "High-level toy programming language providing standardized Software Engineering best practices out of the box"
+  ext:
+    - claro
+  web:
+    home: "https://clarolang.com/"
+    source: "https://github.com/JasonSteving99/claro-lang"
+  category: general
+  mode:
+    - compiled
+    - interpreted
+  platform: []
+  syntax:
+    - c
+  typing: static
+  paradigm:
+    - functional
+    - imperative
+  usage: personal
+
+install:
+  apt:
+    - default-jdk
+  manual: |
+    install -d "${pkg}/opt/claro/programs"
+
+    # Pull resources from the latest Claro repo release.
+    ver="$(latest_release JasonSteving99/claro-lang | sed 's/^v//')"
+
+    # Pull the tarball of the built Bazel repo's bazel-bin instead of just the sources.
+    wget "https://github.com/JasonSteving99/claro-lang/releases/download/v${ver}/claro-lang-bazel-bin.tar.gz"
+    tar -xf claro-lang-bazel-bin.tar.gz
+
+    #####################################################################################################
+    # We don't want to depend on Bazel at all for rebuilding, it's just one file changing. Rebuild it using
+    # the packaged jar files and then update the jar holding that recompiled file and run the Bazel gen'd
+    # run script which points at all the correct jar runfiles. First though, we need to slightly modify
+    # the Bazel gen'd runscript to rebuild using the packaged jars for us (without explicitly rerunning Bazel
+    # itself since this is super slow and involves starting up a new Bazel server...).
+    pushd claro_programs
+
+    read -r -d '' MY_SCRIPT <<"EOF" ||:
+      REBUILD_CLASSPATH="${CLASSPATH}"
+      # For the purpose of rebuilding, we need lombok and autovalue on the classpath.
+      REBUILD_CLASSPATH+=":lombok-1.18.20.jar"
+      REBUILD_CLASSPATH+=":auto-value-1.5.3.jar"
+      javac -classpath $REBUILD_CLASSPATH Conditions.java
+      # There's an assumption that the dir ./com/claro/ was made in the tarball before this.
+      mv Conditions*.class com/claro
+      jar -uf "${RUNPATH}src/java/com/claro/claro_programs/conditions_compiled_claro_image.jar" com/claro/Conditions*.class
+      java -classpath $CLASSPATH "${ARGS[@]}"
+    EOF
+
+    # Insert MY_SCRIPT into the Bazel run script just before java gets executed. We're reusing Bazel's run
+    # script basically just to get a conveniently curated CLASSPATH variable generated to point to all the
+    # randomly scattered jar files that Bazel places throughout bazel-bin/.
+    sed -i "s|exec \$JAVABIN.*|${MY_SCRIPT//$'\n'/\\n}|" conditions_compiled_claro_image
+
+    chmod -R u+rw *
+
+    popd
+    #####################################################################################################
+
+    cp -R claro_programs/. "${pkg}/opt/claro/programs/"
+
+    wget "https://github.com/JasonSteving99/claro-lang/releases/download/v${ver}/claro_compiler_binary_deploy.jar"
+    cp claro_compiler_binary_deploy.jar "${pkg}/opt/claro/"
+
+setup: |
+  cp -R /opt/claro/programs "./"
+
+main: "programs/Conditions.claro"
+template: |
+  # Thanks for trying out Claro during its early development stages!
+  # To learn Claro by example, check out:
+  # https://clarolang.com/tree/main/src/java/com/claro/claro_programs
+
+  print("Hello, world!");
+
+repl: |
+  java -jar /opt/claro/claro_compiler_binary_deploy.jar --repl --silent
+
+# Skip rebuilding the entire compiler all over again and instead just
+# use the pre-built Claro compiler jar.
+compile: |
+  java  -jar /opt/claro/claro_compiler_binary_deploy.jar  \
+       --java_source --silent                             \
+       --classname=Conditions --package=com.claro         \
+    < programs/Conditions.claro                           \
+    > programs/Conditions.java
+run: |
+  set -e
+
+  cd programs
+  ./conditions_compiled_claro_image ||:
+
+  java -jar /opt/claro/claro_compiler_binary_deploy.jar --repl --silent
+
+input: |
+  print(123 * 234);
+
+timeoutFactor: 2
