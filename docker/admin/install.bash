@@ -57,8 +57,9 @@ skopeo
 ssh
 strace
 sudo
-tmux
 terraform
+tmux
+tree
 unzip
 uuid-runtime
 vim
