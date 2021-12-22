@@ -28,7 +28,6 @@ install:
     - default-jdk
   manual: |
     install -d "${pkg}/opt/claro/programs"
-    install -d "${pkg}/usr/local/bin"
 
     # Pull resources from the latest Claro repo release.
     ver="$(latest_release JasonSteving99/claro-lang | sed 's/^v//')"
