@@ -103,3 +103,5 @@ run: |
 
 input: |
   print(123 * 234);
+
+timeoutFactor: 2
