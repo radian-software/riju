@@ -23,6 +23,22 @@ import {
 import { getBaseImages, hashDockerfile } from "./hash-dockerfile.js";
 import { runCommand } from "./util.js";
 
+const CONCURRENCY = 1;
+
+async function allPromises(callables, { concurrency }) {
+  const queue = new PQueue({ concurrency: concurrency });
+  const results = [];
+  for (const callable of callables) {
+    queue.add(async () => {
+      console.log("START");
+      results.push(await callable());
+      console.log("END");
+    });
+  }
+  await queue.onIdle();
+  return results;
+}
+
 function getS3Bucket() {
   if (!process.env.S3_BUCKET) {
     throw new Error(`unset environment variable: \$S3_BUCKET`);
