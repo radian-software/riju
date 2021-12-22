@@ -25,18 +25,26 @@ info:
 
 install:
   manual: |
-    git clone https://github.com/vlang/v.git
-    pushd v
+    install -d "${pkg}/opt"
+    install -d "${pkg}/usr/local/bin"
+
+    git clone https://github.com/vlang/v.git "${pkg}/opt/v"
+    pushd "${pkg}/opt/v"
 
     make
-    cp v "${pkg}/usr/local/bin/"
+    ln -s /opt/v/v "${pkg}/usr/local/bin/"
+
+    # Force vfmt to get compiled ahead of time, otherwise this will
+    # happen at first invocation and fail due to lack of write
+    # permissions on /opt/v.
+    ./v fmt < /dev/null
 
     popd
 
 main: "main.v"
 template: |
   fn main() {
-    println('Hello, world!')
+  	println('Hello, world!')
   }
 
 run: |
