@@ -37,4 +37,4 @@ run: |
   JAVA_OPTS="-Duser.home=$PWD" kotlinc -script main.kts
   kotlinc
 
-timeoutFactor: 2
+timeoutFactor: 4

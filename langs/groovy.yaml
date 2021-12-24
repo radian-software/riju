@@ -18,3 +18,5 @@ run: |
 scope:
   code: |
     x = 123 * 234;
+
+timeoutFactor: 4
