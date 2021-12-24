@@ -2,7 +2,6 @@ id: "verilog"
 aliases:
   - "systemverilog"
   - "iverilog"
-  - "v"
 name: "Verilog"
 
 install:
