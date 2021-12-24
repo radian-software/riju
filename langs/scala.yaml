@@ -22,4 +22,4 @@ scope:
   code: |
     val x = 123 * 234
 
-timeoutFactor: 2
+timeoutFactor: 8
