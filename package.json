@@ -31,6 +31,7 @@
     "p-queue": "^6.6.2",
     "parse-passwd": "^1.0.0",
     "prettier": "^2.3.1",
+    "prom-client": "^14.0.1",
     "regenerator-runtime": "^0.13.7",
     "semaphore": "^1.1.0",
     "strip-ansi": "^6.0.0",

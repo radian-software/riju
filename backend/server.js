@@ -5,6 +5,7 @@ import path from "path";
 import express from "express";
 import ws from "express-ws";
 import _ from "lodash";
+import * as promClient from "prom-client";
 
 import * as api from "./api.js";
 import { aliases, langsPromise } from "./langs.js";
@@ -20,11 +21,18 @@ const analyticsTag = (process.env.ANALYTICS_TAG || "").replace(
   "$1"
 );
 
+promClient.collectDefaultMetrics();
+
 const langs = await langsPromise;
 const app = express();
 
 app.set("query parser", (qs) => new URLSearchParams(qs));
 app.set("view engine", "ejs");
+
+app.get("/metrics", async (_, res) => {
+  res.contentType("text/plain; version=0.0.4");
+  res.send(await promClient.register.metrics());
+});
 
 app.get("/", (_, res) => {
   if (Object.keys(langs).length > 0) {
