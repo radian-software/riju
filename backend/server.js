@@ -15,6 +15,7 @@ import { log, privilegedTeardown } from "./util.js";
 const host = process.env.HOST || "localhost";
 const port = parseInt(process.env.PORT || "") || 6119;
 const tlsPort = parseInt(process.env.TLS_PORT || "") || 6120;
+const metricsPort = parseInt(process.env.METRICS_PORT || "") || 6121;
 const useTLS = process.env.TLS ? true : false;
 const analyticsTag = (process.env.ANALYTICS_TAG || "").replace(
   /^'(.+)'$/,
@@ -23,16 +24,17 @@ const analyticsTag = (process.env.ANALYTICS_TAG || "").replace(
 
 promClient.collectDefaultMetrics();
 
+const metricsApp = express();
+metricsApp.get("/metrics", async (_, res) => {
+  res.contentType("text/plain; version=0.0.4");
+  res.send(await promClient.register.metrics());
+});
+
 const langs = await langsPromise;
 const app = express();
 
 app.set("query parser", (qs) => new URLSearchParams(qs));
 app.set("view engine", "ejs");
-
-app.get("/metrics", async (_, res) => {
-  res.contentType("text/plain; version=0.0.4");
-  res.send(await promClient.register.metrics());
-});
 
 app.get("/", (_, res) => {
   if (Object.keys(langs).length > 0) {
@@ -148,3 +150,7 @@ if (useTLS) {
     console.log(`Listening on http://${host}:${port}`)
   );
 }
+
+metricsApp.listen(metricsPort, host, () =>
+  console.log(`Listening on http://${host}:${metricsPort}/metrics`)
+);

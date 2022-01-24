@@ -62,13 +62,17 @@ endif
 
 VOLUME_MOUNT ?= $(PWD)
 
+# http
 P1 ?= 6119
+# https
 P2 ?= 6120
+# metrics
+P3 ?= 6121
 
 ifneq (,$(EE))
-SHELL_PORTS := -p 0.0.0.0:$(P1):6119 -p 0.0.0.0:$(P2):6120
+SHELL_PORTS := -p 0.0.0.0:$(P1):6119 -p 0.0.0.0:$(P2):6120 -p 0.0.0.0:$(P3):6121
 else ifneq (,$(E))
-SHELL_PORTS := -p 127.0.0.1:$(P1):6119 -p 127.0.0.1:$(P2):6120
+SHELL_PORTS := -p 127.0.0.1:$(P1):6119 -p 127.0.0.1:$(P2):6120 -p 127.0.0.1:$(P3):6121
 else
 SHELL_PORTS :=
 endif
