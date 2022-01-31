@@ -1,0 +1,13 @@
+[Unit]
+Description=Prometheus
+StartLimitBurst=5
+StartLimitIntervalSec=300
+
+[Service]
+Type=exec
+ExecStart=prometheus --config.file /etc/prometheus/config.yaml
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -13,6 +13,16 @@ variable "analytics_tag" {
   default = "${env("ANALYTICS_TAG")}"
 }
 
+variable "grafana_loki_username" {
+  type    = string
+  default = "${env("GRAFANA_LOKI_USERNAME")}"
+}
+
+variable "grafana_prometheus_username" {
+  type    = string
+  default = "${env("GRAFANA_PROMETHEUS_USERNAME")}"
+}
+
 variable "grafana_api_key" {
   type    = string
   default = "${env("GRAFANA_API_KEY")}"
@@ -83,6 +93,21 @@ build {
   }
 
   provisioner "file" {
+    destination = "/tmp/node-exporter.service"
+    source = "node-exporter.service"
+  }
+
+  provisioner "file" {
+    destination = "/tmp/prometheus.service"
+    source = "prometheus.service"
+  }
+
+  provisioner "file" {
+    destination = "/tmp/prometheus.yaml"
+    source = "prometheus.yaml"
+  }
+
+  provisioner "file" {
     destination = "/tmp/promtail.service"
     source = "promtail.service"
   }
@@ -117,6 +142,8 @@ build {
       "ADMIN_PASSWORD=${var.admin_password}",
       "AWS_REGION=${var.aws_region}",
       "ANALYTICS_TAG=${var.analytics_tag}",
+      "GRAFANA_LOKI_USERNAME=${var.grafana_loki_username}",
+      "GRAFANA_PROMETHEUS_USERNAME=${var.grafana_prometheus_username}",
       "GRAFANA_API_KEY=${var.grafana_api_key}",
       "S3_BUCKET=${var.s3_bucket}",
       "SENTRY_DSN=${var.sentry_dsn}",

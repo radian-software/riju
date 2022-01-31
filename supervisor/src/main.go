@@ -355,6 +355,7 @@ func (sv *supervisor) reload() error {
 		"-v", "/var/cache/riju:/var/cache/riju",
 		"-v", "/var/run/docker.sock:/var/run/docker.sock",
 		"-p", fmt.Sprintf("127.0.0.1:%d:6119", port),
+		"-p", "127.0.0.1:6121:6121",
 		"-e", "ANALYTICS_TAG",
 		"-e", "RIJU_DEPLOY_CONFIG",
 		"-e", "SENTRY_DSN",

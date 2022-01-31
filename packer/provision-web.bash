@@ -77,16 +77,38 @@ if [[ -n "${GRAFANA_API_KEY:-}" ]]; then
     unzip promtail-linux-amd64.zip
     sudo cp promtail-linux-amd64 /usr/local/bin/promtail
 
-    sudo chown root:root /tmp/promtail.service /tmp/promtail.yaml
+    ver="$(latest_release prometheus/node_exporter | sed 's/^v//')"
 
-    sudo mkdir /etc/promtail
+    wget -nv "https://github.com/prometheus/node_exporter/releases/download/v${ver}/node_exporter-${ver}.linux-amd64.tar.gz" -O node_exporter.tar.gz
+    tar -xf node_exporter.tar.gz --strip-components=1
+    sudo cp node_exporter /usr/local/bin/
+
+    ver="$(latest_release prometheus/prometheus | sed 's/^v//')"
+
+    wget -nv "https://github.com/prometheus/prometheus/releases/download/v${ver}/prometheus-${ver}.linux-amd64.tar.gz" -O prometheus.tar.gz
+    tar -xf prometheus.tar.gz --strip-components=1
+    sudo cp prometheus /usr/local/bin/
+
+    sudo chown root:root                                                \
+         /tmp/node-exporter.service /tmp/prometheus.service             \
+         /tmp/prometheus.yaml /tmp/promtail.service /tmp/promtail.yaml
+
+    sudo mkdir /etc/prometheus /etc/promtail
+    sudo mv /tmp/prometheus.yaml /etc/prometheus/config.yaml
     sudo mv /tmp/promtail.yaml /etc/promtail/config.yaml
-    sudo mv /tmp/promtail.service /etc/systemd/system/
-    sudo sed -Ei "s/\\\$GRAFANA_API_KEY/${GRAFANA_API_KEY}/" /etc/promtail/config.yaml
+    sudo mv /tmp/prometheus.service /tmp/promtail.service /tmp/node-exporter.service \
+         /etc/systemd/system/
 
-    sudo systemctl enable promtail
+    sudo sed -Ei "s/\\\$GRAFANA_API_KEY/${GRAFANA_API_KEY}/" \
+         /etc/prometheus/config.yaml /etc/promtail/config.yaml
+    sudo sed -Ei "s/\\\$GRAFANA_LOKI_USERNAME/${GRAFANA_LOKI_USERNAME}/" \
+         /etc/promtail/config.yaml
+    sudo sed -Ei "s/\\\$GRAFANA_PROMETHEUS_USERNAME/${GRAFANA_PROMETHEUS_USERNAME}/" \
+         /etc/prometheus/config.yaml
+
+    sudo systemctl enable node-exporter prometheus promtail
 else
-    sudo rm /tmp/promtail.yaml /tmp/promtail.service
+    sudo rm /tmp/node-exporter.service /tmp/promtail.yaml /tmp/promtail.service
 fi
 
 sudo userdel ubuntu -f
