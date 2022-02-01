@@ -27,6 +27,10 @@ info:
 install:
   apt:
     - bash
+    - default-jdk
+    - elinks
+    - clang-9
+    - llvm
   npm:
     - bash-language-server
 
