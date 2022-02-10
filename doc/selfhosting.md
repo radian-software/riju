@@ -124,6 +124,7 @@ AMI_NAME=riju-web-20210711223158
 AWS_REGION=us-west-1
 DOMAIN=your.domain
 S3_BUCKET=yourname-riju
+S3_CONFIG_PATH=config.json
 ```
 
 ### AMI\_NAME

@@ -5,6 +5,7 @@ set -euo pipefail
 : ${ADMIN_PASSWORD}
 : ${AWS_REGION}
 : ${S3_BUCKET}
+: ${S3_CONFIG_PATH}
 : ${SUPERVISOR_ACCESS_TOKEN}
 
 latest_release() {
@@ -61,6 +62,7 @@ sudo sed -Ei 's|^#?PermitEmptyPasswords .*|PermitEmptyPasswords no|' /etc/ssh/ss
 sudo sed -Ei "s|\\\$AWS_REGION|${AWS_REGION}|" /etc/systemd/system/riju.service
 sudo sed -Ei "s|\\\$ANALYTICS_TAG|${ANALYTICS_TAG:-}|" /etc/systemd/system/riju.service
 sudo sed -Ei "s|\\\$S3_BUCKET|${S3_BUCKET}|" /etc/systemd/system/riju.service
+sudo sed -Ei "s|\\\$S3_CONFIG_PATH|${S3_CONFIG_PATH}|" /etc/systemd/system/riju.service
 sudo sed -Ei "s|\\\$SENTRY_DSN|${SENTRY_DSN:-}|" /etc/systemd/system/riju.service
 sudo sed -Ei "s|\\\$SUPERVISOR_ACCESS_TOKEN|${SUPERVISOR_ACCESS_TOKEN}|" /etc/systemd/system/riju.service
 

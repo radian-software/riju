@@ -4,6 +4,7 @@ set -euo pipefail
 
 : ${ADMIN_PASSWORD}
 : ${S3_BUCKET}
+: ${S3_CONFIG_PATH}
 : ${SUPERVISOR_ACCESS_TOKEN}
 
 export AWS_REGION="${AWS_REGION:-$(aws configure get region)}"

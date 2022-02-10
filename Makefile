@@ -9,9 +9,10 @@ export
 BUILD := build/$(T)/$(L)
 DEB := riju-$(T)-$(L).deb
 S3 := s3://$(S3_BUCKET)
+S3_CONFIG_PATH ?= config.json
 S3_DEB := $(S3)/debs/$(DEB)
 S3_HASH := $(S3)/hashes/riju-$(T)-$(L)
-S3_CONFIG := $(S3)/config.json
+S3_CONFIG := $(S3)/$(S3_CONFIG_PATH)
 
 ifneq ($(CMD),)
 C_CMD := -c '$(CMD)'

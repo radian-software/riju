@@ -33,6 +33,11 @@ variable "s3_bucket" {
   default = "${env("S3_BUCKET")}"
 }
 
+variable "s3_config_path" {
+  type = string
+  default = "${env("S3_CONFIG_PATH")}"
+}
+
 variable "sentry_dsn" {
   type = string
   default = "${env("SENTRY_DSN_PACKER")}"
@@ -146,6 +151,7 @@ build {
       "GRAFANA_PROMETHEUS_USERNAME=${var.grafana_prometheus_username}",
       "GRAFANA_API_KEY=${var.grafana_api_key}",
       "S3_BUCKET=${var.s3_bucket}",
+      "S3_CONFIG_PATH=${var.s3_config_path}",
       "SENTRY_DSN=${var.sentry_dsn}",
       "SUPERVISOR_ACCESS_TOKEN=${var.supervisor_access_token}",
     ]

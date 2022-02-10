@@ -43,8 +43,9 @@ type deploymentConfig struct {
 }
 
 type supervisorConfig struct {
-	AccessToken string `env:"SUPERVISOR_ACCESS_TOKEN,notEmpty"`
-	S3Bucket    string `env:"S3_BUCKET,notEmpty"`
+	AccessToken  string `env:"SUPERVISOR_ACCESS_TOKEN,notEmpty"`
+	S3Bucket     string `env:"S3_BUCKET,notEmpty"`
+	S3ConfigPath string `env:"S3_CONFIG_PATH,notEmpty"`
 }
 
 type reloadJob struct {
@@ -264,7 +265,7 @@ func (sv *supervisor) reload() error {
 	buf := s3manager.NewWriteAtBuffer([]byte{})
 	if _, err := dl.Download(context.Background(), buf, &s3.GetObjectInput{
 		Bucket: &sv.config.S3Bucket,
-		Key:    aws.String("config.json"),
+		Key:    aws.String(sv.config.S3ConfigPath),
 	}); err != nil {
 		return err
 	}
