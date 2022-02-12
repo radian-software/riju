@@ -2,7 +2,12 @@
 
 set -euxo pipefail
 
-pushd /tmp
+latest_release() {
+    curl -sSL "https://api.github.com/repos/$1/releases/latest" | jq -r .tag_name
+}
+
+mkdir /tmp/riju-work
+pushd /tmp/riju-work
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -78,7 +83,11 @@ npm install -g prettier
 wget -nv https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -O awscli.zip
 unzip -q awscli.zip
 ./aws/install
-rm -rf aws awscli.zip
+
+ver="$(latest_release grafana/cortex-tools | sed 's/^v//')"
+wget -nv "https://github.com/grafana/cortex-tools/releases/download/v${ver}/cortextool_${ver}_linux_amd64.tar.gz" -O cortextool.tar.gz
+tar -xf cortextool.tar.gz
+cp cortextool /usr/local/bin/
 
 rm -rf /var/lib/apt/lists/*
 
@@ -87,5 +96,6 @@ tee /etc/sudoers.d/90-riju >/dev/null <<"EOF"
 EOF
 
 popd
+rm -rf /tmp/riju-work
 
 rm "$0"
