@@ -287,11 +287,10 @@ fmt: fmt-c fmt-go fmt-python fmt-terraform fmt-web # Format all code
 
 ### Infrastructure
 
-packer-web: supervisor # Build and publish a new webserver AMI
-	tools/packer-build-web.bash
+packer: supervisor # Build and publish a new webserver AMI
+	tools/packer-build.bash
 
-packer-ci: # Build and publish a new CI AMI
-	tools/packer-build-ci.bash
+
 
 ### Miscellaneous
 

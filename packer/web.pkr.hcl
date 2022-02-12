@@ -63,7 +63,7 @@ locals {
 }
 
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "riju-web-${local.timestamp}"
+  ami_name      = "riju-${local.timestamp}"
   instance_type = "t3.small"
   source_ami    = "${data.amazon-ami.ubuntu.id}"
   ssh_username  = "ubuntu"
@@ -80,7 +80,7 @@ source "amazon-ebs" "ubuntu" {
 
   tag {
     key = "Name"
-    value = "riju-web-${local.timestamp}"
+    value = "riju-${local.timestamp}"
   }
 }
 
@@ -155,6 +155,6 @@ build {
       "SENTRY_DSN=${var.sentry_dsn}",
       "SUPERVISOR_ACCESS_TOKEN=${var.supervisor_access_token}",
     ]
-    script           = "provision-web.bash"
+    script           = "provision.bash"
   }
 }
