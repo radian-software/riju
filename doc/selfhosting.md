@@ -232,7 +232,7 @@ from the load balancer).
 to upload the finished build artifacts to ECR, which amount to about
 40 GB of data transfer. If you don't have a symmetric Internet plan at
 home, you may need to do this on an EC2 instance instead. You can
-provision one manually with at least 256 GB of disk space, install
+provision one manually with at least 128 GB of disk space, install
 Docker, clone down Riju, copy over your `.env` file, and proceed as if
 you were running locally.)*
 
