@@ -1,5 +1,7 @@
 global:
   scrape_interval: 15s
+  external_labels:
+    node: "${EC2_INSTANCE_ID}"
 
 scrape_configs:
   - job_name: server
