@@ -34,6 +34,9 @@ import (
 const bluePort = 6229
 const greenPort = 6230
 
+const blueMetricsPort = 6231
+const greenMetricsPort = 6232
+
 const blueName = "riju-app-blue"
 const greenName = "riju-app-green"
 
@@ -339,14 +342,17 @@ func (sv *supervisor) reload() error {
 		))
 	}
 	var port int
+	var metricsPort int
 	var name string
 	var oldName string
 	if sv.isGreen {
 		port = bluePort
+		metricsPort = blueMetricsPort
 		name = blueName
 		oldName = greenName
 	} else {
 		port = greenPort
+		metricsPort = greenMetricsPort
 		name = greenName
 		oldName = blueName
 	}
@@ -356,7 +362,7 @@ func (sv *supervisor) reload() error {
 		"-v", "/var/cache/riju:/var/cache/riju",
 		"-v", "/var/run/docker.sock:/var/run/docker.sock",
 		"-p", fmt.Sprintf("127.0.0.1:%d:6119", port),
-		"-p", "127.0.0.1:6121:6121",
+		"-p", fmt.Sprintf("127.0.0.1:%d:6121", metricsPort),
 		"-e", "ANALYTICS_TAG",
 		"-e", "RIJU_DEPLOY_CONFIG",
 		"-e", "SENTRY_DSN",
@@ -374,7 +380,7 @@ func (sv *supervisor) reload() error {
 	}
 	sv.status("waiting for container to start up")
 	time.Sleep(5 * time.Second)
-	sv.status("checking that container is healthy")
+	sv.status("checking that container responds to HTTP")
 	resp, err := http.Get(fmt.Sprintf("http://localhost:%d", port))
 	if err != nil {
 		return err
@@ -385,7 +391,25 @@ func (sv *supervisor) reload() error {
 		return err
 	}
 	if !strings.Contains(string(body), "python") {
-		return errors.New("container did not appear to be healthy")
+		return errors.New("container did not respond successfully to HTTP")
+	}
+	sv.status("checking that container exposes metrics")
+	resp, err = http.Get(fmt.Sprintf("http://localhost:%d/metrics", metricsPort))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	body, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	if !strings.Contains(string(body), "process_cpu_seconds_total") {
+		return errors.New("container did not expose metrics properly")
+	}
+	if sv.isGreen {
+		sv.status("switching from green to blue")
+	} else {
+		sv.status("switching from blue to green")
 	}
 	sv.isGreen = !sv.isGreen
 	sv.status("stopping old container")
