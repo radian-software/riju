@@ -22,7 +22,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 4,
-  "iteration": 1644684886066,
+  "iteration": 1644689175462,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -498,7 +498,7 @@
             "uid": "grafanacloud-prom"
           },
           "exemplar": true,
-          "expr": "sum (rate(node_network_receive_bytes_total[1m])) by (node) / 1e6",
+          "expr": "sum (rate(node_network_receive_bytes_total{node=~\"$node\"}[1m])) by (node) / 1e6",
           "hide": false,
           "interval": "",
           "legendFormat": "",
@@ -589,7 +589,7 @@
             "uid": "grafanacloud-prom"
           },
           "exemplar": true,
-          "expr": "sum (rate(node_network_transmit_bytes_total[1m])) by (node) / 1e3",
+          "expr": "sum (rate(node_network_transmit_bytes_total{node=~\"$node\"}[1m])) by (node) / 1e3",
           "hide": false,
           "interval": "",
           "legendFormat": "",
@@ -681,7 +681,7 @@
             "uid": "grafanacloud-prom"
           },
           "exemplar": true,
-          "expr": "(1 - sum (node_filesystem_free_bytes{mountpoint=\"/\"}) by (node) / sum (node_filesystem_size_bytes{mountpoint=\"/\"}) by (node)) * 100",
+          "expr": "(1 - sum (node_filesystem_free_bytes{node=~\"$node\",mountpoint=\"/\"}) by (node) / sum (node_filesystem_size_bytes{node=~\"$node\",mountpoint=\"/\"}) by (node)) * 100",
           "hide": false,
           "interval": "",
           "legendFormat": "",
@@ -773,7 +773,7 @@
             "uid": "grafanacloud-prom"
           },
           "exemplar": true,
-          "expr": "(1 - sum (node_filesystem_free_bytes{mountpoint=\"/mnt/riju\"}) by (node) / sum (node_filesystem_size_bytes{mountpoint=\"/mnt/riju\"}) by (node)) * 100",
+          "expr": "(1 - sum (node_filesystem_free_bytes{node=~\"$node\",mountpoint=\"/mnt/riju\"}) by (node) / sum (node_filesystem_size_bytes{node=~\"$node\",mountpoint=\"/mnt/riju\"}) by (node)) * 100",
           "hide": false,
           "interval": "",
           "legendFormat": "",
@@ -842,9 +842,9 @@
     "list": [
       {
         "current": {
-          "selected": true,
-          "text": ["i-0ec6e28b124698fc0"],
-          "value": ["i-0ec6e28b124698fc0"]
+          "selected": false,
+          "text": ["All"],
+          "value": ["$__all"]
         },
         "datasource": {
           "type": "loki",
@@ -866,7 +866,7 @@
       },
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": ["All"],
           "value": ["$__all"]
         },
@@ -897,6 +897,6 @@
   "timezone": "",
   "title": "Riju",
   "uid": "mx3ZlzMnk",
-  "version": 28,
+  "version": 30,
   "weekStart": ""
 }
