@@ -1,4 +1,5 @@
 *.log
+*.out
 *.pem
 .env
 .lsp-repl-history

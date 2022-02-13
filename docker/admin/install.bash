@@ -44,6 +44,7 @@ dctrl-tools
 docker-ce-cli
 file
 g++
+gettext
 git
 golang
 htop

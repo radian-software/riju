@@ -1,0 +1,6 @@
+receivers:
+  - name: pagerduty
+    pagerduty_configs:
+      - routing_key: "$PAGERDUTY_INTEGRATION_KEY"
+route:
+  receiver: pagerduty
