@@ -44,16 +44,12 @@ sudo ./aws/install
 
 wget -nv https://s3.us-west-1.amazonaws.com/amazon-ssm-us-west-1/latest/debian_amd64/amazon-ssm-agent.deb
 
-wget -nv https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
-sudo apt-get install -y ./amazon-cloudwatch-agent.deb
-
 sudo chown root:root                                             \
-     /tmp/cloudwatch.json /tmp/docker.json /tmp/riju.service     \
+     /tmp/docker.json /tmp/riju.service                          \
      /tmp/riju.slice /tmp/riju-init-volume /tmp/riju-supervisor
 
 sudo mv /tmp/docker.json /etc/docker/daemon.json
 sudo mv /tmp/riju.service /tmp/riju.slice /etc/systemd/system/
-sudo mv /tmp/cloudwatch.json /opt/aws/amazon-cloudwatch-agent/bin/config.json
 sudo mv /tmp/riju-init-volume /tmp/riju-supervisor /usr/local/bin/
 
 sudo sed -Ei 's|^#?PermitRootLogin .*|PermitRootLogin no|' /etc/ssh/sshd_config
@@ -69,7 +65,6 @@ sudo sed -Ei "s|\\\$SUPERVISOR_ACCESS_TOKEN|${SUPERVISOR_ACCESS_TOKEN}|" /etc/sy
 sudo passwd -l root
 sudo useradd admin -g admin -G sudo -s /usr/bin/bash -p "$(echo "${ADMIN_PASSWORD}" | mkpasswd -s)" -m
 
-sudo amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
 sudo systemctl enable riju
 
 if [[ -n "${GRAFANA_API_KEY:-}" ]]; then

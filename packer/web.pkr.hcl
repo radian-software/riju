@@ -88,11 +88,6 @@ build {
   sources = ["source.amazon-ebs.ubuntu"]
 
   provisioner "file" {
-    destination = "/tmp/cloudwatch.json"
-    source = "cloudwatch.json"
-  }
-
-  provisioner "file" {
     destination = "/tmp/docker.json"
     source = "docker.json"
   }

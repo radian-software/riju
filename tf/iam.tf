@@ -1,7 +1,3 @@
-data "aws_iam_policy" "cloudwatch" {
-  name = "CloudWatchAgentServerPolicy"
-}
-
 data "aws_iam_policy" "ssm" {
   name = "AmazonSSMManagedInstanceCore"
 }
@@ -194,11 +190,6 @@ resource "aws_iam_role_policy_attachment" "server" {
   policy_arn = aws_iam_policy.server.arn
 }
 
-resource "aws_iam_role_policy_attachment" "server_cloudwatch" {
-  role       = aws_iam_role.server.name
-  policy_arn = data.aws_iam_policy.cloudwatch.arn
-}
-
 resource "aws_iam_role_policy_attachment" "server_ssm" {
   role       = aws_iam_role.server.name
   policy_arn = data.aws_iam_policy.ssm.arn
@@ -246,53 +237,4 @@ resource "aws_iam_role_policy_attachment" "backup" {
 resource "aws_iam_role_policy_attachment" "backup_restores" {
   role       = aws_iam_role.backup.name
   policy_arn = data.aws_iam_policy.backup_restores.arn
-}
-
-data "aws_iam_policy_document" "grafana_cloudwatch" {
-  statement {
-    actions = [
-      "cloudwatch:DescribeAlarmsForMetric",
-      "cloudwatch:DescribeAlarmHistory",
-      "cloudwatch:DescribeAlarms",
-      "cloudwatch:ListMetrics",
-      "cloudwatch:GetMetricStatistics",
-      "cloudwatch:GetMetricData",
-
-      "logs:DescribeLogGroups",
-      "logs:GetLogGroupFields",
-      "logs:StartQuery",
-      "logs:StopQuery",
-      "logs:GetQueryResults",
-      "logs:GetLogEvents",
-
-      "ec2:DescribeTags",
-      "ec2:DescribeInstances",
-      "ec2:DescribeRegions",
-
-      "tag:GetResources",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}
-
-resource "aws_iam_user" "grafana" {
-  name = "riju-grafana"
-}
-
-resource "aws_iam_policy" "grafana_cloudwatch" {
-  name        = "riju-grafana-cloudwatch"
-  description = "Policy granting Grafana access to CloudWatch metrics and logs"
-  policy      = data.aws_iam_policy_document.grafana_cloudwatch.json
-}
-
-resource "aws_iam_user_policy_attachment" "grafana_cloudwatch" {
-  user       = aws_iam_user.grafana.name
-  policy_arn = aws_iam_policy.grafana_cloudwatch.arn
-}
-
-resource "aws_iam_access_key" "grafana" {
-  user = aws_iam_user.grafana.name
 }
