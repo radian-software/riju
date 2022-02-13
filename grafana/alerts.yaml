@@ -18,11 +18,11 @@ groups:
         annotations:
           message: "Root volume on instance {{ $labels.node }} is close to full"
         expr: |
-          (1 - sum (node_filesystem_free_bytes{mountpoint="/"}) by (node) / sum (node_filesystem_size_bytes{mountpoint="/"}) by (node)) * 100
+          (1 - sum (node_filesystem_free_bytes{mountpoint="/"}) by (node) / sum (node_filesystem_size_bytes{mountpoint="/"}) by (node)) * 100 >= 80
         for: 30m
       - alert: DataVolumeFilling
         annotations:
           message: "Data volume on instance {{ $labels.node }} is close to full"
         expr: |
-          (1 - sum (node_filesystem_free_bytes{mountpoint="/mnt/riju"}) by (node) / sum (node_filesystem_size_bytes{mountpoint="/mnt/riju"}) by (node)) * 100
+          (1 - sum (node_filesystem_free_bytes{mountpoint="/mnt/riju"}) by (node) / sum (node_filesystem_size_bytes{mountpoint="/mnt/riju"}) by (node)) * 100 >= 80
         for: 30m
