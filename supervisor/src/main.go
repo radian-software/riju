@@ -60,10 +60,12 @@ type reloadJob struct {
 type supervisor struct {
 	config supervisorConfig
 
-	blueProxyHandler  http.Handler
-	greenProxyHandler http.Handler
-	isGreen           bool // blue-green deployment
-	deployConfigHash  string
+	blueProxyHandler         http.Handler
+	greenProxyHandler        http.Handler
+	blueMetricsProxyHandler  http.Handler
+	greenMetricsProxyHandler http.Handler
+	isGreen                  bool // blue-green deployment
+	deployConfigHash         string
 
 	awsAccountNumber string
 	awsRegion        string
@@ -106,7 +108,15 @@ func (sv *supervisor) scheduleReload() string {
 	return uuid
 }
 
-func (sv *supervisor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (sv *supervisor) serveHTTP(w http.ResponseWriter, r *http.Request, metricsPort bool) {
+	if metricsPort {
+		if sv.isGreen {
+			sv.greenMetricsProxyHandler.ServeHTTP(w, r)
+		} else {
+			sv.blueMetricsProxyHandler.ServeHTTP(w, r)
+		}
+		return
+	}
 	if strings.HasPrefix(r.URL.Path, "/api/supervisor") {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
@@ -477,8 +487,8 @@ func main() {
 	}
 
 	rijuInitVolume := exec.Command("riju-init-volume")
-	rijuInitVolume.Stdout = rijuInitVolume.Stdout
-	rijuInitVolume.Stderr = rijuInitVolume.Stderr
+	rijuInitVolume.Stdout = os.Stdout
+	rijuInitVolume.Stderr = os.Stderr
 	if err := rijuInitVolume.Run(); err != nil {
 		log.Fatalln(err)
 	}
@@ -488,6 +498,15 @@ func main() {
 		log.Fatalln(err)
 	}
 	greenUrl, err := url.Parse(fmt.Sprintf("http://localhost:%d", greenPort))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	blueMetricsUrl, err := url.Parse(fmt.Sprintf("http://localhost:%d", blueMetricsPort))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	greenMetricsUrl, err := url.Parse(fmt.Sprintf("http://localhost:%d", greenMetricsPort))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -609,18 +628,38 @@ func main() {
 	}
 
 	sv := &supervisor{
-		config:            supervisorCfg,
-		blueProxyHandler:  httputil.NewSingleHostReverseProxy(blueUrl),
-		greenProxyHandler: httputil.NewSingleHostReverseProxy(greenUrl),
-		isGreen:           isGreen,
-		deployConfigHash:  deployCfgHash,
-		s3:                s3.NewFromConfig(awsCfg),
-		ecr:               ecr.NewFromConfig(awsCfg),
-		awsRegion:         awsCfg.Region,
-		awsAccountNumber:  *ident.Account,
-		reloadJobs:        map[string]*reloadJob{},
+		config:                   supervisorCfg,
+		blueProxyHandler:         httputil.NewSingleHostReverseProxy(blueUrl),
+		greenProxyHandler:        httputil.NewSingleHostReverseProxy(greenUrl),
+		blueMetricsProxyHandler:  httputil.NewSingleHostReverseProxy(blueMetricsUrl),
+		greenMetricsProxyHandler: httputil.NewSingleHostReverseProxy(greenMetricsUrl),
+		isGreen:                  isGreen,
+		deployConfigHash:         deployCfgHash,
+		s3:                       s3.NewFromConfig(awsCfg),
+		ecr:                      ecr.NewFromConfig(awsCfg),
+		awsRegion:                awsCfg.Region,
+		awsAccountNumber:         *ident.Account,
+		reloadJobs:               map[string]*reloadJob{},
 	}
 	go sv.scheduleReload()
+	go func() {
+		log.Println("listening on http://127.0.0.1:6121/metrics")
+		log.Fatalln(http.ListenAndServe(
+			"127.0.0.1:6121",
+			http.HandlerFunc(
+				func(w http.ResponseWriter, r *http.Request) {
+					sv.serveHTTP(w, r, true)
+				},
+			),
+		))
+	}()
 	log.Println("listening on http://0.0.0.0:80")
-	log.Fatalln(http.ListenAndServe("0.0.0.0:80", sv))
+	log.Fatalln(http.ListenAndServe(
+		"0.0.0.0:80",
+		http.HandlerFunc(
+			func(w http.ResponseWriter, r *http.Request) {
+				sv.serveHTTP(w, r, false)
+			},
+		),
+	))
 }
