@@ -2,8 +2,8 @@
 
 set -euxo pipefail
 
-latest_release() {
-    curl -sSL "https://api.github.com/repos/$1/releases/latest" | jq -r .tag_name
+latest_watchexec_release() {
+    curl -sSL "https://api.github.com/repos/$1/releases" | jq -c -r '[ .[] | select( .tag_name | test("^cli-v") ) ] | first | .tag_name'
 }
 
 mkdir /tmp/riju-work
@@ -72,7 +72,7 @@ apt-get install -y $(sed 's/#.*//' <<< "${packages}")
 
 pip3 install poetry
 
-ver="$(latest_release watchexec/watchexec | sed 's/^cli-v//')"
+ver="$(latest_watchexec_release watchexec/watchexec | sed 's/^cli-v//')"
 wget "https://github.com/watchexec/watchexec/releases/download/cli-v${ver}/watchexec-${ver}-x86_64-unknown-linux-gnu.deb"
 apt-get install -y ./watchexec-*.deb
 
