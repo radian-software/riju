@@ -152,6 +152,15 @@ def classify_line_item(item, billing_month=None, full=False):
             and "EBS:SnapshotUsage" not in usage_type
         ):
             project = "Riju"
+    # Subpar tagging on my part for some testing resources.
+    if billing_month == "2022-02":
+        if service == "AmazonEC2" and resource in {
+            "i-04af44ee8f8238a00",
+            "i-0a16cf6c998e59b88",
+            "i-0ec6e28b124698fc0",
+            "i-0df1818af33ea1aa9",
+        }:
+            project = "Riju"
     # AWS does not let you put tags on a public ECR repository,
     # yippee.
     if service == "AmazonECRPublic" and resource.endswith("repository/riju"):
