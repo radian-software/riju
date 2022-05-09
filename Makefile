@@ -218,7 +218,7 @@ lsp: # L=<lang|cmd> : Run LSP REPL for language or custom command line
 
 ### Fetch artifacts from registries
 
-PUBLIC_DOCKER_REPO_PULL ?= public.ecr.aws/raxod502/riju
+PUBLIC_DOCKER_REPO_PULL ?= public.ecr.aws/radian-software/riju
 
 sync-ubuntu: # Pull Riju Ubuntu image from public Docker registry
 	docker pull $(PUBLIC_DOCKER_REPO_PULL):ubuntu

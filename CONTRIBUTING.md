@@ -8,6 +8,6 @@
 * [Deploying your own instance of Riju](doc/selfhosting.md)
 
 If you'd like to request a new language, head to the [language support
-meta-issue](https://github.com/raxod502/riju/issues/24) and add a
-comment. Of course, if you actually want it to be added anytime soon,
-you should submit a pull request :)
+meta-issue](https://github.com/radian-software/riju/issues/24) and add
+a comment. Of course, if you actually want it to be added anytime
+soon, you should submit a pull request :)

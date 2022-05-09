@@ -49,9 +49,9 @@ requirements:
   because it only runs on macOS, and [Docker](https://www.docker.com/)
   is out because it can't be run inside Docker (without the
   `--privileged` flag, which has unacceptable security drawbacks; see
-  [#29](https://github.com/raxod502/riju/issues/29)). Note, however,
-  that many Windows-based languages can be used successfully via
-  [Mono](https://www.mono-project.com/) or
+  [#29](https://github.com/radian-software/riju/issues/29)). Note,
+  however, that many Windows-based languages can be used successfully
+  via [Mono](https://www.mono-project.com/) or
   [Wine](https://www.winehq.org/), such as
   [Cmd](https://en.wikipedia.org/wiki/Cmd.exe),
   [C#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)),
@@ -60,7 +60,8 @@ requirements:
 Here are some explicit *non-requirements*:
 
 * *Language must be well-known.* Nope, I'll be happy to add your pet
-  project; after all, [Kalyn](https://github.com/raxod502/kalyn) and
+  project; after all,
+  [Kalyn](https://github.com/radian-software/kalyn) and
   [Ink](https://github.com/thesephist/ink) are already supported.
 * *Language must be useful.* I have no objection to adding everything
   on the esolangs wiki, if there are interpreters/compilers available.

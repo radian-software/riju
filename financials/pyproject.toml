@@ -2,7 +2,7 @@
 name = "riju-financials"
 version = "0.1.0"
 description = "Financial data for Riju hosting"
-authors = ["Radon Rosborough <radon.neon@gmail.com>"]
+authors = ["Radian LLC <contact+riju@radian.codes>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"

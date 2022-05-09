@@ -312,7 +312,7 @@ sudo --preserve-env=DEBIAN_FRONTEND apt-get update`);
 Package: riju-${isShared ? "shared" : "lang"}-${id}
 Version: \$(date +%s%3N)
 Architecture: amd64
-Maintainer: Radon Rosborough <radon.neon@gmail.com>
+Maintainer: Radian LLC <contact+riju@radian.codes>
 Description: The ${name} ${
     isShared ? "shared dependency" : "language"
   } packaged for Riju

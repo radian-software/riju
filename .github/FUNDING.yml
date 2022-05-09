@@ -1,8 +1,10 @@
-github: raxod502
-patreon: riju
-ko_fi: riju_codes
-liberapay: riju
+github: radian-software
+patreon: radiansoftware
+ko_fi: radiansoftware
+liberapay: radian-software
 custom:
-  - https://paypal.me/rijucodes
-  - https://cash.app/$RijuCodes
-  - https://venmo.com/code?user_id=3335527067549696598
+  - https://www.paypal.com/donate/?hosted_button_id=SYF48KFJ95FPA
+  # Cash App is not currently supported because their sign-up flow is
+  # broken (verification emails for new accounts are not sent). I have
+  # submitted a support ticket with them.
+  - https://account.venmo.com/u/radian-software

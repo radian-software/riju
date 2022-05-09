@@ -18,8 +18,8 @@ Riju :: $58.75
   S3 :: $0.13
 
 COMMENTARY: I think we could save on ELB costs by migrating to Lambda;
-see https://github.com/raxod502/riju/issues/93 for that. Otherwise,
-the main important thing to note about this month is that I had part
-of the infrastructure spun down for a significant part of it, as per
-https://riju.statuspage.io/ (Aug 1 through Aug 16). So costs are
-liable to increase next month now that we are in normal operation.
+see https://github.com/radian-software/riju/issues/93 for that.
+Otherwise, the main important thing to note about this month is that I
+had part of the infrastructure spun down for a significant part of it,
+as per https://riju.statuspage.io/ (Aug 1 through Aug 16). So costs
+are liable to increase next month now that we are in normal operation.

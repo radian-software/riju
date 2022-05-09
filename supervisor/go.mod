@@ -1,4 +1,4 @@
-module github.com/raxod502/riju/supervisor
+module github.com/radian-software/riju/supervisor
 
 go 1.16
 

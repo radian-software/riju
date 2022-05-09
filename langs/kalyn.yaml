@@ -9,7 +9,7 @@ install:
     install -d "${pkg}/opt/kalyn"
     install -d "${pkg}/usr/local/bin"
 
-    git clone https://github.com/raxod502/kalyn.git
+    git clone https://github.com/radian-software/kalyn.git
     pushd kalyn
     stack build kalyn
     cp "$(stack exec which kalyn)" "${pkg}/usr/local/bin/"

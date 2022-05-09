@@ -13,7 +13,7 @@ hesitate to open an issue!
 Clone locally:
 
 ```
-$ git clone https://github.com/raxod502/riju.git
+$ git clone https://github.com/radian-software/riju.git
 $ cd riju
 ```
 
