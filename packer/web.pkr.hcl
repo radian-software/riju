@@ -13,9 +13,19 @@ variable "analytics_tag" {
   default = "${env("ANALYTICS_TAG")}"
 }
 
+variable "grafana_loki_hostname" {
+  type    = string
+  default = "${env("GRAFANA_LOKI_HOSTNAME")}"
+}
+
 variable "grafana_loki_username" {
   type    = string
   default = "${env("GRAFANA_LOKI_USERNAME")}"
+}
+
+variable "grafana_prometheus_hostname" {
+  type    = string
+  default = "${env("GRAFANA_PROMETHEUS_HOSTNAME")}"
 }
 
 variable "grafana_prometheus_username" {
@@ -142,7 +152,9 @@ build {
       "ADMIN_PASSWORD=${var.admin_password}",
       "AWS_REGION=${var.aws_region}",
       "ANALYTICS_TAG=${var.analytics_tag}",
+      "GRAFANA_LOKI_HOSTNAME=${var.grafana_loki_hostname}",
       "GRAFANA_LOKI_USERNAME=${var.grafana_loki_username}",
+      "GRAFANA_PROMETHEUS_HOSTNAME=${var.grafana_prometheus_hostname}",
       "GRAFANA_PROMETHEUS_USERNAME=${var.grafana_prometheus_username}",
       "GRAFANA_API_KEY=${var.grafana_api_key}",
       "S3_BUCKET=${var.s3_bucket}",

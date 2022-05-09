@@ -292,7 +292,7 @@ packer: supervisor # Build and publish a new webserver AMI
 
 deploy-alerts: # Deploy alerting configuration to Grafana Cloud
 	envsubst < grafana/alertmanager.yaml > grafana/alertmanager.yaml.out
-	cortextool rules load grafana/alerts.yaml --address=https://prometheus-blocks-prod-us-central1.grafana.net --id=$(GRAFANA_PROMETHEUS_USERNAME) --key=$(GRAFANA_API_KEY)
+	cortextool rules load grafana/alerts.yaml --address=https://$(GRAFANA_PROMETHEUS_HOSTNAME) --id=$(GRAFANA_PROMETHEUS_USERNAME) --key=$(GRAFANA_API_KEY)
 	cortextool alertmanager load grafana/alertmanager.yaml.out --address=https://alertmanager-us-central1.grafana.net --id=$(GRAFANA_ALERTMANAGER_USERNAME) --key=$(GRAFANA_API_KEY)
 
 ### Miscellaneous

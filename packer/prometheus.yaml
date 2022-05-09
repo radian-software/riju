@@ -15,7 +15,7 @@ scrape_configs:
       - targets: ["localhost:9090"]
 
 remote_write:
-  - url: "https://prometheus-blocks-prod-us-central1.grafana.net/api/prom/push"
+  - url: "$GRAFANA_PROMETHEUS_HOSTNAME"
     basic_auth:
       username: "$GRAFANA_PROMETHEUS_USERNAME"
       password: "$GRAFANA_API_KEY"

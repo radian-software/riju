@@ -7,7 +7,7 @@ positions:
   filename: /tmp/positions.yaml
 
 client:
-  url: https://$GRAFANA_LOKI_USERNAME:$GRAFANA_API_KEY@logs-prod-us-central1.grafana.net/api/prom/push
+  url: https://$GRAFANA_LOKI_USERNAME:$GRAFANA_API_KEY@$GRAFANA_LOKI_HOSTNAME/api/prom/push
 
 scrape_configs:
   - job_name: kernel

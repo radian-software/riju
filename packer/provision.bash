@@ -98,8 +98,12 @@ if [[ -n "${GRAFANA_API_KEY:-}" ]]; then
 
     sudo sed -Ei "s/\\\$GRAFANA_API_KEY/${GRAFANA_API_KEY}/" \
          /etc/prometheus/config.yaml /etc/promtail/config.yaml
+    sudo sed -Ei "s/\\\$GRAFANA_LOKI_HOSTNAME/${GRAFANA_LOKI_HOSTNAME}/" \
+         /etc/promtail/config.yaml
     sudo sed -Ei "s/\\\$GRAFANA_LOKI_USERNAME/${GRAFANA_LOKI_USERNAME}/" \
          /etc/promtail/config.yaml
+    sudo sed -Ei "s/\\\$GRAFANA_PROMETHEUS_HOSTNAME/${GRAFANA_PROMETHEUS_HOSTNAME}/" \
+         /etc/prometheus/config.yaml
     sudo sed -Ei "s/\\\$GRAFANA_PROMETHEUS_USERNAME/${GRAFANA_PROMETHEUS_USERNAME}/" \
          /etc/prometheus/config.yaml
 
