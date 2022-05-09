@@ -10,14 +10,14 @@ Service uptime available at <https://riju.statuspage.io/>.
 
 ## Is it free?
 
-Riju will always be free for everyone. I pay for the hosting costs
-myself.
+Riju will always be free for everyone. I pay for the hosting costs out
+of the business account of Radian LLC, which is funded by donations
+and my personal savings. If you would like to help keep Riju online
+and see more projects like it, there are a few donation methods
+available in the "Sponsor this project" sidebar on GitHub.
 
-A number of people have asked me if they can donate to help keep Riju
-online. In response, I have set up a few methods, which you can see in
-the "Sponsor this project" sidebar on GitHub. All donations will be
-used solely to cover hosting costs, and any surplus will be donated to
-the [Electronic Frontier Foundation](https://www.eff.org/).
+All financial records for Radian LLC are made [publicly
+available](https://github.com/radian-software/financials).
 
 ## Is it safe?
 
