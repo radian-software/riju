@@ -240,6 +240,13 @@ void session(char *uuid, char *lang, char *imageHash)
         "4000",
         "--cgroup-parent",
         "riju.slice",
+        // Deny access to outside networking for now in order to limit
+        // abuse, as we've received abuse reports from AWS. We should
+        // be able to remove this (and indeed we'll *want* to, in
+        // order to support package installation) by replacing it with
+        // a more fine-grained network control such as limiting
+        // outbound bandwidth.
+        "--network=none",
         "--label",
         "riju.category=user-session",
         "--label",
@@ -250,6 +257,7 @@ void session(char *uuid, char *lang, char *imageHash)
         (char *)sentinel_bash,
         NULL,
     };
+
     execvp(argv[0], argv);
     die("execvp failed");
   }
