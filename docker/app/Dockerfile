@@ -1,4 +1,5 @@
-FROM riju:ubuntu AS build
+# temporary hack
+FROM ubuntu:20.04 AS build
 
 COPY docker/app/install-build.bash /tmp/
 RUN /tmp/install-build.bash
