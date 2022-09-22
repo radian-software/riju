@@ -6,7 +6,7 @@ or compiling [INTERCAL](https://en.wikipedia.org/wiki/INTERCAL) code.
 
 Check it out at <https://riju.codes>!
 
-Service uptime available at <https://riju.statuspage.io/>.
+Service uptime available at <https://radian.statuspage.io/>.
 
 ## Is it free?
 
