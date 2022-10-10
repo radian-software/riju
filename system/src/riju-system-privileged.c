@@ -30,6 +30,7 @@ void init() { sentinel_bash[sentinel_bash_len - 1] = '\0'; }
 void die_with_usage()
 {
   die("usage:\n"
+      "  riju-system-privileged pull REPO:TAG\n"
       "  riju-system-privileged session UUID LANG [IMAGE-HASH]\n"
       "  riju-system-privileged exec UUID CMDLINE...\n"
       "  riju-system-privileged pty UUID CMDLINE...\n"
@@ -117,6 +118,17 @@ char *parseImageHash(char *imageHash)
   return imageHash;
 }
 
+char *parseImage(char *image)
+{
+  if (strnlen(image, 1025) > 1024)
+    die("illegal image name");
+  for (char *ptr = image; *ptr; ++ptr)
+    if (!((*ptr >= 'a' && *ptr <= 'z') || (*ptr >= '0' && *ptr <= '9') ||
+          *ptr == ':' || *ptr == '/' || *ptr == '.' || *ptr == '-'))
+      die("illegal image name");
+  return image;
+}
+
 char *timeout_msg;
 
 void sigalrm_die(int signum)
@@ -132,7 +144,16 @@ void sigalrm_kill_parent(int signum)
   exit(EXIT_FAILURE);
 }
 
-void session(char *uuid, char *lang, char *imageHash)
+void cmd_pull(char *image)
+{
+  char *argv[] = {
+      "docker", "pull", "--", image, NULL,
+  };
+  execvp(argv[0], argv);
+  die("execvp failed");
+}
+
+void cmd_session(char *uuid, char *lang, char *imageHash)
 {
   if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
     die("setvbuf failed");
@@ -295,7 +316,7 @@ void session(char *uuid, char *lang, char *imageHash)
   }
 }
 
-void exec(char *uuid, int argc, char **cmdline, bool pty)
+void cmd_exec(char *uuid, int argc, char **cmdline, bool pty)
 {
   if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
     die("setvbuf failed");
@@ -463,7 +484,7 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   }
 }
 
-void teardown(char *uuid)
+void cmd_teardown(char *uuid)
 {
   if (setuid(0) != 0)
     die("setuid failed");
@@ -491,31 +512,38 @@ int main(int argc, char **argv)
     die("seteuid failed");
   if (argc < 2)
     die_with_usage();
+  if (!strcmp(argv[1], "pull")) {
+    if (argc != 3)
+      die_with_usage();
+    char *image = parseImage(argv[2]);
+    cmd_pull(image);
+    return 0;
+  }
   if (!strcmp(argv[1], "session")) {
     if (argc < 4 || argc > 5)
       die_with_usage();
     char *uuid = parseUUID(argv[2]);
     char *lang = parseLang(argv[3]);
     char *imageHash = argc == 5 ? parseImageHash(argv[4]) : NULL;
-    session(uuid, lang, imageHash);
+    cmd_session(uuid, lang, imageHash);
     return 0;
   }
   if (!strcmp(argv[1], "exec")) {
     if (argc < 4)
       die_with_usage();
-    exec(parseUUID(argv[2]), argc - 3, &argv[3], false);
+    cmd_exec(parseUUID(argv[2]), argc - 3, &argv[3], false);
     return 0;
   }
   if (!strcmp(argv[1], "pty")) {
     if (argc < 4)
       die_with_usage();
-    exec(parseUUID(argv[2]), argc - 3, &argv[3], true);
+    cmd_exec(parseUUID(argv[2]), argc - 3, &argv[3], true);
     return 0;
   }
   if (!strcmp(argv[1], "teardown")) {
     if (argc < 2)
       die_with_usage();
-    teardown(argc >= 3 ? parseUUID(argv[2]) : NULL);
+    cmd_teardown(argc >= 3 ? parseUUID(argv[2]) : NULL);
     return 0;
   }
   die_with_usage();
