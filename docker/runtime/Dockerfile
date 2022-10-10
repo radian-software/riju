@@ -1,4 +1,5 @@
-FROM riju:ubuntu
+# EOL: April 2027
+FROM ubuntu:22.04
 
 COPY docker/runtime/install.bash /tmp/
 RUN /tmp/install.bash
