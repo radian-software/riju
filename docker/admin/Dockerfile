@@ -1,4 +1,5 @@
-FROM ubuntu:21.04
+# EOL: April 2027
+FROM ubuntu:22.04
 
 COPY docker/admin/install.bash /tmp/
 RUN /tmp/install.bash
