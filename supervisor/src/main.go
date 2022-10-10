@@ -282,8 +282,9 @@ func (sv *supervisor) reload() error {
 	}); err != nil {
 		return err
 	}
+	deployCfgBytes := buf.Bytes()
 	deployCfg := deploymentConfig{}
-	if err := json.Unmarshal(buf.Bytes(), &deployCfg); err != nil {
+	if err := json.Unmarshal(deployCfgBytes, &deployCfg); err != nil {
 		return err
 	}
 	sv.status("listing locally available images")
@@ -335,12 +336,8 @@ func (sv *supervisor) reload() error {
 			}
 		}
 	}
-	deployCfgStr, err := json.Marshal(&deployCfg)
-	if err != nil {
-		return err
-	}
 	h := sha1.New()
-	h.Write([]byte(deployCfgStr))
+	h.Write(deployCfgBytes)
 	deployCfgHash := fmt.Sprintf("%x", h.Sum(nil))
 	if deployCfgHash == sv.deployConfigHash {
 		sv.status(fmt.Sprintf("config hash remains at %s", deployCfgHash))
@@ -384,7 +381,7 @@ func (sv *supervisor) reload() error {
 	)
 	dockerRun.Stdout = os.Stdout
 	dockerRun.Stderr = os.Stderr
-	dockerRun.Env = append(os.Environ(), fmt.Sprintf("RIJU_DEPLOY_CONFIG=%s", deployCfgStr))
+	dockerRun.Env = append(os.Environ(), fmt.Sprintf("RIJU_DEPLOY_CONFIG=%s", deployCfgBytes))
 	if err := dockerRun.Run(); err != nil {
 		return err
 	}
