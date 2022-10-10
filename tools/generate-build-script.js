@@ -316,8 +316,7 @@ Maintainer: Radian LLC <contact+riju@radian.codes>
 Description: The ${name} ${
     isShared ? "shared dependency" : "language"
   } packaged for Riju
-Depends: \$(IFS=,; echo "\${depends[*]}" | sed -E 's/^[ ,]*|[ ,]*$| *(, *)+/},{/g' | sed -E 's/ *(\\| *)+/}\\|{/g'${stripDependsFilter} | tr -d '{}' | sed -E 's/^[,|]+|[,|]+$//g' | sed -E 's/[,|]*,[,|]*/,/g' | sed -E 's/\\|+/|/g')
-Riju-Script-Hash: \$((cat "\$0"; echo "\${RIJU_IMAGE_HASH}") | sha1sum - | awk '{ print \$1 }')`;
+Depends: \$(IFS=,; echo "\${depends[*]}" | sed -E 's/^[ ,]*|[ ,]*$| *(, *)+/},{/g' | sed -E 's/ *(\\| *)+/}\\|{/g'${stripDependsFilter} | tr -d '{}' | sed -E 's/^[,|]+|[,|]+$//g' | sed -E 's/[,|]*,[,|]*/,/g' | sed -E 's/\\|+/|/g')`;
   parts.push(`\
 install -d "\${pkg}/DEBIAN"
 cat <<EOF > "\${pkg}/DEBIAN/control"

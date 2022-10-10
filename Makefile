@@ -11,7 +11,6 @@ DEB := riju-$(T)-$(L).deb
 S3 := s3://$(S3_BUCKET)
 S3_CONFIG_PATH ?= config.json
 S3_DEB := $(S3)/debs/$(DEB)
-S3_HASH := $(S3)/hashes/riju-$(T)-$(L)
 S3_CONFIG := $(S3)/$(S3_CONFIG_PATH)
 
 ifneq ($(CMD),)
@@ -52,13 +51,10 @@ image: # I=<image> [L=<lang>] [NC=1] : Build a Docker image
 ifeq ($(I),lang)
 	@: $${L}
 	node tools/build-lang-image.js --lang $(L)
-else ifeq ($(I),ubuntu)
-	docker pull ubuntu:21.04
-	hash="$$(docker inspect ubuntu:21.04 -f '{{ .Id }}' | sha1sum | awk '{ print $$1 }')"; echo "FROM ubuntu:21.04" | docker build --label riju.image-hash="$${hash}" -t riju:$(I) -
 else ifneq (,$(filter $(I),admin ci))
 	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) $(NO_CACHE)
 else
-	hash="$$(node tools/hash-dockerfile.js $(I) | grep .)"; docker build . -f docker/$(I)/Dockerfile -t riju:$(I) --label riju.image-hash="$${hash}" $(NO_CACHE)
+	docker build . -f docker/$(I)/Dockerfile -t riju:$(I) $(NO_CACHE)
 endif
 
 VOLUME_MOUNT ?= $(PWD)
@@ -86,25 +82,22 @@ else
 LANG_TAG := $(I)
 endif
 
-IMAGE_HASH := "$$(docker inspect riju:$(LANG_TAG) -f '{{ index .Config.Labels "riju.image-hash" }}')"
-WITH_IMAGE_HASH := -e RIJU_IMAGE_HASH=$(IMAGE_HASH)
-
 shell: # I=<shell> [L=<lang>] [E[E]=1] [P1|P2=<port>] [CMD="<arg>..."] : Launch Docker image with shell
 	@: $${I}
 ifneq (,$(filter $(I),admin ci))
 	@mkdir -p $(HOME)/.aws $(HOME)/.docker $(HOME)/.ssh $(HOME)/.terraform.d
-	docker run $(IT_ARG) --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/cache/riju:/var/cache/riju -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/cache/riju/.aws -v $(HOME)/.docker:/var/cache/riju/.docker -v $(HOME)/.ssh:/var/cache/riju/.ssh -v $(HOME)/.terraform.d:/var/cache/riju/.terraform.d -e NI -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_REPO -e PUBLIC_DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) --network host riju:$(I) $(BASH_CMD)
+	docker run $(IT_ARG) --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/cache/riju:/var/cache/riju -v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.aws:/var/cache/riju/.aws -v $(HOME)/.docker:/var/cache/riju/.docker -v $(HOME)/.ssh:/var/cache/riju/.ssh -v $(HOME)/.terraform.d:/var/cache/riju/.terraform.d -e NI -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e DOCKER_REPO -e PUBLIC_DOCKER_REPO -e S3_BUCKET -e DOMAIN -e VOLUME_MOUNT=$(VOLUME_MOUNT) $(SHELL_PORTS) $(SHELL_ENV) --network host riju:$(I) $(BASH_CMD)
 else ifeq ($(I),app)
-	docker run $(IT_ARG) --rm --hostname $(I) -v /var/cache/riju:/var/cache/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
+	docker run $(IT_ARG) --rm --hostname $(I) -v /var/cache/riju:/var/cache/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
 else ifneq (,$(filter $(I),base lang))
 ifeq ($(I),lang)
 	@: $${L}
 endif
-	docker run $(IT_ARG) --rm --hostname $(LANG_TAG) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(LANG_TAG) $(BASH_CMD)
+	docker run $(IT_ARG) --rm --hostname $(LANG_TAG) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) riju:$(LANG_TAG) $(BASH_CMD)
 else ifeq ($(I),runtime)
-	docker run $(IT_ARG) --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/cache/riju:/var/cache/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
+	docker run $(IT_ARG) --rm --hostname $(I) -v $(VOLUME_MOUNT):/src -v /var/cache/riju:/var/cache/riju -v /var/run/docker.sock:/var/run/docker.sock $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
 else
-	docker run $(IT_ARG) --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) $(WITH_IMAGE_HASH) riju:$(I) $(BASH_CMD)
+	docker run $(IT_ARG) --rm --hostname $(I) -v $(VOLUME_MOUNT):/src $(SHELL_PORTS) $(SHELL_ENV) riju:$(I) $(BASH_CMD)
 endif
 
 ecr: # Authenticate to ECR (temporary credentials)
@@ -242,21 +235,13 @@ undeploy: # Pull latest deployment config from S3
 
 push: # I=<image> : Push Riju image to Docker registry
 	@: $${I} $${DOCKER_REPO}
-	docker tag riju:$(I) $(DOCKER_REPO):$(I)-$(IMAGE_HASH)
-	docker push $(DOCKER_REPO):$(I)-$(IMAGE_HASH)
-ifeq ($(I),ubuntu)
-	docker tag riju:$(I) $(PUBLIC_DOCKER_REPO):$(I)
-	docker push $(PUBLIC_DOCKER_REPO):$(I)
-endif
 	docker tag riju:$(I) $(DOCKER_REPO):$(I)
 	docker push $(DOCKER_REPO):$(I)
 
 upload: # L=<lang> T=<type> : Upload .deb to S3
 	@: $${L} $${T} $${S3_BUCKET}
 	tools/ensure-deb-compressed.bash
-	aws s3 rm --recursive $(S3_HASH)
 	aws s3 cp $(BUILD)/$(DEB) $(S3_DEB)
-	hash="$$(dpkg-deb -f $(BUILD)/$(DEB) Riju-Script-Hash | grep .)"; aws s3 cp - "$(S3_HASH)/$${hash}" < /dev/null
 
 deploy-config: # Generate deployment config file
 	node tools/generate-deploy-config.js

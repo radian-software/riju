@@ -1,15 +1,10 @@
-import crypto from "crypto";
-import { promises as fs } from "fs";
 import http from "http";
 import url from "url";
 
 import { Command } from "commander";
 import express from "express";
 
-import { getSharedDepsForLangConfig, readLangConfig } from "../lib/yaml.js";
-import { getLocalImageLabel } from "./docker-util.js";
-import { hashDockerfile } from "./hash-dockerfile.js";
-import { getDebHash, runCommand } from "./util.js";
+import { runCommand } from "./util.js";
 
 // Get a Node.js http server object that will allow the Docker
 // build to fetch files from outside the container, without them
@@ -27,44 +22,6 @@ async function main() {
   program.option("--debug", "interactive debugging");
   program.parse(process.argv);
   const { lang, debug } = program.opts();
-  const sharedDeps = await getSharedDepsForLangConfig(
-    await readLangConfig(lang)
-  );
-  const installContents = await fs.readFile(
-    `build/lang/${lang}/install.bash`,
-    "utf-8"
-  );
-  const sharedInstallContents = await Promise.all(
-    sharedDeps.map(async (name) =>
-      fs.readFile(`build/shared/${name}/install.bash`)
-    )
-  );
-  const allInstallContents = [].concat.apply(
-    [installContents],
-    sharedInstallContents
-  );
-  const hash = await hashDockerfile(
-    "lang",
-    {
-      "riju:base": await getLocalImageLabel("riju:base", "riju.image-hash"),
-    },
-    {
-      salt: {
-        langHash: await getDebHash(`build/lang/${lang}/riju-lang-${lang}.deb`),
-        sharedHashes: (
-          await Promise.all(
-            sharedDeps.map(
-              async (name) =>
-                await getDebHash(`build/shared/${name}/riju-shared-${name}.deb`)
-            )
-          )
-        ).sort(),
-        installHash: allInstallContents
-          .map((c) => crypto.createHash("sha1").update(c).digest("hex"))
-          .join(""),
-      },
-    }
-  );
   const server = getServer();
   await new Promise((resolve) => server.listen(8487, "localhost", resolve));
   try {
@@ -76,11 +33,11 @@ async function main() {
       await runCommand(
         `docker build . -f docker/lang/Dockerfile ` +
           `--build-arg LANG=${lang} -t riju:lang-${lang} ` +
-          `--network host --no-cache --label riju.image-hash=${hash}`
+          `--network host --no-cache`
       );
     }
   } finally {
-    await server.close();
+    await new Promise((resolve) => server.close(resolve));
   }
   process.exit(0);
 }
