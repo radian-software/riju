@@ -60,7 +60,8 @@ variable "supervisor_access_token" {
 
 data "amazon-ami" "ubuntu" {
   filters = {
-    name                = "ubuntu/images/hvm-ssd/ubuntu-*-21.04-amd64-server-*"
+    // EOL: April 2027
+    name                = "ubuntu/images/hvm-ssd/ubuntu-*-22.04-amd64-server-*"
     root-device-type    = "ebs"
     virtualization-type = "hvm"
   }
