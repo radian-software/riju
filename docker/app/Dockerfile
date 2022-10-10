@@ -1,5 +1,5 @@
-# temporary hack
-FROM ubuntu:20.04 AS build
+# EOL: April 2027
+FROM ubuntu:22.04 AS build
 
 COPY docker/app/install-build.bash /tmp/
 RUN /tmp/install-build.bash
