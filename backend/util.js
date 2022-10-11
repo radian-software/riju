@@ -86,6 +86,14 @@ export async function run(args, log, options) {
   });
 }
 
+export function privilegedList() {
+  return [rijuSystemPrivileged, "list"];
+}
+
+export function privilegedPull({ repo, tag }) {
+  return [rijuSystemPrivileged, "pull", repo, tag];
+}
+
 export function privilegedSession({ uuid, lang }) {
   const cmdline = [rijuSystemPrivileged, "session", uuid, lang];
   if (imageHashes[lang]) {
