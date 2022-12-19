@@ -55,14 +55,14 @@ spec:
             successThreshold: 1
             timeoutSeconds: 2
           ports:
-            - name: traefik
-              containerPort: 9000
-            - name: web
+            - name: http
               containerPort: 8000
-            - name: websecure
+            - name: https
               containerPort: 8443
-            - name: metrics
-              containerPort: 9100
+            - name: ping
+              containerPort: 9000
+            - name: docker
+              containerPort: 31000
           securityContext:
             capabilities:
               drop:
@@ -101,13 +101,13 @@ spec:
     app: traefik
   ports:
     - port: 80
-      name: "web"
-      targetPort: web
-      protocol: TCP
+      name: http
+      targetPort: 8000
     - port: 443
-      name: "websecure"
-      targetPort: websecure
-      protocol: TCP
+      name: https
+      targetPort: 8443
+    - port: 31000
+      name: docker
 
 ---
 kind: IngressClass
@@ -118,19 +118,3 @@ metadata:
     ingressclass.kubernetes.io/is-default-class: "true"
 spec:
   controller: traefik.io/ingress-controller
----
-
-kind: IngressRoute
-apiVersion: traefik.containo.us/v1alpha1
-metadata:
-  namespace: traefik
-  name: traefik-dashboard
-spec:
-  entryPoints:
-    - traefik
-  routes:
-    - match: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
-      kind: Rule
-      services:
-        - name: api@internal
-          kind: TraefikService

@@ -11,6 +11,9 @@ networking:
   domain: riju.example.com  # FIXME
   ip: x.y.z.w  # FIXME
 
+contact:
+  letsEncryptEmail: ops@example.com  # FIXME
+
 metallb:
   secretkey: "$(pwgen -s 256 1)"
 

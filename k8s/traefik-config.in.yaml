@@ -1,0 +1,33 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  namespace: traefik
+  name: traefik-config
+data:
+  traefik.yaml: |
+    entrypoints:
+      http:
+        address: ":8000/tcp"
+      https:
+        address: ":8443/tcp"
+        http:
+          tls: true
+      healthcheck:
+        address: ":9000/tcp"
+      docker:
+        address: ":31000/tcp"
+        http:
+          tls: true
+    ping:
+      entryPoint: "healthcheck"
+    providers:
+      kubernetescrd: true
+      kubernetesingress: true
+    certificatesResolvers:
+      riju:
+        acme:
+          email: "{{ .contact.letsEncryptEmail }}"
+          storage: acme.json
+          httpChallenge:
+            entryPoint: http
