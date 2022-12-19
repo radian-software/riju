@@ -72,25 +72,16 @@ spec:
             runAsNonRoot: true
             runAsUser: 65532
           volumeMounts:
+            - name: config
+              mountPath: /etc/traefik
             - name: data
               mountPath: /data
             - name: tmp
               mountPath: /tmp
-          args:
-            - "--global.checknewversion"
-            - "--global.sendanonymoususage"
-            - "--entrypoints.metrics.address=:9100/tcp"
-            - "--entrypoints.traefik.address=:9000/tcp"
-            - "--entrypoints.web.address=:8000/tcp"
-            - "--entrypoints.websecure.address=:8443/tcp"
-            - "--api.dashboard=true"
-            - "--ping=true"
-            - "--metrics.prometheus=true"
-            - "--metrics.prometheus.entrypoint=metrics"
-            - "--providers.kubernetescrd"
-            - "--providers.kubernetesingress"
-            - "--entrypoints.websecure.http.tls=true"
       volumes:
+        - name: config
+          configMap:
+            name: traefik-config
         - name: data
           emptyDir: {}
         - name: tmp
