@@ -1,0 +1,145 @@
+# Based on traefik/traefik helm chart 20.8.0 for traefik v2.9.6
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: traefik
+  name: traefik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  minReadySeconds: 0
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9100"
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik
+      terminationGracePeriodSeconds: 60
+      hostNetwork: false
+      containers:
+        - image: traefik:v2.9.6
+          imagePullPolicy: IfNotPresent
+          name: traefik
+          resources: {}
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 9000
+              scheme: HTTP
+            failureThreshold: 1
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 9000
+              scheme: HTTP
+            failureThreshold: 3
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          ports:
+            - name: traefik
+              containerPort: 9000
+            - name: web
+              containerPort: 8000
+            - name: websecure
+              containerPort: 8443
+            - name: metrics
+              containerPort: 9100
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 65532
+            runAsNonRoot: true
+            runAsUser: 65532
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+          args:
+            - "--global.checknewversion"
+            - "--global.sendanonymoususage"
+            - "--entrypoints.metrics.address=:9100/tcp"
+            - "--entrypoints.traefik.address=:9000/tcp"
+            - "--entrypoints.web.address=:8000/tcp"
+            - "--entrypoints.websecure.address=:8443/tcp"
+            - "--api.dashboard=true"
+            - "--ping=true"
+            - "--metrics.prometheus=true"
+            - "--metrics.prometheus.entrypoint=metrics"
+            - "--providers.kubernetescrd"
+            - "--providers.kubernetesingress"
+            - "--entrypoints.websecure.http.tls=true"
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+      securityContext:
+        fsGroup: 65532
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: traefik
+  name: traefik
+spec:
+  type: LoadBalancer
+  selector:
+    app: traefik
+  ports:
+    - port: 80
+      name: "web"
+      targetPort: web
+      protocol: TCP
+    - port: 443
+      name: "websecure"
+      targetPort: websecure
+      protocol: TCP
+
+---
+kind: IngressClass
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: traefik
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+spec:
+  controller: traefik.io/ingress-controller
+---
+
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  namespace: traefik
+  name: traefik-dashboard
+spec:
+  entryPoints:
+    - traefik
+  routes:
+    - match: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: api@internal
+          kind: TraefikService
