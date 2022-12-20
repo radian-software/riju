@@ -13,6 +13,7 @@ networking:
 
 contact:
   letsEncryptEmail: ops@example.com  # FIXME
+  letsEncryptProductionEnabled: false
 
 metallb:
   secretkey: "$(pwgen -s 256 1)"

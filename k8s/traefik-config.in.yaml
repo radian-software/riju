@@ -15,19 +15,27 @@ data:
           tls: true
       healthcheck:
         address: ":9000/tcp"
+      metrics:
+        address: ":9100/tcp"
       docker:
         address: ":31000/tcp"
         http:
           tls: true
     ping:
       entryPoint: "healthcheck"
+    metrics:
+      prometheus:
+        entryPoint: "metrics"
     providers:
       kubernetescrd: true
       kubernetesingress: true
     certificatesResolvers:
       riju:
         acme:
+          {{- if not .contact.letsEncryptProductionEnabled }}
+          caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+          {{- end }}
           email: "{{ .contact.letsEncryptEmail }}"
-          storage: acme.json
+          storage: /data/acme.json
           httpChallenge:
             entryPoint: http

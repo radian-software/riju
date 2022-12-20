@@ -119,6 +119,3 @@ spec:
     - name: http
       port: 80
       targetPort: 6119
-
----
-kind: Ingress

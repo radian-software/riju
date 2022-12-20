@@ -1,8 +1,21 @@
 # Based on traefik/traefik helm chart 20.8.0 for traefik v2.9.6
 
 ---
-apiVersion: apps/v1
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  namespace: traefik
+  name: traefik-data
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 128Mi
+  storageClassName: openebs-hostpath
+
+---
 kind: Deployment
+apiVersion: apps/v1
 metadata:
   namespace: traefik
   name: traefik
@@ -83,7 +96,8 @@ spec:
           configMap:
             name: traefik-config
         - name: data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: traefik-data
         - name: tmp
           emptyDir: {}
       securityContext:
