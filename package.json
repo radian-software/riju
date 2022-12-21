@@ -9,6 +9,7 @@
     "@babel/parser": "^7.13.11",
     "@babel/preset-env": "^7.12.11",
     "@balena/dockerignore": "^1.0.2",
+    "@kubernetes/client-node": "^0.18.0",
     "@sentry/node": "^6.11.0",
     "async-lock": "^1.2.6",
     "babel-loader": "^8.2.2",
