@@ -9,7 +9,7 @@ spec:
     - docker
   routes:
     - kind: Rule
-      match: "Host(`*`)"
+      match: "PathPrefix(`/`)"
       services:
         - namespace: riju
           name: docker-registry
