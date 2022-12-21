@@ -21,16 +21,12 @@ spec:
         - name: docker
           hostPath:
             path: /var/run/docker.sock
+      imagePullSecrets:
+        - name: registry-login
       containers:
         - name: server
           image: "localhost:30999/riju:app"
-          resources:
-            requests:
-              cpu: "1000m"
-              memory: "6Gi"
-            limits:
-              cpu: "1000m"
-              memory: "6Gi"
+          resources: {}
           ports:
             - name: http
               containerPort: 6119
