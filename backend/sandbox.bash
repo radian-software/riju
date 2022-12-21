@@ -1,17 +1,18 @@
+#!/usr/bin/env bash
 # This script is sourced by Bash within 'make sandbox'.
 
 if [[ -z "$L" ]]; then
-    echo 'environment variable unset: $L' >&2
+    echo "environment variable unset: \$L" >&2
     exit 1
 fi
 
 if [[ -z "$LANG_CONFIG" ]]; then
-    echo 'environment variable unset: $LANG_CONFIG' >&2
+    echo "environment variable unset: \$LANG_CONFIG" >&2
     exit 1
 fi
 
 function get {
-    jq -r ".$1" <<< "${LANG_CONFIG}"
+    jq -r ".$1" <<<"${LANG_CONFIG}"
 }
 
 function has {
@@ -24,21 +25,21 @@ function riju-exec {
 
 function daemon {
     if has daemon; then
-        echo "$(get daemon)"
+        get daemon
         riju-exec "$(get daemon)"
     fi
 }
 
 function setup {
     if has setup; then
-        echo "$(get setup)"
+        get setup
         riju-exec "$(get setup)"
     fi
 }
 
 function repl {
     if has repl; then
-        echo "$(get repl)"
+        get repl
         riju-exec "$(get repl)"
     fi
 }
@@ -47,22 +48,22 @@ function main {
     if get main | grep -q /; then
         mkdir -p "$(dirname "$(get main)")"
     fi
-    : > "$(get main)"
-    has prefix && get prefix >> "$(get main)"
-    get template >> "$(get main)"
-    has suffix && get suffix >> "$(get main)"
+    : >"$(get main)"
+    has prefix && get prefix >>"$(get main)"
+    get template >>"$(get main)"
+    has suffix && get suffix >>"$(get main)"
 }
 
 function compile {
     if has compile; then
-        echo "$(get compile)"
+        get compile
         riju-exec "$(get compile)"
     fi
 }
 
 function run-only {
     if has run; then
-        echo "$(get run)"
+        get run
         riju-exec "$(get run)"
     fi
 }
@@ -73,18 +74,18 @@ function run {
 
 function format {
     if has format; then
-        echo "$(get format.run)"
+        get format.run
         riju-exec "( $(get format.run) ) < $(get main)"
     fi
 }
 
 function lsp {
     if has lsp.setup; then
-        echo "$(get lsp.setup)"
+        get lsp.setup
         riju-exec "$(get lsp.setup)"
     fi
     if has lsp; then
-        echo "$(get lsp.start)"
+        get lsp.start
         riju-exec "$(get lsp.start)"
     fi
 }
