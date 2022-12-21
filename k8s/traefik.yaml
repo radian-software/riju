@@ -42,6 +42,16 @@ spec:
       serviceAccountName: traefik
       terminationGracePeriodSeconds: 60
       hostNetwork: false
+      initContainers:
+        - name: volume-permissions
+          image: busybox:1.35
+          command:
+            - "sh"
+            - "-c"
+            - "touch /data/acme.json && chmod -Rv 600 /data/* && chown 65532:65532 /data/acme.json"
+          volumeMounts:
+            - name: data
+              mountPath: /data
       containers:
         - image: traefik:v2.9.6
           imagePullPolicy: IfNotPresent

@@ -6,29 +6,34 @@ metadata:
   name: traefik-config
 data:
   traefik.yaml: |
-    entrypoints:
+    entryPoints:
       http:
-        address: ":8000/tcp"
+        address: ":8000"
       https:
-        address: ":8443/tcp"
+        address: ":8443"
         http:
-          tls: true
+          tls:
+            certResolver: riju
+            domains:
+              - main: k8s.riju.codes
       healthcheck:
-        address: ":9000/tcp"
+        address: ":9000"
       metrics:
-        address: ":9100/tcp"
+        address: ":9100"
       docker:
-        address: ":31000/tcp"
+        address: ":31000"
         http:
-          tls: true
+          tls:
+            certResolver: riju
+            domains:
+              - main: k8s.riju.codes
     ping:
       entryPoint: "healthcheck"
     metrics:
       prometheus:
         entryPoint: "metrics"
     providers:
-      kubernetescrd: true
-      kubernetesingress: true
+      kubernetesCRD: {}
     certificatesResolvers:
       riju:
         acme:

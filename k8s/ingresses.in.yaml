@@ -1,0 +1,16 @@
+---
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  namespace: riju
+  name: docker-registry
+spec:
+  entryPoints:
+    - docker
+  routes:
+    - kind: Rule
+      match: "Host(`*`)"
+      services:
+        - namespace: riju
+          name: docker-registry
+          port: 80
