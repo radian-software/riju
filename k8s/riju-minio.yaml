@@ -24,7 +24,6 @@ spec:
       labels:
         app: minio
     spec:
-      serviceAccountName: minio
       containers:
         - name: minio
           image: "minio/minio:RELEASE.2022-12-12T19-27-27Z"
