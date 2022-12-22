@@ -3,13 +3,13 @@ kind: StatefulSet
 apiVersion: apps/v1
 metadata:
   namespace: riju
-  name: docker-registry
+  name: minio
 spec:
   replicas: 1
-  serviceName: docker-registry
+  serviceName: minio
   selector:
     matchLabels:
-      app: docker-registry
+      app: minio
   volumeClaimTemplates:
     - metadata:
         name: data
@@ -17,25 +17,22 @@ spec:
         accessModes: [ReadWriteOnce]
         resources:
           requests:
-            storage: 128Gi
+            storage: 16Gi
         storageClassName: openebs-hostpath
   template:
     metadata:
       labels:
-        app: docker-registry
+        app: minio
     spec:
-      volumes:
-        - name: auth
-          secret:
-            secretName: registry-auth
+      serviceAccountName: minio
       containers:
-        - name: registry
-          image: "registry:2"
+        - name: minio
+          image: "minio/minio:RELEASE.2022-12-12T19-27-27Z"
           resources: {}
           readinessProbe:
             httpGet:
-              path: /
-              port: 5000
+              path: /minio/health/live
+              port: 9000
               scheme: HTTP
             failureThreshold: 1
             initialDelaySeconds: 2
@@ -44,59 +41,62 @@ spec:
             timeoutSeconds: 2
           livenessProbe:
             httpGet:
-              path: /
-              port: 5000
+              path: /minio/health/live
+              port: 9000
               scheme: HTTP
             failureThreshold: 3
             initialDelaySeconds: 2
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 2
+          args:
+            - "server"
+            - "/data"
           env:
-            - name: REGISTRY_AUTH
-              value: htpasswd
-            - name: REGISTRY_AUTH_HTPASSWD_REALM
-              value: "Registry Realm"
-            - name: REGISTRY_AUTH_HTPASSWD_PATH
-              value: /var/run/registry/auth/htpasswd
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-keys
+                  key: access-key
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-keys
+                  key: secret-key
           ports:
             - name: api
-              containerPort: 5000
+              containerPort: 9000
           volumeMounts:
-            - name: auth
-              mountPath: /var/run/registry/auth
             - name: data
-              mountPath: /var/lib/registry
+              mountPath: /data
 
 ---
 kind: Service
 apiVersion: v1
 metadata:
   namespace: riju
-  name: docker-registry
+  name: minio
 spec:
   selector:
-    app: docker-registry
-  type: NodePort
+    app: minio
   ports:
     - name: api
       port: 80
-      nodePort: 30999
-      targetPort: 5000
+      targetPort: 9000
 
 ---
 kind: IngressRoute
 apiVersion: traefik.containo.us/v1alpha1
 metadata:
   namespace: riju
-  name: docker-registry
+  name: minio
 spec:
   entryPoints:
-    - docker
+    - minio
   routes:
     - kind: Rule
       match: "PathPrefix(`/`)"
       services:
         - namespace: riju
-          name: docker-registry
+          name: minio
           port: 80

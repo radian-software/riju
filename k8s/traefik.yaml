@@ -132,6 +132,8 @@ spec:
       targetPort: 8443
     - port: 31000
       name: docker
+    - port: 32000
+      name: minio
 
 ---
 kind: IngressClass

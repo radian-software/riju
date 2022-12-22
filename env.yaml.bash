@@ -21,4 +21,8 @@ metallb:
 registry:
   password: "${registry_password}"
   htpasswd: "$(htpasswd -nbB admin "${registry_password}")"
+
+minio:
+  accessKey: "$(head -c16 /dev/urandom | xxd -p)"
+  secretKey: "$(head -c16 /dev/urandom | xxd -p)"
 EOF

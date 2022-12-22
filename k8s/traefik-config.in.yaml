@@ -27,6 +27,13 @@ data:
             certResolver: riju
             domains:
               - main: k8s.riju.codes
+      minio:
+        address: ":32000"
+        http:
+          tls:
+            certResolver: riju
+            domains:
+              - main: k8s.riju.codes
     ping:
       entryPoint: "healthcheck"
     metrics:
