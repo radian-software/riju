@@ -57,7 +57,7 @@ func (m *ManagedWebsocket) handleIncoming() {
 		if msgtype != m.MessageType {
 			continue
 		}
-		m.OutgoingChan <- msgdata
+		m.IncomingChan <- msgdata
 	}
 }
 
