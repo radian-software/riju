@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -33,9 +32,6 @@ func (m *ManagedWebsocket) handleIncoming() {
 		for {
 			msgtype, data, err := m.Socket.ReadMessage()
 			if err != nil {
-				if err != io.EOF {
-					logErrorf("reading message: %w", err)
-				}
 				m.Socket.Close()
 				return
 			}
@@ -89,7 +85,6 @@ func (m *ManagedWebsocket) handleOutgoing() {
 		m.Socket.SetWriteDeadline(wd)
 		err := m.Socket.WriteMessage(msgtype, msgdata)
 		if err != nil {
-			logErrorf("writing message: %w", err)
 			m.Socket.Close()
 			return
 		}
