@@ -28,9 +28,12 @@ type managedProcess struct {
 
 func NewManagedProcess(name string, argv []string, attr *os.ProcAttr) (*managedProcess, error) {
 	mp := &managedProcess{
+		internalExitChan: make(chan struct{}, 16),
+
 		StdinChan:  make(chan []byte, 16),
 		StdoutChan: make(chan []byte, 16),
 		StderrChan: make(chan []byte, 16),
+		ExitChan:   make(chan *os.ProcessState, 16),
 		CloseChan:  make(chan struct{}, 16),
 	}
 	done := false
@@ -77,9 +80,9 @@ func NewManagedProcess(name string, argv []string, attr *os.ProcAttr) (*managedP
 
 func (mp *managedProcess) handleInput(ch chan []byte, f *os.File, name string) {
 	for data := range ch {
-		nw, err := f.Write(data)
+		_, err := f.Write(data)
 		if err != nil {
-			logWarnf("writing to %s: got error after %d of %d byte(s): %w", name, nw, len(data), err)
+			// Likely stdin closed by subprocess, this is normal
 			return
 		}
 	}
@@ -90,7 +93,8 @@ func (mp *managedProcess) handleOutput(ch chan []byte, f *os.File, name string) 
 		buf := make([]byte, 1024)
 		nr, err := f.Read(buf)
 		if err != nil {
-			logWarnf("reading from %s: got error after %d byte(s): %w", name, nr, err)
+			// Likely stdout/stderr closed by subprocess,
+			// this is normal
 			return
 		}
 		if nr == 0 {
