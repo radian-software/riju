@@ -11,3 +11,4 @@ env.yaml
 node_modules
 out
 sentinel.h
+agent/agent
