@@ -67,28 +67,6 @@ func warnf(ms *ManagedWebsocket, format string, arg ...interface{}) {
 	warn(ms, fmt.Errorf(format, arg...))
 }
 
-func handleClientMessages(ms *ManagedWebsocket) <-chan []byte {
-	stdinChan := make(chan []byte, 16)
-	go func() {
-		defer close(stdinChan)
-		for data := range ms.IncomingChan {
-			msg := clientMessage{}
-			err := json.Unmarshal(data, &msg)
-			if err != nil {
-				fatalf(ms, "parsing json: %w", err)
-				return
-			}
-			switch msg.Event {
-			case "stdin":
-				stdinChan <- msg.Data
-			default:
-				logWarnf("received unknown event type %s", msg.Event)
-			}
-		}
-	}()
-	return stdinChan
-}
-
 // https://github.com/gorilla/websocket/blob/76ecc29eff79f0cedf70c530605e486fc32131d1/examples/command/main.go
 func handler(w http.ResponseWriter, r *http.Request) {
 	// Upgrade http connection to websocket
