@@ -45,7 +45,7 @@ export async function createUserSession({ sessionID, langConfig, revisions }) {
           resources: {},
           command: ["sh", "-c"],
           args: [
-            `cp -RT /mc /root/.mc &&` +
+            `mkdir -p /root/.mc && cp -LT /mc/config.json /root/.mc/config.json &&` +
               `mc cp riju/agent/${revisions.agent} /riju-bin/agent && chmod +x /riju-bin/agent &&` +
               `mc cp riju/ptyify/${revisions.ptyify} /riju-bin/ptyify && chmod +x /riju-bin/ptyify`,
           ],
@@ -67,6 +67,7 @@ export async function createUserSession({ sessionID, langConfig, revisions }) {
           name: "session",
           image: `localhost:30999/riju-lang:${langConfig.id}-${revisions.langImage}`,
           resources: {
+            requests: {},
             limits: {
               cpu: "1000m",
               memory: "4Gi",
