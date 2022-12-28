@@ -197,6 +197,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	case <-exitChan2:
 	case <-ms.ClosedChan:
 	}
+	// Wait a bit to send any pending messages before closing the
+	// connection.
+	time.Sleep(1 * time.Second)
 	return
 }
 
