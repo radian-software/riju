@@ -5,15 +5,15 @@ kubeconfig.loadFromDefault();
 
 const k8s = kubeconfig.makeApiClient(k8sClient.CoreV1Api);
 
-async function listUserSessions() {
+export async function listUserSessions() {
   return (await k8s.listNamespacedPod("riju-user")).body.items.map((pod) => ({
     podName: pod.metadata.name,
     sessionID: pod.metadata.labels["riju.codes/user-session-id"],
   }));
 }
 
-async function createUserSession({ sessionID, langConfig, revisions }) {
-  await k8s.createNamespacedPod("riju-user", {
+export async function createUserSession({ sessionID, langConfig, revisions }) {
+  const { body: pod } = await k8s.createNamespacedPod("riju-user", {
     metadata: {
       name: `riju-user-session-${sessionID}`,
       labels: {
@@ -43,16 +43,16 @@ async function createUserSession({ sessionID, langConfig, revisions }) {
           name: "download",
           image: "minio/mc:RELEASE.2022-12-13T00-23-28Z",
           resources: {},
+          command: ["sh", "-c"],
           args: [
-            "sh",
-            "-c",
-            `mc cp riju/agent/${revisions.agent} /riju-bin/agent &&` +
-              `mc cp riju/ptyify/${revisions.ptyify} /riju-bin/ptyify`,
+            `cp -RT /mc /root/.mc &&` +
+              `mc cp riju/agent/${revisions.agent} /riju-bin/agent && chmod +x /riju-bin/agent &&` +
+              `mc cp riju/ptyify/${revisions.ptyify} /riju-bin/ptyify && chmod +x /riju-bin/ptyify`,
           ],
           volumeMounts: [
             {
               name: "minio-config",
-              mountPath: "/root/.mc",
+              mountPath: "/mc",
               readOnly: true,
             },
             {
@@ -120,4 +120,11 @@ async function createUserSession({ sessionID, langConfig, revisions }) {
       restartPolicy: "Never",
     },
   });
+  console.log(pod);
+}
+
+export async function deleteUserSessions(sessionsToDelete) {
+  for (const { podName } of sessionsToDelete) {
+    await k8s.deleteNamespacedPod(podName, "riju-user");
+  }
 }
