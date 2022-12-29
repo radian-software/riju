@@ -34,6 +34,10 @@ data:
 
     http_port 3128
 
+    # Avoid logging TCP healthchecks as errors
+    acl hasRequest has request
+    access_log daemon:/var/log/squid/access.log hasRequest
+
 ---
 kind: Deployment
 apiVersion: apps/v1
