@@ -6,6 +6,8 @@ metadata:
   name: riju-proxy-config
 data:
   default.conf: |
+    underscores_in_headers on;
+
     server {
       resolver kube-dns.kube-system.svc.cluster.local;
       listen 1869 default_server;
@@ -13,8 +15,12 @@ data:
       auth_basic "Riju administrative proxy";
       auth_basic_user_file /etc/nginx/passwd;
 
-      location ~ {
-        proxy_pass http://$host:869;
+      location ~ /(10\.[0-9]+\.[0-9]+\.[0-9]+)/(.*) {
+        proxy_pass http://$1:869/$2;
+      }
+
+      location / {
+        return 404;
       }
     }
 
