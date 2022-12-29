@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/google/shlex"
 	"github.com/gorilla/websocket"
 )
 
@@ -67,6 +68,25 @@ func warnf(ms *ManagedWebsocket, format string, arg ...interface{}) {
 	warn(ms, fmt.Errorf(format, arg...))
 }
 
+func getCommandPrefix() []string {
+	prefix := os.Getenv("RIJU_AGENT_COMMAND_PREFIX")
+	if prefix == "" {
+		logErrorf("must specify RIJU_AGENT_COMMAND_PREFIX for security reasons")
+		os.Exit(1)
+	}
+	if prefix == "0" {
+		return []string{}
+	}
+	list, err := shlex.Split(prefix)
+	if err != nil {
+		logErrorf("parsing RIJU_AGENT_COMMAND_PREFIX: %w", err)
+		os.Exit(1)
+	}
+	return list
+}
+
+var CommandPrefix = getCommandPrefix()
+
 // https://github.com/gorilla/websocket/blob/76ecc29eff79f0cedf70c530605e486fc32131d1/examples/command/main.go
 func handler(w http.ResponseWriter, r *http.Request) {
 	// Upgrade http connection to websocket
@@ -98,6 +118,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fatalf(ms, "cmdline query parameter missing")
 		return
 	}
+	cmdline = append(CommandPrefix, cmdline...)
 	binary, err := exec.LookPath(cmdline[0])
 	if err != nil {
 		fatalf(ms, "searching for executable: %w", err)
@@ -191,7 +212,12 @@ func main() {
 		host = "0.0.0.0"
 	}
 	fmt.Printf("Listening on http://%s:%s\n", host, port)
-	err := http.ListenAndServe(fmt.Sprintf("%s:%s", host, port), http.HandlerFunc(handler))
+	mux := http.NewServeMux()
+	mux.HandleFunc("/exec", handler)
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+	err := http.ListenAndServe(fmt.Sprintf("%s:%s", host, port), mux)
 	if err != nil {
 		logError(err)
 		os.Exit(1)

@@ -26,12 +26,15 @@ async function main() {
   }
   const sessionID = getUUID();
   console.log(`Starting session with UUID ${sessionID}`);
+  const watcher = k8s.watchPods();
   await k8s.createUserSession({
+    watcher,
     sessionID,
     langConfig,
     revisions: {
-      agent: "20221228-023645-invisible-amaranth-sparrow",
+      agent: "20221229-002450-semantic-moccasin-albatross",
       ptyify: "20221228-023645-clean-white-gorilla",
+      langImage: "20221227-195753-forward-harlequin-wolverine",
     },
   });
   // let buffer = "";

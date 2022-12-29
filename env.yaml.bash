@@ -5,6 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 registry_password="$(pwgen -s 20 1)"
+proxy_password="$(pwgen -s 20 1)"
 
 cat <<EOF
 networking:
@@ -25,4 +26,8 @@ registry:
 minio:
   accessKey: "$(head -c16 /dev/urandom | xxd -p)"
   secretKey: "$(head -c16 /dev/urandom | xxd -p)"
+
+proxy:
+  password: "${proxy_password}"
+  htpasswd: "$(htpasswd -nbB admin "${proxy_password}")"
 EOF

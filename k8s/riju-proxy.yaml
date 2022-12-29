@@ -1,0 +1,88 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  namespace: riju
+  name: riju-proxy-config
+data:
+  squid.conf: |
+    cache deny all
+
+    acl riju_src src 10.244.0.0/16
+    http_access deny !riju_src
+
+    acl riju_dst dst 10.244.0.0/16
+    http_access deny !riju_dst
+
+    acl riju_port port 869
+    http_access deny !riju_port
+
+    acl riju_method method GET
+    http_access deny !riju_method
+
+    auth_param basic program /usr/lib/squid/basic_ncsa_auth
+    auth_param basic children 5 startup=5 idle=1
+    auth_param basic realm Riju administrative proxy
+    auth_param basic credentialsttl 24 hours
+
+    acl riju_auth proxy_auth REQUIRED
+    http_access deny !riju_auth
+
+    http_access allow all
+    http_access deny all
+
+    http_port 3128
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: riju
+  name: riju-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: riju-proxy
+  template:
+    metadata:
+      labels:
+        app: riju-proxy
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: riju-proxy-config
+        - name: auth
+          secret:
+            secretName: riju-proxy-auth
+      containers:
+        - name: nginx
+          image: "ubuntu/squid:5.2-22.04_beta"
+          resources: {}
+          readinessProbe:
+            tcpSocket:
+              port: 3128
+            failureThreshold: 1
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            tcpSocket:
+              port: 3128
+            failureThreshold: 3
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          ports:
+            - name: http
+              containerPort: 3128
+          volumeMounts:
+            - name: config
+              mountPath: /etc/squid/squid.conf
+              subPath: squid.conf
+            - name: auth
+              mountPath: /etc/squid/passwd
+              subPath: htpasswd
