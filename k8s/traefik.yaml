@@ -124,6 +124,8 @@ spec:
   selector:
     app: traefik
   ports:
+    - port: 3128
+      name: squid
     - port: 80
       name: http
       targetPort: 8000

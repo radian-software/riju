@@ -91,3 +91,34 @@ spec:
             - name: auth
               mountPath: /etc/squid/passwd
               subPath: htpasswd
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: riju
+  name: riju-proxy
+spec:
+  selector:
+    app: riju-proxy
+  ports:
+    - name: http
+      port: 3128
+      targetPort: 3128
+
+---
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  namespace: riju
+  name: riju-proxy
+spec:
+  entryPoints:
+    - proxy
+  routes:
+    - kind: Rule
+      match: "PathPrefix(`/`)"
+      services:
+        - namespace: riju
+          name: riju-proxy
+          port: 3128
