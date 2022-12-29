@@ -8,6 +8,7 @@ data:
   squid.conf: |
     cache deny all
 
+    acl riju_src src 127.0.0.1/32
     acl riju_src src 10.244.0.0/16
     http_access deny !riju_src
 
@@ -20,7 +21,7 @@ data:
     acl riju_method method GET
     http_access deny !riju_method
 
-    auth_param basic program /usr/lib/squid/basic_ncsa_auth
+    auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwd
     auth_param basic children 5 startup=5 idle=1
     auth_param basic realm Riju administrative proxy
     auth_param basic credentialsttl 24 hours
