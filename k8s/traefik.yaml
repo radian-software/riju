@@ -132,6 +132,8 @@ spec:
     - port: 443
       name: https
       targetPort: 8443
+    - port: 1869
+      name: proxy
     - port: 31000
       name: docker
     - port: 32000

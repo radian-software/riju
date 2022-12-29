@@ -5,38 +5,18 @@ metadata:
   namespace: riju
   name: riju-proxy-config
 data:
-  squid.conf: |
-    cache deny all
+  default.conf: |
+    server {
+      resolver kube-dns.kube-system.svc.cluster.local;
+      listen 1869 default_server;
 
-    acl riju_src src 127.0.0.1/32
-    acl riju_src src 10.244.0.0/16
-    http_access deny !riju_src
+      auth_basic "Riju administrative proxy";
+      auth_basic_user_file /etc/nginx/passwd;
 
-    acl riju_dst dst 10.244.0.0/16
-    http_access deny !riju_dst
-
-    acl riju_port port 869
-    http_access deny !riju_port
-
-    acl riju_method method GET
-    http_access deny !riju_method
-
-    auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwd
-    auth_param basic children 5 startup=5 idle=1
-    auth_param basic realm Riju administrative proxy
-    auth_param basic credentialsttl 24 hours
-
-    acl riju_auth proxy_auth REQUIRED
-    http_access deny !riju_auth
-
-    http_access allow all
-    http_access deny all
-
-    http_port 3128
-
-    # Avoid logging TCP healthchecks as errors
-    acl hasRequest has request
-    access_log daemon:/var/log/squid/access.log hasRequest
+      location ~ {
+        proxy_pass http://$host:869;
+      }
+    }
 
 ---
 kind: Deployment
@@ -63,11 +43,11 @@ spec:
             secretName: riju-proxy-auth
       containers:
         - name: nginx
-          image: "ubuntu/squid:5.2-22.04_beta"
+          image: "nginx:1.23"
           resources: {}
           readinessProbe:
             tcpSocket:
-              port: 3128
+              port: 1869
             failureThreshold: 1
             initialDelaySeconds: 2
             periodSeconds: 10
@@ -75,7 +55,7 @@ spec:
             timeoutSeconds: 2
           livenessProbe:
             tcpSocket:
-              port: 3128
+              port: 1869
             failureThreshold: 3
             initialDelaySeconds: 2
             periodSeconds: 10
@@ -83,13 +63,12 @@ spec:
             timeoutSeconds: 2
           ports:
             - name: http
-              containerPort: 3128
+              containerPort: 1869
           volumeMounts:
             - name: config
-              mountPath: /etc/squid/squid.conf
-              subPath: squid.conf
+              mountPath: /etc/nginx/conf.d
             - name: auth
-              mountPath: /etc/squid/passwd
+              mountPath: /etc/nginx/passwd
               subPath: htpasswd
 
 ---
@@ -98,13 +77,27 @@ apiVersion: v1
 metadata:
   namespace: riju
   name: riju-proxy
-  annotations:
-    metallb.universe.tf/allow-shared-ip: main
 spec:
-  type: LoadBalancer
   selector:
     app: riju-proxy
   ports:
     - name: http
-      port: 3128
-      targetPort: 3128
+      port: 1869
+      targetPort: 1869
+
+---
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  namespace: riju
+  name: riju-proxy
+spec:
+  entryPoints:
+    - proxy
+  routes:
+    - kind: Rule
+      match: "PathPrefix(`/`)"
+      services:
+        - namespace: riju
+          name: riju-proxy
+          port: 1869
