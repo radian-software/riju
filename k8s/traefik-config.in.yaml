@@ -7,13 +7,6 @@ metadata:
 data:
   traefik.yaml: |
     entryPoints:
-      proxy:
-        address: ":3128"
-        http:
-          tls:
-            certResolver: riju
-            domains:
-              - main: k8s.riju.codes
       http:
         address: ":8000"
       https:
