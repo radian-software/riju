@@ -1,5 +1,4 @@
 import { spawn } from "child_process";
-import os from "os";
 import process from "process";
 
 import * as Sentry from "@sentry/node";
@@ -84,6 +83,14 @@ export async function run(args, log, options) {
       }
     });
   });
+}
+
+export function privilegedList() {
+  return [rijuSystemPrivileged, "list"];
+}
+
+export function privilegedPull({ repo, tag }) {
+  return [rijuSystemPrivileged, "pull", repo, tag];
 }
 
 export function privilegedSession({ uuid, lang }) {

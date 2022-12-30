@@ -1,0 +1,101 @@
+---
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  namespace: riju
+  name: minio
+spec:
+  replicas: 1
+  serviceName: minio
+  selector:
+    matchLabels:
+      app: minio
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: 16Gi
+        storageClassName: openebs-hostpath
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+        - name: minio
+          image: "minio/minio:RELEASE.2022-12-12T19-27-27Z"
+          resources: {}
+          readinessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: 9000
+              scheme: HTTP
+            failureThreshold: 1
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: 9000
+              scheme: HTTP
+            failureThreshold: 3
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          args:
+            - "server"
+            - "/data"
+          env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-keys
+                  key: access-key
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-keys
+                  key: secret-key
+          ports:
+            - name: api
+              containerPort: 9000
+          volumeMounts:
+            - name: data
+              mountPath: /data
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: riju
+  name: minio
+spec:
+  selector:
+    app: minio
+  ports:
+    - name: api
+      port: 80
+      targetPort: 9000
+
+---
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  namespace: riju
+  name: minio
+spec:
+  entryPoints:
+    - minio
+  routes:
+    - kind: Rule
+      match: "PathPrefix(`/`)"
+      services:
+        - namespace: riju
+          name: minio
+          port: 80

@@ -1,12 +1,14 @@
 *.log
 *.out
+*.out.*
 *.pem
 .env
 .lsp-repl-history
 .terraform
+bin
 build
+env.yaml
 node_modules
 out
 sentinel.h
-financials/????-??/*
-!financials/????-??/breakdown.txt
+agent/agent

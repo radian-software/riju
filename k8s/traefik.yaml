@@ -1,0 +1,150 @@
+# Based on traefik/traefik helm chart 20.8.0 for traefik v2.9.6
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  namespace: traefik
+  name: traefik-data
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 128Mi
+  storageClassName: openebs-hostpath
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: traefik
+  name: traefik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  minReadySeconds: 0
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9100"
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik
+      terminationGracePeriodSeconds: 60
+      hostNetwork: false
+      initContainers:
+        - name: volume-permissions
+          image: busybox:1.35
+          command:
+            - "sh"
+            - "-c"
+            - "touch /data/acme.json && chmod -Rv 600 /data/* && chown 65532:65532 /data/acme.json"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      containers:
+        - image: traefik:v2.9.6
+          imagePullPolicy: IfNotPresent
+          name: traefik
+          resources: {}
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 9000
+              scheme: HTTP
+            failureThreshold: 1
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 9000
+              scheme: HTTP
+            failureThreshold: 3
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          ports:
+            - name: http
+              containerPort: 8000
+            - name: https
+              containerPort: 8443
+            - name: ping
+              containerPort: 9000
+            - name: docker
+              containerPort: 31000
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 65532
+            runAsNonRoot: true
+            runAsUser: 65532
+          volumeMounts:
+            - name: config
+              mountPath: /etc/traefik
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: config
+          configMap:
+            name: traefik-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: traefik-data
+        - name: tmp
+          emptyDir: {}
+      securityContext:
+        fsGroup: 65532
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: traefik
+  name: traefik
+  annotations:
+    metallb.universe.tf/allow-shared-ip: main
+spec:
+  type: LoadBalancer
+  selector:
+    app: traefik
+  ports:
+    - port: 80
+      name: http
+      targetPort: 8000
+    - port: 443
+      name: https
+      targetPort: 8443
+    - port: 1869
+      name: proxy
+    - port: 31000
+      name: docker
+    - port: 32000
+      name: minio
+
+---
+kind: IngressClass
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: traefik
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+spec:
+  controller: traefik.io/ingress-controller

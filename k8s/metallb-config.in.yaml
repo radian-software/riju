@@ -1,0 +1,9 @@
+---
+kind: IPAddressPool
+apiVersion: metallb.io/v1beta1
+metadata:
+  namespace: metallb
+  name: self
+spec:
+  addresses:
+    - "{{ .networking.ip }}/32"

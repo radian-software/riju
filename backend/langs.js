@@ -1,5 +1,4 @@
-import fsOrig, { promises as fs } from "fs";
-import path from "path";
+import fsOrig from "fs";
 
 import debounce from "debounce";
 

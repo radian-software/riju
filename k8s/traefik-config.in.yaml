@@ -1,0 +1,60 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  namespace: traefik
+  name: traefik-config
+data:
+  traefik.yaml: |
+    entryPoints:
+      proxy:
+        address: ":1869"
+        http:
+          tls:
+            certResolver: riju
+            domains:
+              - main: k8s.riju.codes
+      http:
+        address: ":8000"
+      https:
+        address: ":8443"
+        http:
+          tls:
+            certResolver: riju
+            domains:
+              - main: k8s.riju.codes
+      healthcheck:
+        address: ":9000"
+      metrics:
+        address: ":9100"
+      docker:
+        address: ":31000"
+        http:
+          tls:
+            certResolver: riju
+            domains:
+              - main: k8s.riju.codes
+      minio:
+        address: ":32000"
+        http:
+          tls:
+            certResolver: riju
+            domains:
+              - main: k8s.riju.codes
+    ping:
+      entryPoint: "healthcheck"
+    metrics:
+      prometheus:
+        entryPoint: "metrics"
+    providers:
+      kubernetesCRD: {}
+    certificatesResolvers:
+      riju:
+        acme:
+          {{- if not .contact.letsEncryptProductionEnabled }}
+          caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+          {{- end }}
+          email: "{{ .contact.letsEncryptEmail }}"
+          storage: /data/acme.json
+          httpChallenge:
+            entryPoint: http

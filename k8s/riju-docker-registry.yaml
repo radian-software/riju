@@ -1,0 +1,102 @@
+---
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  namespace: riju
+  name: docker-registry
+spec:
+  replicas: 1
+  serviceName: docker-registry
+  selector:
+    matchLabels:
+      app: docker-registry
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: 128Gi
+        storageClassName: openebs-hostpath
+  template:
+    metadata:
+      labels:
+        app: docker-registry
+    spec:
+      volumes:
+        - name: auth
+          secret:
+            secretName: registry-auth
+      containers:
+        - name: registry
+          image: "registry:2"
+          resources: {}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+              scheme: HTTP
+            failureThreshold: 1
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+              scheme: HTTP
+            failureThreshold: 3
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          env:
+            - name: REGISTRY_AUTH
+              value: htpasswd
+            - name: REGISTRY_AUTH_HTPASSWD_REALM
+              value: "Registry Realm"
+            - name: REGISTRY_AUTH_HTPASSWD_PATH
+              value: /var/run/registry/auth/htpasswd
+          ports:
+            - name: api
+              containerPort: 5000
+          volumeMounts:
+            - name: auth
+              mountPath: /var/run/registry/auth
+            - name: data
+              mountPath: /var/lib/registry
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: riju
+  name: docker-registry
+spec:
+  selector:
+    app: docker-registry
+  type: NodePort
+  ports:
+    - name: api
+      port: 80
+      nodePort: 30999
+      targetPort: 5000
+
+---
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  namespace: riju
+  name: docker-registry
+spec:
+  entryPoints:
+    - docker
+  routes:
+    - kind: Rule
+      match: "PathPrefix(`/`)"
+      services:
+        - namespace: riju
+          name: docker-registry
+          port: 80

@@ -30,6 +30,8 @@ void init() { sentinel_bash[sentinel_bash_len - 1] = '\0'; }
 void die_with_usage()
 {
   die("usage:\n"
+      "  riju-system-privileged list\n"
+      "  riju-system-privileged pull REPO TAG\n"
       "  riju-system-privileged session UUID LANG [IMAGE-HASH]\n"
       "  riju-system-privileged exec UUID CMDLINE...\n"
       "  riju-system-privileged pty UUID CMDLINE...\n"
@@ -117,6 +119,28 @@ char *parseImageHash(char *imageHash)
   return imageHash;
 }
 
+char *parseRepo(char *repo)
+{
+  if (strnlen(repo, 501) > 500)
+    die("illegal repo name");
+  for (char *ptr = repo; *ptr; ++ptr)
+    if (!((*ptr >= 'a' && *ptr <= 'z') || (*ptr >= '0' && *ptr <= '9') ||
+          *ptr == '/' || *ptr == '.' || *ptr == '-' || *ptr == '_'))
+      die("illegal repo name");
+  return repo;
+}
+
+char *parseTag(char *tag)
+{
+  if (strnlen(tag, 501) > 500)
+    die("illegal tag name");
+  for (char *ptr = tag; *ptr; ++ptr)
+    if (!((*ptr >= 'a' && *ptr <= 'z') || (*ptr >= '0' && *ptr <= '9') ||
+          *ptr == '.' || *ptr == '-' || *ptr == '_'))
+      die("illegal tag name");
+  return tag;
+}
+
 char *timeout_msg;
 
 void sigalrm_die(int signum)
@@ -132,7 +156,81 @@ void sigalrm_kill_parent(int signum)
   exit(EXIT_FAILURE);
 }
 
-void session(char *uuid, char *lang, char *imageHash)
+void cmd_list()
+{
+  // This command prints a bunch of empty lines because there is no
+  // way to filter to a desired set of images. Caller is expected to
+  // remove empty lines because it's easier in JS than C.
+  char *argv[] = {
+      "docker",
+      "image",
+      "ls",
+      "--format",
+      "{{ if eq .Repository \"riju\" }}{{ .Tag }}{{ end }}",
+      NULL,
+  };
+  execvp(argv[0], argv);
+  die("execvp failed");
+}
+
+void cmd_pull(char *repo, char *tag)
+{
+  char *localImage, *remoteImage;
+  if (asprintf(&remoteImage, "%s:%s", repo, tag) < 0)
+    die("asprintf failed");
+  if (asprintf(&localImage, "riju:%s", tag) < 0)
+    die("asprintf failed");
+  pid_t orig_ppid = getpid();
+  pid_t pid = fork();
+  if (pid < 0)
+    die("fork failed");
+  else if (pid == 0) {
+    if (freopen("/dev/null", "w", stdout) == NULL)
+      die("freopen failed");
+    if (prctl(PR_SET_PDEATHSIG, SIGTERM) < 0)
+      die("prctl failed");
+    if (getppid() != orig_ppid)
+      exit(EXIT_FAILURE);
+    char *argv[] = {
+        "docker", "inspect", "--", localImage, NULL,
+    };
+    execvp(argv[0], argv);
+    die("execvp failed");
+  }
+  siginfo_t info;
+  if (waitid(P_PID, pid, &info, WEXITED) < 0)
+    die("waitid failed");
+  if (info.si_status == 0) {
+    // Image exists already, no need to pull. It is only appropriate
+    // to use cmd_pull with immutable images.
+    return;
+  }
+  orig_ppid = getpid();
+  pid = fork();
+  if (pid < 0)
+    die("fork failed");
+  else if (pid == 0) {
+    if (prctl(PR_SET_PDEATHSIG, SIGTERM) < 0)
+      die("prctl failed");
+    if (getppid() != orig_ppid)
+      exit(EXIT_FAILURE);
+    char *argv[] = {
+        "docker", "pull", "--", remoteImage, NULL,
+    };
+    execvp(argv[0], argv);
+  }
+  if (waitid(P_PID, pid, &info, WEXITED) < 0)
+    die("waitid failed");
+  if (info.si_status != 0)
+    die("child process failed");
+  char *argv[] = {
+      "docker", "tag", "--", remoteImage, localImage,
+  };
+  execvp(argv[0], argv);
+  die("execvp failed");
+}
+
+void cmd_session(char *uuid, char *lang, char *imageHash)
 {
   if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
     die("setvbuf failed");
@@ -295,7 +393,7 @@ void session(char *uuid, char *lang, char *imageHash)
   }
 }
 
-void exec(char *uuid, int argc, char **cmdline, bool pty)
+void cmd_exec(char *uuid, int argc, char **cmdline, bool pty)
 {
   if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
     die("setvbuf failed");
@@ -463,7 +561,7 @@ void exec(char *uuid, int argc, char **cmdline, bool pty)
   }
 }
 
-void teardown(char *uuid)
+void cmd_teardown(char *uuid)
 {
   if (setuid(0) != 0)
     die("setuid failed");
@@ -491,31 +589,45 @@ int main(int argc, char **argv)
     die("seteuid failed");
   if (argc < 2)
     die_with_usage();
+  if (!strcmp(argv[1], "list")) {
+    if (argc != 2)
+      die_with_usage();
+    cmd_list();
+    return 0;
+  }
+  if (!strcmp(argv[1], "pull")) {
+    if (argc != 4)
+      die_with_usage();
+    char *repo = parseRepo(argv[2]);
+    char *tag = parseTag(argv[3]);
+    cmd_pull(repo, tag);
+    return 0;
+  }
   if (!strcmp(argv[1], "session")) {
     if (argc < 4 || argc > 5)
       die_with_usage();
     char *uuid = parseUUID(argv[2]);
     char *lang = parseLang(argv[3]);
     char *imageHash = argc == 5 ? parseImageHash(argv[4]) : NULL;
-    session(uuid, lang, imageHash);
+    cmd_session(uuid, lang, imageHash);
     return 0;
   }
   if (!strcmp(argv[1], "exec")) {
     if (argc < 4)
       die_with_usage();
-    exec(parseUUID(argv[2]), argc - 3, &argv[3], false);
+    cmd_exec(parseUUID(argv[2]), argc - 3, &argv[3], false);
     return 0;
   }
   if (!strcmp(argv[1], "pty")) {
     if (argc < 4)
       die_with_usage();
-    exec(parseUUID(argv[2]), argc - 3, &argv[3], true);
+    cmd_exec(parseUUID(argv[2]), argc - 3, &argv[3], true);
     return 0;
   }
   if (!strcmp(argv[1], "teardown")) {
     if (argc < 2)
       die_with_usage();
-    teardown(argc >= 3 ? parseUUID(argv[2]) : NULL);
+    cmd_teardown(argc >= 3 ? parseUUID(argv[2]) : NULL);
     return 0;
   }
   die_with_usage();

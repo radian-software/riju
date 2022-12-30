@@ -1,0 +1,89 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: riju
+  name: riju-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: riju-server
+  template:
+    metadata:
+      labels:
+        app: riju-server
+    spec:
+      volumes:
+        - name: cache
+          hostPath:
+            path: /var/cache/riju
+        - name: docker
+          hostPath:
+            path: /var/run/docker.sock
+      imagePullSecrets:
+        - name: registry-login
+      containers:
+        - name: server
+          image: "localhost:30999/riju:app"
+          resources: {}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 6119
+              scheme: HTTP
+            failureThreshold: 1
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 6119
+              scheme: HTTP
+            failureThreshold: 3
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          ports:
+            - name: http
+              containerPort: 6119
+          volumeMounts:
+            - name: cache
+              mountPath: /var/cache/riju
+            - name: docker
+              mountPath: /var/run/docker.sock
+              readOnly: true
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: riju
+  name: riju-server
+spec:
+  selector:
+    app: riju-server
+  ports:
+    - name: http
+      port: 80
+      targetPort: 6119
+
+---
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  namespace: riju
+  name: riju-server
+spec:
+  entryPoints:
+    - https
+  routes:
+    - kind: Rule
+      match: "PathPrefix(`/`)"
+      services:
+        - namespace: riju
+          name: riju-server
+          port: 80
