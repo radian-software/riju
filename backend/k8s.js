@@ -75,6 +75,7 @@ export async function createUserSession({
         },
       },
       spec: {
+        hostname: langConfig.id,
         volumes: [
           {
             name: "minio-config",
