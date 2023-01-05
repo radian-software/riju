@@ -4,7 +4,7 @@ import process from "process";
 
 import { readLangConfig } from "../lib/yaml.js";
 import * as k8s from "./k8s.js";
-import { getUUID, quote } from "./util.js";
+import { deptyify, getUUID } from "./util.js";
 
 function die(msg) {
   console.error(msg);
@@ -27,54 +27,49 @@ async function main() {
   const sessionID = getUUID();
   console.log(`Starting session with UUID ${sessionID}`);
   const watcher = k8s.watchPods();
-  await k8s.createUserSession({
+  const podName = await k8s.createUserSession({
     watcher,
     sessionID,
     langConfig,
     revisions: {
-      agent: "20221229-002450-semantic-moccasin-albatross",
+      agent: "20230104-131916-extensive-aquamarine-crocodile",
       ptyify: "20221228-023645-clean-white-gorilla",
       langImage: "20221227-195753-forward-harlequin-wolverine",
     },
   });
-  // let buffer = "";
-  // await new Promise((resolve) => {
-  //   session.stdout.on("data", (data) => {
-  //     buffer += data.toString();
-  //     let idx;
-  //     while ((idx = buffer.indexOf("\n")) !== -1) {
-  //       const line = buffer.slice(0, idx);
-  //       buffer = buffer.slice(idx + 1);
-  //       if (line === "riju: container ready") {
-  //         resolve();
-  //       } else {
-  //         console.error(line);
-  //       }
-  //     }
-  //   });
-  // });
-  // const args = [].concat.apply(
-  //   ["riju-pty", "-f"],
-  //   privilegedPty(
-  //     { uuid },
-  //     bash(
-  //       `env L='${lang}' LANG_CONFIG=${quote(
-  //         JSON.stringify(langConfig)
-  //       )} bash --rcfile <(cat <<< ${quote(sandboxScript)})`
-  //     )
-  //   )
-  // );
-  // const proc = spawn(args[0], args.slice(1), {
-  //   stdio: "inherit",
-  // });
-  // try {
-  //   await new Promise((resolve, reject) => {
-  //     proc.on("error", reject);
-  //     proc.on("close", resolve);
-  //   });
-  // } finally {
-  //   session.kill();
-  // }
+  const proxyInfo = {
+    httpProtocol: "https",
+    wsProtocol: "wss",
+    host: "k8s.riju.codes",
+    port: 1869,
+    username: "admin",
+    password: process.env.RIJU_PROXY_PASSWORD,
+  };
+  console.log(`Waiting for session to become ready`);
+  const session = await k8s.initUserSession({
+    watcher,
+    podName,
+    proxyInfo,
+  });
+  console.log(`Initializing sandbox`);
+  let handlePtyInput;
+  const pty = await deptyify({
+    handlePtyInput: (data) => handlePtyInput(data),
+    handlePtyExit: (_status) => {},
+  });
+  await new Promise((resolve) => {
+    const exec = session.exec(["bash"], {
+      pty: true,
+      on: {
+        stdout: (data) => pty.handlePtyOutput(data),
+        stderr: (data) => process.stderr.write(data),
+        exit: (status) => process.exit(status),
+        error: (err) => process.stderr.write(`riju: error: ${err}\n`),
+        close: () => resolve(),
+      },
+    });
+    handlePtyInput = (data) => exec.stdin.write(data);
+  });
 }
 
 main().catch(die);

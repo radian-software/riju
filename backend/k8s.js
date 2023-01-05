@@ -1,5 +1,6 @@
 import * as k8sClient from "@kubernetes/client-node";
-import lodash from "lodash";
+import fetch from "node-fetch";
+import WebSocket from "ws";
 
 const kubeconfig = new k8sClient.KubeConfig();
 kubeconfig.loadFromDefault();
@@ -45,6 +46,9 @@ export function watchPods() {
       if (podName in pods) {
         callback("add", pods[podName]);
       }
+    },
+    podExists: (podName) => {
+      return podName in pods;
     },
   };
 }
@@ -125,11 +129,59 @@ export async function createUserSession({
             },
             command: ["/riju-bin/agent"],
             env: [
+              // For agent
               {
                 name: "RIJU_AGENT_COMMAND_PREFIX",
                 value: "runuser -u riju --",
               },
+              // For user code
+              {
+                name: "HOME",
+                value: "/home/riju",
+              },
+              {
+                name: "LANG",
+                value: "C.UTF-8",
+              },
+              {
+                name: "LC_ALL",
+                value: "C.UTF-8",
+              },
+              {
+                name: "LOGNAME",
+                value: "riju",
+              },
+              {
+                name: "PATH",
+                value:
+                  "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+              },
+              {
+                name: "PWD",
+                value: "/home/riju/src",
+              },
+              {
+                name: "SHELL",
+                value: "/usr/bin/bash",
+              },
+              {
+                name: "TERM",
+                value: "xterm-256color",
+              },
+              {
+                name: "TMPDIR",
+                value: "/tmp",
+              },
+              {
+                name: "USER",
+                value: "riju",
+              },
+              {
+                name: "USERNAME",
+                value: "riju",
+              },
             ],
+            workingDir: "/home/riju/src",
             securityContext: {
               runAsUser: 0,
             },
@@ -182,24 +234,136 @@ export async function createUserSession({
       },
     })
   ).body;
-  const podIP = await new Promise((resolve, reject) => {
-    setTimeout(() => reject("timed out"), 5 * 60 * 1000);
-    watcher.setCallback(pod.metadata.name, (event, pod) => {
-      if (event == "delete") {
-        reject(new Error("pod was deleted"));
-      } else if (pod.status.phase === "Failed") {
-        reject(new Error("pod status became Failed"));
-      } else if (
-        pod.status.podIP &&
-        lodash.every(pod.status.containerStatuses, (status) => status.ready)
-      ) {
-        resolve(pod.status.podIP);
-      } else {
-        console.log(event, JSON.stringify(pod.status, null, 2));
+  return pod.metadata.name;
+}
+
+export async function initUserSession({ watcher, podName, proxyInfo }) {
+  let done = false;
+  try {
+    return await new Promise(async (resolve, reject) => {
+      try {
+        setTimeout(
+          () => reject("timed out waiting for pod to become ready"),
+          5 * 60 * 1000
+        );
+        const podIP = await new Promise((resolve, reject) => {
+          watcher.setCallback(podName, (event, pod) => {
+            if (event == "delete") {
+              reject(new Error("pod was deleted"));
+            } else if (pod.status.phase === "Failed") {
+              reject(new Error("pod status became Failed"));
+            } else if (pod.status.podIP) {
+              resolve(pod.status.podIP);
+            }
+          });
+        });
+        while (!done) {
+          let resp;
+          try {
+            if (!proxyInfo) {
+              resp = await fetch(`http://${podIP}:869`);
+            } else {
+              resp = await fetch(
+                `${proxyInfo.httpProtocol}://${proxyInfo.host}:${proxyInfo.port}/${podIP}/health`,
+                {
+                  headers: {
+                    Authorization: `Basic ${Buffer.from(
+                      `${proxyInfo.username}:${proxyInfo.password}`
+                    ).toString("base64")}`,
+                  },
+                }
+              );
+            }
+            if (!resp.ok) {
+              throw new Error(`Got HTTP error ${resp.status}`);
+            } else {
+              done = true;
+            }
+          } catch (err) {
+            await new Promise((resolve) => setTimeout(resolve, 250));
+          }
+        }
+        resolve({
+          exec: (cmdline, { on, pty }) => {
+            // on :: { stdout, stderr, exit, error, close }
+            if (pty) {
+              cmdline = ["/riju-bin/ptyify", ...cmdline];
+            }
+            let conn;
+            if (!proxyInfo) {
+              conn = new WebSocket(
+                `ws://${podIP}:869/exec?${new URLSearchParams({
+                  cmdline,
+                }).toString()}`
+              );
+            } else {
+              conn = new WebSocket(
+                `${proxyInfo.wsProtocol}://${proxyInfo.host}:${
+                  proxyInfo.port
+                }/${podIP}/exec?${new URLSearchParams({
+                  cmdline,
+                }).toString()}`,
+                {
+                  headers: {
+                    Authorization: `Basic ${Buffer.from(
+                      `${proxyInfo.username}:${proxyInfo.password}`
+                    ).toString("base64")}`,
+                  },
+                }
+              );
+            }
+            conn.on("message", (msg) => {
+              let event, data, text, exitStatus;
+              try {
+                ({ event, data, text, exitStatus } = JSON.parse(msg));
+              } catch (err) {
+                on.error(
+                  `Unable to parse JSON message from agent: ${JSON.stringify(
+                    msg
+                  )}`
+                );
+              }
+              switch (event) {
+                case "stdout":
+                  on.stdout(data);
+                  break;
+                case "stderr":
+                  on.stderr(data);
+                  break;
+                case "exit":
+                  on.exit(exitStatus);
+                  break;
+                case "warn":
+                case "error":
+                  on.error(text);
+                  break;
+                default:
+                  on.error(`Unexpected event type: ${JSON.stringify(event)}`);
+                  break;
+              }
+            });
+            conn.on("close", () => {
+              on.close();
+            });
+            conn.on("error", (err) => {
+              on.error(`Websocket closed with error: ${err}`);
+              on.close();
+            });
+            return {
+              stdin: {
+                write: (data) =>
+                  conn.write(JSON.stringify({ event: "stdin", data })),
+              },
+            };
+          },
+        });
+      } catch (err) {
+        reject(err);
       }
     });
-  });
-  return podIP;
+  } finally {
+    done = true;
+  }
 }
 
 export async function deleteUserSessions(sessionsToDelete) {

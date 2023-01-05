@@ -1,7 +1,10 @@
 import { spawn } from "child_process";
+import { promises as fs } from "fs";
 import process from "process";
 
+import TailFile from "@logdna/tail-file";
 import * as Sentry from "@sentry/node";
+import * as tmp from "tmp-promise";
 import { v4 as getUUIDOrig } from "uuid";
 
 let sentryEnabled = false;
@@ -158,4 +161,74 @@ export function asBool(value, def) {
     return false;
   }
   throw new Error(`asBool doesn't understand value: ${value}`);
+}
+
+export function deptyify({ handlePtyInput, handlePtyExit }) {
+  return new Promise((resolve, reject) => {
+    const done = false;
+    let triggerDone = () => {
+      // Calling the function stored in this variable should have the
+      // effect of terminating the tmp-promise callback and getting
+      // the temporary directory cleaned up.
+      done = true;
+    };
+    tmp
+      .withDir(
+        async (dir) => {
+          const mkfifo = spawn("mkfifo", ["input", "output"], {
+            cwd: dir.path,
+          });
+          await new Promise((resolve, reject) => {
+            mkfifo.on("error", reject);
+            mkfifo.on("exit", (code) => {
+              if (code === 0) {
+                resolve();
+              } else {
+                reject(code);
+              }
+            });
+          });
+          const input = new TailFile(`${dir.path}/input`, {
+            encoding: "utf-8",
+          });
+          input.on("data", (data) => handlePtyOutput(data));
+          input.on("tail_error", logError);
+          input.on("error", logError);
+          await input.start();
+          const output = await fs.open(`${dir.path}/output`, "w");
+          const proc = spawn(
+            "system/out/riju-pty",
+            ["-f", "sh", "-c", "cat > input & cat output"],
+            {
+              cwd: dir.path,
+            }
+          );
+          proc.on("exit", (status) => {
+            handlePtyExit(status);
+            triggerDone();
+          });
+          resolve({
+            handlePtyOutput: async (data) => {
+              await input.write(data);
+            },
+          });
+        },
+        {
+          unsafeCleanup: true,
+        }
+      )
+      .then(async () => {
+        await new Promise((resolve) => {
+          if (done) {
+            resolve();
+          } else {
+            triggerDone = resolve;
+          }
+        });
+      })
+      .catch((err) => {
+        logError(err);
+        reject(err);
+      });
+  });
 }

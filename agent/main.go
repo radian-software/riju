@@ -20,7 +20,7 @@ type clientMessage struct {
 }
 
 type serverMessage struct {
-	// "start", "stdout", "stderr", "exit", "warn", "error"
+	// "stdout", "stderr", "exit", "warn", "error"
 	Event string `json:"event"`
 	// contents of stdout/stderr
 	Data []byte `json:"data,omitempty"`

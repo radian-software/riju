@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -24,6 +25,17 @@ type managedProcess struct {
 	StderrChan chan []byte
 	ExitChan   chan *os.ProcessState
 	CloseChan  chan struct{}
+}
+
+func cleanEnv(env []string) []string {
+	newEnv := []string{}
+	for _, entry := range env {
+		if strings.HasPrefix(entry, "RIJU_") || strings.HasPrefix(entry, "KUBERNETES_") {
+			continue
+		}
+		newEnv = append(newEnv, entry)
+	}
+	return newEnv
 }
 
 func NewManagedProcess(name string, argv []string, attr *os.ProcAttr) (*managedProcess, error) {
@@ -66,6 +78,10 @@ func NewManagedProcess(name string, argv []string, attr *os.ProcAttr) (*managedP
 		newAttr.Files[1] = mp.stdoutWrite
 		newAttr.Files[2] = mp.stderrWrite
 	}
+	if newAttr.Env == nil {
+		newAttr.Env = os.Environ()
+	}
+	newAttr.Env = cleanEnv(newAttr.Env)
 	mp.proc, err = os.StartProcess(name, argv, newAttr)
 	if err != nil {
 		return mp, fmt.Errorf("spawning process: %w", err)
