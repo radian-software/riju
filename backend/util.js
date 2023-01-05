@@ -7,6 +7,8 @@ import * as Sentry from "@sentry/node";
 import * as tmp from "tmp-promise";
 import { v4 as getUUIDOrig } from "uuid";
 
+tmp.setGracefulCleanup();
+
 let sentryEnabled = false;
 
 if (process.env.SENTRY_DSN) {
@@ -223,20 +225,19 @@ export function deptyify({ handlePtyInput, handlePtyExit }) {
               output.write(data);
             },
           });
+          // Wait before deleting tmpdir...
+          await new Promise((resolve) => {
+            if (done) {
+              resolve();
+            } else {
+              triggerDone = resolve;
+            }
+          });
         },
         {
           unsafeCleanup: true,
         }
       )
-      .then(async () => {
-        await new Promise((resolve) => {
-          if (done) {
-            resolve();
-          } else {
-            triggerDone = resolve;
-          }
-        });
-      })
       .catch((err) => {
         logError(err);
         reject(err);
