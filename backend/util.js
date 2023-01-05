@@ -192,7 +192,9 @@ export function deptyify({ handlePtyInput, handlePtyExit }) {
           });
           const proc = spawn(
             `${process.cwd()}/system/out/riju-pty`,
-            ["-f", "sh", "-c", "cat > input & cat output"],
+            // Order is important, stdin can't be read properly from
+            // the background without more configuration
+            ["-f", "sh", "-c", "cat output & cat > input"],
             {
               cwd: dir.path,
               stdio: "inherit",
