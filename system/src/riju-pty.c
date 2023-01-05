@@ -14,6 +14,14 @@
 #include <termios.h>
 #include <unistd.h>
 
+// This implementation is largely cribbed from
+// https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
+//
+// Known issue: tty attached to stdin is not configured quite right,
+// and entering a line of more than 80 characters causes buggy
+// wraparound. This does not affect output sent to stdout from the
+// subprocess.
+
 void __attribute__((noreturn)) die(char *msg)
 {
   fprintf(stderr, "%s (errno %d)\n", msg, errno);
