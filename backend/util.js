@@ -1,4 +1,5 @@
 import { spawn } from "child_process";
+import * as fsBase from "fs";
 import { promises as fs } from "fs";
 import process from "process";
 
@@ -203,27 +204,23 @@ export function deptyify({ handlePtyInput, handlePtyExit }) {
             handlePtyExit(status);
             triggerDone();
           });
-          const [input, output] = await new Promise((resolve, reject) => {
+          const output = await new Promise((resolve, reject) => {
             setTimeout(() => reject("timed out"), 5000);
-            resolve(
-              Promise.all([
-                fs.open(`${dir.path}/input`, "r"),
-                fs.open(`${dir.path}/output`, "w"),
-              ])
-            );
+            resolve(fs.open(`${dir.path}/output`, "w"));
           });
+          const input = fsBase.createReadStream(`${dir.path}/input`);
           setTimeout(async () => {
             try {
-              while (true) {
-                handlePtyInput((await input.read()).buffer);
+              for await (const data of input) {
+                handlePtyInput(data);
               }
             } catch (err) {
               logError(err);
             }
           }, 0);
           resolve({
-            handlePtyOutput: async (data) => {
-              await output.write(data);
+            handlePtyOutput: (data) => {
+              output.write(data);
             },
           });
         },
