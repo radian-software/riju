@@ -284,7 +284,7 @@ export async function initUserSession({ watcher, podName, proxyInfo }) {
           }
         }
         resolve({
-          exec: (cmdline, { on, pty }) => {
+          exec: async (cmdline, { on, pty }) => {
             // on :: { stdout, stderr, exit, error, close }
             if (pty) {
               cmdline = ["/riju-bin/ptyify", ...cmdline];
@@ -312,6 +312,10 @@ export async function initUserSession({ watcher, podName, proxyInfo }) {
                 }
               );
             }
+            await new Promise((resolve, reject) => {
+              conn.on("open", resolve);
+              conn.on("error", reject);
+            });
             conn.on("message", (msg) => {
               let event, data, text, exitStatus;
               try {
@@ -352,7 +356,7 @@ export async function initUserSession({ watcher, podName, proxyInfo }) {
             return {
               stdin: {
                 write: (data) =>
-                  conn.write(JSON.stringify({ event: "stdin", data })),
+                  conn.send(JSON.stringify({ event: "stdin", data })),
               },
             };
           },

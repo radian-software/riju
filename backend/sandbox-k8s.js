@@ -57,8 +57,8 @@ async function main() {
     handlePtyInput: (data) => handlePtyInput(data),
     handlePtyExit: (_status) => {},
   });
-  await new Promise((resolve) => {
-    const exec = session.exec(["bash"], {
+  await new Promise(async (resolve) => {
+    const exec = await session.exec(["bash"], {
       pty: true,
       on: {
         stdout: (data) => pty.handlePtyOutput(data),

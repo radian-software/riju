@@ -2,7 +2,6 @@ import { spawn } from "child_process";
 import { promises as fs } from "fs";
 import process from "process";
 
-import TailFile from "@logdna/tail-file";
 import * as Sentry from "@sentry/node";
 import * as tmp from "tmp-promise";
 import { v4 as getUUIDOrig } from "uuid";
@@ -188,25 +187,40 @@ export function deptyify({ handlePtyInput, handlePtyExit }) {
               }
             });
           });
-          const input = new TailFile(`${dir.path}/input`, {
-            encoding: "utf-8",
-          });
-          input.on("data", (data) => handlePtyInput(data));
-          input.on("tail_error", logError);
-          input.on("error", logError);
-          await input.start();
-          const output = await fs.open(`${dir.path}/output`, "w");
           const proc = spawn(
-            "system/out/riju-pty",
+            `${process.cwd()}/system/out/riju-pty`,
             ["-f", "sh", "-c", "cat > input & cat output"],
             {
               cwd: dir.path,
+              stdio: "inherit",
             }
           );
+          await new Promise((resolve, reject) => {
+            proc.on("spawn", resolve);
+            proc.on("error", reject);
+          });
           proc.on("exit", (status) => {
             handlePtyExit(status);
             triggerDone();
           });
+          const [input, output] = await new Promise((resolve, reject) => {
+            setTimeout(() => reject("timed out"), 5000);
+            resolve(
+              Promise.all([
+                fs.open(`${dir.path}/input`, "r"),
+                fs.open(`${dir.path}/output`, "w"),
+              ])
+            );
+          });
+          setTimeout(async () => {
+            try {
+              while (true) {
+                handlePtyInput(await input.read({ encoding: "utf-8" }));
+              }
+            } catch (err) {
+              logError(err);
+            }
+          }, 0);
           resolve({
             handlePtyOutput: async (data) => {
               await output.write(data);

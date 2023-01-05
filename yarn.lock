@@ -904,11 +904,6 @@
   optionalDependencies:
     openid-client "^5.3.0"
 
-"@logdna/tail-file@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@logdna/tail-file/-/tail-file-3.0.0.tgz#0120353e59bf04b318d4861684e95682b0e85071"
-  integrity sha512-aZy8XzJI9zwl7gbmQa1L5Hr6yJbS062OMQJ7I9sqHD/QMEBfwlhxyytJ4Qe2jAoimefuabopEi4Gk+t/7to6/A==
-
 "@sentry/core@6.11.0":
   version "6.11.0"
   resolved "https://registry.yarnpkg.com/@sentry/core/-/core-6.11.0.tgz#40e94043afcf6407a109be26655c77832c64e740"
