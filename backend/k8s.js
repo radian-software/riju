@@ -60,12 +60,7 @@ export async function listUserSessions() {
   }));
 }
 
-export async function createUserSession({
-  watcher,
-  sessionID,
-  langConfig,
-  revisions,
-}) {
+export async function createUserSession({ sessionID, langConfig, revisions }) {
   const pod = (
     await k8s.createNamespacedPod("riju-user", {
       metadata: {
