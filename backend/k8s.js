@@ -289,20 +289,20 @@ export async function initUserSession({ watcher, podName, proxyInfo }) {
             if (pty) {
               cmdline = ["/riju-bin/ptyify", ...cmdline];
             }
+            const params = new URLSearchParams();
+            for (const arg of cmdline) {
+              params.append("cmdline", arg);
+            }
             let conn;
             if (!proxyInfo) {
               conn = new WebSocket(
-                `ws://${podIP}:869/exec?${new URLSearchParams({
-                  cmdline,
-                }).toString()}`
+                `ws://${podIP}:869/exec?${params.toString()}`
               );
             } else {
               conn = new WebSocket(
                 `${proxyInfo.wsProtocol}://${proxyInfo.host}:${
                   proxyInfo.port
-                }/${podIP}/exec?${new URLSearchParams({
-                  cmdline,
-                }).toString()}`,
+                }/${podIP}/exec?${params.toString()}`,
                 {
                   headers: {
                     Authorization: `Basic ${Buffer.from(
@@ -329,10 +329,10 @@ export async function initUserSession({ watcher, podName, proxyInfo }) {
               }
               switch (event) {
                 case "stdout":
-                  on.stdout(data);
+                  on.stdout(Buffer.from(data, "base64"));
                   break;
                 case "stderr":
-                  on.stderr(data);
+                  on.stderr(Buffer.from(data, "base64"));
                   break;
                 case "exit":
                   on.exit(exitStatus);
@@ -355,8 +355,14 @@ export async function initUserSession({ watcher, podName, proxyInfo }) {
             });
             return {
               stdin: {
+                // data should be of type Buffer
                 write: (data) =>
-                  conn.send(JSON.stringify({ event: "stdin", data })),
+                  conn.send(
+                    JSON.stringify({
+                      event: "stdin",
+                      data: data.toString("base64"),
+                    })
+                  ),
               },
             };
           },

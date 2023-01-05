@@ -215,7 +215,7 @@ export function deptyify({ handlePtyInput, handlePtyExit }) {
           setTimeout(async () => {
             try {
               while (true) {
-                handlePtyInput(await input.read({ encoding: "utf-8" }));
+                handlePtyInput((await input.read()).buffer);
               }
             } catch (err) {
               logError(err);

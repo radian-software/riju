@@ -2,6 +2,9 @@ import { spawn } from "child_process";
 import { promises as fs } from "fs";
 import process from "process";
 
+import pQueue from "p-queue";
+const PQueue = pQueue.default;
+
 import { readLangConfig } from "../lib/yaml.js";
 import * as k8s from "./k8s.js";
 import { deptyify, getUUID } from "./util.js";
@@ -52,23 +55,27 @@ async function main() {
     proxyInfo,
   });
   console.log(`Initializing sandbox`);
-  let handlePtyInput;
-  const pty = await deptyify({
-    handlePtyInput: (data) => handlePtyInput(data),
-    handlePtyExit: (_status) => {},
-  });
   await new Promise(async (resolve) => {
+    // Use a queue to resolve the circular dependency between exec and
+    // pty.
+    const outputQueue = new PQueue({ concurrency: 1, autoStart: false });
+    let handlePtyOutput;
     const exec = await session.exec(["bash"], {
       pty: true,
       on: {
-        stdout: (data) => pty.handlePtyOutput(data),
+        stdout: (data) => outputQueue.add(() => handlePtyOutput(data)),
         stderr: (data) => process.stderr.write(data),
         exit: (status) => process.exit(status),
         error: (err) => process.stderr.write(`riju: error: ${err}\n`),
         close: () => resolve(),
       },
     });
-    handlePtyInput = (data) => exec.stdin.write(data);
+    const pty = await deptyify({
+      handlePtyInput: (data) => exec.stdin.write(data),
+      handlePtyExit: (_status) => {},
+    });
+    handlePtyOutput = pty.handlePtyOutput;
+    outputQueue.start();
   });
 }
 
