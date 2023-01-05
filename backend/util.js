@@ -191,7 +191,7 @@ export function deptyify({ handlePtyInput, handlePtyExit }) {
           const input = new TailFile(`${dir.path}/input`, {
             encoding: "utf-8",
           });
-          input.on("data", (data) => handlePtyOutput(data));
+          input.on("data", (data) => handlePtyInput(data));
           input.on("tail_error", logError);
           input.on("error", logError);
           await input.start();
@@ -209,7 +209,7 @@ export function deptyify({ handlePtyInput, handlePtyExit }) {
           });
           resolve({
             handlePtyOutput: async (data) => {
-              await input.write(data);
+              await output.write(data);
             },
           });
         },
