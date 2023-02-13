@@ -42,6 +42,12 @@ void restore_tty()
     die("tcsetattr failed");
 }
 
+void handle_signal(int signum)
+{
+  restore_tty();
+  signal(signum, SIG_DFL);
+}
+
 int main(int argc, char **argv)
 {
   argc -= 1;
@@ -76,6 +82,10 @@ int main(int argc, char **argv)
       die("tcsetattr failed");
     if (atexit(restore_tty) < 0)
       die("atexit failed");
+    if (signal(SIGTERM, handle_signal) == SIG_ERR)
+      die("signal failed");
+    if (signal(SIGINT, handle_signal) == SIG_ERR)
+      die("signal failed");
   } else {
     if (errno != ENOTTY)
       die("isatty failed");

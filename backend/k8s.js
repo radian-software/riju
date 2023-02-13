@@ -237,8 +237,9 @@ export async function initUserSession({ watcher, podName, proxyInfo }) {
   let done = false;
   try {
     return await new Promise(async (resolve, reject) => {
+      let timeout = null;
       try {
-        setTimeout(
+        timeout = setTimeout(
           () => reject("timed out waiting for pod to become ready"),
           5 * 60 * 1000
         );
@@ -365,6 +366,10 @@ export async function initUserSession({ watcher, podName, proxyInfo }) {
         });
       } catch (err) {
         reject(err);
+      } finally {
+        if (timeout) {
+          clearTimeout(timeout);
+        }
       }
     });
   } finally {

@@ -59,13 +59,16 @@ async function main() {
     // Use a queue to resolve the circular dependency between exec and
     // pty.
     const outputQueue = new PQueue({ concurrency: 1, autoStart: false });
-    let handlePtyOutput;
+    let handlePtyOutput, handlePtyExit;
     const exec = await session.exec(["bash"], {
       pty: true,
       on: {
         stdout: (data) => outputQueue.add(() => handlePtyOutput(data)),
         stderr: (data) => process.stderr.write(data),
-        exit: (status) => process.exit(status),
+        exit: (status) => {
+          handlePtyExit();
+          process.exit(status);
+        },
         error: (err) => process.stderr.write(`riju: error: ${err}\n`),
         close: () => resolve(),
       },
@@ -75,6 +78,7 @@ async function main() {
       handlePtyExit: (_status) => {},
     });
     handlePtyOutput = pty.handlePtyOutput;
+    handlePtyExit = pty.handlePtyExit;
     outputQueue.start();
   });
 }

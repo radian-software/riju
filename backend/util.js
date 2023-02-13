@@ -165,7 +165,27 @@ export function asBool(value, def) {
   throw new Error(`asBool doesn't understand value: ${value}`);
 }
 
-export function deptyify({ handlePtyInput, handlePtyExit }) {
+// This function is a little wrapper for riju-pty to help avoid
+// reimplementing the C logic in JavaScript, because it was a pain to
+// work out the first time. This is done by using named pipes (FIFOs)
+// to ferry IPC data back and forth between C and JavaScript.
+//
+// When calling this function it will create a riju-pty subprocess,
+// and invoke your provided handlePtyInput function when the user
+// types into the current terminal. It will also return a
+// handlePtyOutput function that you can call to cause output to be
+// displayed on the current terminal.
+//
+// Also returned is a handlePtyExit function that you should call when
+// the process is supposed to terminate, this will shut down the
+// riju-pty subprocess and teardown associated resources.
+//
+// The point of using this instead of just reading and writing output
+// using the normal functions, is that the read/write operations act
+// on raw pty control sequences, meaning they can be hooked up to the
+// Riju agent control stream from a user session container in the
+// cluster.
+export function deptyify({ handlePtyInput }) {
   return new Promise((resolve, reject) => {
     const done = false;
     let triggerDone = () => {
@@ -204,13 +224,13 @@ export function deptyify({ handlePtyInput, handlePtyExit }) {
             proc.on("spawn", resolve);
             proc.on("error", reject);
           });
-          proc.on("exit", (status) => {
-            handlePtyExit(status);
+          proc.on("exit", (_status) => {
             triggerDone();
           });
           const output = await new Promise((resolve, reject) => {
-            setTimeout(() => reject("timed out"), 5000);
+            const timeout = setTimeout(() => reject("timed out"), 5000);
             resolve(fs.open(`${dir.path}/output`, "w"));
+            clearTimeout(timeout);
           });
           const input = fsBase.createReadStream(`${dir.path}/input`);
           setTimeout(async () => {
@@ -225,6 +245,23 @@ export function deptyify({ handlePtyInput, handlePtyExit }) {
           resolve({
             handlePtyOutput: (data) => {
               output.write(data);
+            },
+            handlePtyExit: async () => {
+              try {
+                // SIGTERM, wait for proc to exit, if it doesn't,
+                // then SIGKILL.
+                proc.kill("SIGTERM");
+                try {
+                  await new Promise((resolve, reject) => {
+                    proc.on("exit", resolve);
+                    setTimeout(reject, 1000);
+                  });
+                } catch (err) {
+                  proc.kill("SIGKILL");
+                }
+              } catch (err) {
+                logError(err);
+              }
             },
           });
           // Wait before deleting tmpdir...
