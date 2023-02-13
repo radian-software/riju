@@ -50,6 +50,9 @@ export function watchPods() {
     podExists: (podName) => {
       return podName in pods;
     },
+    close: () => {
+      informer.stop();
+    },
   };
 }
 
@@ -360,6 +363,9 @@ export async function initUserSession({ watcher, podName, proxyInfo }) {
                       data: data.toString("base64"),
                     })
                   ),
+              },
+              close: () => {
+                conn.close();
               },
             };
           },

@@ -187,7 +187,7 @@ export function asBool(value, def) {
 // cluster.
 export function deptyify({ handlePtyInput }) {
   return new Promise((resolve, reject) => {
-    const done = false;
+    let done = false;
     let triggerDone = () => {
       // Calling the function stored in this variable should have the
       // effect of terminating the tmp-promise callback and getting
@@ -251,13 +251,18 @@ export function deptyify({ handlePtyInput }) {
                 // SIGTERM, wait for proc to exit, if it doesn't,
                 // then SIGKILL.
                 proc.kill("SIGTERM");
+                let timeout = null;
                 try {
                   await new Promise((resolve, reject) => {
                     proc.on("exit", resolve);
-                    setTimeout(reject, 1000);
+                    timeout = setTimeout(reject, 250);
                   });
                 } catch (err) {
                   proc.kill("SIGKILL");
+                } finally {
+                  if (timeout) {
+                    clearTimeout(timeout);
+                  }
                 }
               } catch (err) {
                 logError(err);

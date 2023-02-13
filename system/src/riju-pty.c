@@ -95,6 +95,10 @@ int main(int argc, char **argv)
   if (exec_pid < 0)
     die("fork failed");
   else if (exec_pid == 0) {
+    if (signal(SIGTERM, SIG_DFL) == SIG_ERR)
+      die("signal failed");
+    if (signal(SIGINT, SIG_DFL) == SIG_ERR)
+      die("signal failed");
     if (prctl(PR_SET_PDEATHSIG, SIGTERM) < 0)
       die("prctl failed");
     if (getppid() != orig_ppid)
@@ -131,6 +135,10 @@ int main(int argc, char **argv)
     }
     return WEXITSTATUS(wstatus);
   }
+  if (signal(SIGTERM, SIG_DFL) == SIG_ERR)
+    die("signal failed");
+  if (signal(SIGINT, SIG_DFL) == SIG_ERR)
+    die("signal failed");
   if (prctl(PR_SET_PDEATHSIG, SIGTERM) < 0)
     die("prctl failed");
   if (getppid() != orig_ppid)
