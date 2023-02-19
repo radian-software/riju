@@ -45,7 +45,10 @@ void restore_tty()
 void handle_signal(int signum)
 {
   restore_tty();
-  signal(signum, SIG_DFL);
+  if (signal(signum, SIG_DFL) == SIG_ERR)
+    die("signal failed");
+  if (raise(signum) != 0)
+    die("raise failed");
 }
 
 int main(int argc, char **argv)
