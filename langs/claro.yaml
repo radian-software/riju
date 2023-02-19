@@ -82,9 +82,6 @@ template: |
 
   print("Hello, world!");
 
-repl: |
-  java -jar /opt/claro/claro_compiler_binary_deploy.jar --repl --silent
-
 # Skip rebuilding the entire compiler all over again and instead just
 # use the pre-built Claro compiler jar.
 compile: |
