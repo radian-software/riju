@@ -94,7 +94,4 @@ run: |
   cd programs
   ./conditions_compiled_claro_image
 
-input: |
-  print(123 * 234);
-
 timeoutFactor: 2
