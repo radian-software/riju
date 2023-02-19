@@ -91,12 +91,8 @@ compile: |
     < programs/Conditions.claro                           \
     > programs/Conditions.java
 run: |
-  set -e
-
   cd programs
-  ./conditions_compiled_claro_image ||:
-
-  java -jar /opt/claro/claro_compiler_binary_deploy.jar --repl --silent
+  ./conditions_compiled_claro_image
 
 input: |
   print(123 * 234);
