@@ -1,24 +1,14 @@
 ---
-kind: StatefulSet
+kind: Deployment
 apiVersion: apps/v1
 metadata:
   namespace: riju
   name: docker-registry
 spec:
   replicas: 1
-  serviceName: docker-registry
   selector:
     matchLabels:
       app: docker-registry
-  volumeClaimTemplates:
-    - metadata:
-        name: data
-      spec:
-        accessModes: [ReadWriteOnce]
-        resources:
-          requests:
-            storage: 128Gi
-        storageClassName: openebs-hostpath
   template:
     metadata:
       labels:
@@ -59,14 +49,46 @@ spec:
               value: "Registry Realm"
             - name: REGISTRY_AUTH_HTPASSWD_PATH
               value: /var/run/registry/auth/htpasswd
+            - name: REGISTRY_HTTP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: registry-http-secret
+                  key: http-secret
+            - name: REGISTRY_STORAGE
+              value: s3
+            - name: REGISTRY_STORAGE_S3_REGIONENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: s3-config
+                  key: endpoint
+            - name: REGISTRY_STORAGE_S3_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: s3-config
+                  key: region
+            - name: REGISTRY_STORAGE_S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: s3-config
+                  key: bucket
+            - name: REGISTRY_STORAGE_S3_ACCESSKEY
+              valueFrom:
+                secretKeyRef:
+                  name: s3-auth
+                  key: access-key
+            - name: REGISTRY_STORAGE_S3_SECRETKEY
+              valueFrom:
+                secretKeyRef:
+                  name: s3-auth
+                  key: secret-key
+            - name: REGISTRY_STORAGE_S3_SECURE
+              value: "true"
           ports:
             - name: api
               containerPort: 5000
           volumeMounts:
             - name: auth
               mountPath: /var/run/registry/auth
-            - name: data
-              mountPath: /var/lib/registry
 
 ---
 kind: Service
