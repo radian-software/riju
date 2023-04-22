@@ -1,0 +1,26 @@
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  namespace: docker-registry
+  name: docker-registry
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "30720m"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "docker.{{ .networking.domain }}"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: docker-registry
+                port:
+                  number: 5000
+  tls:
+    - hosts:
+      - "docker.{{ .networking.domain }}"
+      secretName: docker-registry-tls

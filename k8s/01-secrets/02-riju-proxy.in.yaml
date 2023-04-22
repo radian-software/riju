@@ -2,7 +2,7 @@
 kind: Secret
 apiVersion: v1
 metadata:
-  namespace: riju
+  namespace: riju-proxy
   name: riju-proxy-auth
 data:
   htpasswd: "{{ .proxy.htpasswd | println | b64enc }}"

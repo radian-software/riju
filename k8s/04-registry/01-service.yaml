@@ -1,0 +1,15 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: docker-registry
+  name: docker-registry
+spec:
+  selector:
+    app: docker-registry
+  type: NodePort
+  ports:
+    - name: api
+      port: 80
+      nodePort: 30999
+      targetPort: 5000

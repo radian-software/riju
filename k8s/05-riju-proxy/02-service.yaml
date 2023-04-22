@@ -1,0 +1,14 @@
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: riju-proxy
+  name: riju-proxy
+spec:
+  selector:
+    app: riju-proxy
+  ports:
+    - name: http
+      port: 1869
+      targetPort: 1869

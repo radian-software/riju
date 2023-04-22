@@ -1,0 +1,30 @@
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cert-manager-leaderelection
+  namespace: cert-manager
+rules:
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    resourceNames: ["cert-manager-controller"]
+    verbs: ["get", "update", "patch"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["create"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: cert-manager
+  name: cert-manager-leaderelection
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: cert-manager-leaderelection
+subjects:
+  - kind: ServiceAccount
+    namespace: cert-manager
+    name: cert-manager
+    apiGroup: ""

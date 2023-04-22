@@ -1,0 +1,52 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: riju-proxy
+  name: riju-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: riju-proxy
+  template:
+    metadata:
+      labels:
+        app: riju-proxy
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: riju-proxy-config
+        - name: auth
+          secret:
+            secretName: riju-proxy-auth
+      containers:
+        - name: nginx
+          image: "nginx:1.23"
+          resources: {}
+          readinessProbe:
+            tcpSocket:
+              port: 1869
+            failureThreshold: 1
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            tcpSocket:
+              port: 1869
+            failureThreshold: 3
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          ports:
+            - name: http
+              containerPort: 1869
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/conf.d
+            - name: auth
+              mountPath: /etc/nginx/passwd
+              subPath: htpasswd

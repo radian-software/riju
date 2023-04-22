@@ -1,0 +1,13 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: riju-server
+  name: riju-server
+spec:
+  selector:
+    app: riju-server
+  ports:
+    - name: http
+      port: 80
+      targetPort: 6119

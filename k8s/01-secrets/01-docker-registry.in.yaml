@@ -2,8 +2,29 @@
 kind: Secret
 apiVersion: v1
 metadata:
-  namespace: riju
-  name: registry-http-secret
+  namespace: docker-registry
+  name: docker-registry-s3-auth
+stringData:
+  access-key: "{{ .registry.s3.accessKey }}"
+  secret-key: "{{ .registry.s3.secretKey }}"
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  namespace: docker-registry
+  name: docker-registry-s3-config
+data:
+  bucket: "{{ .registry.s3.bucket }}"
+  region: "{{ .registry.s3.region }}"
+  endpoint: "{{ .registry.s3.endpoint }}"
+
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  namespace: docker-registry
+  name: docker-registry-http-secret
 stringData:
   http-secret: "{{ .registry.httpSecret }}"
 
@@ -11,8 +32,8 @@ stringData:
 kind: Secret
 apiVersion: v1
 metadata:
-  namespace: riju
-  name: registry-auth
+  namespace: docker-registry
+  name: docker-registry-htpasswd
 data:
   htpasswd: "{{ .registry.htpasswd | println | b64enc }}"
 
@@ -20,8 +41,8 @@ data:
 kind: Secret
 apiVersion: v1
 metadata:
-  namespace: riju
-  name: registry-login
+  namespace: riju-server
+  name: docker-registry-auth
 type: kubernetes.io/dockerconfigjson
 stringData:
   .dockerconfigjson: |
@@ -39,8 +60,8 @@ stringData:
 kind: Secret
 apiVersion: v1
 metadata:
-  namespace: riju-user
-  name: registry-user-login
+  namespace: user
+  name: docker-registry-auth
 type: kubernetes.io/dockerconfigjson
 stringData:
   .dockerconfigjson: |

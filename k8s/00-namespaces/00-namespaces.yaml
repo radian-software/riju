@@ -2,22 +2,34 @@
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: traefik
+  name: ingress-nginx
 
 ---
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: metallb
+  name: cert-manager
 
 ---
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: riju
+  name: docker-registry
 
 ---
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: riju-user
+  name: riju-proxy
+
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: riju-server
+
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: user
