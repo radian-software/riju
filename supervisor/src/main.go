@@ -34,6 +34,9 @@ import (
 const bluePort = 6229
 const greenPort = 6230
 
+const blueMetricsPort = 6231
+const greenMetricsPort = 6232
+
 const blueName = "riju-app-blue"
 const greenName = "riju-app-green"
 
@@ -43,8 +46,9 @@ type deploymentConfig struct {
 }
 
 type supervisorConfig struct {
-	AccessToken string `env:"SUPERVISOR_ACCESS_TOKEN,notEmpty"`
-	S3Bucket    string `env:"S3_BUCKET,notEmpty"`
+	AccessToken  string `env:"SUPERVISOR_ACCESS_TOKEN,notEmpty"`
+	S3Bucket     string `env:"S3_BUCKET,notEmpty"`
+	S3ConfigPath string `env:"S3_CONFIG_PATH,notEmpty"`
 }
 
 type reloadJob struct {
@@ -56,10 +60,12 @@ type reloadJob struct {
 type supervisor struct {
 	config supervisorConfig
 
-	blueProxyHandler  http.Handler
-	greenProxyHandler http.Handler
-	isGreen           bool // blue-green deployment
-	deployConfigHash  string
+	blueProxyHandler         http.Handler
+	greenProxyHandler        http.Handler
+	blueMetricsProxyHandler  http.Handler
+	greenMetricsProxyHandler http.Handler
+	isGreen                  bool // blue-green deployment
+	deployConfigHash         string
 
 	awsAccountNumber string
 	awsRegion        string
@@ -102,7 +108,15 @@ func (sv *supervisor) scheduleReload() string {
 	return uuid
 }
 
-func (sv *supervisor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (sv *supervisor) serveHTTP(w http.ResponseWriter, r *http.Request, metricsPort bool) {
+	if metricsPort {
+		if sv.isGreen {
+			sv.greenMetricsProxyHandler.ServeHTTP(w, r)
+		} else {
+			sv.blueMetricsProxyHandler.ServeHTTP(w, r)
+		}
+		return
+	}
 	if strings.HasPrefix(r.URL.Path, "/api/supervisor") {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
@@ -264,12 +278,13 @@ func (sv *supervisor) reload() error {
 	buf := s3manager.NewWriteAtBuffer([]byte{})
 	if _, err := dl.Download(context.Background(), buf, &s3.GetObjectInput{
 		Bucket: &sv.config.S3Bucket,
-		Key:    aws.String("config.json"),
+		Key:    aws.String(sv.config.S3ConfigPath),
 	}); err != nil {
 		return err
 	}
+	deployCfgBytes := buf.Bytes()
 	deployCfg := deploymentConfig{}
-	if err := json.Unmarshal(buf.Bytes(), &deployCfg); err != nil {
+	if err := json.Unmarshal(deployCfgBytes, &deployCfg); err != nil {
 		return err
 	}
 	sv.status("listing locally available images")
@@ -321,12 +336,8 @@ func (sv *supervisor) reload() error {
 			}
 		}
 	}
-	deployCfgStr, err := json.Marshal(&deployCfg)
-	if err != nil {
-		return err
-	}
 	h := sha1.New()
-	h.Write([]byte(deployCfgStr))
+	h.Write(deployCfgBytes)
 	deployCfgHash := fmt.Sprintf("%x", h.Sum(nil))
 	if deployCfgHash == sv.deployConfigHash {
 		sv.status(fmt.Sprintf("config hash remains at %s", deployCfgHash))
@@ -338,14 +349,17 @@ func (sv *supervisor) reload() error {
 		))
 	}
 	var port int
+	var metricsPort int
 	var name string
 	var oldName string
 	if sv.isGreen {
 		port = bluePort
+		metricsPort = blueMetricsPort
 		name = blueName
 		oldName = greenName
 	} else {
 		port = greenPort
+		metricsPort = greenMetricsPort
 		name = greenName
 		oldName = blueName
 	}
@@ -355,6 +369,7 @@ func (sv *supervisor) reload() error {
 		"-v", "/var/cache/riju:/var/cache/riju",
 		"-v", "/var/run/docker.sock:/var/run/docker.sock",
 		"-p", fmt.Sprintf("127.0.0.1:%d:6119", port),
+		"-p", fmt.Sprintf("127.0.0.1:%d:6121", metricsPort),
 		"-e", "ANALYTICS_TAG",
 		"-e", "RIJU_DEPLOY_CONFIG",
 		"-e", "SENTRY_DSN",
@@ -366,13 +381,13 @@ func (sv *supervisor) reload() error {
 	)
 	dockerRun.Stdout = os.Stdout
 	dockerRun.Stderr = os.Stderr
-	dockerRun.Env = append(os.Environ(), fmt.Sprintf("RIJU_DEPLOY_CONFIG=%s", deployCfgStr))
+	dockerRun.Env = append(os.Environ(), fmt.Sprintf("RIJU_DEPLOY_CONFIG=%s", deployCfgBytes))
 	if err := dockerRun.Run(); err != nil {
 		return err
 	}
 	sv.status("waiting for container to start up")
 	time.Sleep(5 * time.Second)
-	sv.status("checking that container is healthy")
+	sv.status("checking that container responds to HTTP")
 	resp, err := http.Get(fmt.Sprintf("http://localhost:%d", port))
 	if err != nil {
 		return err
@@ -383,7 +398,25 @@ func (sv *supervisor) reload() error {
 		return err
 	}
 	if !strings.Contains(string(body), "python") {
-		return errors.New("container did not appear to be healthy")
+		return errors.New("container did not respond successfully to HTTP")
+	}
+	sv.status("checking that container exposes metrics")
+	resp, err = http.Get(fmt.Sprintf("http://localhost:%d/metrics", metricsPort))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	body, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	if !strings.Contains(string(body), "process_cpu_seconds_total") {
+		return errors.New("container did not expose metrics properly")
+	}
+	if sv.isGreen {
+		sv.status("switching from green to blue")
+	} else {
+		sv.status("switching from blue to green")
 	}
 	sv.isGreen = !sv.isGreen
 	sv.status("stopping old container")
@@ -451,8 +484,8 @@ func main() {
 	}
 
 	rijuInitVolume := exec.Command("riju-init-volume")
-	rijuInitVolume.Stdout = rijuInitVolume.Stdout
-	rijuInitVolume.Stderr = rijuInitVolume.Stderr
+	rijuInitVolume.Stdout = os.Stdout
+	rijuInitVolume.Stderr = os.Stderr
 	if err := rijuInitVolume.Run(); err != nil {
 		log.Fatalln(err)
 	}
@@ -462,6 +495,15 @@ func main() {
 		log.Fatalln(err)
 	}
 	greenUrl, err := url.Parse(fmt.Sprintf("http://localhost:%d", greenPort))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	blueMetricsUrl, err := url.Parse(fmt.Sprintf("http://localhost:%d", blueMetricsPort))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	greenMetricsUrl, err := url.Parse(fmt.Sprintf("http://localhost:%d", greenMetricsPort))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -583,18 +625,38 @@ func main() {
 	}
 
 	sv := &supervisor{
-		config:            supervisorCfg,
-		blueProxyHandler:  httputil.NewSingleHostReverseProxy(blueUrl),
-		greenProxyHandler: httputil.NewSingleHostReverseProxy(greenUrl),
-		isGreen:           isGreen,
-		deployConfigHash:  deployCfgHash,
-		s3:                s3.NewFromConfig(awsCfg),
-		ecr:               ecr.NewFromConfig(awsCfg),
-		awsRegion:         awsCfg.Region,
-		awsAccountNumber:  *ident.Account,
-		reloadJobs:        map[string]*reloadJob{},
+		config:                   supervisorCfg,
+		blueProxyHandler:         httputil.NewSingleHostReverseProxy(blueUrl),
+		greenProxyHandler:        httputil.NewSingleHostReverseProxy(greenUrl),
+		blueMetricsProxyHandler:  httputil.NewSingleHostReverseProxy(blueMetricsUrl),
+		greenMetricsProxyHandler: httputil.NewSingleHostReverseProxy(greenMetricsUrl),
+		isGreen:                  isGreen,
+		deployConfigHash:         deployCfgHash,
+		s3:                       s3.NewFromConfig(awsCfg),
+		ecr:                      ecr.NewFromConfig(awsCfg),
+		awsRegion:                awsCfg.Region,
+		awsAccountNumber:         *ident.Account,
+		reloadJobs:               map[string]*reloadJob{},
 	}
 	go sv.scheduleReload()
+	go func() {
+		log.Println("listening on http://127.0.0.1:6121/metrics")
+		log.Fatalln(http.ListenAndServe(
+			"127.0.0.1:6121",
+			http.HandlerFunc(
+				func(w http.ResponseWriter, r *http.Request) {
+					sv.serveHTTP(w, r, true)
+				},
+			),
+		))
+	}()
 	log.Println("listening on http://0.0.0.0:80")
-	log.Fatalln(http.ListenAndServe("0.0.0.0:80", sv))
+	log.Fatalln(http.ListenAndServe(
+		"0.0.0.0:80",
+		http.HandlerFunc(
+			func(w http.ResponseWriter, r *http.Request) {
+				sv.serveHTTP(w, r, false)
+			},
+		),
+	))
 }

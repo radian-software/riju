@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s
+  external_labels:
+    node: "${EC2_INSTANCE_ID}"
+
+scrape_configs:
+  - job_name: server
+    static_configs:
+      - targets: ["localhost:6121"]
+  - job_name: node
+    static_configs:
+      - targets: ["localhost:9100"]
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+remote_write:
+  - url: "$GRAFANA_PROMETHEUS_HOSTNAME"
+    basic_auth:
+      username: "$GRAFANA_PROMETHEUS_USERNAME"
+      password: "$GRAFANA_API_KEY"

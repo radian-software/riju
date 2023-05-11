@@ -1,0 +1,24 @@
+id: "verilog"
+aliases:
+  - "systemverilog"
+  - "iverilog"
+name: "Verilog"
+
+install:
+  apt:
+    - iverilog
+
+main: "main.v"
+template: |
+  module main;
+
+  initial begin
+    $display("Hello, world!");
+  end
+
+  endmodule
+
+compile: |
+  iverilog main.v -o main
+run: |
+  ./main

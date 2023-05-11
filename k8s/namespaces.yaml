@@ -1,0 +1,23 @@
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: traefik
+
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: metallb
+
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: riju
+
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: riju-user

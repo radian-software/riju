@@ -10,7 +10,7 @@ import { getTestHash } from "../lib/hash-test.js";
 import * as api from "./api.js";
 import { langsPromise } from "./langs.js";
 import { shutdown } from "./shutdown.js";
-import { getUUID, run } from "./util.js";
+import { run } from "./util.js";
 
 let langs = {};
 
@@ -525,7 +525,7 @@ const testTypes = {
   ensure: {
     pred: ({ ensure }) => (ensure ? true : false),
   },
-  run: { pred: (config) => true },
+  run: { pred: (_config) => true },
   repl: {
     pred: ({ repl }) => (repl ? true : false),
   },

@@ -21,8 +21,3 @@ MemorySwapMax=0
 # this space to user code.
 TasksAccounting=true
 TasksMax=400000
-
-# Attempt to deny access to EC2 Instance Metadata service from user
-# code.
-IPAccounting=true
-IPAddressDeny=169.254.169.254

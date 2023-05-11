@@ -1,0 +1,25 @@
+id: "scala"
+name: "Scala"
+
+install:
+  apt:
+    - scala
+
+repl: |
+  scala
+input: |
+  DELAY: 5
+  123 * 234
+
+main: "main.scala"
+template: |
+  println("Hello, world!")
+
+run: |
+  scala -i main.scala
+
+scope:
+  code: |
+    val x = 123 * 234
+
+timeoutFactor: 8

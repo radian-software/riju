@@ -1,4 +1,5 @@
-FROM riju:ubuntu
+# EOL: April 2027
+FROM ubuntu:22.04
 
 COPY docker/runtime/install.bash /tmp/
 RUN /tmp/install.bash
@@ -10,4 +11,5 @@ WORKDIR /src
 CMD ["bash"]
 EXPOSE 6119
 EXPOSE 6120
+EXPOSE 6121
 ENV HOST=0.0.0.0

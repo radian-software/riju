@@ -6,6 +6,7 @@ import cors from "cors"
 import express from "express";
 import ws from "express-ws";
 import _ from "lodash";
+import * as promClient from "prom-client";
 
 import * as api from "./api.js";
 import { aliases, langsPromise } from "./langs.js";
@@ -15,11 +16,20 @@ import { log, privilegedTeardown } from "./util.js";
 const host = process.env.HOST || "localhost";
 const port = parseInt(process.env.PORT || "") || 6119;
 const tlsPort = parseInt(process.env.TLS_PORT || "") || 6120;
+const metricsPort = parseInt(process.env.METRICS_PORT || "") || 6121;
 const useTLS = process.env.TLS ? true : false;
 const analyticsTag = (process.env.ANALYTICS_TAG || "").replace(
   /^'(.+)'$/,
   "$1"
 );
+
+promClient.collectDefaultMetrics();
+
+const metricsApp = express();
+metricsApp.get("/metrics", async (_, res) => {
+  res.contentType("text/plain; version=0.0.4");
+  res.send(await promClient.register.metrics());
+});
 
 const langs = await langsPromise;
 const app = express();
@@ -142,3 +152,7 @@ if (useTLS) {
     console.log(`Listening on http://${host}:${port}`)
   );
 }
+
+metricsApp.listen(metricsPort, host, () =>
+  console.log(`Listening on http://${host}:${metricsPort}/metrics`)
+);

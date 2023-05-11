@@ -1,0 +1,60 @@
+id: "v"
+aliases:
+  - "vlang"
+name: "V"
+
+info:
+  year: 2019
+  desc: "Simple, statically-typed compiled programming language designed for building maintainable software"
+  ext:
+    - v
+  web:
+    home: "https://vlang.io/"
+    source: "https://github.com/vlang/v"
+  category: general
+  mode: compiled
+  platform: clr
+  syntax:
+    - c
+  typing:
+    - static
+  paradigm:
+    - functional
+    - imperative
+  usage: personal
+
+install:
+  manual: |
+    install -d "${pkg}/opt"
+    install -d "${pkg}/usr/local/bin"
+
+    git clone https://github.com/vlang/v.git "${pkg}/opt/v"
+    pushd "${pkg}/opt/v"
+
+    make
+    ln -s /opt/v/v "${pkg}/usr/local/bin/"
+
+    # Force vfmt to get compiled ahead of time, otherwise this will
+    # happen at first invocation and fail due to lack of write
+    # permissions on /opt/v.
+    ./v fmt < /dev/null
+
+    popd
+
+main: "main.v"
+template: |
+  fn main() {
+  	println('Hello, world!')
+  }
+
+run: |
+  v run main.v
+
+format:
+  run: |
+    v fmt main.v
+  input: |
+    fn main()
+    {
+      println("Hello, world!")
+    }

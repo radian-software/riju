@@ -41,15 +41,8 @@ install:
     - python3
     - python3-pip
     - black
-  manual: |
-    install -d "${pkg}/opt/mspyls"
-    install -d "${pkg}/usr/local/bin"
-
-    url="$(curl -fsSL "https://pvsc.blob.core.windows.net/python-language-server-stable?restype=container&comp=list&prefix=Python-Language-Server-linux-x64" | grep -Eo 'https://[^<]+\.nupkg' | tail -n1)"
-    wget "${url}"
-    unzip -d "${pkg}/opt/mspyls" Python-Language-Server-linux-x64.*.nupkg
-    chmod +x "${pkg}/opt/mspyls/Microsoft.Python.LanguageServer"
-    ln -s "/opt/mspyls/Microsoft.Python.LanguageServer" "${pkg}/usr/local/bin/Microsoft.Python.LanguageServer"
+  npm:
+    - pyright
 
 repl: |
   python3 -u
@@ -83,10 +76,13 @@ pkg:
 
 lsp:
   start: |
-    Microsoft.Python.LanguageServer
-  init:
-    interpreter:
-      properties:
-        InterpreterPath: /usr/bin/python3
+    pyright-langserver --stdio
   code: "import func"
+<<<<<<< HEAD
   item: "functools"
+=======
+  item: "functools"
+
+skip:
+  - lsp
+>>>>>>> d370c5fbc85bf9f479adca7c532ec13c2b54199f

@@ -5,7 +5,7 @@ StartLimitIntervalSec=300
 
 [Service]
 Type=exec
-ExecStart=bash -c 'promtail -config.file /etc/promtail/config.yaml -client.external-labels instance="$(curl -fsSL http://169.254.169.254/latest/meta-data/instance-id)"'
+ExecStart=bash -c 'promtail -config.file /etc/promtail/config.yaml -client.external-labels node="$(curl -fsSL http://169.254.169.254/latest/meta-data/instance-id)"'
 Restart=always
 RestartSec=5
 

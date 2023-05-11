@@ -111,8 +111,8 @@ API. Generate one randomly with `pwgen -s 30 1`.
 ## Build web AMI
 
 You'll want to run `set -a; . .env` to load in the new variables from
-`.env`. Now run `make packer-web`. This will take up to 10 minutes to
-build a timestamped AMI with a name like `riju-web-20210711223158`.
+`.env`. Now run `make packer`. This will take up to 10 minutes to
+build a timestamped AMI with a name like `riju-20210711223158`.
 
 ## Create local configuration (part 2 of 3)
 
@@ -120,15 +120,16 @@ Add to `.env` the following contents:
 
 ```
 # Terraform
-AMI_NAME=riju-web-20210711223158
+AMI_NAME=riju-20210711223158
 AWS_REGION=us-west-1
 DOMAIN=your.domain
 S3_BUCKET=yourname-riju
+S3_CONFIG_PATH=config.json
 ```
 
 ### AMI\_NAME
 
-This is the AMI name from `make packer-web`.
+This is the AMI name from `make packer`.
 
 ### AWS\_REGION
 
@@ -168,7 +169,7 @@ infrastructure.
 follow these steps:*
 
 1. Update `.env` and make sure it is sourced (`set -a; . .env`).
-2. Run `make packer-web` and get the name of the new AMI.
+2. Run `make packer` and get the name of the new AMI.
 3. Update it in `.env` under `AMI_NAME` and make sure the update is
    sourced (`set -a; . .env`).
 4. Run `terraform apply`.
@@ -231,7 +232,7 @@ from the load balancer).
 to upload the finished build artifacts to ECR, which amount to about
 40 GB of data transfer. If you don't have a symmetric Internet plan at
 home, you may need to do this on an EC2 instance instead. You can
-provision one manually with at least 256 GB of disk space, install
+provision one manually with at least 128 GB of disk space, install
 Docker, clone down Riju, copy over your `.env` file, and proceed as if
 you were running locally.)*
 

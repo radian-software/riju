@@ -6,20 +6,14 @@ import { readLangConfig } from "../lib/yaml.js";
 import {
   bash,
   getUUID,
-  privilegedExec,
   privilegedPty,
   privilegedSession,
   quote,
-  run,
 } from "./util.js";
 
 function die(msg) {
   console.error(msg);
   process.exit(1);
-}
-
-function log(msg) {
-  console.log(msg);
 }
 
 async function main() {

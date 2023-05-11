@@ -1,0 +1,44 @@
+id: "ante"
+aliases:
+  - "an"
+name: "Ante"
+
+install:
+  prepare:
+    apt:
+      - cargo
+      - cmake
+      - libssl-dev
+      - pkg-config
+      - python3-distutils
+    manual: |
+      export PATH="$HOME/.cargo/bin:$PATH"
+      cargo install llvmenv
+      llvmenv init
+      # If compiler is not explicitly set to LLVM, then we get an
+      # error: unrecognized command-line option '-Wnewline-eof'.
+      CC=/usr/bin/clang CXX=/usr/bin/clang++ llvmenv build-entry -G Makefile -j$(nproc) 10.0.1
+      llvmenv global 10.0.1
+  manual: |
+    git clone https://github.com/jfecher/ante.git -n
+    pushd ante
+    git checkout ba940f3b492fb448a6a73b139403eefa7a0daedc
+    LLVM_SYS_100_PREFIX="$(llvmenv prefix)" cargo build --release
+    install -d "${pkg}/opt/ante"
+    install -d "${pkg}/usr/local/bin"
+    cp target/release/ante "${pkg}/usr/local/bin/"
+    cp -R stdlib "${pkg}/opt/ante/"
+    popd
+
+setup: |
+  mkdir -p "$HOME/.config/ante"
+  cp -R /opt/ante/stdlib "$HOME/.config/ante/"
+
+main: "main.an"
+template: |
+  print "Hello, world!"
+
+compile: |
+  ante main.an
+run: |
+  ./main

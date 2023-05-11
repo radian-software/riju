@@ -1,4 +1,4 @@
-module github.com/raxod502/riju/cli
+module github.com/radian-software/riju/cli
 
 go 1.16
 

@@ -1,8 +1,12 @@
-github: raxod502
-patreon: riju
-ko_fi: riju_codes
-liberapay: riju
+github: radian-software
+patreon: radiansoftware
+ko_fi: radiansoftware
+liberapay: radian-software
 custom:
-  - https://paypal.me/rijucodes
-  - https://cash.app/$RijuCodes
-  - https://venmo.com/code?user_id=3335527067549696598
+  - https://www.paypal.com/donate/?hosted_button_id=SYF48KFJ95FPA
+  - https://cash.app/$RadianSoftware
+  # Venmo is not currently supported because it is impossible to
+  # create a new business account when one has been created at any
+  # point in the past, even if it has been deleted. I have reached out
+  # to Venmo support and they have confirmed there is no supported way
+  # to use Venmo going forward, and suggested I use PayPal instead.

@@ -7,7 +7,7 @@ positions:
   filename: /tmp/positions.yaml
 
 client:
-  url: https://72217:$GRAFANA_API_KEY@logs-prod-us-central1.grafana.net/api/prom/push
+  url: https://$GRAFANA_LOKI_USERNAME:$GRAFANA_API_KEY@$GRAFANA_LOKI_HOSTNAME/api/prom/push
 
 scrape_configs:
   - job_name: kernel
@@ -39,6 +39,16 @@ scrape_configs:
         regex: "riju\\.service"
         target_label: source
         replacement: "supervisor"
+      - source_labels:
+          - __journal__systemd_unit
+        regex: "prometheus\\.service"
+        target_label: source
+        replacement: "prometheus"
+      - source_labels:
+          - __journal__systemd_unit
+        regex: "node-exporter\\.service"
+        target_label: source
+        replacement: "node-exporter"
       - source_labels:
           - source
         regex: "systemd"

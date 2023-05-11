@@ -1,0 +1,28 @@
+namespace: riju
+groups:
+  - name: riju
+    rules:
+      - alert: NodeCPUHigh
+        annotations:
+          message: "Instance {{ $labels.node }} is running close to max CPU"
+        expr: |
+          sum(1 - rate(node_cpu_seconds_total{mode="idle"}[1m])) by (node) / count(sum(node_cpu_seconds_total{mode="idle"}) by (node, cpu)) by (node) * 100 >= 80
+        for: 30m
+      - alert: NodeMemoryHigh
+        annotations:
+          message: "Instance {{ $labels.node }} is running close to max memory"
+        expr: |
+          sum(1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) by (node) * 100 >= 80
+        for: 30m
+      - alert: RootVolumeFilling
+        annotations:
+          message: "Root volume on instance {{ $labels.node }} is close to full"
+        expr: |
+          (1 - sum (node_filesystem_free_bytes{mountpoint="/"}) by (node) / sum (node_filesystem_size_bytes{mountpoint="/"}) by (node)) * 100 >= 80
+        for: 30m
+      - alert: DataVolumeFilling
+        annotations:
+          message: "Data volume on instance {{ $labels.node }} is close to full"
+        expr: |
+          (1 - sum (node_filesystem_free_bytes{mountpoint="/mnt/riju"}) by (node) / sum (node_filesystem_size_bytes{mountpoint="/mnt/riju"}) by (node)) * 100 >= 80
+        for: 30m

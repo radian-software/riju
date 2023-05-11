@@ -1,0 +1,30 @@
+id: "ioke"
+aliases:
+  - "ik"
+name: "Ioke"
+
+install:
+  prepare:
+    cert:
+      - "https://letsencrypt.org/certs/lets-encrypt-r3.pem"
+  apt:
+    - default-jdk
+  manual: |
+    install -d "${pkg}/opt/ioke"
+    install -d "${pkg}/usr/local/bin"
+
+    wget https://ioke.org/dist/ioke-ikj-latest.tar.gz -O ioke.tar.gz
+    tar -xf ioke.tar.gz -C "${pkg}/opt/ioke" --strip-components=1
+    ln -s /opt/ioke/bin/ioke "${pkg}/usr/local/bin/ioke"
+
+repl: |
+  JAVA_OPTS="-Duser.home=$PWD" ioke
+
+main: "main.ik"
+template: |
+  "Hello, world!" println
+
+run: |
+  JAVA_OPTS="-Duser.home=$PWD" ioke main.ik; JAVA_OPTS="-Duser.home=$PWD" ioke
+
+timeoutFactor: 4

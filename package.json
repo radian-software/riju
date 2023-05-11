@@ -9,6 +9,7 @@
     "@babel/parser": "^7.13.11",
     "@babel/preset-env": "^7.12.11",
     "@balena/dockerignore": "^1.0.2",
+    "@kubernetes/client-node": "^0.18.0",
     "@sentry/node": "^6.11.0",
     "async-lock": "^1.2.6",
     "babel-loader": "^8.2.2",
@@ -19,7 +20,7 @@
     "css-loader": "^5.0.1",
     "debounce": "^1.2.0",
     "docker-file-parser": "^1.0.5",
-    "ejs": "^3.1.5",
+    "ejs": "^3.1.7",
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
     "file-loader": "^6.2.0",
@@ -32,9 +33,12 @@
     "p-queue": "^6.6.2",
     "parse-passwd": "^1.0.0",
     "prettier": "^2.3.1",
+    "prom-client": "^14.0.1",
     "regenerator-runtime": "^0.13.7",
+    "semaphore": "^1.1.0",
     "strip-ansi": "^6.0.0",
     "style-loader": "^2.0.0",
+    "unique-names-generator": "^4.7.1",
     "uuid": "^8.3.2",
     "vscode-languageserver-protocol": "3.15.3",
     "webpack": "^4.44.2",
@@ -42,5 +46,9 @@
     "xterm": "^4.9.0",
     "xterm-addon-fit": "^0.4.0",
     "yaml": "^1.10.0"
-  }
+  },
+  "$comments": [
+    "limiter version pinned due to https://github.com/jhurliman/node-rate-limiter/issues/80",
+    "monaco-languageclient, monaco-editor, vscode-languageserver-protocol pinned because their APIs changed a bunch and Riju hasn't been updated yet"
+  ]
 }

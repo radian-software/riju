@@ -10,12 +10,3 @@ output "deploy_aws_secret_access_key" {
   value     = aws_iam_access_key.deploy.secret
   sensitive = true
 }
-
-output "grafana_aws_access_key_id" {
-  value = aws_iam_access_key.grafana.id
-}
-
-output "grafana_aws_secret_access_key" {
-  value     = aws_iam_access_key.grafana.secret
-  sensitive = true
-}

@@ -1,4 +1,5 @@
-FROM riju:ubuntu AS build
+# EOL: April 2027
+FROM ubuntu:22.04 AS build
 
 COPY docker/app/install-build.bash /tmp/
 RUN /tmp/install-build.bash
