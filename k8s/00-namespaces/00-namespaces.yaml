@@ -20,6 +20,12 @@ metadata:
 kind: Namespace
 apiVersion: v1
 metadata:
+  name: database
+
+---
+kind: Namespace
+apiVersion: v1
+metadata:
   name: riju-proxy
 
 ---

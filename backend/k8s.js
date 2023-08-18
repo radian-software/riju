@@ -17,8 +17,8 @@ export function watchPods() {
   // paste, and pray.
   const informer = k8sClient.makeInformer(
     kubeconfig,
-    "/api/v1/namespaces/riju-user/pods",
-    () => k8s.listNamespacedPod("riju-user")
+    "/api/v1/namespaces/user/pods",
+    () => k8s.listNamespacedPod("user")
   );
 
   for (const event of ["add", "update", "delete"]) {
@@ -27,7 +27,7 @@ export function watchPods() {
         callbacks[pod.metadata.name](event, pod);
       }
       pods[pod.metadata.name] = pod;
-      if (event == "delete") {
+      if (event === "delete") {
         delete callbacks[pod.metadata.name];
         delete pods[pod.metadata.name];
       }
@@ -47,8 +47,47 @@ export function watchPods() {
         callback("add", pods[podName]);
       }
     },
-    podExists: (podName) => {
-      return podName in pods;
+    close: () => {
+      informer.stop();
+    },
+  };
+}
+
+export function watchConfigMaps() {
+  const callbacks = {};
+  const configMaps = {};
+
+  const informer = k8sClient.makeInformer(
+    kubeconfig,
+    "/api/v1/namespaces/database",
+    () => k8s.listNamespacedConfigMap("database")
+  );
+
+  for (const event of ["add", "update", "delete"]) {
+    informer.event(event, (configMap) => {
+      if (event === "delete") {
+        // Ignore this explicitly
+        return;
+      }
+      if (configMap.metadata.name in callbacks) {
+        callbacks[configMap.metadata.name](event, configMap);
+      }
+      configMaps[configMaps.metadata.name] = configMap;
+    });
+  }
+
+  informer.on("error", (err) => {
+    console.error(err);
+    setTimeout(() => informer.start(), 5000);
+  });
+  informer.start();
+
+  return {
+    setCallback: (configMapName, callback) => {
+      callbacks[configMapName] = callback;
+      if (configMapName in configMaps) {
+        callback("add", configMaps[configMapName]);
+      }
     },
     close: () => {
       informer.stop();
@@ -57,15 +96,19 @@ export function watchPods() {
 }
 
 export async function listUserSessions() {
-  return (await k8s.listNamespacedPod("riju-user")).body.items.map((pod) => ({
+  return (await k8s.listNamespacedPod("user")).body.items.map((pod) => ({
     podName: pod.metadata.name,
     sessionID: pod.metadata.labels["riju.codes/user-session-id"],
   }));
 }
 
-export async function createUserSession({ sessionID, langConfig, revisions }) {
+export async function createUserSession({
+  sessionID,
+  containerHostname,
+  langImageTag,
+}) {
   const pod = (
-    await k8s.createNamespacedPod("riju-user", {
+    await k8s.createNamespacedPod("user", {
       metadata: {
         name: `riju-user-session-${sessionID}`,
         labels: {
@@ -73,52 +116,16 @@ export async function createUserSession({ sessionID, langConfig, revisions }) {
         },
       },
       spec: {
-        hostname: langConfig.id,
-        volumes: [
-          {
-            name: "minio-config",
-            secret: {
-              secretName: "minio-user-login",
-            },
-          },
-          {
-            name: "riju-bin",
-            emptyDir: {},
-          },
-        ],
+        hostname: containerHostname,
         imagePullSecrets: [
           {
             name: "registry-user-login",
           },
         ],
-        initContainers: [
-          {
-            name: "download",
-            image: "minio/mc:RELEASE.2022-12-13T00-23-28Z",
-            resources: {},
-            command: ["sh", "-c"],
-            args: [
-              `mkdir -p /root/.mc && cp -LT /mc/config.json /root/.mc/config.json &&` +
-                `mc cp riju/agent/${revisions.agent} /riju-bin/agent && chmod +x /riju-bin/agent &&` +
-                `mc cp riju/ptyify/${revisions.ptyify} /riju-bin/ptyify && chmod +x /riju-bin/ptyify`,
-            ],
-            volumeMounts: [
-              {
-                name: "minio-config",
-                mountPath: "/mc",
-                readOnly: true,
-              },
-              {
-                name: "riju-bin",
-                mountPath: "/riju-bin",
-              },
-            ],
-          },
-        ],
         containers: [
           {
             name: "session",
-            image: `localhost:30999/riju-lang:${langConfig.id}-${revisions.langImage}`,
+            image: `localhost:30999/riju-lang:${langImageTag}`,
             resources: {
               requests: {},
               limits: {
@@ -126,7 +133,6 @@ export async function createUserSession({ sessionID, langConfig, revisions }) {
                 memory: "4Gi",
               },
             },
-            command: ["/riju-bin/agent"],
             env: [
               // For agent
               {
@@ -385,6 +391,6 @@ export async function initUserSession({ watcher, podName, proxyInfo }) {
 
 export async function deleteUserSessions(sessionsToDelete) {
   for (const { podName } of sessionsToDelete) {
-    await k8s.deleteNamespacedPod(podName, "riju-user");
+    await k8s.deleteNamespacedPod(podName, "user");
   }
 }
