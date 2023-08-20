@@ -15,10 +15,11 @@ spec:
         app: riju-server
     spec:
       imagePullSecrets:
-        - name: docker-registry-login
+        - name: docker-registry-auth
       containers:
         - name: server
-          image: "localhost:30999/riju:app"
+          image: "localhost:30999/app:latest"
+          imagePullPolicy: Always
           resources: {}
           readinessProbe:
             httpGet:

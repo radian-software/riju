@@ -25,32 +25,9 @@ export function logError(err) {
   }
 }
 
-function computeImageHashes() {
-  let deployConfig = process.env.RIJU_DEPLOY_CONFIG;
-  if (!deployConfig) return {};
-  deployConfig = JSON.parse(deployConfig);
-  const imageHashes = {};
-  for (const [lang, tag] of Object.entries(deployConfig.langImageTags)) {
-    const prefix = `lang-${lang}-`;
-    if (!tag.startsWith(prefix)) {
-      throw new Error(`malformed tag ${tag}`);
-    }
-    const imageHash = tag.slice(prefix.length);
-    if (imageHash.length !== 40) {
-      throw new Error(`malformed tag ${tag}`);
-    }
-    imageHashes[lang] = imageHash;
-  }
-  return imageHashes;
-}
-
-const imageHashes = computeImageHashes();
-
 export function quote(str) {
   return "'" + str.replace(/'/g, `'"'"'`) + "'";
 }
-
-export const rijuSystemPrivileged = "system/out/riju-system-privileged";
 
 export function getUUID() {
   return getUUIDOrig().replace(/-/g, "");
@@ -88,40 +65,6 @@ export async function run(args, log, options) {
       }
     });
   });
-}
-
-export function privilegedList() {
-  return [rijuSystemPrivileged, "list"];
-}
-
-export function privilegedPull({ repo, tag }) {
-  return [rijuSystemPrivileged, "pull", repo, tag];
-}
-
-export function privilegedSession({ uuid, lang }) {
-  const cmdline = [rijuSystemPrivileged, "session", uuid, lang];
-  if (imageHashes[lang]) {
-    cmdline.push(imageHashes[lang]);
-  }
-  return cmdline;
-}
-
-export function privilegedExec({ uuid }, args) {
-  return [rijuSystemPrivileged, "exec", uuid].concat(args);
-}
-
-export function privilegedPty({ uuid }, args) {
-  return [rijuSystemPrivileged, "pty", uuid].concat(args);
-}
-
-export function privilegedTeardown(options) {
-  options = options || {};
-  const { uuid } = options;
-  const cmdline = [rijuSystemPrivileged, "teardown"];
-  if (uuid) {
-    cmdline.push(uuid);
-  }
-  return cmdline;
 }
 
 export function bash(cmdline, opts) {

@@ -9,8 +9,7 @@ import * as promClient from "prom-client";
 
 import * as api from "./api.js";
 import { aliases, langsPromise } from "./langs.js";
-import * as util from "./util.js";
-import { log, privilegedTeardown } from "./util.js";
+import { log } from "./util.js";
 
 const host = process.env.HOST || "localhost";
 const port = parseInt(process.env.PORT || "") || 6119;
@@ -113,10 +112,6 @@ function addWebsocket(baseApp, httpsServer) {
   });
   return app;
 }
-
-util.run(privilegedTeardown(), console.error).catch((err) => {
-  console.error(err);
-});
 
 if (useTLS) {
   const httpsServer = https.createServer(

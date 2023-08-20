@@ -2,8 +2,8 @@
 kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
-  namespace: riju-proxy
-  name: riju-proxy
+  namespace: riju-server
+  name: riju-server
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
@@ -22,4 +22,4 @@ spec:
   tls:
     - hosts:
       - "{{ .networking.domain }}"
-      secretName: riju-proxy-tls
+      secretName: riju-server-tls
