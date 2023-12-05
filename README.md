@@ -4,7 +4,13 @@ Riju is a very fast online playground for every programming language.
 In less than a second, you can start playing with a Python interpreter
 or compiling [INTERCAL](https://en.wikipedia.org/wiki/INTERCAL) code.
 
-Check it out at <https://riju.codes>!
+Check it out at <https://riju.codes>! Please note that Riju is only
+available on IPv6-enabled networks due to the higher financial cost of
+supporting legacy protocols. If your network [does not support
+IPv6](https://test-ipv6.com/) then please consider asking your network
+administrator or service provider to do their part in supporting
+modern internet standards. You can consider accessing Riju through a
+VPN as a workaround.
 
 Service uptime available at <https://radian.statuspage.io/>.
 
