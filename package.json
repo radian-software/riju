@@ -20,7 +20,7 @@
     "debounce": "^1.2.0",
     "docker-file-parser": "^1.0.5",
     "ejs": "^3.1.7",
-    "express": "^4.17.3",
+    "express": "^4.19.2",
     "express-ws": "^4.0.0",
     "file-loader": "^6.2.0",
     "historic-readline": "^1.0.8",
