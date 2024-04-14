@@ -4,7 +4,13 @@ ko_fi: radiansoftware
 liberapay: radian-software
 custom:
   - https://www.paypal.com/donate/?hosted_button_id=SYF48KFJ95FPA
-  - https://cash.app/$RadianSoftware
+
+  # Cash App is not currently supported because they have blocked
+  # my ability to sign in and have refused to provide any customer
+  # support whatsoever, including to process legally mandated CCPA
+  # data privacy requests. A report is being submitted to the office
+  # of the California Attorney General on this matter.
+
   # Venmo is not currently supported because it is impossible to
   # create a new business account when one has been created at any
   # point in the past, even if it has been deleted. I have reached out
