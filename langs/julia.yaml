@@ -4,12 +4,12 @@ aliases:
 name: "Julia"
 
 install:
-  prepare:
-    apt:
-      - julia
-  apt:
-    - julia
   manual: |
+    wget https://julialang-s3.julialang.org/bin/linux/x64/1.7/julia-1.7.0-linux-x86_64.tar.gz
+    tar xvf julia-*.tar.gz
+    rm julia-*.tar.gz
+    ln -s julia-*/bin/julia /usr/local/bin/julia
+
     install -d "${pkg}/opt/julia-language-server"
 
     export JULIA_DEPOT_PATH="${pkg}/opt/julia-language-server"
