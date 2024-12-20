@@ -5,3 +5,13 @@
 #header .button {
   border-radius: 0;
 }
+
+@media (max-width: 767px) {
+  #editor-wrapper {
+    max-height: 50vh !important;
+  }
+}
+
+#editor-wrapper {
+  height: 100%;
+}
