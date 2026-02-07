@@ -42,7 +42,7 @@
     "unique-names-generator": "^4.7.1",
     "uuid": "^10.0.0",
     "vscode-languageserver-protocol": "3.17.5",
-    "webpack": "^5.95.0",
+    "webpack": "^5.104.1",
     "webpack-cli": "^5.1.4",
     "ws": "^8.18.0",
     "xterm": "^5.3.0",
