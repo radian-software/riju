@@ -47,7 +47,7 @@
     "ws": "^8.18.0",
     "xterm": "^5.3.0",
     "xterm-addon-fit": "^0.8.0",
-    "yaml": "^2.6.0"
+    "yaml": "^2.8.3"
   },
   "$comments": [
     "monaco-languageclient, monaco-editor, vscode-languageserver-protocol pinned because their APIs changed a bunch and Riju hasn't been updated yet"
